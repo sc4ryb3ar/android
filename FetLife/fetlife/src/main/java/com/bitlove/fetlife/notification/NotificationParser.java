@@ -9,6 +9,7 @@ public class NotificationParser {
     public static final String JSON_FIELD_STRING_ID = "i";
 
     public static final String JSON_FIELD_STRING_CONVERSATIONID = "conversation_id";
+    public static final String JSON_FIELD_STRING_NICKNAME = "nickname";
 
     private static final String JSON_FIELD_STRING_TYPE = "type";
     private static final String JSON_FIELD_STACKED_NOTIFICATION = "stacked_notifications";

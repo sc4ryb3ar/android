@@ -11,12 +11,12 @@ public class FriendRequestNotification extends OneSignalNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
-
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        return true;
     }
 
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
-
     }
+
 }

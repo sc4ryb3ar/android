@@ -11,8 +11,8 @@ public class VersionNotification extends InfoNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
-
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        return false;
     }
 
 }

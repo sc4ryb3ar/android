@@ -11,7 +11,17 @@ public class InfoNotification extends UrlNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        //TODO: save notification
+        return false;
+    }
 
+    @Override
+    public void onClick(FetLifeApplication fetLifeApplication) {
+        if (launchUrl != null) {
+            super.onClick(fetLifeApplication);
+        } else {
+            //TODO: open notification history
+        }
     }
 }

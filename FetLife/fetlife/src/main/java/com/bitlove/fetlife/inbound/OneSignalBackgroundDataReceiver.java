@@ -16,30 +16,34 @@ import org.json.JSONObject;
 public class OneSignalBackgroundDataReceiver extends WakefulBroadcastReceiver {
 
     public void onReceive(Context context, Intent intent) {
-        try {
+        //keep this class empty for now for have the full call back mechanism for now
+        //moving the processing code to the notification opener service seems to be sufficient now
+        //but we will see after having more coverage of notifications
 
-            Bundle dataBundle = intent.getBundleExtra("data");
-            String message = dataBundle.getString("message");
-            JSONObject customJSON = new JSONObject(dataBundle.getString("custom"));
+//        try {
+//            Bundle dataBundle = intent.getBundleExtra("data");
+//            String message = dataBundle.getString("message");
+//            JSONObject customJSON = new JSONObject(dataBundle.getString("custom"));
+//
+//            if (BuildConfig.DEBUG) {
+//                Log.w(getClass().getSimpleName(), customJSON.toString());
+//            }
+//
+//            FetLifeApplication fetLifeApplication = getFetLifeApplication(context);
+//
+//            OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(message, customJSON);
+//            //oneSignalNotification.process(fetLifeApplication);
+//
+//        } catch (JSONException e) {
+//            //no valid custom information; nothing to handle
+//            if (BuildConfig.DEBUG) {
+//                Log.w(getClass().getSimpleName(), e);
+//            }
+//        }
 
-            if (BuildConfig.DEBUG) {
-                Log.w(getClass().getSimpleName(), customJSON.toString());
-            }
-
-            FetLifeApplication fetLifeApplication = getFetLifeApplication(context);
-
-            OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(message, customJSON);
-            oneSignalNotification.process(fetLifeApplication);
-
-        } catch (JSONException e) {
-            //no valid custom information; nothing to handle
-            if (BuildConfig.DEBUG) {
-                Log.w(getClass().getSimpleName(), e);
-            }
-        }
     }
 
-    private FetLifeApplication getFetLifeApplication(Context context) {
-        return (FetLifeApplication) context.getApplicationContext();
-    }
+//    private FetLifeApplication getFetLifeApplication(Context context) {
+//        return (FetLifeApplication) context.getApplicationContext();
+//    }
 }

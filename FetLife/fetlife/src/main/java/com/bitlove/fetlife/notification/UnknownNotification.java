@@ -11,12 +11,12 @@ public class UnknownNotification extends OneSignalNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
-        //Do nothing
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        //Hide notification
+        return true;
     }
 
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
-
     }
 }

@@ -14,7 +14,8 @@ public class UrlNotification extends OneSignalNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        return false;
     }
 
     @Override

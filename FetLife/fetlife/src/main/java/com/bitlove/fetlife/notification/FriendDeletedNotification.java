@@ -11,8 +11,8 @@ public class FriendDeletedNotification extends OneSignalNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
-
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        return true;
     }
 
     @Override

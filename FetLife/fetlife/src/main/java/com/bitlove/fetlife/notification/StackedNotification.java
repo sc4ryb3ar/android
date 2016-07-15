@@ -11,8 +11,9 @@ public class StackedNotification extends OneSignalNotification {
     }
 
     @Override
-    public void process(FetLifeApplication fetLifeApplication) {
-
+    public boolean process(FetLifeApplication fetLifeApplication) {
+        //Should not be invoked
+        return false;
     }
 
     @Override

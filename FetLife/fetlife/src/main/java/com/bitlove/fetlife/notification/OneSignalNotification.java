@@ -18,7 +18,7 @@ public abstract class OneSignalNotification {
         this.id = id;
     }
 
-    public abstract void process(FetLifeApplication fetLifeApplication);
+    public abstract boolean process(FetLifeApplication fetLifeApplication);
 
     public abstract void onClick(FetLifeApplication fetLifeApplication);
 
