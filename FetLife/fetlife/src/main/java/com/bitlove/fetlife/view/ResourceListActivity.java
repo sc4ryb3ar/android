@@ -34,7 +34,7 @@ import com.bitlove.fetlife.model.pojos.Member;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class ResourceActivity extends AppCompatActivity
+public class ResourceListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String PREFERENCE_VERSION_NOTIFICATION_INT = "PREFERENCE_VERSION_NOTIFICATION_INT";
@@ -223,7 +223,7 @@ public class ResourceActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(ResourceActivity.this, text, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ResourceListActivity.this, text, Toast.LENGTH_SHORT).show();
             }
         });
     }

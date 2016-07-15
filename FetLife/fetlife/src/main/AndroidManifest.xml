@@ -67,6 +67,14 @@
             android:name=".model.service.FetLifeApiIntentService"
             android:exported="false" />
 
+        <service
+            android:name=".inbound.OneSignalNotificationExtenderService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesignal.NotificationExtender" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".inbound.NfcFriendActivity"
             android:theme="@style/AppTheme.Transparent">

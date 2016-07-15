@@ -5,6 +5,7 @@ import android.os.Build;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.NewMessageEvent;
+import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.bitlove.fetlife.view.ConversationsActivity;
 import com.bitlove.fetlife.view.MessagesActivity;
 import com.onesignal.OneSignal;
@@ -16,6 +17,9 @@ public class OnNotificationOpenedHandler implements OneSignal.NotificationOpened
     @Override
     public void notificationOpened(String message, JSONObject additionalData, boolean isActive) {
         FetLifeApplication application = FetLifeApplication.getInstance();
+
+        OneSignalNotification oneSignalNotification = application.getNotificationParser().parseNotification(message, null, additionalData, null);
+
         if (isActive) {
             try {
                 if (additionalData.has("stacked_notifications")) {
