@@ -1,6 +1,7 @@
 package com.bitlove.fetlife.inbound;
 
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.onesignal.OneSignal;
 
@@ -11,7 +12,7 @@ public class OnNotificationOpenedHandler implements OneSignal.NotificationOpened
     public void notificationOpened(String message, JSONObject additionalData, boolean isActive) {
         FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
 
-        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(message, null, additionalData, null);
+        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(additionalData.optString(NotificationParser.JSON_FIELD_STRING_TITLE), message, additionalData.optString(NotificationParser.JSON_FIELD_STRING_LAUNCHURL), additionalData, null);
         oneSignalNotification.onClick(fetLifeApplication);
     }
 }

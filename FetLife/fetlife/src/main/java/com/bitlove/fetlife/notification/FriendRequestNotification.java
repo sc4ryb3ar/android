@@ -6,8 +6,8 @@ import org.json.JSONObject;
 
 public class FriendRequestNotification extends OneSignalNotification {
 
-    public FriendRequestNotification(String message, String launchUrl, JSONObject additionalData, String id) {
-        super(message,launchUrl,additionalData,id);
+    public FriendRequestNotification(String title, String message, String launchUrl, JSONObject additionalData, String id) {
+        super(title, message,launchUrl,additionalData,id);
     }
 
     @Override

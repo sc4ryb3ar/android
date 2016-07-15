@@ -13,7 +13,7 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
 
         NotificationParser notificationParser = fetLifeApplication.getNotificationParser();
-        OneSignalNotification oneSignalNotification = notificationParser.parseNotification(notification.message, notification.launchUrl, notification.additionalData, notification.notificationId);
+        OneSignalNotification oneSignalNotification = notificationParser.parseNotification(notification.title, notification.message, notification.launchUrl, notification.additionalData, notification.notificationId);
 
         return oneSignalNotification.process(fetLifeApplication);
     }

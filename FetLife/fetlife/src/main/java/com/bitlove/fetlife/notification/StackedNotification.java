@@ -6,8 +6,8 @@ import org.json.JSONObject;
 
 public class StackedNotification extends OneSignalNotification {
 
-    public StackedNotification(String message, String launchUrl, JSONObject additionalData, String id) {
-        super(message, launchUrl, additionalData, id);
+    public StackedNotification(String title, String message, String launchUrl, JSONObject additionalData, String id) {
+        super(title, message, launchUrl, additionalData, id);
     }
 
     @Override

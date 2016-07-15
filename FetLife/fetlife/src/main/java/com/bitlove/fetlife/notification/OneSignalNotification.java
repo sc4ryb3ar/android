@@ -7,11 +7,13 @@ import org.json.JSONObject;
 public abstract class OneSignalNotification {
 
     protected final String id;
+    protected final String title;
     protected final String message;
     protected final String launchUrl;
     protected final JSONObject additionalData;
 
-    public OneSignalNotification(String message, String launchUrl, JSONObject additionalData, String id) {
+    public OneSignalNotification(String title, String message, String launchUrl, JSONObject additionalData, String id) {
+        this.title = title;
         this.message = message;
         this.launchUrl = launchUrl;
         this.additionalData = additionalData;

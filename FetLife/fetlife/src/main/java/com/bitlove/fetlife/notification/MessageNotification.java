@@ -16,8 +16,8 @@ public class MessageNotification extends OneSignalNotification {
     private String conversationId;
     private String nickname;
 
-    public MessageNotification(String message, String launchUrl, JSONObject additionalData, String id) {
-        super(message,launchUrl,additionalData,id);
+    public MessageNotification(String title, String message, String launchUrl, JSONObject additionalData, String id) {
+        super(title, message,launchUrl,additionalData,id);
     }
 
     @Override
