@@ -12,7 +12,7 @@ public class OnNotificationOpenedHandler implements OneSignal.NotificationOpened
     public void notificationOpened(String message, JSONObject additionalData, boolean isActive) {
         FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
 
-        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(additionalData.optString(NotificationParser.JSON_FIELD_STRING_TITLE), message, additionalData.optString(NotificationParser.JSON_FIELD_STRING_LAUNCHURL), additionalData, null);
+        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(additionalData.optString(NotificationParser.JSON_FIELD_STRING_TITLE), message, additionalData.optString(NotificationParser.JSON_FIELD_STRING_LAUNCHURL), additionalData, null, additionalData.optString(NotificationParser.JSON_FIELD_STRING_GROUP));
         oneSignalNotification.onClick(fetLifeApplication);
     }
 }

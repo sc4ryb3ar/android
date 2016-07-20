@@ -32,7 +32,7 @@ public class OneSignalBackgroundDataReceiver extends WakefulBroadcastReceiver {
 //            FetLifeApplication fetLifeApplication = getFetLifeApplication(context);
 //
 //            OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(message, customJSON);
-//            //oneSignalNotification.process(fetLifeApplication);
+//            //oneSignalNotification.handle(fetLifeApplication);
 //
 //        } catch (JSONException e) {
 //            //no valid custom information; nothing to handle

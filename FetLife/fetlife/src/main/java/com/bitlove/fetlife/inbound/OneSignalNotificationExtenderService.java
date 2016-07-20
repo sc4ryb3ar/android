@@ -4,6 +4,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.onesignal.NotificationExtenderService;
+import com.onesignal.OSNotificationDisplayedResult;
 import com.onesignal.OSNotificationPayload;
 
 public class OneSignalNotificationExtenderService extends NotificationExtenderService {
@@ -13,9 +14,16 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
 
         NotificationParser notificationParser = fetLifeApplication.getNotificationParser();
-        OneSignalNotification oneSignalNotification = notificationParser.parseNotification(notification.title, notification.message, notification.launchUrl, notification.additionalData, notification.notificationId);
+        OneSignalNotification oneSignalNotification = notificationParser.parseNotification(notification.title, notification.message, notification.launchUrl, notification.additionalData, notification.notificationId, notification.group);
 
-        return oneSignalNotification.process(fetLifeApplication);
+        boolean handledInternally = oneSignalNotification.handle(fetLifeApplication);
+
+        if (!handledInternally) {
+            OSNotificationDisplayedResult displayedResult  = displayNotification(new OverrideSettings());
+            oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.notificationId);
+        }
+
+        return true;
     }
 
     private FetLifeApplication getFetLifeApplication() {

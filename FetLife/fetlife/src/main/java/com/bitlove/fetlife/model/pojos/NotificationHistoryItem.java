@@ -1,7 +1,6 @@
 package com.bitlove.fetlife.model.pojos;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -12,7 +11,7 @@ public class NotificationHistoryItem extends BaseModel {
 
     @Column
     @PrimaryKey(autoincrement = true)
-    private int id;
+    private int dbId;
 
     @Column
     private String displayHeader;
@@ -21,7 +20,7 @@ public class NotificationHistoryItem extends BaseModel {
     private String displayMessage;
 
     @Column
-    private String group;
+    private String collapseId;
 
     @Column
     private long validity;
@@ -29,12 +28,26 @@ public class NotificationHistoryItem extends BaseModel {
     @Column
     private String launchUrl;
 
-    public int getId() {
-        return id;
+    @Column
+    private String notificationId;
+
+    @Column
+    private int displayId;
+
+    public int getDbId() {
+        return dbId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
+    }
+
+    public int getDisplayId() {
+        return displayId;
+    }
+
+    public void setDisplayId(int displayId) {
+        this.displayId = displayId;
     }
 
     public String getDisplayHeader() {
@@ -53,12 +66,12 @@ public class NotificationHistoryItem extends BaseModel {
         this.displayMessage = displayMessage;
     }
 
-    public String getGroup() {
-        return group;
+    public String getCollapseId() {
+        return collapseId;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setCollapseId(String collapseId) {
+        this.collapseId = collapseId;
     }
 
     public long getValidity() {
@@ -75,5 +88,13 @@ public class NotificationHistoryItem extends BaseModel {
 
     public void setLaunchUrl(String launchUrl) {
         this.launchUrl = launchUrl;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
     }
 }

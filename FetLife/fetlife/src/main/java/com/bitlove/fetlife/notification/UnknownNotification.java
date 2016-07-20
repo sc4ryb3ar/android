@@ -6,12 +6,12 @@ import org.json.JSONObject;
 
 public class UnknownNotification extends OneSignalNotification {
 
-    public UnknownNotification(String title, String message, String launchUrl, JSONObject additionalData, String id) {
-        super(title, message,launchUrl,additionalData,id);
+    public UnknownNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
+        super(title, message,launchUrl,additionalData,id, group);
     }
 
     @Override
-    public boolean process(FetLifeApplication fetLifeApplication) {
+    public boolean handle(FetLifeApplication fetLifeApplication) {
         //Hide notification
         return true;
     }

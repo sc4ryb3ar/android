@@ -16,12 +16,12 @@ public class MessageNotification extends OneSignalNotification {
     private String conversationId;
     private String nickname;
 
-    public MessageNotification(String title, String message, String launchUrl, JSONObject additionalData, String id) {
-        super(title, message,launchUrl,additionalData,id);
+    public MessageNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
+        super(title, message,launchUrl,additionalData,id, group);
     }
 
     @Override
-    public boolean process(FetLifeApplication fetLifeApplication) {
+    public boolean handle(FetLifeApplication fetLifeApplication) {
 
         conversationId = additionalData.optString(NotificationParser.JSON_FIELD_STRING_CONVERSATIONID);
         nickname = additionalData.optString(NotificationParser.JSON_FIELD_STRING_NICKNAME);
@@ -49,6 +49,5 @@ public class MessageNotification extends OneSignalNotification {
             ConversationsActivity.startActivity(fetLifeApplication);
             MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
         }
-
     }
 }
