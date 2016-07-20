@@ -31,8 +31,10 @@ public class InfoNotification extends OneSignalNotification {
         NotificationHistoryItem notificationHistoryItem = createNotificationItem(notificationId);
         if (collapseId != null && collapseId.trim().length() != 0) {
             NotificationHistoryItem toBeCollapsedNotification = new Select().from(NotificationHistoryItem.class).where(NotificationHistoryItem_Table.collapseId.eq(notificationHistoryItem.getCollapseId())).querySingle();
-            OneSignal.cancelNotification(toBeCollapsedNotification.getDisplayId());
-            toBeCollapsedNotification.delete();
+            if (toBeCollapsedNotification != null) {
+                OneSignal.cancelNotification(toBeCollapsedNotification.getDisplayId());
+                toBeCollapsedNotification.delete();
+            }
         }
         notificationHistoryItem.save();
     }
