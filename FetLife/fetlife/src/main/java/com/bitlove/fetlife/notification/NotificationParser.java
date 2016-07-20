@@ -30,9 +30,9 @@ public class NotificationParser {
 
     public OneSignalNotification parseNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
 
-        if (additionalData == null && launchUrl == null) {
+        if (additionalData == null && title == null && message == null) {
             return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
-        } else if (launchUrl != null) {
+        } else if (additionalData == null) {
             return new InfoNotification(title, message, launchUrl, additionalData, id, group);
         }
 
