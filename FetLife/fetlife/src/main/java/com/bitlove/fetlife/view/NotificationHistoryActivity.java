@@ -36,7 +36,7 @@ public class NotificationHistoryActivity extends ResourceListActivity
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, NotificationHistoryActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
 
