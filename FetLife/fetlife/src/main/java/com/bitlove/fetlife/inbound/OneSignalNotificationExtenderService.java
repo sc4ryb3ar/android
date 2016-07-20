@@ -1,6 +1,7 @@
 package com.bitlove.fetlife.inbound;
 
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.event.NotificationReceivedEvent;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.onesignal.NotificationExtenderService;
@@ -22,6 +23,8 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
             OSNotificationDisplayedResult displayedResult  = displayNotification(new OverrideSettings());
             oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.notificationId);
         }
+
+        fetLifeApplication.getEventBus().post(new NotificationReceivedEvent());
 
         return true;
     }

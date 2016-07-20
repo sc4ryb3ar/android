@@ -1,14 +1,13 @@
 package com.bitlove.fetlife.notification;
 
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
+import com.bitlove.fetlife.view.NotificationHistoryActivity;
 import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.json.JSONObject;
@@ -56,7 +55,7 @@ public class InfoNotification extends OneSignalNotification {
             intent.setData(Uri.parse(launchUrl));
             fetLifeApplication.startActivity(intent);
         } else {
-            //TODO: open notification history
+            NotificationHistoryActivity.startActivity(fetLifeApplication);
         }
     }
 }

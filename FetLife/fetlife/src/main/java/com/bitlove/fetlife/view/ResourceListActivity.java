@@ -172,6 +172,8 @@ public class ResourceListActivity extends AppCompatActivity
             AddNfcFriendActivity.startActivity(this);
         } else if (id == R.id.nav_about) {
             AboutActivity.startActivity(this);
+        } else if (id == R.id.nav_notifications) {
+            NotificationHistoryActivity.startActivity(this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
