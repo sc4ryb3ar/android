@@ -19,7 +19,7 @@ public class NotificationParser {
     public static final String JSON_FIELD_STRING_NICKNAME = "nickname";
 
     public static final String JSON_FIELD_STRING_COLLAPSE_ID = "collapse_id";
-    public static final java.lang.String JSON_FIELD_STRING_VERSION = "version_number";
+    public static final java.lang.String JSON_FIELD_STRING_VERSION = "version";
 
     private static final String JSON_FIELD_STRING_TYPE = "type";
     private static final String JSON_FIELD_STACKED_NOTIFICATION = "stacked_notifications";
