@@ -23,7 +23,7 @@ import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class FriendRequestsActivity extends ResourceActivity
+public class FriendRequestsActivity extends ResourceListActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int FRIENDREQUESTS_PAGE_COUNT = 10;
@@ -131,6 +131,8 @@ public class FriendRequestsActivity extends ResourceActivity
         friendRequestsModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
+
+        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

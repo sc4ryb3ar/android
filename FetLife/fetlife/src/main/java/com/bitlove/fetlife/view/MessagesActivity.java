@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class MessagesActivity extends ResourceActivity
+public class MessagesActivity extends ResourceListActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
@@ -107,6 +107,10 @@ public class MessagesActivity extends ResourceActivity
         recyclerView.setAdapter(messagesAdapter);
     }
 
+    public String getConversationId() {
+        return conversationId;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -139,6 +143,8 @@ public class MessagesActivity extends ResourceActivity
         messagesModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
+
+        finish();
 
     }
 
@@ -246,10 +252,12 @@ public class MessagesActivity extends ResourceActivity
     }
 
     public void onSend(View v) {
+        final String text = textInput.getText().toString();
+        textInput.setText("");
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String text = textInput.getText().toString();
                 if (text == null || text.trim().length() == 0) {
                     return;
                 }
@@ -271,7 +279,6 @@ public class MessagesActivity extends ResourceActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        textInput.setText("");
                         messagesAdapter.refresh();
                     }
                 });
