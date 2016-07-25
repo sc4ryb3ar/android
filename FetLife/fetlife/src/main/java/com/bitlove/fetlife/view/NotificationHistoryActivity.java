@@ -74,6 +74,8 @@ public class NotificationHistoryActivity extends ResourceListActivity
     protected void onStop() {
         super.onStop();
         getFetLifeApplication().getEventBus().unregister(this);
+
+        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -14,11 +14,11 @@ import org.json.JSONObject;
 
 public class InfoNotification extends OneSignalNotification {
 
-    private final String collapseId;
+    protected String collapseId;
 
     public InfoNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
         super(title, message,launchUrl,additionalData,id,group);
-        collapseId = additionalData.optString(NotificationParser.JSON_FIELD_STRING_COLLAPSE_ID);
+        collapseId = additionalData != null ? additionalData.optString(NotificationParser.JSON_FIELD_STRING_COLLAPSE_ID) : null;
     }
 
     @Override

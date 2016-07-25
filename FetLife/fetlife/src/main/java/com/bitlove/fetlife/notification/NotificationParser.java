@@ -1,12 +1,16 @@
 package com.bitlove.fetlife.notification;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotificationParser {
 
     public static final String JSON_FIELD_STRING_LAUNCHURL = "launchURL";
     public static final String JSON_FIELD_STRING_TITLE = "title";
-    public static final String JSON_FIELD_STRING_GROUP = "group";
+    public static final String JSON_FIELD_STRING_GROUP = "grp";
 //    public static final String JSON_FIELD_JSONOBJECT_ADDITIONA_DATA = "a";
 //    public static final String JSON_FIELD_STRING_U = "u";
 //    public static final String JSON_FIELD_STRING_ID = "i";
@@ -15,9 +19,14 @@ public class NotificationParser {
     public static final String JSON_FIELD_STRING_NICKNAME = "nickname";
 
     public static final String JSON_FIELD_STRING_COLLAPSE_ID = "collapse_id";
+    public static final java.lang.String JSON_FIELD_STRING_VERSION = "version_number";
 
     private static final String JSON_FIELD_STRING_TYPE = "type";
     private static final String JSON_FIELD_STACKED_NOTIFICATION = "stacked_notifications";
+
+    public static final String JSON_VALUE_GROUP_INFO = "info";
+    public static final String JSON_VALUE_GROUP_FETLIFE = "fetlife";
+    public static final String JSON_VALUE_GROUP_MESSAGE = "messages";
 
 //    public OneSignalNotification parseNotification(String message, JSONObject notificationJson) {
 //
@@ -30,21 +39,32 @@ public class NotificationParser {
 
     public OneSignalNotification parseNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
 
-        if (additionalData == null && title == null && message == null) {
-            return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
-        } else if (additionalData == null) {
-            return new InfoNotification(title, message, launchUrl, additionalData, id, group);
+        JSONArray subNotifications;
+        if (additionalData != null && (subNotifications = additionalData.optJSONArray(JSON_FIELD_STACKED_NOTIFICATION)) != null) {
+            List<OneSignalNotification> subNotificationList = new ArrayList<>(subNotifications.length());
+            for (int i = 0; i < subNotifications.length(); i++) {
+                JSONObject notificationObject = subNotifications.optJSONObject(i);
+                String subTitle = notificationObject.optString(JSON_FIELD_STRING_TITLE);
+                String subMessage = notificationObject.optString(JSON_FIELD_STRING_TITLE);
+                String subLaunchUrl = notificationObject.optString(JSON_FIELD_STRING_TITLE);
+                String subGroup = notificationObject.optString(JSON_FIELD_STRING_GROUP);
+                OneSignalNotification subNotification = parseNotification(subTitle, subMessage, subLaunchUrl, notificationObject, null, subGroup);
+                if (group == null || group.trim().length() == 0) {
+                    group = subGroup;
+                }
+                subNotificationList.add(subNotification);
+            }
+            StackedNotification stackedNotification = new StackedNotification(title, message, launchUrl, additionalData, id, group, subNotificationList);
+            return stackedNotification;
         }
 
-        if (additionalData.has(JSON_FIELD_STACKED_NOTIFICATION)) {
-            return new StackedNotification(title, message, launchUrl, additionalData, id, group);
-        }
-
-        String type = additionalData.optString(JSON_FIELD_STRING_TYPE).toLowerCase();
+        String type = additionalData != null ? additionalData.optString(JSON_FIELD_STRING_TYPE).toLowerCase() : "";
 
         switch (type) {
             case "info":
                 return new InfoNotification(title, message, launchUrl, additionalData, id, group);
+            case "version":
+                return new VersionNotification(title, message, launchUrl, additionalData, id, group);
             case "conversation_created":
             case "message_created":
                 return new MessageNotification(title, message, launchUrl, additionalData, id, group);
@@ -57,7 +77,11 @@ public class NotificationParser {
 //            case "conversation_archived":
 //                return new ConversationArchivedNotification(message, launchUrl, additionalData, id, group);
             default:
-                return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
+                if (title != null || message != null) {
+                    return new InfoNotification(title, message, launchUrl, additionalData, id, group);
+                } else {
+                    return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
+                }
         }
 
     }

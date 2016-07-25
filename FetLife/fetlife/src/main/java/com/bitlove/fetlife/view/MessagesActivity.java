@@ -107,6 +107,10 @@ public class MessagesActivity extends ResourceListActivity
         recyclerView.setAdapter(messagesAdapter);
     }
 
+    public String getConversationId() {
+        return conversationId;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -139,6 +143,8 @@ public class MessagesActivity extends ResourceListActivity
         messagesModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
+
+        finish();
 
     }
 

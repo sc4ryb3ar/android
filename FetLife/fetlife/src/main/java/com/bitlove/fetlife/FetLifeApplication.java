@@ -42,6 +42,7 @@ public class FetLifeApplication extends Application {
 
     private String versionText;
     private int versionNumber;
+    private Activity foregroundActivty;
 
     public static FetLifeApplication getInstance() {
         return instance;
@@ -114,6 +115,10 @@ public class FetLifeApplication extends Application {
         return appInForeground;
     }
 
+    public Activity getForegroundActivty() {
+        return foregroundActivty;
+    }
+
     public FetLifeService getFetLifeService() {
         return fetLifeService;
     }
@@ -172,6 +177,7 @@ public class FetLifeApplication extends Application {
         @Override
         public void onActivityStarted(Activity activity) {
             appInForeground = true;
+            foregroundActivty = activity;
         }
 
         @Override
@@ -185,6 +191,7 @@ public class FetLifeApplication extends Application {
         @Override
         public void onActivityStopped(Activity activity) {
             appInForeground = false;
+            foregroundActivty = null;
         }
 
         @Override

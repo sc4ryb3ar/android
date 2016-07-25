@@ -21,13 +21,17 @@ public class OneSignalBackgroundDataReceiver extends WakefulBroadcastReceiver {
         //but we will see after having more coverage of notifications
 
 //        try {
-//            Bundle dataBundle = intent.getBundleExtra("data");
+
+            Bundle dataBundle = intent.getBundleExtra("data");
+            if (BuildConfig.DEBUG) {
+                for (String key: dataBundle.keySet())
+                {
+                    Log.d (getClass().getSimpleName(), key + " is a key in the bundle");
+                }
+            }
+
 //            String message = dataBundle.getString("message");
 //            JSONObject customJSON = new JSONObject(dataBundle.getString("custom"));
-//
-//            if (BuildConfig.DEBUG) {
-//                Log.w(getClass().getSimpleName(), customJSON.toString());
-//            }
 //
 //            FetLifeApplication fetLifeApplication = getFetLifeApplication(context);
 //

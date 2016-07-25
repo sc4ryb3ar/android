@@ -1,12 +1,18 @@
 package com.bitlove.fetlife.inbound;
 
+import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.app.NotificationCompat;
+
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NotificationReceivedEvent;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationDisplayedResult;
 import com.onesignal.OSNotificationPayload;
+
+import org.json.JSONException;
 
 public class OneSignalNotificationExtenderService extends NotificationExtenderService {
 
@@ -20,7 +26,8 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
         boolean handledInternally = oneSignalNotification.handle(fetLifeApplication);
 
         if (!handledInternally) {
-            OSNotificationDisplayedResult displayedResult  = displayNotification(new OverrideSettings());
+            OverrideSettings overrideSettings = new OverrideSettings();
+            OSNotificationDisplayedResult displayedResult  = displayNotification(overrideSettings);
             oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.notificationId);
         }
 

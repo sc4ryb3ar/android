@@ -145,6 +145,8 @@ public class FriendsActivity extends ResourceListActivity
         friendsModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
+
+        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

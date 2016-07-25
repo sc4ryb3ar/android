@@ -49,6 +49,11 @@
             android:label="@string/title_activity_notificationhistory"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".view.MessagesActivity"
+            android:label="@string/title_activity_messages"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".view.FriendsActivity"
             android:label="@string/title_activity_friends"
             android:theme="@style/AppTheme.NoActionBar"

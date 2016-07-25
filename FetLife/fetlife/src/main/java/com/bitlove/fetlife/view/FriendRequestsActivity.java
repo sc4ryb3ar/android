@@ -131,6 +131,8 @@ public class FriendRequestsActivity extends ResourceListActivity
         friendRequestsModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
+
+        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
