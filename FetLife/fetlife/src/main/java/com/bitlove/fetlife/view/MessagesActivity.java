@@ -252,10 +252,12 @@ public class MessagesActivity extends ResourceListActivity
     }
 
     public void onSend(View v) {
+        final String text = textInput.getText().toString();
+        textInput.setText("");
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String text = textInput.getText().toString();
                 if (text == null || text.trim().length() == 0) {
                     return;
                 }
@@ -277,7 +279,6 @@ public class MessagesActivity extends ResourceListActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        textInput.setText("");
                         messagesAdapter.refresh();
                     }
                 });

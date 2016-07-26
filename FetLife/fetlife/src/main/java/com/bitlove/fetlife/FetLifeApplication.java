@@ -176,22 +176,22 @@ public class FetLifeApplication extends Application {
 
         @Override
         public void onActivityStarted(Activity activity) {
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
             appInForeground = true;
             foregroundActivty = activity;
         }
 
         @Override
-        public void onActivityResumed(Activity activity) {
-        }
-
-        @Override
         public void onActivityPaused(Activity activity) {
+            appInForeground = false;
+            foregroundActivty = null;
         }
 
         @Override
         public void onActivityStopped(Activity activity) {
-            appInForeground = false;
-            foregroundActivty = null;
         }
 
         @Override
