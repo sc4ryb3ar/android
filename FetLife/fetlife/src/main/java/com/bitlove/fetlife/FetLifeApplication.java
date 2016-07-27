@@ -39,23 +39,20 @@ public class FetLifeApplication extends Application {
     private static FetLifeApplication instance;
     private ImageLoader imageLoader;
     private NotificationParser notificationParser;
+    private FetLifeService fetLifeService;
 
     private String versionText;
     private int versionNumber;
     private Activity foregroundActivty;
-
-    public static FetLifeApplication getInstance() {
-        return instance;
-    }
-
-    private FetLifeService fetLifeService;
 
     private String accessToken;
     private Member me;
 
     private EventBus eventBus;
 
-    private boolean appInForeground = false;
+    public static FetLifeApplication getInstance() {
+        return instance;
+    }
 
     @Override
     public void onCreate() {
@@ -112,7 +109,7 @@ public class FetLifeApplication extends Application {
     }
 
     public boolean isAppInForeground() {
-        return appInForeground;
+        return foregroundActivty != null;
     }
 
     public Activity getForegroundActivty() {
@@ -180,13 +177,11 @@ public class FetLifeApplication extends Application {
 
         @Override
         public void onActivityResumed(Activity activity) {
-            appInForeground = true;
             foregroundActivty = activity;
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
-            appInForeground = false;
             foregroundActivty = null;
         }
 
