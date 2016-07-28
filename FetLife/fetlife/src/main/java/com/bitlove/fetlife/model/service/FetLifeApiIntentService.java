@@ -42,11 +42,14 @@ import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -65,6 +68,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_LOGON_USER = "com.bitlove.fetlife.action.apicall.logon_user";
     public static final String ACTION_APICALL_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.friendrequests";
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
+    public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
 
     private static final String CONSTANT_PREF_KEY_REFRESH_TOKEN = "com.bitlove.fetlife.key.pref.token.refresh";
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
@@ -158,6 +162,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_SEND_FRIENDREQUESTS:
                     result = sendPendingFriendRequests();
+                    break;
+                case ACTION_APICALL_UPLOAD_PICTURE:
+                    result = uploadPiture(params);
                     break;
             }
 
@@ -488,6 +495,16 @@ public class FetLifeApiIntentService extends IntentService {
         String[] messageIds = Arrays.copyOfRange(params, 1, params.length);
         Call<ResponseBody> setMessagesReadCall = getFetLifeApi().setMessagesRead(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), conversationId, messageIds);
         Response<ResponseBody> response = setMessagesReadCall.execute();
+        return response.isSuccess();
+    }
+
+    private boolean uploadPiture(String[] params) throws IOException {
+
+        File file = new File(params[0]);
+        RequestBody pictureBody = RequestBody.create(MediaType.parse("image/*"), file);
+
+        Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), pictureBody, false, false, "");
+        Response<ResponseBody> response = uploadPictureCall.execute();
         return response.isSuccess();
     }
 

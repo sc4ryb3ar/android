@@ -30,6 +30,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -174,6 +175,8 @@ public class ResourceListActivity extends AppCompatActivity
             AboutActivity.startActivity(this);
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(this);
+        } else if (id == R.id.nav_upload_pic) {
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
