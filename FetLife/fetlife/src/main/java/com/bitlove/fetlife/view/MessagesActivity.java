@@ -252,7 +252,7 @@ public class MessagesActivity extends ResourceListActivity
     }
 
     public void onSend(View v) {
-        final String text = textInput.getText().toString();
+        final String text = textInput.getUnmodifiedText().toString();
         textInput.setText("");
 
         new Thread(new Runnable() {

@@ -30,6 +30,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.widget.EmojiEditText;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -46,7 +47,7 @@ public class ResourceListActivity extends AppCompatActivity
     protected LinearLayoutManager recyclerLayoutManager;
     protected View inputLayout;
     protected View inputIcon;
-    protected EditText textInput;
+    protected EmojiEditText textInput;
     protected ProgressBar progressIndicator;
 
     @Override
@@ -70,7 +71,7 @@ public class ResourceListActivity extends AppCompatActivity
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
-        textInput = (EditText) findViewById(R.id.text_input);
+        textInput = (EmojiEditText) findViewById(R.id.text_input);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());

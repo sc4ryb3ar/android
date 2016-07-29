@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.bitlove.fetlife.model.pojos.Message;
 
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.util.ColorUtil;
+import com.bitlove.fetlife.util.CustomEmojiUtil;
 import com.bitlove.fetlife.util.StringUtil;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -61,10 +63,14 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
 
     @Override
     public void onBindViewHolder(MessageViewHolder messageViewHolder, int position) {
+
+        Context context = messageViewHolder.messageText.getContext();
+
         Message message = itemList.get(position);
         String messageBody = message.getBody().trim();
 
-        messageViewHolder.messageText.setText(StringUtil.parseHtml(messageBody));
+        Spanned emojiBody = CustomEmojiUtil.replaceEmojiTags(context, StringUtil.parseHtml(messageBody), messageViewHolder.messageText.getLineHeight());
+        messageViewHolder.messageText.setText(emojiBody != null ? emojiBody : StringUtil.parseHtml(messageBody));
         messageViewHolder.subText.setText(message.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(message.getDate())));
 
         boolean myMessage = message.getSenderId().equals(messageViewHolder.selfMessageId);
