@@ -1,9 +1,11 @@
 package com.bitlove.fetlife.model.service;
 
 import android.app.IntentService;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -36,6 +38,7 @@ import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.Token;
+import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -500,10 +503,16 @@ public class FetLifeApiIntentService extends IntentService {
 
     private boolean uploadPiture(String[] params) throws IOException {
 
-        File file = new File(params[0]);
-        RequestBody pictureBody = RequestBody.create(MediaType.parse("image/*"), file);
+        Uri uri = Uri.parse(params[0]);
+        ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
 
-        Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), pictureBody, false, false, "");
+        RequestBody pictureBody = RequestBody.create(MediaType.parse(contentResolver.getType(uri)), BytesUtil.getBytes(contentResolver.openInputStream(uri)));
+        RequestBody isAvatarPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(false));
+        RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(false));
+        RequestBody captionPart = RequestBody.create(MediaType.parse("text/plain"), "");
+        RequestBody isFromUserPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(true));
+
+        Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), pictureBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
         Response<ResponseBody> response = uploadPictureCall.execute();
         return response.isSuccess();
     }

@@ -2,9 +2,11 @@ package com.bitlove.fetlife.view;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -176,12 +178,26 @@ public class ResourceListActivity extends AppCompatActivity
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(this);
         } else if (id == R.id.nav_upload_pic) {
-            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE);
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent,
+                    "Select Picture"), 2315);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    //TODO: finalize code
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 2315) {
+                Uri selectedImageUri = data.getData();
+                FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, selectedImageUri.toString());
+            }
+        }
     }
 
     @Override
