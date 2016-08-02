@@ -51,6 +51,7 @@
 
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
+            android:layout_alignBottom="@+id/notificationhistoryitem_title"
             android:layout_toLeftOf="@+id/notificationhistoryitem_title"
 
             android:layout_alignWithParentIfMissing="true"
