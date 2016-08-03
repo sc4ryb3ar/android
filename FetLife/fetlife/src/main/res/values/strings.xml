@@ -114,4 +114,5 @@
     <string name="message_image_upload_started">Beaming up your photo ...</string>
     <string name="message_image_upload_finished">Your photo has been uploaded</string>
     <string name="message_image_upload_failed">Photo upload has failed. Try again later</string>
+    <string name="action_clear_notification_history">Clear all</string>
 </resources>

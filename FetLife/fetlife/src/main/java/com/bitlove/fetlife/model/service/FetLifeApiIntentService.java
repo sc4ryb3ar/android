@@ -520,7 +520,7 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private boolean retriveConversations(String[] params) throws IOException {
-        final int limit = getIntFromParams(params, 0, 10);
+        final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
 
         Call<List<Conversation>> getConversationsCall = getFetLifeApi().getConversations(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), PARAM_SORT_ORDER_UPDATED_DESC, limit, page);
