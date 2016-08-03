@@ -21,7 +21,7 @@ public class AboutActivity extends AppCompatActivity {
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, AboutActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }
 
@@ -39,6 +39,18 @@ public class AboutActivity extends AppCompatActivity {
 
         aboutTextView.setText(Html.fromHtml(getString(R.string.text_about, getFetLifeApplication().getVersionText()), null, new HtmlListTagHandler()));
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 
     @Override

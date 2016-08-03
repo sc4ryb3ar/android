@@ -133,6 +133,12 @@ public class ResourceListActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -162,6 +168,10 @@ public class ResourceListActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    protected boolean finishAtMenuNavigation() {
+        return true;
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -180,13 +190,18 @@ public class ResourceListActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             AboutActivity.startActivity(this);
         } else if (id == R.id.nav_notifications) {
-            NotificationHistoryActivity.startActivity(this);
+            NotificationHistoryActivity.startActivity(this, false);
         } else if (id == R.id.nav_upload_pic) {
             MediaUploadSelectionDialog.show(this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
+        if (finishAtMenuNavigation()) {
+            finish();
+        }
+
         return false;
     }
 
