@@ -219,11 +219,11 @@ public class LoginActivity extends Activity {
     }
 
     public void onSignUp(View v) {
-        openLink("https://fetlife.com/signup");
+        openLink("https://fetlife.com/signup_step1");
     }
 
     public void onForgotLogin(View v) {
-        openLink("https://fetlife.com/retrieve_login_information");
+        openLink("https://fetlife.com/users/password/new");
     }
 
     private void openLink(String link) {
