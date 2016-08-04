@@ -39,7 +39,7 @@ public class FriendRequestsActivity extends ResourceListActivity
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, FriendRequestsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }
 
@@ -131,8 +131,6 @@ public class FriendRequestsActivity extends ResourceListActivity
         friendRequestsModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
-
-        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -48,7 +48,7 @@ public class FriendsActivity extends ResourceListActivity
     public static Intent createIntent(Context context, FriendListMode friendListMode) {
         Intent intent = new Intent(context, FriendsActivity.class);
         intent.putExtra(EXTRA_FRIEND_LIST_MODE, friendListMode.toString());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }
 
@@ -145,8 +145,6 @@ public class FriendsActivity extends ResourceListActivity
         friendsModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
-
-        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

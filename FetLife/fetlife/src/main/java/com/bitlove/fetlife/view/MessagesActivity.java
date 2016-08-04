@@ -143,9 +143,6 @@ public class MessagesActivity extends ResourceListActivity
         messagesModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
-
-        finish();
-
     }
 
     @Override

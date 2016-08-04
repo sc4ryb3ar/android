@@ -13,7 +13,7 @@
     <string name="error_invalid_password">This password is invalid</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="title_activity_conversations" translatable="false">FetLife</string>
+    <string name="title_activity_conversations">Conversations</string>
     <string name="title_activity_messages" translatable="false">FetLife</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

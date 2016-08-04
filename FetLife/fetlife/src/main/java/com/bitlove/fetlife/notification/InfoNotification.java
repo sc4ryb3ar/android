@@ -57,7 +57,7 @@ public class InfoNotification extends OneSignalNotification {
             intent.setData(Uri.parse(launchUrl));
             fetLifeApplication.startActivity(intent);
         } else {
-            NotificationHistoryActivity.startActivity(fetLifeApplication);
+            NotificationHistoryActivity.startActivity(fetLifeApplication, true);
         }
     }
 }
