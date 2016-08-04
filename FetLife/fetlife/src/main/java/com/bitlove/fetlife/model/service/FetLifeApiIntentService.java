@@ -329,14 +329,8 @@ public class FetLifeApiIntentService extends IntentService {
                     //db changed, reload remaining pending messages
                     return sendPendingMessages(true);
                 }
-            } else {
-                if (!sendPendingMessage(pendingMessage)) {
-                    pendingMessage.setPending(false);
-                    pendingMessage.setFailed(true);
-                    pendingMessage.save();
-                } else if (!positiveStackedResult) {
-                    positiveStackedResult = true;
-                }
+            } else if (sendPendingMessage(pendingMessage) && !positiveStackedResult) {
+                positiveStackedResult = true;
             }
         }
         return positiveStackedResult;
@@ -355,6 +349,9 @@ public class FetLifeApiIntentService extends IntentService {
             getFetLifeApplication().getEventBus().post(new MessageSendSucceededEvent(conversationId));
             return true;
         } else {
+            pendingMessage.setPending(false);
+            pendingMessage.setFailed(true);
+            pendingMessage.save();
             getFetLifeApplication().getEventBus().post(new MessageSendFailedEvent(conversationId));
             return false;
         }

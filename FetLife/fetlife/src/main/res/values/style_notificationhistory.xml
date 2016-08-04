@@ -2,8 +2,8 @@
     <style name="NotificationHistoryItem">
         <item name="android:background">@drawable/listitem_background_rounded</item>
         <item name="android:padding">@dimen/listitem_padding</item>
-        <item name="android:layout_marginTop">@dimen/listitem_vertical_margin</item>
-        <item name="android:layout_marginBottom">@dimen/listitem_vertical_margin</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
         <item name="android:layout_marginLeft">@dimen/listitem_horizontal_margin</item>
         <item name="android:layout_marginRight">@dimen/listitem_horizontal_margin</item>
     </style>
@@ -25,8 +25,8 @@
 
     <style name="NotificationHistoryRejectLayout" parent="NotificationHistoryItem">
         <item name="android:background">@drawable/listitem_background_reject_rounded</item>
-        <item name="android:layout_marginTop">@dimen/listitem_background_margin_vertical</item>
-        <item name="android:layout_marginBottom">@dimen/listitem_background_margin_vertical</item>
+        <item name="android:layout_marginTop">@dimen/listitem_background_margin_vertical_top</item>
+        <item name="android:layout_marginBottom">@dimen/listitem_background_margin_vertical_bottom</item>
         <item name="android:layout_marginRight">@dimen/listitem_background_margin_horizontal</item>
         <item name="android:layout_marginLeft">@dimen/listitem_background_margin_horizontal</item>
     </style>

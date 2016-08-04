@@ -5,9 +5,6 @@ import com.bitlove.fetlife.view.FriendRequestsActivity;
 
 import org.json.JSONObject;
 
-/**
- * Created by Titan on 8/4/2016.
- */
 public class FriendRequestNotification extends OneSignalNotification {
 
     public FriendRequestNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
@@ -21,6 +18,6 @@ public class FriendRequestNotification extends OneSignalNotification {
 
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
-        FriendRequestsActivity.startActivity(fetLifeApplication);
+        FriendRequestsActivity.startActivity(fetLifeApplication, true);
     }
 }
