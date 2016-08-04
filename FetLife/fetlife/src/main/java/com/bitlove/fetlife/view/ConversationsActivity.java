@@ -146,6 +146,10 @@ public class ConversationsActivity extends ResourceListActivity
         getFetLifeApplication().getEventBus().unregister(this);
     }
 
+    @Override
+    protected boolean finishAtMenuNavigation() {
+        return false;
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConversationsCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {

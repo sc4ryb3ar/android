@@ -37,7 +37,7 @@ public class StackedNotification extends OneSignalNotification {
     public void onClick(FetLifeApplication fetLifeApplication) {
         switch (group) {
             case NotificationParser.JSON_VALUE_GROUP_INFO:
-                NotificationHistoryActivity.startActivity(fetLifeApplication);
+                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
                 break;
             case NotificationParser.JSON_VALUE_GROUP_FETLIFE:
             case NotificationParser.JSON_VALUE_GROUP_MESSAGE:
@@ -53,7 +53,7 @@ public class StackedNotification extends OneSignalNotification {
                 missingGroupFallBack(fetLifeApplication);
                 break;
             default:
-                NotificationHistoryActivity.startActivity(fetLifeApplication);
+                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
         }
     }
 
@@ -66,7 +66,7 @@ public class StackedNotification extends OneSignalNotification {
             if (firstNotification != null && firstNotification instanceof MessageNotification) {
                 ConversationsActivity.startActivity(fetLifeApplication);
             } else {
-                NotificationHistoryActivity.startActivity(fetLifeApplication);
+                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
             }
         }
     }
