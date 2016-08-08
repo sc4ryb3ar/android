@@ -6,7 +6,7 @@ import android.net.Uri;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
-import com.bitlove.fetlife.view.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.activity.NotificationHistoryActivity;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.sql.language.Select;
 

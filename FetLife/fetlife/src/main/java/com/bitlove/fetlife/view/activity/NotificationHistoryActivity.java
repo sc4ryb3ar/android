@@ -1,28 +1,18 @@
-package com.bitlove.fetlife.view;
+package com.bitlove.fetlife.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.FriendRequestSendFailedEvent;
-import com.bitlove.fetlife.event.FriendRequestSendSucceededEvent;
-import com.bitlove.fetlife.event.FriendSuggestionAddedEvent;
 import com.bitlove.fetlife.event.NotificationReceivedEvent;
-import com.bitlove.fetlife.event.ServiceCallFailedEvent;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.FriendSuggestion;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
-import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
+import com.bitlove.fetlife.view.adapter.NotificationHistoryRecyclerAdapter;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 
 import org.greenrobot.eventbus.Subscribe;

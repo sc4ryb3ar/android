@@ -6,11 +6,9 @@ import android.os.Build;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.NewMessageEvent;
-import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.ConversationsActivity;
-import com.bitlove.fetlife.view.MessagesActivity;
-import com.bitlove.fetlife.view.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.activity.ConversationsActivity;
+import com.bitlove.fetlife.view.activity.MessagesActivity;
 
 import org.json.JSONObject;
 

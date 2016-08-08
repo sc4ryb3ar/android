@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view;
+package com.bitlove.fetlife.view.dialog;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -84,15 +84,14 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        dismiss();
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
-                Uri selectedImageUri = data.getData();
-                FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, selectedImageUri.toString());
+                MediaUploadConfirmationDialog.show(getActivity(), data.getData().toString(), false);
             } else if (requestCode == REQUEST_CODE_CAMERA_IMAGE) {
-                FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, photoURI.toString());
+                MediaUploadConfirmationDialog.show(getActivity(), photoURI.toString(), true);
             }
         }
-        dismiss();
     }
 
     private void onCameraUpload() {

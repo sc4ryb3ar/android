@@ -516,6 +516,10 @@ public class FetLifeApiIntentService extends IntentService {
         Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), pictureBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
         Response<ResponseBody> response = uploadPictureCall.execute();
 
+        if (getBoolFromParams(params, 1, false)) {
+            getContentResolver().delete(uri, null, null);
+        }
+
         return response.isSuccess();
     }
 

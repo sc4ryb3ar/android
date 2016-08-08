@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view;
+package com.bitlove.fetlife.view.adapter;
 
 import android.content.Context;
 import android.os.Handler;
