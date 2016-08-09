@@ -2,11 +2,9 @@ package com.bitlove.fetlife.view;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -184,7 +182,7 @@ public class ResourceListActivity extends AppCompatActivity
         } else if (id == R.id.nav_friends) {
             FriendsActivity.startActivity(this);
         } else if (id == R.id.nav_friendrequests) {
-            FriendRequestsActivity.startActivity(this);
+            FriendRequestsActivity.startActivity(this, false);
         } else if (id == R.id.nav_introduce) {
             AddNfcFriendActivity.startActivity(this);
         } else if (id == R.id.nav_about) {

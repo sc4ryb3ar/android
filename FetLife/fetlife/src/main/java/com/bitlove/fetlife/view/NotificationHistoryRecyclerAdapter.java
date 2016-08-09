@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
+import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public class NotificationHistoryRecyclerAdapter extends RecyclerView.Adapter<Not
     private static final int NOTIFICATION_HISTORYITEM_REMOVE_UNDO_DURATION = 5000;
 
     public interface OnNotificationHistoryItemClickListener {
-        public void onItemClick(NotificationHistoryItem notificationHistoryItem);
+        void onItemClick(NotificationHistoryItem notificationHistoryItem);
     }
 
     static class Undo {
@@ -48,7 +49,7 @@ public class NotificationHistoryRecyclerAdapter extends RecyclerView.Adapter<Not
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            notificationHistoryItems = new Select().from(NotificationHistoryItem.class).queryList();
+            notificationHistoryItems = new Select().from(NotificationHistoryItem.class).orderBy(NotificationHistoryItem_Table.timeStamp,false).queryList();
         } catch (Throwable t) {
             notificationHistoryItems = new ArrayList<>();
         }
