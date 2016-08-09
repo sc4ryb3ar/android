@@ -33,6 +33,8 @@ For more information about how to do it please read the following [guideline](ht
 2. Download and install the [fetlife-1.3.0.apk](https://github.com/fetlife/fetlife-android/releases/download/v1.3.0/fetlife-1.3.0.apk) to your device
 3. (Optional) disable application install from unknown sources.
 
+If you are interested in testing new features you can download our pre-release version: [fetlife-1.4.0.apk](https://github.com/fetlife/android/releases/download/v1.4.0/fetlife-1.4.0.apk)
+
 ### Kinksters Helping Kinksters
 
 Want to install the app on your phone but are not technically savvy? Ask your local kinky geek! Technically savvy and want to give back to the community... bring your laptop with you the next time you attend an event and install / update the app for anyone who's interested in having it install on their phone. *#KinkstersHelpingKinksters*
