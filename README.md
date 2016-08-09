@@ -2,13 +2,6 @@
 
 Welcome to FetLife's open-source Android app!
 
-# WARNING!
-
-Due to recent security imporvements Android App below version 1.1.2 won't be able to be used any more.
-Please use the latest released version.
-
-Thank you for your understandings.
-
 ### Features
 
 - View your list of conversations
@@ -16,6 +9,16 @@ Thank you for your understandings.
 - View your list of friends
 - Start new conversation with a friend
 - Receive a push notification when you receive a new message
+- View your list of incoming, pending friend requests
+- Approve or Reject your pending friend requests
+- Share your profile with others via NFC beam
+- Accept shared profiles and create a new friend request at Friend Requests screen
+- Receive all FetLife notifications on your phone 
+- View your notification history
+- Get information about new features at About Screen
+- Use hardware menu button to open the menu
+- Image upload from Gallery
+- Image upload taken by Camera
 
 ### Requirements
 
