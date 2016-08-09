@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view;
+package com.bitlove.fetlife.view.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,6 +34,7 @@ import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -264,7 +265,7 @@ public class ResourceListActivity extends AppCompatActivity
         }
     }
 
-    protected void showToast(final String text) {
+    public void showToast(final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

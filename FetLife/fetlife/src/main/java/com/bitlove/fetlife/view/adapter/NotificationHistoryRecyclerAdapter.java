@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view;
+package com.bitlove.fetlife.view.adapter;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
+import com.bitlove.fetlife.view.activity.ResourceListActivity;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 

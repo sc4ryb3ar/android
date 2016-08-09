@@ -73,6 +73,10 @@
     <string name="message_image_upload_finished">Your photo has been uploaded</string>
     <string name="message_image_upload_failed">Photo upload has failed. Try again later</string>
     <string name="action_clear_notification_history">Clear all</string>
+    <string name="message_media_picture_upload_confirmation">I certify this picture is of me, or that I have explicit permission to post it on FetLife. I tell no lie</string>
+    <string name="button_media_picture_upload_confirmation">Certify</string>
+    <string name="button_media_picture_upload_cancel">Cancel</string>
+    <string name="title_media_picture_upload_confirmation">Add your picture</string>
 
     <!--TODO: consider improving about layout -->
     <string name="text_about">
@@ -122,5 +126,4 @@
             <p/>
         ]]>
     </string>
-
 </resources>

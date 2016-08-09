@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view;
+package com.bitlove.fetlife.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,7 @@ import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
 import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 
