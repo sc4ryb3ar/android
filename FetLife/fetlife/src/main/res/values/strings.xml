@@ -61,6 +61,22 @@
     <string name="nfc_tap_your_device">Tap your device to another Android device to activate the beam</string>
     <string name="message_nfc_turned_off">Please turn on NFC to enable this feature</string>
     <string name="title_activity_about">About This App</string>
+    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'About\' screen</string>
+    <string name="text_notificationhistoryitem_toremove">Delete</string>
+    <string name="text_notificationhistoryitem_removed">Deleted</string>
+    <string name="notificationhistory_activity_hint">Swipe left to delete notification</string>
+    <string name="title_activity_notificationhistory">Notifications</string>
+    <string name="menu_notifications">Notifications</string>
+    <string name="menu_upload_media">Upload Photo</string>
+    <string name="title_intent_choose_media_upload">Select Media App</string>
+    <string name="message_image_upload_started">Beaming up your photo ...</string>
+    <string name="message_image_upload_finished">Your photo has been uploaded</string>
+    <string name="message_image_upload_failed">Photo upload has failed. Try again later</string>
+    <string name="action_clear_notification_history">Clear all</string>
+    <string name="message_media_picture_upload_confirmation">I certify this picture is of me, or that I have explicit permission to post it on FetLife. I tell no lie</string>
+    <string name="button_media_picture_upload_confirmation">Certify</string>
+    <string name="button_media_picture_upload_cancel">Cancel</string>
+    <string name="title_media_picture_upload_confirmation">Add your picture</string>
 
     <!--TODO: consider improving about layout -->
     <string name="text_about">
@@ -69,6 +85,14 @@
             <h1>Official FetLife App v%1$s</h1>
 
             <p>Version History</p>
+
+            <p/>v1.4<br/>
+                    <ul>
+                        <li>Picture upload</li>
+                        <li>Timestamp field for Notification History Items</li>
+                        <li>Clear All menu option for Notification History</li>
+                        <li>Default Emoji Support</li>
+                    </ul>
 
             <p/>v1.3<br/>
                     <ul>
@@ -102,21 +126,4 @@
             <p/>
         ]]>
     </string>
-    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'About\' screen</string>
-
-    <string name="text_notificationhistoryitem_toremove">Delete</string>
-    <string name="text_notificationhistoryitem_removed">Deleted</string>
-    <string name="notificationhistory_activity_hint">Swipe left to delete notification</string>
-    <string name="title_activity_notificationhistory">Notifications</string>
-    <string name="menu_notifications">Notifications</string>
-    <string name="menu_upload_media">Upload Picture</string>
-    <string name="title_intent_choose_media_upload">Select Media App</string>
-    <string name="message_image_upload_started">Beaming up your photo ...</string>
-    <string name="message_image_upload_finished">Your photo has been uploaded</string>
-    <string name="message_image_upload_failed">Photo upload has failed. Try again later</string>
-    <string name="action_clear_notification_history">Clear all</string>
-    <string name="message_media_picture_upload_confirmation">I certify this picture is of me, or that I have explicit permission to post it on FetLife. I tell no lie</string>
-    <string name="button_media_picture_upload_confirmation">Certify</string>
-    <string name="button_media_picture_upload_cancel">Cancel</string>
-    <string name="title_media_picture_upload_confirmation">Add your picture</string>
 </resources>

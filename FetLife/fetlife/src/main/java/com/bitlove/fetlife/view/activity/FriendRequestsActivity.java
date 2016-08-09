@@ -34,13 +34,16 @@ public class FriendRequestsActivity extends ResourceListActivity
 
     private int requestedPage = 1;
 
-    public static void startActivity(Context context) {
-        context.startActivity(createIntent(context));
+    public static void startActivity(Context context, boolean newTask) {
+        context.startActivity(createIntent(context, newTask));
     }
 
-    public static Intent createIntent(Context context) {
+    public static Intent createIntent(Context context, boolean newTask) {
         Intent intent = new Intent(context, FriendRequestsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (newTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         return intent;
     }
 

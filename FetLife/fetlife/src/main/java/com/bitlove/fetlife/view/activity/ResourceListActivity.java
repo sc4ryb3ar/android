@@ -183,7 +183,7 @@ public class ResourceListActivity extends AppCompatActivity
         } else if (id == R.id.nav_friends) {
             FriendsActivity.startActivity(this);
         } else if (id == R.id.nav_friendrequests) {
-            FriendRequestsActivity.startActivity(this);
+            FriendRequestsActivity.startActivity(this, false);
         } else if (id == R.id.nav_introduce) {
             AddNfcFriendActivity.startActivity(this);
         } else if (id == R.id.nav_about) {
