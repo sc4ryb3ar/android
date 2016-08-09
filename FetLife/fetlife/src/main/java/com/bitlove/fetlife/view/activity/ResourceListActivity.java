@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -133,7 +134,10 @@ public class ResourceListActivity extends AppCompatActivity
         int versionNumber = getFetLifeApplication().getVersionNumber();
         if (lastVersionNotification < versionNumber) {
             Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), getString(R.string.snackbar_version_notification, getFetLifeApplication().getVersionText()), Snackbar.LENGTH_LONG);
-            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.color_accent));
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.color_accent_light));
+            TextView snackText = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+            snackText.setTextColor(getResources().getColor(R.color.color_accent));
+            snackText.setTypeface(null, Typeface.BOLD);
             snackbar.show();
             preferences.edit().putInt(PREFERENCE_VERSION_NOTIFICATION_INT, versionNumber).apply();
         }
