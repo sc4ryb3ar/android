@@ -1,7 +1,7 @@
 package com.bitlove.fetlife.notification;
 
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.view.FriendRequestsActivity;
+import com.bitlove.fetlife.view.activity.FriendRequestsActivity;
 
 import org.json.JSONObject;
 

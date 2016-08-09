@@ -16,6 +16,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.EmojiUtil;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -76,6 +79,17 @@ public class ResourceListActivity extends AppCompatActivity
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
+        textInput.setFilters(new InputFilter[]{new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                CharSequence noEmoji = EmojiUtil.removeEmojis(source.toString());
+                if (noEmoji.length() != source.length()) {
+                    return noEmoji;
+                } else {
+                    return source;
+                }
+            }
+        }});
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
