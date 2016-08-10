@@ -82,6 +82,8 @@ public class FetLifeApplication extends Application {
 
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());
 
+        PreferenceManager.setDefaultValues(this, R.xml.notification_preferences, false);
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //TODO: move me to database and check also for structure update
         String meAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, null);

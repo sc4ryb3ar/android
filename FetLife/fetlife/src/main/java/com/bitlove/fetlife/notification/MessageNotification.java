@@ -2,9 +2,11 @@ package com.bitlove.fetlife.notification;
 
 import android.app.Activity;
 import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.os.Build;
 
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.ConversationsActivity;
@@ -56,5 +58,10 @@ public class MessageNotification extends OneSignalNotification {
             ConversationsActivity.startActivity(fetLifeApplication);
             MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
         }
+    }
+
+    @Override
+    public String getAssociatedPreferenceKey(Context context) {
+        return context.getString(R.string.settings_key_notification_messages_enabled);
     }
 }

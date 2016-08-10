@@ -78,6 +78,13 @@ android {
 
         }
 
+        productFlavors {
+            hardcore {
+            }
+            vanilla {
+            }
+        }
+
     }
 
     packagingOptions {

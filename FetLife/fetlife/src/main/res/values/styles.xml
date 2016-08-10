@@ -47,4 +47,8 @@
         <item name="android:background">@color/window_background</item>
     </style>
 
+    <style name="AppTheme.Light_Accent" parent="AppTheme">
+        <item name="colorAccent">@color/color_accent_light</item>
+    </style>
+
 </resources>

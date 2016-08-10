@@ -6,4 +6,10 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="AppTheme.Light_Accent" parent="AppTheme">
+        <item name="colorAccent">@color/color_accent_light</item>
+        <item name="android:colorAccent">@color/color_accent_light</item>
+    </style>
+
 </resources>
