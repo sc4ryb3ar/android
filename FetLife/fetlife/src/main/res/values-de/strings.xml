@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">FetLife</string>
-	<string name="action_log_on">Log mich ein, Scotty!</string>
 	<string name="action_settings">Einstellungen</string>
 	<string name="action_sign_in_short">Login</string>
 	<string name="authentication_failed">Bitte versuche es noch einmal!</string>
@@ -19,7 +18,6 @@
 	<string name="friendrequest_activity_hint">Wische nach rechts zum Akzeptieren, nach links um abzulehnen</string>
 	<string name="header_friendrequest">Freundschaftsanfragen</string>
 	<string name="input_message_description">Deine Nachricht</string>
-	<string name="logon_title"></string>
 	<string name="menu_about">Über</string>
 	<string name="menu_conversations">Unterhaltungen</string>
 	<string name="menu_friendrequests">Freundschaftsanfragen</string>
@@ -32,7 +30,6 @@
 	<string name="navigation_drawer_close">Navigationsleiste schließen</string>
 	<string name="navigation_drawer_open">Navigationsleiste öffnen</string>
 	<string name="new_message_indication">NEU</string>
-	<string name="progress_logging_in"></string>
 	<string name="prompt_new_message">Deine Nachricht</string>
 	<string name="prompt_password">Passwort</string>
 	<string name="prompt_username">Benutzername</string>

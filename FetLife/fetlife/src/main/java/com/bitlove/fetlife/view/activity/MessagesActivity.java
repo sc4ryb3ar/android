@@ -70,26 +70,6 @@ public class MessagesActivity extends ResourceListActivity
         inputIcon.setVisibility(View.VISIBLE);
 
         setConversation(getIntent());
-
-        if (!Conversation.isLocal(conversationId)) {
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
-            {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-                {
-                    if(!oldMessageloadingInProgress && dy < 0) {
-                        int lastVisibleItem = recyclerLayoutManager.findLastVisibleItemPosition();
-                        int totalItemCount = recyclerLayoutManager.getItemCount();
-
-                        if (lastVisibleItem == (totalItemCount-1)) {
-                            oldMessageloadingInProgress = true;
-                            //TODO: not trigger call if the old messages were already triggered and there was no older message
-                            FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_MESSAGES, conversationId, Boolean.toString(false));
-                        }
-                    }
-                }
-            });
-        }
     }
 
     @Override
@@ -128,6 +108,25 @@ public class MessagesActivity extends ResourceListActivity
         messagesAdapter.refresh();
 
         if (!Conversation.isLocal(conversationId)) {
+
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+            {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+                {
+                    if(!oldMessageloadingInProgress && dy < 0) {
+                        int lastVisibleItem = recyclerLayoutManager.findLastVisibleItemPosition();
+                        int totalItemCount = recyclerLayoutManager.getItemCount();
+
+                        if (lastVisibleItem == (totalItemCount-1)) {
+                            oldMessageloadingInProgress = true;
+                            //TODO: not trigger call if the old messages were already triggered and there was no older message
+                            FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_MESSAGES, conversationId, Boolean.toString(false));
+                        }
+                    }
+                }
+            });
+
             showProgress();
             FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MESSAGES, conversationId);
         } else if (messagesAdapter.getItemCount() != 0) {

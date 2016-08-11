@@ -251,7 +251,7 @@ public class ResourceListActivity extends AppCompatActivity
     protected void verifyUser() {
 
         if (getFetLifeApplication().getMe() == null) {
-            LoginActivity.logout(getFetLifeApplication());
+            LoginActivity.verify(getFetLifeApplication());
             finish();
             return;
         }

@@ -11,11 +11,7 @@ public class StartActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getFetLifeApplication().getMe() == null) {
-            LoginActivity.logout(getFetLifeApplication());
-        } else {
-            ConversationsActivity.startActivity(this);
-        }
+        ConversationsActivity.startActivity(this);
         finish();
     }
 

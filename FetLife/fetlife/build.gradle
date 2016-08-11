@@ -20,6 +20,10 @@ android {
         targetSdkVersion 22
         versionCode 10400
         versionName "1.4.0"
+
+        buildConfigField "String", "FLAVOR_HARDCORE", "\"hardcore\""
+        buildConfigField "String", "FLAVOR_VANILLA", "\"vanilla\""
+
     }
 
     signingConfigs {
