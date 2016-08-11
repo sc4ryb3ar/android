@@ -1,9 +1,11 @@
 package com.bitlove.fetlife.notification;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
 import com.bitlove.fetlife.view.activity.NotificationHistoryActivity;
@@ -60,4 +62,10 @@ public class InfoNotification extends OneSignalNotification {
             NotificationHistoryActivity.startActivity(fetLifeApplication, true);
         }
     }
+
+    @Override
+    public String getAssociatedPreferenceKey(Context context) {
+        return context.getString(R.string.settings_key_notification_info_enabled);
+    }
+
 }

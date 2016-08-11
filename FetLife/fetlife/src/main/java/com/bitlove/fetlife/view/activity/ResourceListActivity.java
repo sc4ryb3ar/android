@@ -210,6 +210,8 @@ public class ResourceListActivity extends AppCompatActivity
             NotificationHistoryActivity.startActivity(this, false);
         } else if (id == R.id.nav_upload_pic) {
             MediaUploadSelectionDialog.show(this);
+        } else if (id == R.id.nav_settings) {
+            SettingsActivity.startActivity(this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -251,7 +253,6 @@ public class ResourceListActivity extends AppCompatActivity
         if (getFetLifeApplication().getMe() == null) {
             LoginActivity.logout(getFetLifeApplication());
             finish();
-            overridePendingTransition(0, 0);
             return;
         }
     }
