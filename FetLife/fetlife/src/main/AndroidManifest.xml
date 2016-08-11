@@ -92,7 +92,7 @@
 
         <activity
             android:name=".view.activity.SettingsActivity"
-            android:theme="@style/AppTheme.Light_Accent"
+            android:theme="@style/AppTheme.No_Accent"
             android:label="@string/title_activity_settings"></activity>
 
         <service
