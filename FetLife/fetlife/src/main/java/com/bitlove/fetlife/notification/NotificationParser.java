@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.notification;
 
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 
 import org.json.JSONArray;
@@ -27,6 +28,7 @@ public class NotificationParser {
     private static final String JSON_FIELD_STACKED_NOTIFICATION = "stacked_notifications";
     private static final java.lang.String JSON_FIELD_INT_MIN_VERSION = "min_version";
     private static final java.lang.String JSON_FIELD_INT_MAX_VERSION = "max_version";
+    private static final String JSON_FIELD_STRING_FLAVOR = "flavor";
 
     public static final String JSON_VALUE_GROUP_INFO = "info";
     public static final String JSON_VALUE_GROUP_FETLIFE = "fetlife";
@@ -65,8 +67,8 @@ public class NotificationParser {
 
         //Check Version relevance
 
-        String minVersion = additionalData != null ? additionalData.optString(JSON_FIELD_INT_MIN_VERSION).toLowerCase() : null;
-        if (minVersion != null) {
+        String minVersion = additionalData != null ? additionalData.optString(JSON_FIELD_INT_MIN_VERSION) : null;
+        if (minVersion != null && minVersion.trim().length() > 0) {
             try {
                 int minVersionInt = Integer.parseInt(minVersion);
                 if (minVersionInt > fetLifeApplication.getVersionNumber()) {
@@ -77,8 +79,8 @@ public class NotificationParser {
             }
         }
 
-        String maxVersion = additionalData != null ? additionalData.optString(JSON_FIELD_INT_MAX_VERSION).toLowerCase() : null;
-        if (maxVersion != null) {
+        String maxVersion = additionalData != null ? additionalData.optString(JSON_FIELD_INT_MAX_VERSION) : null;
+        if (maxVersion != null && maxVersion.trim().length() > 0) {
             try {
                 int maxVersionInt = Integer.parseInt(maxVersion);
                 if (maxVersionInt < fetLifeApplication.getVersionNumber()) {
@@ -89,9 +91,20 @@ public class NotificationParser {
             }
         }
 
+        //Check flavor relevance
+        String flavor = additionalData != null ? additionalData.optString(JSON_FIELD_STRING_FLAVOR) : null;
+        if (flavor != null && flavor.trim().length() > 0) {
+            if (!flavor.equalsIgnoreCase(BuildConfig.FLAVOR)) {
+                return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
+            }
+        }
+
         //Check Type
 
-        String type = additionalData != null ? additionalData.optString(JSON_FIELD_STRING_TYPE).toLowerCase() : "";
+        String type = additionalData != null ? additionalData.optString(JSON_FIELD_STRING_TYPE) : "";
+        if (type != null) {
+            type.toLowerCase();
+        }
 
         switch (type) {
             case "info":

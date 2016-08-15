@@ -18,8 +18,8 @@ android {
         applicationId "com.bitlove.fetlife"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 10500
-        versionName "1.5.0"
+        versionCode 10501
+        versionName "1.5.1"
 
         buildConfigField "String", "FLAVOR_HARDCORE", "\"kinky\""
         buildConfigField "String", "FLAVOR_VANILLA", "\"vanilla\""
