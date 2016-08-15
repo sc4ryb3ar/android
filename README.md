@@ -19,6 +19,8 @@ Welcome to FetLife's open-source Android app!
 - Use hardware menu button to open the menu
 - Image upload from Gallery
 - Image upload taken by Camera
+- Fine tune Notification Settings
+- Use Vanilla version to hide what App you use
 
 ### Requirements
 
@@ -33,10 +35,16 @@ Welcome to FetLife's open-source Android app!
 
 1. Enable installing application from unknwon sources.
 For more information about how to do it please read the following [guideline](https://developer.android.com/distribute/tools/open-distribution.html#unknown-sources)
-2. Download and install the [fetlife-1.3.0.apk](https://github.com/fetlife/fetlife-android/releases/download/v1.3.0/fetlife-1.3.0.apk) to your device
+2. Download and install the [fetlife-1.4.0.apk](https://github.com/fetlife/fetlife-android/releases/download/v1.4.0/fetlife-1.4.0.apk) to your device
 3. (Optional) disable application install from unknown sources.
 
-If you are interested in testing new features you can download our pre-release version: [fetlife-1.4.0.apk](https://github.com/fetlife/android/releases/download/v1.4.0/fetlife-1.4.0.apk)
+If you are interested in testing new features you can download one of our our pre-release versions:
+
+Official app with FetLife icon and App name
+[fetlife-1.5.0.apk](https://github.com/fetlife/android/releases/download/v1.5.0/fetlife-1.5.0.apk)
+Vanilla version with general icon and App name
+[fetlife-vanilla-1.5.0.ap](https://github.com/fetlife/android/releases/download/v1.5.0/fetlife-vanilla-1.5.0.apk)
+
 
 ### Kinksters Helping Kinksters
 
