@@ -41,8 +41,11 @@ For more information about how to do it please read the following [guideline](ht
 If you are interested in testing new features you can download one of our our pre-release versions:
 
 Official app with FetLife icon and App name
+
 [fetlife-1.5.0.apk](https://github.com/fetlife/android/releases/download/v1.5.0/fetlife-1.5.0.apk)
+
 Vanilla version with general icon and App name
+
 [fetlife-vanilla-1.5.0.ap](https://github.com/fetlife/android/releases/download/v1.5.0/fetlife-vanilla-1.5.0.apk)
 
 
