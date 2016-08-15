@@ -11,7 +11,6 @@ import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestSendSucceededEvent;
@@ -53,7 +52,6 @@ import com.squareup.okhttp.ResponseBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -113,11 +111,16 @@ public class FetLifeApiIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        if (intent == null && getFetLifeApplication().getMe() == null) {
+        if (intent == null) {
             return;
         }
 
         final String action = intent.getAction();
+        final Member user = getFetLifeApplication().getMe();
+
+        if (user == null && action != ACTION_APICALL_LOGON_USER) {
+            return;
+        }
 
         if (NetworkUtil.getConnectivityStatus(this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
             sendConnectionFailedNotification(action);
@@ -156,10 +159,10 @@ public class FetLifeApiIntentService extends IntentService {
                     result = retriveFriendRequests(params);
                     break;
                 case ACTION_APICALL_MESSAGES:
-                    result = retrieveMessages(params);
+                    result = retrieveMessages(user, params);
                     break;
                 case ACTION_APICALL_SEND_MESSAGES:
-                    result = sendPendingMessages(false);
+                    result = sendPendingMessages(user, false);
                     break;
                 case ACTION_APICALL_SET_MESSAGES_READ:
                     result = setMessagesRead(params);
@@ -285,9 +288,9 @@ public class FetLifeApiIntentService extends IntentService {
 
             if (retrieveMyself()) {
 
-                Member me = getFetLifeApplication().getMe();
+                Member user = getFetLifeApplication().getMe();
 
-                String meAsJson = me.toJsonString();
+                String meAsJson = user.toJsonString();
                 Bundle accountData = new Bundle();
                 accountData.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson);
 
@@ -301,8 +304,8 @@ public class FetLifeApiIntentService extends IntentService {
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION,1);
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME,me.getNickname());
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN,me.getNotificationToken());
+                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, user.getNickname());
+                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, user.getNotificationToken());
                     OneSignal.sendTags(jsonObject);
                 } catch (JSONException e) {
                     //TODO: error handling
@@ -320,14 +323,14 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean sendPendingMessages(boolean positiveStackedResult) throws IOException {
+    private boolean sendPendingMessages(Member user, boolean positiveStackedResult) throws IOException {
         List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.pending.is(true)).queryList();
         for (Message pendingMessage : pendingMessages) {
             String conversationId = pendingMessage.getConversationId();
             if (Conversation.isLocal(conversationId)) {
-                if (startNewConversation(conversationId, pendingMessage)) {
+                if (startNewConversation(user, conversationId, pendingMessage)) {
                     //db changed, reload remaining pending messages
-                    return sendPendingMessages(true);
+                    return sendPendingMessages(user, true);
                 }
             } else if (sendPendingMessage(pendingMessage) && !positiveStackedResult) {
                 positiveStackedResult = true;
@@ -417,7 +420,7 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean startNewConversation(String localConversationId, Message startMessage) throws IOException {
+    private boolean startNewConversation(Member user, String localConversationId, Message startMessage) throws IOException {
 
         Conversation pendingConversation = new Select().from(Conversation.class).where(Conversation_Table.id.is(localConversationId)).querySingle();
         if (pendingConversation == null) {
@@ -434,7 +437,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             String serverConversationId = conversation.getId();
             startMessage.delete();
-            retrieveMessages(serverConversationId);
+            retrieveMessages(user, serverConversationId);
 
             List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.conversationId.is(localConversationId)).queryList();
             for (Message pendingMessage : pendingMessages) {
@@ -449,14 +452,14 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean retrieveMessages(String... params) throws IOException {
+    private boolean retrieveMessages(Member user, String... params) throws IOException {
         final String conversationId = params[0];
 
         final boolean loadNewMessages = getBoolFromParams(params,1,true);
 
         Call<List<Message>> getMessagesCall = null;
         if (loadNewMessages) {
-            String selfId = getFetLifeApplication().getMe().getId();
+            String selfId = user.getId();
             Message newestMessage = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).and(Message_Table.senderId.isNot(selfId)).orderBy(Message_Table.date, false).querySingle();
             getMessagesCall = getFetLifeApi().getMessages(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken(), conversationId, newestMessage != null ? newestMessage.getId() : null, null, PARAM_NEWMESSAGE_LIMIT);
         } else {

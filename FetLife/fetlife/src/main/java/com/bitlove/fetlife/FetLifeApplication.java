@@ -28,6 +28,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 public class FetLifeApplication extends Application {
 
     public static final String CONSTANT_PREF_KEY_ME_JSON = "com.bitlove.fetlife.bundle.json";
@@ -36,6 +38,8 @@ public class FetLifeApplication extends Application {
     public static final String CONSTANT_ONESIGNAL_TAG_VERSION = "version";
     public static final String CONSTANT_ONESIGNAL_TAG_NICKNAME = "nickname";
     public static final String CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN = "member_token";
+
+    private static final String PREFERENCE_PASSWORD_ALWAYS = "preference_password_always";
 
     private static FetLifeApplication instance;
     private ImageLoader imageLoader;
@@ -82,6 +86,7 @@ public class FetLifeApplication extends Application {
 
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());
 
+        applyDefaultPreferences(false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //TODO: move me to database and check also for structure update
         String meAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, null);
@@ -122,6 +127,15 @@ public class FetLifeApplication extends Application {
             versionText = getString(R.string.text_unknown);
         }
 
+    }
+
+    private void applyDefaultPreferences(boolean forceDefaults) {
+        PreferenceManager.setDefaultValues(this, R.xml.notification_preferences, forceDefaults);
+    }
+
+    private void clearPreferences() {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().clear().commit();
+        applyDefaultPreferences(true);
     }
 
     public boolean isAppInForeground() {
@@ -182,6 +196,54 @@ public class FetLifeApplication extends Application {
         return versionNumber;
     }
 
+    public void setPasswordAlwaysPreference(boolean checked) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putBoolean(PREFERENCE_PASSWORD_ALWAYS, checked).apply();
+    }
+    public boolean getPasswordAlwaysPreference() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean(PREFERENCE_PASSWORD_ALWAYS, true);
+    }
+
+    public void doSoftLogout() {
+        setAccessToken(null);
+        removeMe();
+    }
+
+    public void doHardLogout() {
+
+        setAccessToken(null);
+
+        OneSignal.setSubscription(false);
+        clearPreferences();
+
+        if (getMe() != null) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION, 1);
+                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, getMe().getNickname());
+                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, "");
+                OneSignal.sendTags(jsonObject);
+
+                String[] tags = new String[]{
+                        FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION,
+                        FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME,
+                        FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN
+                };
+                OneSignal.deleteTags(Arrays.asList(tags));
+
+            } catch (JSONException e) {
+                //TODO: error handling
+            }
+
+            deleteDatabase();
+            FlowManager.destroy();
+            FlowManager.init(new FlowConfig.Builder(this).build());
+
+            removeMe();
+        }
+    }
+
     private class ForegroundActivityObserver implements ActivityLifecycleCallbacks {
         @Override
         public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -203,6 +265,9 @@ public class FetLifeApplication extends Application {
 
         @Override
         public void onActivityStopped(Activity activity) {
+            if (foregroundActivty == null && !activity.isChangingConfigurations() && getPasswordAlwaysPreference()) {
+                doSoftLogout();
+            }
         }
 
         @Override
@@ -213,5 +278,6 @@ public class FetLifeApplication extends Application {
         public void onActivityDestroyed(Activity activity) {
         }
     }
+
 }
 

@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,31 +12,27 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
 import com.bitlove.fetlife.event.LoginStartedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.config.FlowConfig;
-import com.raizlabs.android.dbflow.config.FlowManager;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Arrays;
 
 public class LoginActivity extends Activity {
 
     private EditText mUserNameView;
     private EditText mPasswordView;
+    private CheckBox passwordPreferenceCheckBox;
     private Button logonButton;
     private Button logonProgressFakeButton;
 
@@ -60,6 +57,8 @@ public class LoginActivity extends Activity {
             }
         });
 
+        passwordPreferenceCheckBox = (CheckBox) findViewById(R.id.logon_password_preference);
+
         logonButton = (Button) findViewById(R.id.log_on_button);
         logonButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -69,6 +68,11 @@ public class LoginActivity extends Activity {
         });
 
         logonProgressFakeButton = (Button) findViewById(R.id.logging_progress_button);
+
+        if (BuildConfig.FLAVOR_VANILLA.equals(BuildConfig.FLAVOR)) {
+            findViewById(R.id.link_text_sign_up).setVisibility(View.GONE);
+            findViewById(R.id.link_text_forgot_password).setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -107,6 +111,8 @@ public class LoginActivity extends Activity {
      */
     private void attemptLogin() {
 
+        getFetLifeApplication().setPasswordAlwaysPreference(passwordPreferenceCheckBox.isChecked());
+
         // Reset errors.
         mUserNameView.setError(null);
         mPasswordView.setError(null);
@@ -141,43 +147,14 @@ public class LoginActivity extends Activity {
     }
 
     public static void logout(FetLifeApplication fetLifeApplication) {
+        fetLifeApplication.doHardLogout();
+        login(fetLifeApplication);
+    }
 
-        fetLifeApplication.setAccessToken(null);
-
-        //TODO: think about to move to the intent service
-        PreferenceManager.getDefaultSharedPreferences(fetLifeApplication).edit().clear().apply();
-        OneSignal.setSubscription(false);
-
-        if (fetLifeApplication.getMe() != null) {
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION, 1);
-                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, fetLifeApplication.getMe().getNickname());
-                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, "");
-                OneSignal.sendTags(jsonObject);
-
-                String[] tags = new String[]{
-                        FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION,
-                        FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME,
-                        FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN
-                };
-                OneSignal.deleteTags(Arrays.asList(tags));
-
-            } catch (JSONException e) {
-                //TODO: error handling
-            }
-
-            fetLifeApplication.deleteDatabase();
-            FlowManager.destroy();
-            FlowManager.init(new FlowConfig.Builder(fetLifeApplication).build());
-
-            fetLifeApplication.removeMe();
-        }
-
+    public static void login(FetLifeApplication fetLifeApplication) {
         //TODO: add toast
         Intent intent = new Intent(fetLifeApplication, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK
-        );
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
         fetLifeApplication.startActivity(intent);
     }
 
@@ -189,8 +166,15 @@ public class LoginActivity extends Activity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLoginFinished(LoginFinishedEvent loginFinishedEvent) {
         //dismissProgress();
+        apply_v1_5_pwd_decision();
         ConversationsActivity.startActivity(this);
         finish();
+    }
+
+    //TODO: remove in later versions
+    private void apply_v1_5_pwd_decision() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
+        preferences.edit().putBoolean("v1_5_pwd_decision_made",true).apply();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

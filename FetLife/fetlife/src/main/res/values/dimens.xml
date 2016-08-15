@@ -19,7 +19,7 @@
     <dimen name="icon_margin">12dp</dimen>
     <dimen name="icon_border">1dp</dimen>
 
-    <dimen name="logon_header_margin">32dp</dimen>
+    <dimen name="logon_header_margin">24dp</dimen>
     <dimen name="area_margin">32dp</dimen>
 
     <dimen name="listitem_background_margin">16dp</dimen>
