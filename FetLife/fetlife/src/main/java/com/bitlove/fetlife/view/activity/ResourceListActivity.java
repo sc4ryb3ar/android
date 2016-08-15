@@ -249,12 +249,18 @@ public class ResourceListActivity extends AppCompatActivity
     }
 
     protected void verifyUser() {
-
-        if (getFetLifeApplication().getMe() == null) {
-            LoginActivity.verify(getFetLifeApplication());
+        if (getFetLifeApplication().getMe() == null || !v1_5_pwd_decision_made()) {
+            LoginActivity.login(getFetLifeApplication());
             finish();
             return;
         }
+    }
+
+    //TODO: remove in later versions
+    private boolean v1_5_pwd_decision_made() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
+        boolean result = preferences.getBoolean("v1_5_pwd_decision_made",false);
+        return result;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

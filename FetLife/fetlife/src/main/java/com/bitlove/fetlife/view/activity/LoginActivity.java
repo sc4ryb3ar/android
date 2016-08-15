@@ -24,16 +24,9 @@ import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
 import com.bitlove.fetlife.event.LoginStartedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.config.FlowConfig;
-import com.raizlabs.android.dbflow.config.FlowManager;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Arrays;
 
 public class LoginActivity extends Activity {
 
@@ -155,10 +148,10 @@ public class LoginActivity extends Activity {
 
     public static void logout(FetLifeApplication fetLifeApplication) {
         fetLifeApplication.doHardLogout();
-        verify(fetLifeApplication);
+        login(fetLifeApplication);
     }
 
-    public static void verify(FetLifeApplication fetLifeApplication) {
+    public static void login(FetLifeApplication fetLifeApplication) {
         //TODO: add toast
         Intent intent = new Intent(fetLifeApplication, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -173,8 +166,15 @@ public class LoginActivity extends Activity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLoginFinished(LoginFinishedEvent loginFinishedEvent) {
         //dismissProgress();
+        apply_v1_5_pwd_decision();
         ConversationsActivity.startActivity(this);
         finish();
+    }
+
+    //TODO: remove in later versions
+    private void apply_v1_5_pwd_decision() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
+        preferences.edit().putBoolean("v1_5_pwd_decision_made",true).apply();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

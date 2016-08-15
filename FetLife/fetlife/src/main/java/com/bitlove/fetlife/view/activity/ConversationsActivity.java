@@ -50,27 +50,6 @@ public class ConversationsActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        //Temporary fix not to force previous version user to log out and login again to get notifications
-        //TODO: remove in later releases
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        if (getFetLifeApplication().getMe() != null && !preferences.getBoolean("v100FixApplied",false)) {
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put(getFetLifeApplication().CONSTANT_ONESIGNAL_TAG_VERSION,1);
-                jsonObject.put(getFetLifeApplication().CONSTANT_ONESIGNAL_TAG_NICKNAME, getFetLifeApplication().getMe().getNickname());
-                jsonObject.put(getFetLifeApplication().CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, getFetLifeApplication().getMe().getNotificationToken());
-                OneSignal.sendTags(jsonObject);
-
-                OneSignal.setSubscription(true);
-
-                preferences.edit().putBoolean("v100FixApplied",true);
-            } catch (JSONException e) {
-                //TODO: error handling
-            }
-        }
-
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

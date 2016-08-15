@@ -23,7 +23,6 @@
 	<string name="menu_friendrequests">Freundschaftsanfragen</string>
 	<string name="menu_friends">Freunde</string>
 	<string name="menu_introduce">Profil teilen</string>
-	<string name="menu_logout">Logout</string>
 	<string name="message_android_version_not_sufficient">Dieses Feature benötigt eine neuere Android-Version.</string>
 	<string name="message_nfc_not_available">Dieses Feature benötigt NFC.</string>
 	<string name="message_nfc_turned_off">Bitte NFC aktivieren um dieses Feature zu nutzen</string>

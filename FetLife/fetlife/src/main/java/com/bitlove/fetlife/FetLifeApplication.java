@@ -86,8 +86,7 @@ public class FetLifeApplication extends Application {
 
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());
 
-        PreferenceManager.setDefaultValues(this, R.xml.notification_preferences, false);
-
+        applyDefaultPreferences(false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //TODO: move me to database and check also for structure update
         String meAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, null);
@@ -128,6 +127,15 @@ public class FetLifeApplication extends Application {
             versionText = getString(R.string.text_unknown);
         }
 
+    }
+
+    private void applyDefaultPreferences(boolean forceDefaults) {
+        PreferenceManager.setDefaultValues(this, R.xml.notification_preferences, forceDefaults);
+    }
+
+    private void clearPreferences() {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().clear().commit();
+        applyDefaultPreferences(true);
     }
 
     public boolean isAppInForeground() {
@@ -206,9 +214,8 @@ public class FetLifeApplication extends Application {
 
         setAccessToken(null);
 
-        //TODO: think about to move to the intent service
-        PreferenceManager.getDefaultSharedPreferences(this).edit().clear().apply();
         OneSignal.setSubscription(false);
+        clearPreferences();
 
         if (getMe() != null) {
             try {
@@ -258,7 +265,7 @@ public class FetLifeApplication extends Application {
 
         @Override
         public void onActivityStopped(Activity activity) {
-            if (foregroundActivty == null && getPasswordAlwaysPreference()) {
+            if (foregroundActivty == null && !activity.isChangingConfigurations() && getPasswordAlwaysPreference()) {
                 doSoftLogout();
             }
         }

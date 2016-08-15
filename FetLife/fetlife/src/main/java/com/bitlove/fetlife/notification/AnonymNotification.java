@@ -26,10 +26,12 @@ public class AnonymNotification {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(fetLifeApplication)
-                        .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.drawable.ic_onesignal_large_icon_default))
-                        .setSmallIcon(R.drawable.ic_stat_onesignal_default)
+                        .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.ic_launcher))
+                        .setSmallIcon(R.drawable.ic_anonym_notif_small)
                         .setContentTitle(fetLifeApplication.getString(R.string.noification_title_new_one_or_more_notification))
                         .setContentText(fetLifeApplication.getString(R.string.noification_text_new_one_or_more_notification))
+                        .setAutoCancel(true)
+                        .setVibrate(new long[] {1000, 1000})
                         .setGroup(getClass().getSimpleName())
                         .setContentIntent(contentPendingIntent);
 
