@@ -294,11 +294,16 @@ public class FetLifeApiIntentService extends IntentService {
                 Bundle accountData = new Bundle();
                 accountData.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson);
 
-                //TODO: investigate use of account manager
-                //TODO: use keystore for encryption as an alternative
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson).putString(CONSTANT_PREF_KEY_REFRESH_TOKEN, tokenResponse.body().getRefreshToken());
+                if (!getFetLifeApplication().getPasswordAlwaysPreference()) {
+                    //TODO: investigate use of account manager
+                    //TODO: use keystore for encryption as an alternative
+                    editor.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson).putString(CONSTANT_PREF_KEY_REFRESH_TOKEN, tokenResponse.body().getRefreshToken());
+                } else {
+                    //TODO: clean up is needed only for older versions to adapt the change, remove this later
+                    editor.remove(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON).remove(CONSTANT_PREF_KEY_REFRESH_TOKEN);
+                }
                 editor.apply();
 
                 try {
