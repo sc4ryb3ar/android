@@ -31,7 +31,7 @@ import retrofit.Retrofit;
 
 public class FetLifeService {
 
-    private static final String LOGON_BASE_URL = "https://fetlife.com";
+    private static final String LOGON_BASE_URL = "https://staging.fetlife.com";
     private static final String HOST_NAME = "fetlife.com";
     public static final String GRANT_TYPE_PASSWORD = "password";
     public static final String GRANT_TYPE_TOKEN_REFRESH = "refresh_token";
