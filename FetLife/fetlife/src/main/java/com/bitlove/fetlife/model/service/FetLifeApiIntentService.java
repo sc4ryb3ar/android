@@ -4,10 +4,7 @@ import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
@@ -40,7 +37,6 @@ import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
-import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
@@ -48,9 +44,6 @@ import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -72,7 +65,6 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
 
-    private static final String CONSTANT_PREF_KEY_REFRESH_TOKEN = "com.bitlove.fetlife.key.pref.token.refresh";
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
     private static final String PARAM_SORT_ORDER_UPDATED_DESC = "-updated_at";
 
@@ -196,8 +188,7 @@ public class FetLifeApiIntentService extends IntentService {
 
     private boolean refreshToken() throws IOException {
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        String refreshToken = preferences.getString(CONSTANT_PREF_KEY_REFRESH_TOKEN, null);
+        String refreshToken = getFetLifeApplication().getUser().getRefreshToken();
 
         if (refreshToken == null) {
             return false;
@@ -216,9 +207,9 @@ public class FetLifeApiIntentService extends IntentService {
         if (tokenResponse.isSuccess()) {
             getFetLifeApplication().setAccessToken(tokenResponse.body().getAccessToken());
 
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(CONSTANT_PREF_KEY_REFRESH_TOKEN, tokenResponse.body().getRefreshToken());
-            editor.apply();
+            Member user = getFetLifeApplication().getUser();
+            user.setRefreshToken(tokenResponse.body().getRefreshToken());
+            getFetLifeApplication().updateCurrentUser(user);
 
             return true;
         } else {
@@ -285,44 +276,13 @@ public class FetLifeApiIntentService extends IntentService {
         Response<Token> tokenResponse = tokenCall.execute();
         if (tokenResponse.isSuccess()) {
             getFetLifeApplication().setAccessToken(tokenResponse.body().getAccessToken());
-
-            if (retrieveMyself()) {
-
-                Member user = getFetLifeApplication().getUser();
-
-                String meAsJson = user.toJsonString();
-                Bundle accountData = new Bundle();
-                accountData.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson);
-
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-                SharedPreferences.Editor editor = preferences.edit();
-                if (!getFetLifeApplication().getPasswordAlwaysPreference()) {
-                    //TODO: investigate use of account manager
-                    //TODO: use keystore for encryption as an alternative
-                    editor.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson).putString(CONSTANT_PREF_KEY_REFRESH_TOKEN, tokenResponse.body().getRefreshToken());
-                } else {
-                    //TODO: clean up is needed only for older versions to adapt the change, remove this later
-                    editor.remove(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON).remove(CONSTANT_PREF_KEY_REFRESH_TOKEN);
-                }
-                editor.apply();
-
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION,1);
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, user.getNickname());
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, user.getNotificationToken());
-                    OneSignal.sendTags(jsonObject);
-                } catch (JSONException e) {
-                    //TODO: error handling
-                }
-
-                OneSignal.setSubscription(true);
-
-                return true;
-
-            } else {
+            Member currentUser = retrieveCurrentUser();
+            if (currentUser == null) {
                 return false;
             }
+            currentUser.setRefreshToken(tokenResponse.body().getRefreshToken());
+            getFetLifeApplication().setCurrentUser(currentUser);
+            return true;
         } else {
             return false;
         }
@@ -622,14 +582,13 @@ public class FetLifeApiIntentService extends IntentService {
         return param;
     }
 
-    private boolean retrieveMyself() throws IOException {
+    private Member retrieveCurrentUser() throws IOException {
         Call<Member> getMeCall = getFetLifeApi().getMe(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken());
         Response<Member> getMeResponse = getMeCall.execute();
         if (getMeResponse.isSuccess()) {
-            getFetLifeApplication().setUser(getMeResponse.body());
-            return true;
+            return getMeResponse.body();
         } else {
-            return false;
+            return null;
         }
     }
 

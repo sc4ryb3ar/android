@@ -10,8 +10,9 @@ public class UserDatabaseHolder extends DatabaseHolder {
 
     private DatabaseDefinition databaseDefinition;
 
-    public UserDatabaseHolder(FetLifeApplication fetLifeApplication) {
-        databaseDefinition = new UserDataBaseDefinition(fetLifeApplication, new FetLifeDatabasefetlife_Database(this));
+    public UserDatabaseHolder() {
+        FetLifeApplication.getInstance().setBaseDataBaseDefinition(new FetLifeDatabasefetlife_Database(this));
+        databaseDefinition = new UserDataBaseDefinition();
     }
 
     @Override
@@ -21,12 +22,12 @@ public class UserDatabaseHolder extends DatabaseHolder {
 
     @Override
     public DatabaseDefinition getDatabase(String databaseName) {
-        return super.getDatabase(databaseName);
+        return databaseDefinition;
     }
 
     @Override
     public DatabaseDefinition getDatabaseForTable(Class<? extends Model> table) {
-        return super.getDatabaseForTable(table);
+        return databaseDefinition;
     }
 
 }

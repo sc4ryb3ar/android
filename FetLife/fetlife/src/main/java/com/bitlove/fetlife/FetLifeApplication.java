@@ -12,12 +12,16 @@ import android.widget.Toast;
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.db.UserDatabaseHolder;
 import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.Users;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.crashlytics.android.Crashlytics;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onesignal.OneSignal;
+import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
@@ -26,11 +30,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class FetLifeApplication extends Application {
 
     public static final String CONSTANT_PREF_KEY_ME_JSON = "com.bitlove.fetlife.bundle.json";
+    private static final String CONSTANT_PREF_KEY_USERS_JSON = "com.bitlove.fetlife.users.json";
     private static final String CONSTANT_PREF_KEY_DB_VERSION = "com.bitlove.fetlife.pref.db_version";
 
     public static final String CONSTANT_ONESIGNAL_TAG_VERSION = "version";
@@ -40,13 +49,16 @@ public class FetLifeApplication extends Application {
     private static final String PREFERENCE_PASSWORD_ALWAYS = "preference_password_always";
 
     private static FetLifeApplication instance;
+
+    private DatabaseDefinition baseDataBaseDefinition;
+
     private ImageLoader imageLoader;
     private NotificationParser notificationParser;
     private FetLifeService fetLifeService;
 
     private String versionText;
     private int versionNumber;
-    private Activity foregroundActivty;
+    private Activity foregroundActivity;
 
     private String accessToken;
     private Member user;
@@ -55,21 +67,6 @@ public class FetLifeApplication extends Application {
 
     public static FetLifeApplication getInstance() {
         return instance;
-    }
-
-    public void showToast(final int resourceId) {
-        showToast(getResources().getString(resourceId));
-    }
-
-    public void showToast(final String text) {
-        if (foregroundActivty != null && !foregroundActivty.isFinishing()) {
-            foregroundActivty.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(foregroundActivty, text, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
     }
 
     @Override
@@ -85,34 +82,26 @@ public class FetLifeApplication extends Application {
 
         //SetUp preferences if needed
         applyDefaultPreferences(false);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //Load logged in user
-        String meAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, null);
-        try {
-            Member user = new ObjectMapper().readValue(meAsJson, Member.class);
-            this.user = user;
-        } catch (Exception e) {
-            preferences.edit().remove(CONSTANT_PREF_KEY_ME_JSON);
-        }
-
+        user = loadLoggedInUser();
         if (user != null) {
-            loadUserData();
+            initUserDb();
         }
 
+        //Init push notifications
         OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
         OneSignal.enableNotificationsWhenActive(true);
 
-        imageLoader = new ImageLoader(this);
-
+        //Init members
         try {
             fetLifeService = new FetLifeService(this);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
+        imageLoader = new ImageLoader(this);
         notificationParser = new NotificationParser();
-
         eventBus = EventBus.getDefault();
 
         try {
@@ -125,13 +114,112 @@ public class FetLifeApplication extends Application {
 
     }
 
-    private void loadUserData() {
+    public void setBaseDataBaseDefinition(DatabaseDefinition baseDataBaseDefinition) {
+        this.baseDataBaseDefinition = baseDataBaseDefinition;
+    }
+
+    public DatabaseDefinition getBaseDataBaseDefinition() {
+        return baseDataBaseDefinition;
+    }
+
+    private Member loadLoggedInUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String lastNickname = getLastFromUserHistory(preferences);
+        if (lastNickname == null) {
+            return null;
+        }
+        String userAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON + lastNickname, null);
+        if (userAsJson == null) {
+            return null;
+        }
+        try {
+            return new ObjectMapper().readValue(userAsJson, Member.class);
+        } catch (IOException e) {
+            preferences.edit().remove(CONSTANT_PREF_KEY_ME_JSON + lastNickname);
+            return null;
+        }
+    }
+
+    public void setCurrentUser(Member user) {
+
+        this.user = user;
+        saveCurrentUser();
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION,1);
+            jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, user.getNickname());
+            jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, user.getNotificationToken());
+            OneSignal.sendTags(jsonObject);
+        } catch (JSONException e) {
+            //TODO: error handling
+        }
+
+        OneSignal.setSubscription(true);
+
+        initUserDb();
+    }
+
+    public void updateCurrentUser(Member user) {
+        this.user = user;
+        saveCurrentUser();
+    }
+
+    private void saveCurrentUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        String userAsJson;
+        try {
+            userAsJson = user.toJsonString();
+            if (!getPasswordAlwaysPreference()) {
+                editor.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON + user.getNickname(), userAsJson);
+                addToUserHistory(user.getNickname());
+            } else {
+                editor.remove(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON + user.getNickname());
+                deleteFromUserHistory(user.getNickname());
+            }
+        } catch (JsonProcessingException e) {
+            editor.remove(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON + user.getNickname());
+            deleteFromUserHistory(user.getNickname());
+        }
+        editor.apply();
+    }
+
+    private void deleteCurrentUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON + user.getNickname());
+        editor.apply();
+        deleteFromUserHistory(user.getNickname());
+    }
+
+    public Member getUser() {
+        if (user == null) {
+            loadLoggedInUser();
+            if (user != null) {
+                initUserDb();
+            }
+        }
+        return user;
+    }
+
+    private void initUserDb() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int databaseVersion = preferences.getInt(CONSTANT_PREF_KEY_DB_VERSION, 0);
         if (databaseVersion < FetLifeDatabase.MIN_SUPPORTED_VERSION) {
-            deleteDatabase();
+            DeleteUserDatabase();
         }
         preferences.edit().putInt(CONSTANT_PREF_KEY_DB_VERSION, FetLifeDatabase.VERSION).apply();
-        FlowManager.init(new FlowConfig.Builder(this).addDatabaseConfig().build());
+        FlowManager.init(new FlowConfig.Builder(this).addDatabaseHolder(UserDatabaseHolder.class).build());
+    }
+
+    public void removeCurrentUser(boolean deleteContent) {
+        if (deleteContent) {
+            DeleteUserDatabase();
+            deleteCurrentUser();
+        }
+        FlowManager.destroy();
+        user = null;
     }
 
     private void applyDefaultPreferences(boolean forceDefaults) {
@@ -143,12 +231,101 @@ public class FetLifeApplication extends Application {
         applyDefaultPreferences(true);
     }
 
-    public boolean isAppInForeground() {
-        return foregroundActivty != null;
+    private String getLastFromUserHistory(SharedPreferences preferences) {
+        String knownUsersAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_USERS_JSON, null);
+        if (knownUsersAsJson == null) {
+            return null;
+        }
+        String lastNickname = null;
+        try {
+            Users knownUsers = new ObjectMapper().readValue(knownUsersAsJson, Users.class);
+            List<String> nicknames = knownUsers.getNicknames();
+            if (nicknames != null && !nicknames.isEmpty()) {
+                lastNickname = nicknames.get(nicknames.size()-1);
+            }
+            return lastNickname;
+        } catch (IOException e) {
+            throw new RuntimeException("Invalid user history");
+        }
     }
 
-    public Activity getForegroundActivty() {
-        return foregroundActivty;
+    private void deleteFromUserHistory(String nickname) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String knownUsersAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_USERS_JSON, null);
+        if (knownUsersAsJson != null) {
+            try {
+                Users knownUsers = new ObjectMapper().readValue(knownUsersAsJson, Users.class);
+                List<String> nicknames = knownUsers.getNicknames();
+                if (nicknames != null && !nicknames.isEmpty()) {
+                    int userLoginHistoryId = Collections.binarySearch(nicknames, nickname);
+                    if (userLoginHistoryId >= 0) {
+                        nicknames.remove(userLoginHistoryId);
+                        knownUsers.setNicknames(nicknames);
+                        preferences.edit().putString(CONSTANT_PREF_KEY_USERS_JSON, new ObjectMapper().writeValueAsString(knownUsers)).apply();
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Invalid user history");
+            }
+        }
+    }
+
+    private void addToUserHistory(String nickname) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String knownUsersAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_USERS_JSON, null);
+        Users knownUsers = null;
+        List<String> nicknames = null;
+        if (knownUsersAsJson != null) {
+            try {
+                knownUsers = new ObjectMapper().readValue(knownUsersAsJson, Users.class);
+                nicknames = knownUsers.getNicknames();
+                if (nicknames != null && !nicknames.isEmpty()) {
+                    int userLoginHistoryId = Collections.binarySearch(nicknames, nickname);
+                    if (userLoginHistoryId >= 0) {
+                        nicknames.remove(userLoginHistoryId);
+                    }
+                }
+            } catch (IOException e) {
+                //skip
+            }
+        }
+        if (knownUsers == null || nicknames == null) {
+            knownUsers = new Users();
+            nicknames = new ArrayList<>();
+        }
+        if (nicknames == null) {
+            nicknames = new ArrayList<>();
+        }
+        nicknames.add(nickname);
+        knownUsers.setNicknames(nicknames);
+        try {
+            preferences.edit().putString(CONSTANT_PREF_KEY_USERS_JSON, new ObjectMapper().writeValueAsString(knownUsers)).apply();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Invalid user history");
+        }
+    }
+
+    public void showToast(final int resourceId) {
+        showToast(getResources().getString(resourceId));
+    }
+
+    public void showToast(final String text) {
+        if (foregroundActivity != null && !foregroundActivity.isFinishing()) {
+            foregroundActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(foregroundActivity, text, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    public boolean isAppInForeground() {
+        return foregroundActivity != null;
+    }
+
+    public Activity getForegroundActivity() {
+        return foregroundActivity;
     }
 
     public FetLifeService getFetLifeService() {
@@ -171,23 +348,11 @@ public class FetLifeApplication extends Application {
         return accessToken;
     }
 
-    public void setUser(Member user) {
-        this.user = user;
-    }
-
-    public void removeMe() {
-        user = null;
-    }
-
-    public Member getUser() {
-        return user;
-    }
-
     public EventBus getEventBus() {
         return eventBus;
     }
 
-    public void deleteDatabase(String userName) {
+    public void DeleteUserDatabase() {
         deleteDatabase(FetLifeDatabase.NAME + "_" + user.getNickname() +".db");
 
         //TODO: keep a bit for legacy purposes, but delete later
@@ -215,15 +380,15 @@ public class FetLifeApplication extends Application {
 
     public void doSoftLogout() {
         setAccessToken(null);
-        removeMe();
+        removeCurrentUser(false);
     }
 
     public void doHardLogout() {
 
         setAccessToken(null);
 
-        OneSignal.setSubscription(false);
-        clearPreferences();
+        //OneSignal.setSubscription(false);
+        //clearPreferences();
 
         if (getUser() != null) {
             try {
@@ -244,11 +409,7 @@ public class FetLifeApplication extends Application {
                 //TODO: error handling
             }
 
-            deleteDatabase();
-            FlowManager.destroy();
-            FlowManager.init(new FlowConfig.Builder(this).build());
-
-            removeMe();
+            removeCurrentUser(true);
         }
     }
 
@@ -263,17 +424,17 @@ public class FetLifeApplication extends Application {
 
         @Override
         public void onActivityResumed(Activity activity) {
-            foregroundActivty = activity;
+            foregroundActivity = activity;
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
-            foregroundActivty = null;
+            foregroundActivity = null;
         }
 
         @Override
         public void onActivityStopped(Activity activity) {
-            if (foregroundActivty == null && !activity.isChangingConfigurations() && getPasswordAlwaysPreference()) {
+            if (foregroundActivity == null && !activity.isChangingConfigurations() && getPasswordAlwaysPreference()) {
                 doSoftLogout();
             }
         }

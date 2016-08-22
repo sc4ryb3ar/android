@@ -5,46 +5,47 @@ import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 
 public class UserDataBaseDefinition extends DatabaseDefinition {
 
-    private final DatabaseDefinition decoratedDbDefiniton;
-    private final FetLifeApplication fetLifeApplication;
-
-    public UserDataBaseDefinition(FetLifeApplication fetLifeApplication, DatabaseDefinition decoratedDbDefiniton) {
-        this.fetLifeApplication = fetLifeApplication;
-        this.decoratedDbDefiniton = decoratedDbDefiniton;
+    public UserDataBaseDefinition() {
     }
 
     @Override
     public String getDatabaseName() {
-        return decoratedDbDefiniton.getDatabaseName() + fetLifeApplication.getUser().getNickname();
+        return getDecoratedDbDefinition().getDatabaseName() + FetLifeApplication.getInstance().getUser().getNickname();
     }
 
     @Override
     public boolean isInMemory() {
-        return decoratedDbDefiniton.isInMemory();
+        return getDecoratedDbDefinition().isInMemory();
     }
 
     @Override
     public int getDatabaseVersion() {
-        return decoratedDbDefiniton.getDatabaseVersion();
+        return getDecoratedDbDefinition().getDatabaseVersion();
     }
 
     @Override
     public boolean areConsistencyChecksEnabled() {
-        return decoratedDbDefiniton.areConsistencyChecksEnabled();
+        return getDecoratedDbDefinition().areConsistencyChecksEnabled();
     }
 
     @Override
     public boolean isForeignKeysSupported() {
-        return decoratedDbDefiniton.isForeignKeysSupported();
+        return getDecoratedDbDefinition().isForeignKeysSupported();
     }
 
     @Override
     public boolean backupEnabled() {
-        return decoratedDbDefiniton.backupEnabled();
+        return getDecoratedDbDefinition().backupEnabled();
     }
 
     @Override
     public Class<?> getAssociatedDatabaseClassFile() {
-        return decoratedDbDefiniton.getAssociatedDatabaseClassFile();
+        return getDecoratedDbDefinition().getAssociatedDatabaseClassFile();
     }
+
+    private DatabaseDefinition getDecoratedDbDefinition() {
+        return FetLifeApplication.getInstance().getBaseDataBaseDefinition();
+    }
+
+
 }
