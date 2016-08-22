@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.squareup.picasso.OkHttpDownloader;
-import com.squareup.picasso.Picasso;
 
 import io.fabric.sdk.android.Fabric;
 import org.greenrobot.eventbus.EventBus;
@@ -51,7 +49,7 @@ public class FetLifeApplication extends Application {
     private Activity foregroundActivty;
 
     private String accessToken;
-    private Member me;
+    private Member user;
 
     private EventBus eventBus;
 
@@ -78,31 +76,29 @@ public class FetLifeApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-//        Thread.currentThread().setUncaughtExceptionHandler(new FetlifeExceptionHandler(this, Thread.currentThread().getDefaultUncaughtExceptionHandler()));
-
-        Fabric.with(this, new Crashlytics());
-
+        //Setup default instance and callbacks
         instance = this;
-
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());
 
+        //Init crash logging
+        Fabric.with(this, new Crashlytics());
+
+        //SetUp preferences if needed
         applyDefaultPreferences(false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        //TODO: move me to database and check also for structure update
+
+        //Load logged in user
         String meAsJson = preferences.getString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, null);
         try {
-            Member me = new ObjectMapper().readValue(meAsJson, Member.class);
-            this.me = me;
+            Member user = new ObjectMapper().readValue(meAsJson, Member.class);
+            this.user = user;
         } catch (Exception e) {
             preferences.edit().remove(CONSTANT_PREF_KEY_ME_JSON);
         }
 
-        int databaseVersion = preferences.getInt(CONSTANT_PREF_KEY_DB_VERSION, 0);
-        if (databaseVersion < FetLifeDatabase.MIN_SUPPORTED_VERSION) {
-            deleteDatabase();
+        if (user != null) {
+            loadUserData();
         }
-        preferences.edit().putInt(CONSTANT_PREF_KEY_DB_VERSION, FetLifeDatabase.VERSION).apply();
-        FlowManager.init(new FlowConfig.Builder(this).build());
 
         OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
         OneSignal.enableNotificationsWhenActive(true);
@@ -127,6 +123,15 @@ public class FetLifeApplication extends Application {
             versionText = getString(R.string.text_unknown);
         }
 
+    }
+
+    private void loadUserData() {
+        int databaseVersion = preferences.getInt(CONSTANT_PREF_KEY_DB_VERSION, 0);
+        if (databaseVersion < FetLifeDatabase.MIN_SUPPORTED_VERSION) {
+            deleteDatabase();
+        }
+        preferences.edit().putInt(CONSTANT_PREF_KEY_DB_VERSION, FetLifeDatabase.VERSION).apply();
+        FlowManager.init(new FlowConfig.Builder(this).addDatabaseConfig().build());
     }
 
     private void applyDefaultPreferences(boolean forceDefaults) {
@@ -166,23 +171,26 @@ public class FetLifeApplication extends Application {
         return accessToken;
     }
 
-    public void setMe(Member me) {
-        this.me = me;
+    public void setUser(Member user) {
+        this.user = user;
     }
 
     public void removeMe() {
-        me = null;
+        user = null;
     }
 
-    public Member getMe() {
-        return me;
+    public Member getUser() {
+        return user;
     }
 
     public EventBus getEventBus() {
         return eventBus;
     }
 
-    public void deleteDatabase() {
+    public void deleteDatabase(String userName) {
+        deleteDatabase(FetLifeDatabase.NAME + "_" + user.getNickname() +".db");
+
+        //TODO: keep a bit for legacy purposes, but delete later
         deleteDatabase(FetLifeDatabase.NAME + ".db");
         //DBFlow library uses .db suffix, but they mentioned they might going to change this in the future
         deleteDatabase(FetLifeDatabase.NAME);
@@ -217,11 +225,11 @@ public class FetLifeApplication extends Application {
         OneSignal.setSubscription(false);
         clearPreferences();
 
-        if (getMe() != null) {
+        if (getUser() != null) {
             try {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION, 1);
-                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, getMe().getNickname());
+                jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, getUser().getNickname());
                 jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, "");
                 OneSignal.sendTags(jsonObject);
 

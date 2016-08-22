@@ -116,7 +116,7 @@ public class FetLifeApiIntentService extends IntentService {
         }
 
         final String action = intent.getAction();
-        final Member user = getFetLifeApplication().getMe();
+        final Member user = getFetLifeApplication().getUser();
 
         if (user == null && action != ACTION_APICALL_LOGON_USER) {
             return;
@@ -288,7 +288,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             if (retrieveMyself()) {
 
-                Member user = getFetLifeApplication().getMe();
+                Member user = getFetLifeApplication().getUser();
 
                 String meAsJson = user.toJsonString();
                 Bundle accountData = new Bundle();
@@ -626,7 +626,7 @@ public class FetLifeApiIntentService extends IntentService {
         Call<Member> getMeCall = getFetLifeApi().getMe(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken());
         Response<Member> getMeResponse = getMeCall.execute();
         if (getMeResponse.isSuccess()) {
-            getFetLifeApplication().setMe(getMeResponse.body());
+            getFetLifeApplication().setUser(getMeResponse.body());
             return true;
         } else {
             return false;

@@ -269,7 +269,7 @@ public class MessagesActivity extends ResourceListActivity
                 message.setClientId(UUID.randomUUID().toString());
                 message.setConversationId(conversationId);
                 message.setBody(text.trim());
-                Member me = getFetLifeApplication().getMe();
+                Member me = getFetLifeApplication().getUser();
                 message.setSenderId(me.getId());
                 message.setSenderNickname(me.getNickname());
                 message.save();

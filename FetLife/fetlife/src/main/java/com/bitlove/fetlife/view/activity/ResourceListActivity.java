@@ -104,7 +104,7 @@ public class ResourceListActivity extends AppCompatActivity
 
         navigationHeaderView = navigationView.getHeaderView(0);
 
-        Member me = getFetLifeApplication().getMe();
+        Member me = getFetLifeApplication().getUser();
         if (me != null) {
             TextView headerTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_text);
             headerTextView.setText(me.getNickname());
@@ -249,7 +249,7 @@ public class ResourceListActivity extends AppCompatActivity
     }
 
     protected void verifyUser() {
-        if (getFetLifeApplication().getMe() == null || !v1_5_pwd_decision_made()) {
+        if (getFetLifeApplication().getUser() == null || !v1_5_pwd_decision_made()) {
             LoginActivity.login(getFetLifeApplication());
             finish();
             return;

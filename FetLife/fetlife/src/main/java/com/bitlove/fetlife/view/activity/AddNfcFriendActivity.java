@@ -64,7 +64,7 @@ public class AddNfcFriendActivity extends Activity implements NfcAdapter.CreateN
         try {
             NdefMessage msg = new NdefMessage(
                     new NdefRecord[] { NdefRecord.createMime(
-                            "application/vnd.com.bitlove.fetlife", getFetLifeApplication().getMe().toJsonString().getBytes())
+                            "application/vnd.com.bitlove.fetlife", getFetLifeApplication().getUser().toJsonString().getBytes())
                     });
             return msg;
         } catch (JsonProcessingException e) {
