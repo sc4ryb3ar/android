@@ -111,7 +111,7 @@ public class LoginActivity extends Activity {
      */
     private void attemptLogin() {
 
-        getFetLifeApplication().setPasswordAlwaysPreference(passwordPreferenceCheckBox.isChecked());
+        getFetLifeApplication().getUserSessionManager().onPasswordAlwaysPreferenceSet(passwordPreferenceCheckBox.isChecked());
 
         // Reset errors.
         mUserNameView.setError(null);
@@ -147,11 +147,11 @@ public class LoginActivity extends Activity {
     }
 
     public static void logout(FetLifeApplication fetLifeApplication) {
-        fetLifeApplication.doHardLogout();
-        login(fetLifeApplication);
+        fetLifeApplication.getUserSessionManager().onUserReset();
+        startLogin(fetLifeApplication);
     }
 
-    public static void login(FetLifeApplication fetLifeApplication) {
+    public static void startLogin(FetLifeApplication fetLifeApplication) {
         //TODO: add toast
         Intent intent = new Intent(fetLifeApplication, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);

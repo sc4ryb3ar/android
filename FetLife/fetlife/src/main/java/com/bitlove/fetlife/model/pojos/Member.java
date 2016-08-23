@@ -31,10 +31,6 @@ public class Member extends BaseModel {
     @Column
     private String notificationToken;
 
-    @JsonProperty("refresh_token")
-    @Column
-    private String refreshToken;
-
     @JsonProperty("meta_line")
     @Column
     private String metaInfo;
@@ -72,14 +68,6 @@ public class Member extends BaseModel {
 
     public void setNotificationToken(String notificationToken) {
         this.notificationToken = notificationToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public Avatar getAvatar() {

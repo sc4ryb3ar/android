@@ -35,7 +35,7 @@ import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.EmojiUtil;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
@@ -104,15 +104,15 @@ public class ResourceListActivity extends AppCompatActivity
 
         navigationHeaderView = navigationView.getHeaderView(0);
 
-        Member me = getFetLifeApplication().getUser();
-        if (me != null) {
+        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        if (currentUser != null) {
             TextView headerTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_text);
-            headerTextView.setText(me.getNickname());
+            headerTextView.setText(currentUser.getNickname());
             TextView headerSubTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_subtext);
-            headerSubTextView.setText(me.getMetaInfo());
+            headerSubTextView.setText(currentUser.getMetaInfo());
             ImageView headerAvatar = (ImageView) navigationHeaderView.findViewById(R.id.nav_header_image);
-            getFetLifeApplication().getImageLoader().loadImage(this, me.getAvatarLink(), headerAvatar, R.drawable.dummy_avatar);
-            final String selfLink = me.getLink();
+            getFetLifeApplication().getImageLoader().loadImage(this, currentUser.getAvatarLink(), headerAvatar, R.drawable.dummy_avatar);
+            final String selfLink = currentUser.getLink();
             if (selfLink != null) {
                 headerAvatar.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -249,18 +249,11 @@ public class ResourceListActivity extends AppCompatActivity
     }
 
     protected void verifyUser() {
-        if (getFetLifeApplication().getUser() == null || !v1_5_pwd_decision_made()) {
-            LoginActivity.login(getFetLifeApplication());
+        if (getFetLifeApplication().getUserSessionManager().getCurrentUser() == null) {
+            LoginActivity.startLogin(getFetLifeApplication());
             finish();
             return;
         }
-    }
-
-    //TODO: remove in later versions
-    private boolean v1_5_pwd_decision_made() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        boolean result = preferences.getBoolean("v1_5_pwd_decision_made",false);
-        return result;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

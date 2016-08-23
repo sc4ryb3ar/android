@@ -21,6 +21,7 @@ import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 
+import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
 import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
@@ -269,9 +270,9 @@ public class MessagesActivity extends ResourceListActivity
                 message.setClientId(UUID.randomUUID().toString());
                 message.setConversationId(conversationId);
                 message.setBody(text.trim());
-                Member me = getFetLifeApplication().getUser();
-                message.setSenderId(me.getId());
-                message.setSenderNickname(me.getNickname());
+                User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+                message.setSenderId(currentUser.getId());
+                message.setSenderNickname(currentUser.getNickname());
                 message.save();
                 runOnUiThread(new Runnable() {
                     @Override

@@ -50,7 +50,8 @@ public class ConversationsActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getFetLifeApplication().getUser() == null) {
+        //TODO: handle better way activity hierarchy
+        if (getFetLifeApplication().getUserSessionManager().getCurrentUser() == null) {
             return;
         }
 
