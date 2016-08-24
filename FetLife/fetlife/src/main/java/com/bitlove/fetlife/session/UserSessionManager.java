@@ -5,10 +5,12 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
+import com.bitlove.fetlife.view.activity.SettingsActivity;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -38,11 +40,11 @@ public class UserSessionManager {
     }
 
     public void init() {
-        if (!getPasswordAlwaysPreference()) {
-            String userKey = loadLastLoggedUserKey();
-            if (userKey == null) {
-                return;
-            }
+        String userKey = loadLastLoggedUserKey();
+        if (userKey == null) {
+            return;
+        }
+        if (!getPasswordAlwaysPreference(userKey)) {
             loadUserDb(userKey);
             initDb();
             currentUser = readUserRecord();
@@ -50,16 +52,17 @@ public class UserSessionManager {
     }
 
     public void onAppInBackground() {
-        if (getPasswordAlwaysPreference()) {
+        if (getPasswordAlwaysPreference(getUserKey(currentUser))) {
             onUserLogOut();
         }
     }
 
-    public void onUserLogIn(User loggedInUser) {
+    public void onUserLogIn(User loggedInUser, boolean passwordAlways) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
             currentUser = loggedInUser;
+            setPasswordAlwaysPreference(getUserKey(loggedInUser), passwordAlways);
         } else {
             updateUserRecord(loggedInUser);
         }
@@ -78,6 +81,7 @@ public class UserSessionManager {
     private void logInUser(User user) {
         saveLastLoggedUserKey(getUserKey(user));
         loadUserDb(getUserKey(user));
+        initUserPreferences(getUserKey(user));
         initDb();
         updateUserRecord(user);
         registerToPushMessages(user);
@@ -141,13 +145,12 @@ public class UserSessionManager {
         }
     }
 
-    public void onPasswordAlwaysPreferenceSet(boolean checked) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+    private void setPasswordAlwaysPreference(String userKey, boolean checked) {
+        SharedPreferences sharedPreferences = getUserPreferences(userKey);
         sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, checked).apply();
     }
-    private boolean getPasswordAlwaysPreference() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        return sharedPreferences.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
+    private boolean getPasswordAlwaysPreference(String userKey) {
+        return getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
     }
 
     private String loadLastLoggedUserKey() {
@@ -194,7 +197,6 @@ public class UserSessionManager {
 
     private void updateUserRecord(User user) {
         if (user != null) {
-            user.setId("currentUser");
             user.save();
         }
     }
@@ -219,6 +221,19 @@ public class UserSessionManager {
         }
         File userDatabaseFile = new File(databaseFile.getParentFile(), getUserDatabaseName(userKey));
         userDatabaseFile.renameTo(databaseFile);
+    }
+
+    private void initUserPreferences(String userKey) {
+        SettingsActivity.init(getUserPreferenceName(userKey));
+        PreferenceManager.setDefaultValues(fetLifeApplication, getUserPreferenceName(userKey), Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+    }
+
+    public SharedPreferences getUserPreferences() {
+        return currentUser != null ? getUserPreferences(getUserKey(currentUser)) : null;
+    }
+
+    private SharedPreferences getUserPreferences(String userKey) {
+        return fetLifeApplication.getSharedPreferences(userKey,Context.MODE_PRIVATE);
     }
 
     private void deleteUserDb(String userKey) {
@@ -250,6 +265,10 @@ public class UserSessionManager {
 
     private static String getUserDatabaseName(String userKey) {
         return FetLifeDatabase.NAME + "_" + userKey + ".db";
+    }
+
+    private static String getUserPreferenceName(String userKey) {
+        return "fetlife" + "_" + userKey + ".pref";
     }
 
     private static boolean isSameUser(User user1, User user2) {

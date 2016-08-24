@@ -55,9 +55,6 @@ public class FetLifeApplication extends Application {
         OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
         OneSignal.enableNotificationsWhenActive(true);
 
-        //SetUp preferences if needed
-        applyDefaultPreferences(false);
-
         //Init user session manager
         userSessionManager = new UserSessionManager(this);
         userSessionManager.init();
@@ -85,15 +82,6 @@ public class FetLifeApplication extends Application {
 
     public UserSessionManager getUserSessionManager() {
         return userSessionManager;
-    }
-
-    private void applyDefaultPreferences(boolean forceDefaults) {
-        PreferenceManager.setDefaultValues(this, R.xml.notification_preferences, forceDefaults);
-    }
-
-    private void clearPreferences() {
-        PreferenceManager.getDefaultSharedPreferences(this).edit().clear().commit();
-        applyDefaultPreferences(true);
     }
 
     public void showToast(final int resourceId) {

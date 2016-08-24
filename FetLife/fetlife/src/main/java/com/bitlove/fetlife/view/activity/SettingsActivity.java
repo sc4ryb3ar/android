@@ -17,6 +17,12 @@ import java.util.List;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    private static String userPreferenceName;
+
+    public static void init(String userPreferenceName) {
+        SettingsActivity.userPreferenceName = userPreferenceName;
+    }
+
     public static void startActivity(Context context) {
         context.startActivity(createIntent(context));
     }
@@ -68,6 +74,8 @@ public class SettingsActivity extends PreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
+            getPreferenceManager().setSharedPreferencesName(userPreferenceName);
 
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.notification_preferences);

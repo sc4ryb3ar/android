@@ -281,7 +281,7 @@ public class FetLifeApiIntentService extends IntentService {
                 return false;
             }
             user.setRefreshToken(tokenResponse.body().getRefreshToken());
-            getFetLifeApplication().getUserSessionManager().onUserLogIn(user);
+            getFetLifeApplication().getUserSessionManager().onUserLogIn(user, getBoolFromParams(params, 2, true));
             return true;
         } else {
             return false;

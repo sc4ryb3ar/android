@@ -111,8 +111,6 @@ public class LoginActivity extends Activity {
      */
     private void attemptLogin() {
 
-        getFetLifeApplication().getUserSessionManager().onPasswordAlwaysPreferenceSet(passwordPreferenceCheckBox.isChecked());
-
         // Reset errors.
         mUserNameView.setError(null);
         mPasswordView.setError(null);
@@ -142,7 +140,7 @@ public class LoginActivity extends Activity {
             focusView.requestFocus();
         } else {
             showProgress();
-            FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_LOGON_USER, username, password);
+            FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_LOGON_USER, username, password, Boolean.toString(passwordPreferenceCheckBox.isChecked()));
         }
     }
 
