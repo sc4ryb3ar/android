@@ -18,8 +18,10 @@ android {
         applicationId "com.bitlove.fetlife"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 10505
-        versionName "1.5.5"
+        versionCode 10509
+        versionName "1.5.9"
+
+        vectorDrawables.useSupportLibrary = true
 
         buildConfigField "String", "FLAVOR_HARDCORE", "\"kinky\""
         buildConfigField "String", "FLAVOR_VANILLA", "\"vanilla\""
@@ -76,8 +78,8 @@ android {
 
             signingConfig signingConfigs.release
 
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
         }
 
@@ -102,8 +104,8 @@ def dbflow_version = "3.0.1"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.2.0'
-    compile 'com.android.support:design:23.2.0'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
 
     compile 'com.google.android.gms:play-services-gcm:+'
     compile 'com.google.android.gms:play-services-analytics:+'

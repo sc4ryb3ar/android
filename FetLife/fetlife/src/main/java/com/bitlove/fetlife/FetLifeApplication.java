@@ -2,6 +2,8 @@ package com.bitlove.fetlife;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,16 +12,23 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
+import com.bitlove.fetlife.util.SecurityUtil;
 import com.crashlytics.android.Crashlytics;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onesignal.OneSignal;
+import com.raizlabs.android.dbflow.config.FlowManager;
 
 import io.fabric.sdk.android.Fabric;
 import org.greenrobot.eventbus.EventBus;
 
 public class FetLifeApplication extends Application {
+
+    private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
 
     private static FetLifeApplication instance;
 
@@ -46,6 +55,15 @@ public class FetLifeApplication extends Application {
 
         //Setup default instance and callbacks
         instance = this;
+
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionText = pInfo.versionName;
+            versionNumber = pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionText = getString(R.string.text_unknown);
+        }
+
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());
 
         //Init crash logging
@@ -57,6 +75,9 @@ public class FetLifeApplication extends Application {
 
         //Init user session manager
         userSessionManager = new UserSessionManager(this);
+
+        applyVersionUpgradeIfNeeded();
+
         userSessionManager.init();
 
         //Init members
@@ -69,14 +90,6 @@ public class FetLifeApplication extends Application {
         imageLoader = new ImageLoader(this);
         notificationParser = new NotificationParser();
         eventBus = EventBus.getDefault();
-
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            versionText = pInfo.versionName;
-            versionNumber = pInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            versionText = getString(R.string.text_unknown);
-        }
 
     }
 
@@ -137,6 +150,21 @@ public class FetLifeApplication extends Application {
 
     public int getVersionNumber() {
         return versionNumber;
+    }
+
+    private void applyVersionUpgradeIfNeeded() {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        if (lastVersionUpgrade >= versionNumber) {
+            return;
+        }
+
+        FlowManager.destroy();
+        deleteDatabase(FetLifeDatabase.NAME + ".db");
+        openOrCreateDatabase(FetLifeDatabase.NAME + ".db", Context.MODE_PRIVATE, null);
+
+        sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, versionNumber).apply();
     }
 
     private class ForegroundActivityObserver implements ActivityLifecycleCallbacks {

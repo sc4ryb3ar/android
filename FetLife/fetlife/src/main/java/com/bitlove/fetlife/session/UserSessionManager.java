@@ -106,6 +106,7 @@ public class UserSessionManager {
         deleteUserDb(userKey);
         removeLoggedUserKey(userKey);
         clearDb();
+        clearUserPreferences(userKey);
         unregisterFromPushMessages(user);
     }
 
@@ -228,12 +229,12 @@ public class UserSessionManager {
         PreferenceManager.setDefaultValues(fetLifeApplication, getUserPreferenceName(userKey), Context.MODE_PRIVATE, R.xml.notification_preferences, false);
     }
 
-    public SharedPreferences getUserPreferences() {
-        return currentUser != null ? getUserPreferences(getUserKey(currentUser)) : null;
-    }
-
     private SharedPreferences getUserPreferences(String userKey) {
         return fetLifeApplication.getSharedPreferences(userKey,Context.MODE_PRIVATE);
+    }
+
+    private void clearUserPreferences(String userKey) {
+        getUserPreferences(userKey).edit().clear().apply();
     }
 
     private void deleteUserDb(String userKey) {

@@ -65,6 +65,10 @@ public class MessagesActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (isFinishing()) {
+            return;
+        }
+
         floatingActionButton.setVisibility(View.GONE);
 
         inputLayout.setVisibility(View.VISIBLE);
@@ -97,14 +101,12 @@ public class MessagesActivity extends ResourceListActivity
     protected void onStart() {
         super.onStart();
 
-        messagesModelObserver = new FlowContentObserver();
-
         if (isFinishing()) {
             return;
         }
 
-        getFetLifeApplication().getEventBus().register(this);
-
+        messagesModelObserver = new FlowContentObserver();
+        messagesModelObserver = new FlowContentObserver();
         messagesModelObserver.registerForContentChanges(this, Message.class);
         messagesAdapter.refresh();
 

@@ -64,6 +64,12 @@ public class ResourceListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        verifyUser();
+
+        if (isFinishing()) {
+            return;
+        }
+
         //TODO: think of moving content stuff out of this class/method
         setContentView(R.layout.activity_resource);
 
