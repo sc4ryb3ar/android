@@ -38,7 +38,7 @@ public class MessageNotification extends OneSignalNotification {
 
         if (appInForeground) {
             fetLifeApplication.getEventBus().post(new NewMessageEvent(conversationId));
-            Activity foregroundActivity = fetLifeApplication.getForegroundActivty();
+            Activity foregroundActivity = fetLifeApplication.getForegroundActivity();
             if (foregroundActivity instanceof MessagesActivity) {
                 conversationInForeground = conversationId.equals(((MessagesActivity)foregroundActivity).getConversationId());
             } else if (foregroundActivity instanceof  ConversationsActivity) {

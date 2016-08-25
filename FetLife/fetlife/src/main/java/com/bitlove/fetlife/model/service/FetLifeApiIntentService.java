@@ -4,10 +4,7 @@ import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
@@ -34,13 +31,12 @@ import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
 import com.bitlove.fetlife.model.pojos.FriendSuggestion;
 import com.bitlove.fetlife.model.pojos.FriendSuggestion_Table;
-import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.Token;
+import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
-import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
@@ -48,9 +44,6 @@ import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -72,7 +65,6 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
 
-    private static final String CONSTANT_PREF_KEY_REFRESH_TOKEN = "com.bitlove.fetlife.key.pref.token.refresh";
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
     private static final String PARAM_SORT_ORDER_UPDATED_DESC = "-updated_at";
 
@@ -116,9 +108,10 @@ public class FetLifeApiIntentService extends IntentService {
         }
 
         final String action = intent.getAction();
-        final Member user = getFetLifeApplication().getMe();
 
-        if (user == null && action != ACTION_APICALL_LOGON_USER) {
+        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+
+        if (currentUser == null && action != ACTION_APICALL_LOGON_USER) {
             return;
         }
 
@@ -136,7 +129,7 @@ public class FetLifeApiIntentService extends IntentService {
             sendLoadStartedNotification(action);
 
             if (action != ACTION_APICALL_LOGON_USER && getFetLifeApplication().getAccessToken() == null) {
-                if (refreshToken()) {
+                if (refreshToken(currentUser)) {
                     onHandleIntent(intent);
                 } else {
                     sendAuthenticaionFailedNotification();
@@ -159,10 +152,10 @@ public class FetLifeApiIntentService extends IntentService {
                     result = retriveFriendRequests(params);
                     break;
                 case ACTION_APICALL_MESSAGES:
-                    result = retrieveMessages(user, params);
+                    result = retrieveMessages(currentUser, params);
                     break;
                 case ACTION_APICALL_SEND_MESSAGES:
-                    result = sendPendingMessages(user, false);
+                    result = sendPendingMessages(currentUser, false);
                     break;
                 case ACTION_APICALL_SET_MESSAGES_READ:
                     result = setMessagesRead(params);
@@ -178,7 +171,7 @@ public class FetLifeApiIntentService extends IntentService {
             if (result) {
                 sendLoadFinishedNotification(action);
             } else if (action != ACTION_APICALL_LOGON_USER && getFetLifeApplication().getFetLifeService().getLastResponseCode() == 403) {
-                if (refreshToken()) {
+                if (refreshToken(currentUser)) {
                     onHandleIntent(intent);
                 } else {
                     sendLoadFailedNotification(action);
@@ -194,10 +187,9 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean refreshToken() throws IOException {
+    private boolean refreshToken(User currentUser) throws IOException {
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        String refreshToken = preferences.getString(CONSTANT_PREF_KEY_REFRESH_TOKEN, null);
+        String refreshToken = currentUser.getRefreshToken();
 
         if (refreshToken == null) {
             return false;
@@ -216,9 +208,8 @@ public class FetLifeApiIntentService extends IntentService {
         if (tokenResponse.isSuccess()) {
             getFetLifeApplication().setAccessToken(tokenResponse.body().getAccessToken());
 
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(CONSTANT_PREF_KEY_REFRESH_TOKEN, tokenResponse.body().getRefreshToken());
-            editor.apply();
+            currentUser.setRefreshToken(tokenResponse.body().getRefreshToken());
+            currentUser.save();
 
             return true;
         } else {
@@ -285,50 +276,19 @@ public class FetLifeApiIntentService extends IntentService {
         Response<Token> tokenResponse = tokenCall.execute();
         if (tokenResponse.isSuccess()) {
             getFetLifeApplication().setAccessToken(tokenResponse.body().getAccessToken());
-
-            if (retrieveMyself()) {
-
-                Member user = getFetLifeApplication().getMe();
-
-                String meAsJson = user.toJsonString();
-                Bundle accountData = new Bundle();
-                accountData.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson);
-
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-                SharedPreferences.Editor editor = preferences.edit();
-                if (!getFetLifeApplication().getPasswordAlwaysPreference()) {
-                    //TODO: investigate use of account manager
-                    //TODO: use keystore for encryption as an alternative
-                    editor.putString(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON, meAsJson).putString(CONSTANT_PREF_KEY_REFRESH_TOKEN, tokenResponse.body().getRefreshToken());
-                } else {
-                    //TODO: clean up is needed only for older versions to adapt the change, remove this later
-                    editor.remove(FetLifeApplication.CONSTANT_PREF_KEY_ME_JSON).remove(CONSTANT_PREF_KEY_REFRESH_TOKEN);
-                }
-                editor.apply();
-
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_VERSION,1);
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_NICKNAME, user.getNickname());
-                    jsonObject.put(FetLifeApplication.CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN, user.getNotificationToken());
-                    OneSignal.sendTags(jsonObject);
-                } catch (JSONException e) {
-                    //TODO: error handling
-                }
-
-                OneSignal.setSubscription(true);
-
-                return true;
-
-            } else {
+            User user = retrieveCurrentUser();
+            if (user == null) {
                 return false;
             }
+            user.setRefreshToken(tokenResponse.body().getRefreshToken());
+            getFetLifeApplication().getUserSessionManager().onUserLogIn(user, getBoolFromParams(params, 2, true));
+            return true;
         } else {
             return false;
         }
     }
 
-    private boolean sendPendingMessages(Member user, boolean positiveStackedResult) throws IOException {
+    private boolean sendPendingMessages(User user, boolean positiveStackedResult) throws IOException {
         List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.pending.is(true)).queryList();
         for (Message pendingMessage : pendingMessages) {
             String conversationId = pendingMessage.getConversationId();
@@ -425,7 +385,7 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean startNewConversation(Member user, String localConversationId, Message startMessage) throws IOException {
+    private boolean startNewConversation(User user, String localConversationId, Message startMessage) throws IOException {
 
         Conversation pendingConversation = new Select().from(Conversation.class).where(Conversation_Table.id.is(localConversationId)).querySingle();
         if (pendingConversation == null) {
@@ -457,7 +417,7 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean retrieveMessages(Member user, String... params) throws IOException {
+    private boolean retrieveMessages(User user, String... params) throws IOException {
         final String conversationId = params[0];
 
         final boolean loadNewMessages = getBoolFromParams(params,1,true);
@@ -622,14 +582,13 @@ public class FetLifeApiIntentService extends IntentService {
         return param;
     }
 
-    private boolean retrieveMyself() throws IOException {
-        Call<Member> getMeCall = getFetLifeApi().getMe(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken());
-        Response<Member> getMeResponse = getMeCall.execute();
+    private User retrieveCurrentUser() throws IOException {
+        Call<User> getMeCall = getFetLifeApi().getMe(FetLifeService.AUTH_HEADER_PREFIX + getFetLifeApplication().getAccessToken());
+        Response<User> getMeResponse = getMeCall.execute();
         if (getMeResponse.isSuccess()) {
-            getFetLifeApplication().setMe(getMeResponse.body());
-            return true;
+            return getMeResponse.body();
         } else {
-            return false;
+            return null;
         }
     }
 

@@ -117,7 +117,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
 
         Context context = itemView.getContext();
         FetLifeApplication fetLifeApplication = (FetLifeApplication) context.getApplicationContext();
-        selfMessageId = fetLifeApplication.getMe().getId();
+        selfMessageId = fetLifeApplication.getUserSessionManager().getCurrentUser().getId();
 
         subMessageSeparator = context.getResources().getString(R.string.message_sub_separator);
 

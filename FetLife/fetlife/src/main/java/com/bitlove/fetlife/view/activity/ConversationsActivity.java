@@ -50,6 +50,11 @@ public class ConversationsActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //TODO: handle better way activity hierarchy
+        if (getFetLifeApplication().getUserSessionManager().getCurrentUser() == null) {
+            return;
+        }
+
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
