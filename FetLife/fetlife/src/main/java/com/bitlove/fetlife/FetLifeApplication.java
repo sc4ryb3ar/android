@@ -7,19 +7,18 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
-import com.bitlove.fetlife.util.SecurityUtil;
+import com.bitlove.fetlife.view.activity.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
@@ -29,6 +28,7 @@ import org.greenrobot.eventbus.EventBus;
 public class FetLifeApplication extends Application {
 
     private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
+    private static final long WAITING_FOR_RESULT_LOGOUT_DELAY_MILLIS = 30 * 1000;
 
     private static FetLifeApplication instance;
 
@@ -112,8 +112,16 @@ public class FetLifeApplication extends Application {
         }
     }
 
+    public synchronized void setForegroundActivity(Activity foregroundActivity) {
+        synchronized (userSessionManager) {
+            this.foregroundActivity = foregroundActivity;
+        }
+    }
+
     public boolean isAppInForeground() {
-        return foregroundActivity != null;
+        synchronized (userSessionManager) {
+            return foregroundActivity != null;
+        }
     }
 
     public Activity getForegroundActivity() {
@@ -156,9 +164,11 @@ public class FetLifeApplication extends Application {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade >= versionNumber) {
+        if (lastVersionUpgrade >= 10510) {
             return;
         }
+
+        sharedPreferences.edit().clear().apply();
 
         FlowManager.destroy();
         deleteDatabase(FetLifeDatabase.NAME + ".db");
@@ -178,19 +188,40 @@ public class FetLifeApplication extends Application {
 
         @Override
         public void onActivityResumed(Activity activity) {
-            foregroundActivity = activity;
+            setForegroundActivity(activity);
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
-            foregroundActivity = null;
+            setForegroundActivity(null);
         }
 
         @Override
         public void onActivityStopped(Activity activity) {
-            if (foregroundActivity == null && !activity.isChangingConfigurations()) {
-                userSessionManager.onAppInBackground();
+            boolean isWaitingForResult = isWaitingForResult(activity);
+            if (!isAppInForeground() && !activity.isChangingConfigurations() && !isWaitingForResult) {
+                if (userSessionManager.getPasswordAlwaysPreference()) {
+                    userSessionManager.onUserLogOut();
+                }
+            } else if(isWaitingForResult) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (userSessionManager) {
+                            if (!isAppInForeground()) {
+                                userSessionManager.onUserLogOut();
+                            }
+                        }
+                    }
+                }, WAITING_FOR_RESULT_LOGOUT_DELAY_MILLIS);
             }
+        }
+
+        private boolean isWaitingForResult(Activity activity) {
+            if (activity instanceof ResourceListActivity) {
+                return ((ResourceListActivity)activity).isWaitingForResult();
+            }
+            return false;
         }
 
         @Override

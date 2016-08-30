@@ -51,12 +51,6 @@ public class UserSessionManager {
         }
     }
 
-    public void onAppInBackground() {
-        if (getPasswordAlwaysPreference(getUserKey(currentUser))) {
-            onUserLogOut();
-        }
-    }
-
     public void onUserLogIn(User loggedInUser, boolean passwordAlways) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
@@ -144,6 +138,10 @@ public class UserSessionManager {
         } catch (JSONException e) {
             //TODO: think about possible error handling
         }
+    }
+
+    public boolean getPasswordAlwaysPreference() {
+        return getPasswordAlwaysPreference(getUserKey(currentUser));
     }
 
     private void setPasswordAlwaysPreference(String userKey, boolean checked) {

@@ -60,6 +60,8 @@ public class ResourceListActivity extends AppCompatActivity
     protected EditText textInput;
     protected ProgressBar progressIndicator;
 
+    private boolean waitingForResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +179,12 @@ public class ResourceListActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        waitingForResult = false;
     }
 
     @Override
@@ -320,4 +328,19 @@ public class ResourceListActivity extends AppCompatActivity
         return (FetLifeApplication) getApplication();
     }
 
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
+        super.startActivityForResult(intent, requestCode, options);
+        waitingForResult = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        waitingForResult = false;
+    }
+
+    public boolean isWaitingForResult() {
+        return waitingForResult;
+    }
 }
