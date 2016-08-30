@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.activity.ResourceListActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +77,10 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+        ResourceListActivity activity = getResourceActivity();
+        if (getResourceActivity() != null) {
+            activity.onWaitingForResult();
+        }
         startActivityForResult(Intent.createChooser(intent,
                 getResources().getString(R.string.title_intent_choose_media_upload)), REQUEST_CODE_GALLERY_IMAGE);
     }
@@ -146,5 +150,14 @@ public class MediaUploadSelectionDialog extends DialogFragment {
 
     private static DialogFragment newInstance() {
         return new MediaUploadSelectionDialog();
+    }
+
+    private ResourceListActivity getResourceActivity() {
+        Activity activity = getActivity();
+        if (activity instanceof ResourceListActivity) {
+            return (ResourceListActivity) activity;
+        } else {
+            return null;
+        }
     }
 }

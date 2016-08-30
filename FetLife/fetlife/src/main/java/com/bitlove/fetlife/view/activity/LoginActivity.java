@@ -144,11 +144,6 @@ public class LoginActivity extends Activity {
         }
     }
 
-    public static void logout(FetLifeApplication fetLifeApplication) {
-        fetLifeApplication.getUserSessionManager().onUserReset();
-        startLogin(fetLifeApplication);
-    }
-
     public static void startLogin(FetLifeApplication fetLifeApplication) {
         //TODO: add toast
         Intent intent = new Intent(fetLifeApplication, LoginActivity.class);

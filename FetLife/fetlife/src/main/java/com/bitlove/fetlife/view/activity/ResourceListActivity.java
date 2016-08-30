@@ -226,8 +226,12 @@ public class ResourceListActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_logout) {
-            LoginActivity.logout(getFetLifeApplication());
+        if (id == R.id.nav_reset) {
+            getFetLifeApplication().getUserSessionManager().onUserReset();
+            LoginActivity.startLogin(getFetLifeApplication());
+        } else if (id == R.id.nav_logout) {
+            getFetLifeApplication().getUserSessionManager().onUserLogOut();
+            LoginActivity.startLogin(getFetLifeApplication());
         } else if (id == R.id.nav_conversations) {
             ConversationsActivity.startActivity(this);
         } else if (id == R.id.nav_friends) {
@@ -291,7 +295,8 @@ public class ResourceListActivity extends AppCompatActivity
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAuthenticationFailed(AuthenticationFailedEvent authenticationFailedEvent) {
         showToast(getString(R.string.authentication_failed));
-        LoginActivity.logout(getFetLifeApplication());
+        getFetLifeApplication().getUserSessionManager().onUserLogOut();
+        LoginActivity.startLogin(getFetLifeApplication());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -342,5 +347,9 @@ public class ResourceListActivity extends AppCompatActivity
 
     public boolean isWaitingForResult() {
         return waitingForResult;
+    }
+
+    public void onWaitingForResult() {
+        this.waitingForResult = true;
     }
 }

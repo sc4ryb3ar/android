@@ -28,7 +28,7 @@ import org.greenrobot.eventbus.EventBus;
 public class FetLifeApplication extends Application {
 
     private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
-    private static final long WAITING_FOR_RESULT_LOGOUT_DELAY_MILLIS = 30 * 1000;
+    private static final long WAITING_FOR_RESULT_LOGOUT_DELAY_MILLIS = 60 * 1000;
 
     private static FetLifeApplication instance;
 
