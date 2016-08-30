@@ -51,7 +51,7 @@ public class UserSessionManager {
         }
     }
 
-    public void onUserLogIn(User loggedInUser, boolean passwordAlways) {
+    public synchronized void onUserLogIn(User loggedInUser, boolean passwordAlways) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
@@ -62,14 +62,18 @@ public class UserSessionManager {
         }
     }
 
-    public void onUserLogOut() {
+    public synchronized void onUserLogOut() {
         logOutUser(currentUser);
         currentUser = null;
     }
 
-    public void onUserReset() {
+    public synchronized void onUserReset() {
         resetUser(currentUser);
         currentUser = null;
+    }
+
+    public synchronized User getCurrentUser() {
+        return currentUser;
     }
 
     private void logInUser(User user) {
@@ -277,7 +281,4 @@ public class UserSessionManager {
         return user1.getNickname().equals(user2.getNickname());
     }
 
-    public User getCurrentUser() {
-        return currentUser;
-    }
 }

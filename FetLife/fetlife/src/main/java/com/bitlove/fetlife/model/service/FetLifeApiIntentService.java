@@ -20,6 +20,7 @@ import com.bitlove.fetlife.event.NewConversationEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
+import com.bitlove.fetlife.exception.NoLoggedInUserRuntimeException;
 import com.bitlove.fetlife.model.api.FetLifeApi;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
@@ -39,6 +40,7 @@ import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.squareup.okhttp.MediaType;
@@ -143,7 +145,7 @@ public class FetLifeApiIntentService extends IntentService {
                     result = logonUser(params);
                     break;
                 case ACTION_APICALL_CONVERSATIONS:
-                    result = retriveConversations(params);
+                    result = retrieveConversations(params);
                     break;
                 case ACTION_APICALL_FRIENDS:
                     result = retriveFriends(params);
@@ -164,7 +166,7 @@ public class FetLifeApiIntentService extends IntentService {
                     result = sendPendingFriendRequests();
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
-                    result = uploadPiture(params);
+                    result = uploadPicture(params);
                     break;
             }
 
@@ -182,6 +184,15 @@ public class FetLifeApiIntentService extends IntentService {
             }
         } catch (IOException ioe) {
             sendConnectionFailedNotification(action);
+        } catch (InvalidDBConfiguration idb) {
+            //db might have been closed due probably to user logout, check it and let
+            //the exception go in case of it is not the case
+            //TODO: create separate DB Manager class to synchronize db executions and DB close due to user logout
+            if (getFetLifeApplication().getUserSessionManager().getCurrentUser() != null) {
+                throw idb;
+            }
+        } catch (NoLoggedInUserRuntimeException nue) {
+            //skip
         } finally {
             setActionInProgress(null);
         }
@@ -467,7 +478,7 @@ public class FetLifeApiIntentService extends IntentService {
         return response.isSuccess();
     }
 
-    private boolean uploadPiture(String[] params) throws IOException {
+    private boolean uploadPicture(String[] params) throws IOException {
 
         Uri uri = Uri.parse(params[0]);
         ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
@@ -488,7 +499,7 @@ public class FetLifeApiIntentService extends IntentService {
         return response.isSuccess();
     }
 
-    private boolean retriveConversations(String[] params) throws IOException {
+    private boolean retrieveConversations(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
 
