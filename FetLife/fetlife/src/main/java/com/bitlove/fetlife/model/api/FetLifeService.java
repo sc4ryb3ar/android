@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.exception.NoLoggedInUserRuntimeException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.Interceptor;
@@ -68,9 +67,6 @@ public class FetLifeService {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request request = chain.request();
-                if (fetLifeApplication.getUserSessionManager().getCurrentUser() == null) {
-                    throw new NoLoggedInUserRuntimeException();
-                }
                 Response response = chain.proceed(request);
                 //response.body().string();
                 lastResponseCode = response.code();
