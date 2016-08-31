@@ -32,6 +32,8 @@ public class MediaUploadSelectionDialog extends DialogFragment {
 
     private static final String FRAGMENT_TAG = MediaUploadSelectionDialog.class.getSimpleName();
 
+    private static final String STATE_PARCELABLE_PHOTOURI = "STATE_PARCELABLE_PHOTOURI";
+
     private Uri photoURI;
 
     @Nullable
@@ -83,6 +85,18 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         }
         startActivityForResult(Intent.createChooser(intent,
                 getResources().getString(R.string.title_intent_choose_media_upload)), REQUEST_CODE_GALLERY_IMAGE);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_PARCELABLE_PHOTOURI, photoURI);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        photoURI = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
     }
 
     @Override

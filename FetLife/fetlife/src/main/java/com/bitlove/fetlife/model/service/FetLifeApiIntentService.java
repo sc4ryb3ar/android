@@ -20,7 +20,6 @@ import com.bitlove.fetlife.event.NewConversationEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.exception.NoLoggedInUserRuntimeException;
 import com.bitlove.fetlife.model.api.FetLifeApi;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
@@ -191,8 +190,6 @@ public class FetLifeApiIntentService extends IntentService {
             if (getFetLifeApplication().getUserSessionManager().getCurrentUser() != null) {
                 throw idb;
             }
-        } catch (NoLoggedInUserRuntimeException nue) {
-            //skip
         } finally {
             setActionInProgress(null);
         }
