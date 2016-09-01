@@ -134,7 +134,7 @@ public class FetLifeApiIntentService extends IntentService {
                 if (refreshToken(currentUser)) {
                     onHandleIntent(intent);
                 } else {
-                    sendAuthenticaionFailedNotification();
+                    sendAuthenticationFailedNotification();
                     return;
                 }
             }
@@ -227,7 +227,7 @@ public class FetLifeApiIntentService extends IntentService {
 
     }
 
-    private void sendAuthenticaionFailedNotification() {
+    private void sendAuthenticationFailedNotification() {
         getFetLifeApplication().getEventBus().post(new AuthenticationFailedEvent());
     }
 

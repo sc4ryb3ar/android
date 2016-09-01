@@ -106,17 +106,11 @@ public class ResourceListActivity extends AppCompatActivity
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
-        textInput.setFilters(new InputFilter[]{new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                CharSequence noEmoji = EmojiUtil.removeEmojis(source.toString());
-                if (noEmoji.length() != source.length()) {
-                    return noEmoji;
-                } else {
-                    return source;
-                }
-            }
-        }});
+//        textInput.setFilters(new InputFilter[]{new InputFilter() {
+//            @Override
+//            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+//                  //Custom Emoji Support will go here
+//        }});
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());

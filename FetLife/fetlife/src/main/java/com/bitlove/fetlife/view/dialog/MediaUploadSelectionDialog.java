@@ -96,7 +96,9 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        photoURI = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
+        if (savedInstanceState != null) {
+            photoURI = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
+        }
     }
 
     @Override

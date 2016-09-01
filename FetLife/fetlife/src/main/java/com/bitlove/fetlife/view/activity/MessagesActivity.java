@@ -40,7 +40,6 @@ public class MessagesActivity extends ResourceListActivity
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
     private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
 
-    private FlowContentObserver messagesModelObserver;
     private MessagesRecyclerAdapter messagesAdapter;
 
     private String conversationId;
@@ -105,9 +104,8 @@ public class MessagesActivity extends ResourceListActivity
             return;
         }
 
-        messagesModelObserver = new FlowContentObserver();
-        messagesModelObserver = new FlowContentObserver();
-        messagesModelObserver.registerForContentChanges(this, Message.class);
+        getFetLifeApplication().getEventBus().register(this);
+
         messagesAdapter.refresh();
 
         if (!Conversation.isLocal(conversationId)) {
@@ -142,8 +140,6 @@ public class MessagesActivity extends ResourceListActivity
     @Override
     protected void onStop() {
         super.onStop();
-
-        messagesModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
     }

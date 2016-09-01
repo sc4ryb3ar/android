@@ -81,6 +81,12 @@
 
             <p>Version History</p>
 
+            <p/>v1.6<br/>
+                    <ul>
+                        <li>Default Emoji Support</li>
+                        <li>Crash fixes</li>
+                    </ul>
+
             <p/>v1.5<br/>
                     <ul>
                         <li>Notification Settings</li>
