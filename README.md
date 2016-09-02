@@ -42,11 +42,11 @@ If you are interested in testing new features you can download one of our our pr
 
 Official app with FetLife icon and App name
 
-[fetlife-1.6.0.apk](https://github.com/fetlife/android/releases/download/v1.6.0/fetlife-1.6.0.apk)
+[fetlife-1.6.1.apk](https://github.com/fetlife/android/releases/download/v1.6.1/fetlife-1.6.1.apk)
 
 Vanilla version with general icon and App name
 
-[fetlife-vanilla-1.6.0.apk](https://github.com/fetlife/android/releases/download/v1.6.0/fetlife-vanilla-1.6.0.apk)
+[fetlife-vanilla-1.6.1.apk](https://github.com/fetlife/android/releases/download/v1.6.1/fetlife-vanilla-1.6.1.apk)
 
 
 ### Kinksters Helping Kinksters
