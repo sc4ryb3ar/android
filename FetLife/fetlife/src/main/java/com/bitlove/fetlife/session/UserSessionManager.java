@@ -63,13 +63,13 @@ public class UserSessionManager {
     }
 
     public synchronized void onUserLogOut() {
-        currentUser = null;
         logOutUser(currentUser);
+        currentUser = null;
     }
 
     public synchronized void onUserReset() {
-        currentUser = null;
         resetUser(currentUser);
+        currentUser = null;
     }
 
     public synchronized User getCurrentUser() {
