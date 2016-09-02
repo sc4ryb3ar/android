@@ -20,7 +20,8 @@ Welcome to FetLife's open-source Android app!
 - Image upload from Gallery
 - Image upload taken by Camera
 - Fine tune Notification Settings
-- Use Vanilla version to hide what App you use
+- Use Vanilla version to hide what kind of App you use
+- Use the defaut unicode emoji set in your coverations
 
 ### Requirements
 
