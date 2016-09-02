@@ -35,19 +35,9 @@ Welcome to FetLife's open-source Android app!
 
 1. Enable installing application from unknwon sources.
 For more information about how to do it please read the following [guideline](https://developer.android.com/distribute/tools/open-distribution.html#unknown-sources)
-2. Download and install the [fetlife-1.4.0.apk](https://github.com/fetlife/fetlife-android/releases/download/v1.4.0/fetlife-1.4.0.apk) to your device
+2a. Download and install the [fetlife-1.6.2.apk](https://github.com/fetlife/android/releases/download/v1.6.2/fetlife-1.6.2.apk) to your device
+2b If you would like to have less kinky icon and app name to make the app look like a usual app on your device, you can also download our vanilla version [fetlife-vanilla-1.6.2.apk](https://github.com/fetlife/android/releases/download/v1.6.2/fetlife-vanilla-1.6.2.apk)
 3. (Optional) disable application install from unknown sources.
-
-If you are interested in testing new features you can download one of our our pre-release versions:
-
-Official app with FetLife icon and App name
-
-[fetlife-1.6.1.apk](https://github.com/fetlife/android/releases/download/v1.6.1/fetlife-1.6.1.apk)
-
-Vanilla version with general icon and App name
-
-[fetlife-vanilla-1.6.1.apk](https://github.com/fetlife/android/releases/download/v1.6.1/fetlife-vanilla-1.6.1.apk)
-
 
 ### Kinksters Helping Kinksters
 
