@@ -39,7 +39,7 @@ For more information about how to do it please read the following [guideline](ht
 
 2. Download and install the [fetlife-1.6.3.apk](https://github.com/fetlife/android/releases/download/v1.6.3/fetlife-1.6.3.apk) to your device
 
-2. If you would like to have less kinky icon and app name to make the app look like a usual app on your device, you can also download our vanilla version [fetlife-vanilla-1.6.3.apk](https://github.com/fetlife/android/releases/download/v1.6.3/fetlife-vanilla-1.6.3.apk)
+If you would like to have less kinky icon and app name to make the app look like a usual app on your device, you can rather download our vanilla version [fetlife-vanilla-1.6.3.apk](https://github.com/fetlife/android/releases/download/v1.6.3/fetlife-vanilla-1.6.3.apk)
 
 3. (Optional) disable application install from unknown sources.
 
