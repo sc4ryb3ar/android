@@ -63,20 +63,20 @@ public class UserSessionManager {
     }
 
     public synchronized void onUserLogOut() {
-        logOutUser(currentUser);
         currentUser = null;
+        logOutUser(currentUser);
     }
 
     public synchronized void onUserReset() {
-        resetUser(currentUser);
         currentUser = null;
+        resetUser(currentUser);
     }
 
     public synchronized User getCurrentUser() {
         return currentUser;
     }
 
-    private void logInUser(User user) {
+    private synchronized void logInUser(User user) {
         saveLastLoggedUserKey(getUserKey(user));
         loadUserDb(getUserKey(user));
         initUserPreferences(getUserKey(user));
@@ -85,7 +85,7 @@ public class UserSessionManager {
         registerToPushMessages(user);
     }
 
-    private void logOutUser(User user) {
+    private synchronized void logOutUser(User user) {
         closeDb();
         String userKey = user == null ? loadLastLoggedUserKey() : getUserKey(user);
         if (userKey != null) {
@@ -95,7 +95,7 @@ public class UserSessionManager {
         }
     }
 
-    private void resetUser(User user) {
+    private synchronized void resetUser(User user) {
         String userKey = getUserKey(user);
         if (userKey == null) {
             return;
