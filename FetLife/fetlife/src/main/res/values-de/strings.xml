@@ -65,7 +65,7 @@
   <string name="message_image_upload_finished">Dein Foto wurde hochgeladen</string>
   <string name="message_image_upload_failed">Hochladen des Fotos fehlgeschlagen. Versuche es später nochmal</string>
   <string name="action_clear_notification_history">Lösche alle</string>
-  <string name="message_media_picture_upload_confirmation">Ich bezeuge, dass dieses Foto von mir ist, oder dass ich die expliziete Berechtigung habe, es auf Fetlife zu teilen. Ich erzähle keine Lügen</string>
+  <string name="message_media_picture_upload_confirmation">Ich bezeuge, dass dieses Foto von mir ist, oder dass ich die explizite Berechtigung habe, es auf Fetlife zu teilen. Ich erzähle keine Lügen</string>
   <string name="button_media_picture_upload_confirmation">Bestätigen</string>
   <string name="button_media_picture_upload_cancel">Abbrechen</string>
   <string name="title_media_picture_upload_confirmation">Füge dein Bild hinzu</string>
@@ -75,7 +75,7 @@
   <string name="settings_summary_notifications">Stelle ein wann und wie Benachrichtigungen empfangen werden</string>
   <string name="settings_category_notification_text">Benachrichtigungstext</string>
   <string name="settings_title_notification_anonymtext">Anonyme Benachrichtigungen</string>
-  <string name="settings_summary_notification_anonymtext">Verstecke jede Details in eingehenden Benachrichtigungen und nutze stattdessen eine einzige Standardbenachrichtigung</string>
+  <string name="settings_summary_notification_anonymtext">Verstecke alle Details in eingehenden Benachrichtigungen und nutze stattdessen eine einzige Standardbenachrichtigung</string>
   <string name="settings_category_notification_enablement">Aktiviere Benachrichtigungen</string>
   <string name="settings_title_notification_messages_enabled">Nachricht-Benachrichtigungen</string>
   <string name="settings_summary_notification_messages_enabled">Aktiviere Benachrichtigungen für eingehende Nachrichten</string>
