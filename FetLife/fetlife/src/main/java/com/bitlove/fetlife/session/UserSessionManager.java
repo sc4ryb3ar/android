@@ -48,8 +48,6 @@ public class UserSessionManager {
             return;
         }
 
-        Log.w("GHI168","Init; userkey: " + userKey);
-
         applyVersionUpgradeIfNeeded(userKey);
 
         if (!getPasswordAlwaysPreference(userKey)) {
@@ -240,12 +238,8 @@ public class UserSessionManager {
     }
 
     private void initUserPreferences(String userKey) {
-        Log.w("GHI168","initUserPreferences; pref w true: " + getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true));
-        Log.w("GHI168","initUserPreferences; pref w false: " + getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, false));
         SettingsActivity.init(getUserPreferenceName(userKey));
         PreferenceManager.setDefaultValues(fetLifeApplication, getUserPreferenceName(userKey), Context.MODE_PRIVATE, R.xml.notification_preferences, false);
-        Log.w("GHI168", "initUserPreferences; pref w true: " + getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true));
-        Log.w("GHI168", "initUserPreferences; pref w false: " + getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, false));
     }
 
     private SharedPreferences getUserPreferences(String userKey) {
@@ -301,14 +295,10 @@ public class UserSessionManager {
     private void applyVersionUpgradeIfNeeded(String userKey) {
         SharedPreferences sharedPreferences = getUserPreferences(userKey);
         int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        Log.w("GHI168","applyVersionUpgradeIfNeeded; lastVersionUpgrade: " + lastVersionUpgrade);
         if (lastVersionUpgrade < 10603) {
             SharedPreferences oldPreference = fetLifeApplication.getSharedPreferences(userKey, Context.MODE_PRIVATE);
-            Log.w("GHI168","applyVersionUpgradeIfNeeded; currentSettings: " +  sharedPreferences.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true));
             boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
-            Log.w("GHI168","applyVersionUpgradeIfNeeded; oldSettings: " + oldSettings);
             sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
-            Log.w("GHI168", "applyVersionUpgradeIfNeeded; newSettings: " + sharedPreferences.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true));
         }
     }
 
