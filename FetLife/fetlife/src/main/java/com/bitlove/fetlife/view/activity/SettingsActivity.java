@@ -10,6 +10,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -17,6 +18,7 @@ import android.widget.LinearLayout;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.util.PreferenceKeys;
 
 import java.util.List;
 
@@ -94,8 +96,14 @@ public class SettingsActivity extends PreferenceActivity {
 
             getPreferenceManager().setSharedPreferencesName(userPreferenceName);
 
+            Log.w("GHI168", "ProfileSettings; pref w true: " + getPreferenceManager().getSharedPreferences().getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true));
+            Log.w("GHI168", "ProfileSettings; pref w false: " + getPreferenceManager().getSharedPreferences().getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, false));
+
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.profile_preferences);
+
+            Log.w("GHI168", "ProfileSettings; pref w true: " + getPreferenceManager().getSharedPreferences().getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true));
+            Log.w("GHI168", "ProfileSettings; pref w false: " + getPreferenceManager().getSharedPreferences().getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, false));
 
             Preference clearDataPreference = findPreference(getString(R.string.settings_key_profile_clear_data));
             clearDataPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -109,7 +117,8 @@ public class SettingsActivity extends PreferenceActivity {
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     FetLifeApplication.getInstance().getUserSessionManager().onUserReset();
-                                }})
+                                }
+                            })
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
