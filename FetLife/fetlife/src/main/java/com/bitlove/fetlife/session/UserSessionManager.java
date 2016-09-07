@@ -55,6 +55,7 @@ public class UserSessionManager {
         if (!getPasswordAlwaysPreference(userKey)) {
             loadUserDb(userKey);
             initDb();
+            initUserPreferences(userKey);
             currentUser = readUserRecord();
         }
     }
