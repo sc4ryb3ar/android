@@ -31,6 +31,8 @@ public class UserSessionManager {
     private static final String CONSTANT_ONESIGNAL_TAG_NICKNAME = "nickname";
     private static final String CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN = "member_token";
 
+    private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
+
     private final FetLifeApplication fetLifeApplication;
 
     private User currentUser;
@@ -44,6 +46,9 @@ public class UserSessionManager {
         if (userKey == null) {
             return;
         }
+
+        applyVersionUpgradeIfNeeded(userKey);
+
         if (!getPasswordAlwaysPreference(userKey)) {
             loadUserDb(userKey);
             initDb();
@@ -77,9 +82,13 @@ public class UserSessionManager {
     }
 
     private synchronized void logInUser(User user) {
-        saveLastLoggedUserKey(getUserKey(user));
+        String userKey = getUserKey(user);
+
+        applyVersionUpgradeIfNeeded(userKey);
+
+        saveLastLoggedUserKey(userKey);
         loadUserDb(getUserKey(user));
-        initUserPreferences(getUserKey(user));
+        initUserPreferences(userKey);
         initDb();
         updateUserRecord(user);
         registerToPushMessages(user);
@@ -232,7 +241,7 @@ public class UserSessionManager {
     }
 
     private SharedPreferences getUserPreferences(String userKey) {
-        return fetLifeApplication.getSharedPreferences(userKey,Context.MODE_PRIVATE);
+        return fetLifeApplication.getSharedPreferences(getUserPreferenceName(userKey),Context.MODE_PRIVATE);
     }
 
     private void clearUserPreferences(String userKey) {
@@ -279,6 +288,16 @@ public class UserSessionManager {
             return false;
         }
         return user1.getNickname().equals(user2.getNickname());
+    }
+
+    private void applyVersionUpgradeIfNeeded(String userKey) {
+        SharedPreferences sharedPreferences = getUserPreferences(userKey);
+        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        if (lastVersionUpgrade < 10603) {
+            SharedPreferences oldPreference = fetLifeApplication.getSharedPreferences(userKey, Context.MODE_PRIVATE);
+            boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
+            sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
+        }
     }
 
 }

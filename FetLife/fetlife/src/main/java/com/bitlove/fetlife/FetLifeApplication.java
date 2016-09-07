@@ -165,17 +165,15 @@ public class FetLifeApplication extends Application {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade >= 10510) {
-            return;
+        if (lastVersionUpgrade < 10510) {
+            sharedPreferences.edit().clear().apply();
+
+            FlowManager.destroy();
+            deleteDatabase(FetLifeDatabase.NAME + ".db");
+            openOrCreateDatabase(FetLifeDatabase.NAME + ".db", Context.MODE_PRIVATE, null);
+
+            sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, versionNumber).apply();
         }
-
-        sharedPreferences.edit().clear().apply();
-
-        FlowManager.destroy();
-        deleteDatabase(FetLifeDatabase.NAME + ".db");
-        openOrCreateDatabase(FetLifeDatabase.NAME + ".db", Context.MODE_PRIVATE, null);
-
-        sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, versionNumber).apply();
     }
 
     private class ForegroundActivityObserver implements ActivityLifecycleCallbacks {

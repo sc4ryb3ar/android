@@ -1,16 +1,21 @@
 package com.bitlove.fetlife.view.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 
 import java.util.List;
@@ -82,8 +87,49 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    public static class ProfileSettings extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            getPreferenceManager().setSharedPreferencesName(userPreferenceName);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.profile_preferences);
+
+            Preference clearDataPreference = findPreference(getString(R.string.settings_key_profile_clear_data));
+            clearDataPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Title")
+                            .setMessage("Do you really want to whatever?")
+                            .setInverseBackgroundForced(true)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    FetLifeApplication.getInstance().getUserSessionManager().onUserReset();
+                                }})
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+                    return true;
+                }
+            });
+        }
+    }
+
     @Override
     protected boolean isValidFragment(String fragmentName) {
-        return NotificationSettings.class.getName().equals(fragmentName);
+        if (NotificationSettings.class.getName().equals(fragmentName)) {
+            return true;
+        }
+        if (ProfileSettings.class.getName().equals(fragmentName)) {
+            return true;
+        }
+        return false;
     }
 }

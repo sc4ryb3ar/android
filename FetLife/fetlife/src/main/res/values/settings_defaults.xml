@@ -5,4 +5,5 @@
     <string name="settings_default_notification_friendrequests_enabled">true</string>
     <string name="settings_default_notification_others_enabled">true</string>
     <string name="settings_default_notification_info_enabled">true</string>
+    <string name="settings_default_profile_password_always">true</string>
 </resources>
