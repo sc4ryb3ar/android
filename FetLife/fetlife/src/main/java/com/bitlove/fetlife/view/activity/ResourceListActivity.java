@@ -220,10 +220,7 @@ public class ResourceListActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_reset) {
-            getFetLifeApplication().getUserSessionManager().onUserReset();
-            LoginActivity.startLogin(getFetLifeApplication());
-        } else if (id == R.id.nav_logout) {
+        if (id == R.id.nav_logout) {
             getFetLifeApplication().getUserSessionManager().onUserLogOut();
             LoginActivity.startLogin(getFetLifeApplication());
         } else if (id == R.id.nav_conversations) {

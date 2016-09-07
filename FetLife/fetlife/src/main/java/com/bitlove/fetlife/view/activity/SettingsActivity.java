@@ -105,21 +105,22 @@ public class SettingsActivity extends PreferenceActivity {
             Log.w("GHI168", "ProfileSettings; pref w true: " + getPreferenceManager().getSharedPreferences().getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true));
             Log.w("GHI168", "ProfileSettings; pref w false: " + getPreferenceManager().getSharedPreferences().getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, false));
 
-            Preference clearDataPreference = findPreference(getString(R.string.settings_key_profile_clear_data));
+            final Preference clearDataPreference = findPreference(getString(R.string.settings_key_profile_clear_data));
             clearDataPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle("Title")
-                            .setMessage("Do you really want to whatever?")
+                    new AlertDialog.Builder(getActivity(), R.style.AppTheme_AlertDialog)
+                            .setTitle(getString(R.string.title_delete_user_data_confirmation))
+                            .setMessage(getString(R.string.message_delete_user_data_confirmation))
                             .setInverseBackgroundForced(true)
                             .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            .setPositiveButton(getString(R.string.button_delete_user_data_confirmation), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     FetLifeApplication.getInstance().getUserSessionManager().onUserReset();
+                                    LoginActivity.startLogin(FetLifeApplication.getInstance());
                                 }
                             })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            .setNegativeButton(getString(R.string.button_delete_user_data_cancel), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();

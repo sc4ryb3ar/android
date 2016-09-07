@@ -29,7 +29,6 @@
   <string name="version_prefix">"App Version: "</string>
   <string name="title_activity_friends">Freunde</string>
   <string name="menu_friends">Freunde</string>
-  <string name="menu_logout_and_reset">Lösche lokale Nutzerdaten</string>
   <string name="title_activity_friends_new_conversation">Neue Unterhaltung</string>
   <string name="menu_about">Über</string>
   <string name="text_unknown">unbekannt</string>
