@@ -242,6 +242,10 @@ public class UserSessionManager {
         PreferenceManager.setDefaultValues(fetLifeApplication, getUserPreferenceName(userKey), Context.MODE_PRIVATE, R.xml.notification_preferences, false);
     }
 
+    public SharedPreferences getLoggedInUserPreferences() {
+        return getUserPreferences(getUserKey(currentUser));
+    }
+
     private SharedPreferences getUserPreferences(String userKey) {
         return fetLifeApplication.getSharedPreferences(getUserPreferenceName(userKey),Context.MODE_PRIVATE);
     }
