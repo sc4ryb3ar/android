@@ -63,10 +63,10 @@ public class UserSessionManager {
             logOutUser(currentUser);
             logInUser(loggedInUser);
             currentUser = loggedInUser;
-            setPasswordAlwaysPreference(getUserKey(loggedInUser), passwordAlways);
         } else {
             updateUserRecord(loggedInUser);
         }
+        setPasswordAlwaysPreference(getUserKey(loggedInUser), passwordAlways);
     }
 
     public synchronized void onUserLogOut() {

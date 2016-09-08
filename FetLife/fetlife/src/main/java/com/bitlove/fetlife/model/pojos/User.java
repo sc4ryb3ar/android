@@ -14,6 +14,18 @@ public class User extends Member {
     @Column
     private String refreshToken;
 
+    @JsonIgnore
+    @Column
+    private String accessToken;
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
     public String getRefreshToken() {
         return refreshToken;
     }

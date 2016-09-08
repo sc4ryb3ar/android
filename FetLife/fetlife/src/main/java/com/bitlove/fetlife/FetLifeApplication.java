@@ -41,8 +41,6 @@ public class FetLifeApplication extends Application {
     private int versionNumber;
     private Activity foregroundActivity;
 
-    private String accessToken;
-
     private EventBus eventBus;
     private UserSessionManager userSessionManager;
 
@@ -139,14 +137,6 @@ public class FetLifeApplication extends Application {
 
     public NotificationParser getNotificationParser() {
         return notificationParser;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
     }
 
     public EventBus getEventBus() {
