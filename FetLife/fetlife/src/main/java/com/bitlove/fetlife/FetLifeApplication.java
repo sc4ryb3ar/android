@@ -197,7 +197,7 @@ public class FetLifeApplication extends Application {
                     @Override
                     public void run() {
                         synchronized (userSessionManager) {
-                            if (!isAppInForeground()) {
+                            if (!isAppInForeground() && userSessionManager.getCurrentUser() != null && userSessionManager.getPasswordAlwaysPreference()) {
                                 userSessionManager.onUserLogOut();
                             }
                         }
