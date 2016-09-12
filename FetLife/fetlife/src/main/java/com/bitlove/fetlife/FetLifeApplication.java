@@ -201,7 +201,7 @@ public class FetLifeApplication extends Application {
         public void onActivityStopped(Activity activity) {
             boolean isWaitingForResult = isWaitingForResult(activity);
             if (!isAppInForeground() && !activity.isChangingConfigurations() && !isWaitingForResult) {
-                if (userSessionManager.getPasswordAlwaysPreference()) {
+                if (userSessionManager.getActivePasswordAlwaysPreference()) {
                     userSessionManager.onUserLogOut();
                 }
             } else if(isWaitingForResult) {
@@ -209,7 +209,7 @@ public class FetLifeApplication extends Application {
                     @Override
                     public void run() {
                         synchronized (userSessionManager) {
-                            if (!isAppInForeground()) {
+                            if (!isAppInForeground() && userSessionManager.getActivePasswordAlwaysPreference()) {
                                 userSessionManager.onUserLogOut();
                             }
                         }
