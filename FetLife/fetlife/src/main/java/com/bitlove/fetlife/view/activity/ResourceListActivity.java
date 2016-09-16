@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.Spanned;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -106,6 +107,8 @@ public class ResourceListActivity extends AppCompatActivity
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
+        //textInput.setSingleLine(false);
+        //textInput.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
 //        textInput.setFilters(new InputFilter[]{new InputFilter() {
 //            @Override
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {

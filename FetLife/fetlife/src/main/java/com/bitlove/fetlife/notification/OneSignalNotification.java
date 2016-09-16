@@ -35,7 +35,7 @@ public abstract class OneSignalNotification {
     public abstract String getAssociatedPreferenceKey(Context context);
 
     public boolean isEnabled(FetLifeApplication fetLifeApplication) {
-        SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getLoggedInUserPreferences();
+        SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getActiveUserPreferences();
         return sharedPreferences.getBoolean(getAssociatedPreferenceKey(fetLifeApplication), true);
     }
 

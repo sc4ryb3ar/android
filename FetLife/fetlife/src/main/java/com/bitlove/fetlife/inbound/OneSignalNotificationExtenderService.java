@@ -46,7 +46,7 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
     }
 
     private boolean useAnonymNotifications() {
-        SharedPreferences sharedPreferences = getFetLifeApplication().getUserSessionManager().getLoggedInUserPreferences();
+        SharedPreferences sharedPreferences = getFetLifeApplication().getUserSessionManager().getActiveUserPreferences();
         return sharedPreferences.getBoolean(getFetLifeApplication().getString(R.string.settings_key_notification_anonymtext),false);
     }
 

@@ -37,6 +37,7 @@ public class UserSessionManager {
     private final FetLifeApplication fetLifeApplication;
 
     private User currentUser;
+    private SharedPreferences activePreferences;
 
     public UserSessionManager(FetLifeApplication fetLifeApplication) {
         this.fetLifeApplication = fetLifeApplication;
@@ -50,6 +51,7 @@ public class UserSessionManager {
 
         applyVersionUpgradeIfNeeded(userKey);
 
+        initUserPreferences(userKey);
         if (!getPasswordAlwaysPreference(userKey)) {
             loadUserDb(userKey);
             initDb();
@@ -155,16 +157,20 @@ public class UserSessionManager {
         }
     }
 
-    public boolean getPasswordAlwaysPreference() {
-        return getPasswordAlwaysPreference(getUserKey(currentUser));
+    public SharedPreferences getActiveUserPreferences() {
+        return activePreferences;
+    }
+
+    public boolean getActivePasswordAlwaysPreference() {
+        return activePreferences.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
+    }
+
+    public boolean getPasswordAlwaysPreference(String userKey) {
+        return getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
     }
 
     private void setPasswordAlwaysPreference(String userKey, boolean checked) {
-        SharedPreferences sharedPreferences = getUserPreferences(userKey);
-        sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, checked).apply();
-    }
-    private boolean getPasswordAlwaysPreference(String userKey) {
-        return getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
+        getUserPreferences(userKey).edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, checked).apply();
     }
 
     private String loadLastLoggedUserKey() {
@@ -238,12 +244,10 @@ public class UserSessionManager {
     }
 
     private void initUserPreferences(String userKey) {
-        SettingsActivity.init(getUserPreferenceName(userKey));
-        PreferenceManager.setDefaultValues(fetLifeApplication, getUserPreferenceName(userKey), Context.MODE_PRIVATE, R.xml.notification_preferences, false);
-    }
-
-    public SharedPreferences getLoggedInUserPreferences() {
-        return getUserPreferences(getUserKey(currentUser));
+        String userPreferenceName = getUserPreferenceName(userKey);
+        SettingsActivity.init(userPreferenceName);
+        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+        activePreferences = getUserPreferences(userKey);
     }
 
     private SharedPreferences getUserPreferences(String userKey) {
