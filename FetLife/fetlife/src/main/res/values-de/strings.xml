@@ -64,7 +64,7 @@
   <string name="message_image_upload_finished">Dein Foto wurde hochgeladen</string>
   <string name="message_image_upload_failed">Hochladen des Fotos fehlgeschlagen. Versuche es später nochmal</string>
   <string name="action_clear_notification_history">Lösche alle</string>
-  <string name="message_media_picture_upload_confirmation">Ich bezeuge, dass dieses Foto von mir ist, oder dass ich die explizite Berechtigung habe, es auf Fetlife zu teilen. Ich erzähle keine Lügen</string>
+  <string name="message_media_picture_upload_confirmation">Ich bezeuge, dass dieses Foto von mir ist, oder dass ich die explizite Berechtigung habe, es auf Fetlife zu teilen.\nIch erzähle keine Lügen</string>
   <string name="button_media_picture_upload_confirmation">Bestätigen</string>
   <string name="button_media_picture_upload_cancel">Abbrechen</string>
   <string name="title_media_picture_upload_confirmation">Füge dein Bild hinzu</string>

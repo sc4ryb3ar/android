@@ -487,16 +487,20 @@ public class FetLifeApiIntentService extends IntentService {
         Uri uri = Uri.parse(params[0]);
         ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
 
+        boolean deleteAfterUpload = getBoolFromParams(params, 1, false);
+        String caption = params[2];
+        boolean friendsOnly = getBoolFromParams(params, 3, false);
+
         RequestBody pictureBody = RequestBody.create(MediaType.parse(contentResolver.getType(uri)), BytesUtil.getBytes(contentResolver.openInputStream(uri)));
         RequestBody isAvatarPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(false));
-        RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(false));
-        RequestBody captionPart = RequestBody.create(MediaType.parse("text/plain"), "");
+        RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(friendsOnly));
+        RequestBody captionPart = RequestBody.create(MediaType.parse("text/plain"), caption);
         RequestBody isFromUserPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(true));
 
         Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pictureBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
         Response<ResponseBody> response = uploadPictureCall.execute();
 
-        if (getBoolFromParams(params, 1, false)) {
+        if (deleteAfterUpload) {
             getContentResolver().delete(uri, null, null);
         }
 
