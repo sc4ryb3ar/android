@@ -247,11 +247,15 @@ public class ResourceListActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
-        if (finishAtMenuNavigation()) {
+        if (isNavigation(id) && finishAtMenuNavigation()) {
             finish();
         }
 
         return false;
+    }
+
+    private boolean isNavigation(int id) {
+        return id != R.id.nav_upload_pic;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
