@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.view.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -18,11 +19,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.Spanned;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -35,7 +38,7 @@ import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.EmojiUtil;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
@@ -58,9 +61,17 @@ public class ResourceListActivity extends AppCompatActivity
     protected EditText textInput;
     protected ProgressBar progressIndicator;
 
+    private boolean waitingForResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        verifyUser();
+
+        if (isFinishing()) {
+            return;
+        }
 
         //TODO: think of moving content stuff out of this class/method
         setContentView(R.layout.activity_resource);
@@ -73,24 +84,36 @@ public class ResourceListActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        };
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
-        textInput.setFilters(new InputFilter[]{new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                CharSequence noEmoji = EmojiUtil.removeEmojis(source.toString());
-                if (noEmoji.length() != source.length()) {
-                    return noEmoji;
-                } else {
-                    return source;
-                }
-            }
-        }});
+        //textInput.setSingleLine(false);
+        //textInput.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+//        textInput.setFilters(new InputFilter[]{new InputFilter() {
+//            @Override
+//            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+//                  //Custom Emoji Support will go here
+//        }});
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -104,15 +127,15 @@ public class ResourceListActivity extends AppCompatActivity
 
         navigationHeaderView = navigationView.getHeaderView(0);
 
-        Member me = getFetLifeApplication().getMe();
-        if (me != null) {
+        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        if (currentUser != null) {
             TextView headerTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_text);
-            headerTextView.setText(me.getNickname());
+            headerTextView.setText(currentUser.getNickname());
             TextView headerSubTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_subtext);
-            headerSubTextView.setText(me.getMetaInfo());
+            headerSubTextView.setText(currentUser.getMetaInfo());
             ImageView headerAvatar = (ImageView) navigationHeaderView.findViewById(R.id.nav_header_image);
-            getFetLifeApplication().getImageLoader().loadImage(this, me.getAvatarLink(), headerAvatar, R.drawable.dummy_avatar);
-            final String selfLink = me.getLink();
+            getFetLifeApplication().getImageLoader().loadImage(this, currentUser.getAvatarLink(), headerAvatar, R.drawable.dummy_avatar);
+            final String selfLink = currentUser.getLink();
             if (selfLink != null) {
                 headerAvatar.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -156,6 +179,12 @@ public class ResourceListActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        waitingForResult = false;
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -195,7 +224,8 @@ public class ResourceListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_logout) {
-            LoginActivity.logout(getFetLifeApplication());
+            getFetLifeApplication().getUserSessionManager().onUserLogOut();
+            LoginActivity.startLogin(getFetLifeApplication());
         } else if (id == R.id.nav_conversations) {
             ConversationsActivity.startActivity(this);
         } else if (id == R.id.nav_friends) {
@@ -249,24 +279,18 @@ public class ResourceListActivity extends AppCompatActivity
     }
 
     protected void verifyUser() {
-        if (getFetLifeApplication().getMe() == null || !v1_5_pwd_decision_made()) {
-            LoginActivity.login(getFetLifeApplication());
+        if (getFetLifeApplication().getUserSessionManager().getCurrentUser() == null) {
+            LoginActivity.startLogin(getFetLifeApplication());
             finish();
             return;
         }
     }
 
-    //TODO: remove in later versions
-    private boolean v1_5_pwd_decision_made() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        boolean result = preferences.getBoolean("v1_5_pwd_decision_made",false);
-        return result;
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAuthenticationFailed(AuthenticationFailedEvent authenticationFailedEvent) {
         showToast(getString(R.string.authentication_failed));
-        LoginActivity.logout(getFetLifeApplication());
+        getFetLifeApplication().getUserSessionManager().onUserLogOut();
+        LoginActivity.startLogin(getFetLifeApplication());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -303,4 +327,23 @@ public class ResourceListActivity extends AppCompatActivity
         return (FetLifeApplication) getApplication();
     }
 
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
+        super.startActivityForResult(intent, requestCode, options);
+        waitingForResult = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        waitingForResult = false;
+    }
+
+    public boolean isWaitingForResult() {
+        return waitingForResult;
+    }
+
+    public void onWaitingForResult() {
+        this.waitingForResult = true;
+    }
 }

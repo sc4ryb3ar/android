@@ -57,6 +57,10 @@ public class FriendsActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (isFinishing()) {
+            return;
+        }
+
         switch (getFriendListMode()) {
             case FRIEND_PROFILE:
                 setTitle(R.string.title_activity_friends);
@@ -119,6 +123,10 @@ public class FriendsActivity extends ResourceListActivity
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (isFinishing()) {
+            return;
+        }
 
         friendsModelObserver = new FlowContentObserver();
 

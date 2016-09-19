@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.activity.ResourceListActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +31,8 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     private static final int REQUEST_CODE_CAMERA_IMAGE = 3455;
 
     private static final String FRAGMENT_TAG = MediaUploadSelectionDialog.class.getSimpleName();
+
+    private static final String STATE_PARCELABLE_PHOTOURI = "STATE_PARCELABLE_PHOTOURI";
 
     private Uri photoURI;
 
@@ -77,8 +79,26 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+        ResourceListActivity activity = getResourceActivity();
+        if (getResourceActivity() != null) {
+            activity.onWaitingForResult();
+        }
         startActivityForResult(Intent.createChooser(intent,
                 getResources().getString(R.string.title_intent_choose_media_upload)), REQUEST_CODE_GALLERY_IMAGE);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_PARCELABLE_PHOTOURI, photoURI);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            photoURI = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
+        }
     }
 
     @Override
@@ -146,5 +166,14 @@ public class MediaUploadSelectionDialog extends DialogFragment {
 
     private static DialogFragment newInstance() {
         return new MediaUploadSelectionDialog();
+    }
+
+    private ResourceListActivity getResourceActivity() {
+        Activity activity = getActivity();
+        if (activity instanceof ResourceListActivity) {
+            return (ResourceListActivity) activity;
+        } else {
+            return null;
+        }
     }
 }

@@ -21,6 +21,7 @@ import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 
+import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
 import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
@@ -39,7 +40,6 @@ public class MessagesActivity extends ResourceListActivity
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
     private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
 
-    private FlowContentObserver messagesModelObserver;
     private MessagesRecyclerAdapter messagesAdapter;
 
     private String conversationId;
@@ -63,6 +63,10 @@ public class MessagesActivity extends ResourceListActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (isFinishing()) {
+            return;
+        }
 
         floatingActionButton.setVisibility(View.GONE);
 
@@ -96,15 +100,12 @@ public class MessagesActivity extends ResourceListActivity
     protected void onStart() {
         super.onStart();
 
-        messagesModelObserver = new FlowContentObserver();
-
         if (isFinishing()) {
             return;
         }
 
         getFetLifeApplication().getEventBus().register(this);
 
-        messagesModelObserver.registerForContentChanges(this, Message.class);
         messagesAdapter.refresh();
 
         if (!Conversation.isLocal(conversationId)) {
@@ -139,8 +140,6 @@ public class MessagesActivity extends ResourceListActivity
     @Override
     protected void onStop() {
         super.onStop();
-
-        messagesModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
     }
@@ -269,9 +268,9 @@ public class MessagesActivity extends ResourceListActivity
                 message.setClientId(UUID.randomUUID().toString());
                 message.setConversationId(conversationId);
                 message.setBody(text.trim());
-                Member me = getFetLifeApplication().getMe();
-                message.setSenderId(me.getId());
-                message.setSenderNickname(me.getNickname());
+                User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+                message.setSenderId(currentUser.getId());
+                message.setSenderNickname(currentUser.getNickname());
                 message.save();
                 runOnUiThread(new Runnable() {
                     @Override

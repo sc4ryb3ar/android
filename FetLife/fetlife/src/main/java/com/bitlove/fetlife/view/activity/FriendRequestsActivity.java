@@ -51,6 +51,10 @@ public class FriendRequestsActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (isFinishing()) {
+            return;
+        }
+
         floatingActionButton.setVisibility(View.GONE);
 
         friendRequestsAdapter = new FriendRequestsRecyclerAdapter(getFetLifeApplication().getImageLoader(), savedInstanceState == null);
@@ -109,12 +113,11 @@ public class FriendRequestsActivity extends ResourceListActivity
     protected void onStart() {
         super.onStart();
 
-        friendRequestsModelObserver = new FlowContentObserver();
-
         if (isFinishing()) {
             return;
         }
 
+        friendRequestsModelObserver = new FlowContentObserver();
         friendRequestsModelObserver.registerForContentChanges(this, FriendRequest.class);
         friendRequestsAdapter.refresh();
 

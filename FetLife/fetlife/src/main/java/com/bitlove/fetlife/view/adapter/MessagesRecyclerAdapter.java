@@ -17,6 +17,7 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Message;
 
 import com.bitlove.fetlife.model.pojos.Message_Table;
+import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.ColorUtil;
 import com.bitlove.fetlife.util.StringUtil;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -67,7 +68,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
         messageViewHolder.messageText.setText(StringUtil.parseHtml(messageBody));
         messageViewHolder.subText.setText(message.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(message.getDate())));
 
-        boolean myMessage = message.getSenderId().equals(messageViewHolder.selfMessageId);
+        boolean myMessage = message.getSenderId().equals(messageViewHolder.getSelfMessageId());
 
         if (myMessage) {
             messageViewHolder.subText.setGravity(Gravity.RIGHT);
@@ -116,8 +117,6 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
 
         Context context = itemView.getContext();
-        FetLifeApplication fetLifeApplication = (FetLifeApplication) context.getApplicationContext();
-        selfMessageId = fetLifeApplication.getMe().getId();
 
         subMessageSeparator = context.getResources().getString(R.string.message_sub_separator);
 
@@ -132,5 +131,16 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         messageText = (TextView) itemView.findViewById(R.id.message_text);
         messageText.setMovementMethod(LinkMovementMethod.getInstance());
         subText = (TextView) itemView.findViewById(R.id.message_sub);
+    }
+
+    public String getSelfMessageId() {
+        if (selfMessageId == null) {
+            FetLifeApplication fetLifeApplication = (FetLifeApplication) messageContainer.getContext().getApplicationContext();
+            User currentUser = fetLifeApplication.getUserSessionManager().getCurrentUser();
+            if (currentUser != null) {
+                selfMessageId = currentUser.getId();
+            }
+        }
+        return selfMessageId;
     }
 }

@@ -32,7 +32,6 @@
     <string name="version_prefix">"App version: "</string>
     <string name="title_activity_friends">Friends</string>
     <string name="menu_friends">Friends</string>
-    <string name="menu_logout_and_reset">Log out and Reset</string>
     <string name="title_activity_friends_new_conversation">New Conversation</string>
     <string name="menu_about">About</string>
     <string name="text_unknown">unknown</string>
@@ -80,6 +79,12 @@
             <h1>Official FetLife App v%1$s</h1>
 
             <p>Version History</p>
+
+            <p/>v1.6<br/>
+                    <ul>
+                        <li>Default Emoji Support</li>
+                        <li>Crash fixes</li>
+                    </ul>
 
             <p/>v1.5<br/>
                     <ul>
@@ -146,4 +151,17 @@
     <string name="noification_title_new_one_or_more_notification">New Notification</string>
     <string name="noification_text_new_one_or_more_notification">You have one or more notifications waiting</string>
     <string name="logon_check_ask_for_password">Always ask for password</string>
+    <string name="menu_logout">Logout</string>
+    <string name="settings_title_profile">Profile Settings</string>
+    <string name="settings_summary_profile">Manage settings relevant to your FetLife App Profile</string>
+    <string name="settings_category_profile_login">Login Settings</string>
+    <string name="settings_title_profile_password_always">Always ask for password</string>
+    <string name="settings_summary_profile_password_always">Make the app to ask password each time after the App was sent to the background</string>
+    <string name="settings_category_profile_data">User Data Settings</string>
+    <string name="settings_title_profile_clear_data">Clear local User Data</string>
+    <string name="settings_summary_profile_clear_data">Clear all data related to current FetLife profile stored on this device. Also logs out you out and disable any further notifications sent to this user</string>
+    <string name="title_delete_user_data_confirmation">Delete local User Data</string>
+    <string name="message_delete_user_data_confirmation">Do you really want to delete all App local user data and logout?\nYou won\'t receive App notifications until you log in again</string>
+    <string name="button_delete_user_data_confirmation">Yes</string>
+    <string name="button_delete_user_data_cancel">Cancel</string>
 </resources>

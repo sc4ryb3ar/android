@@ -50,6 +50,15 @@ public class ConversationsActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (isFinishing()) {
+            return;
+        }
+
+        //TODO: handle better way activity hierarchy
+        if (getFetLifeApplication().getUserSessionManager().getCurrentUser() == null) {
+            return;
+        }
+
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,12 +107,11 @@ public class ConversationsActivity extends ResourceListActivity
     protected void onStart() {
         super.onStart();
 
-        conversationsModelObserver = new FlowContentObserver();
-
         if (isFinishing()) {
             return;
         }
 
+        conversationsModelObserver = new FlowContentObserver();
         conversationsModelObserver.registerForContentChanges(this, Conversation.class);
         conversationsAdapter.refresh();
 

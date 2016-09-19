@@ -40,6 +40,10 @@ public class NotificationHistoryActivity extends ResourceListActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (isFinishing()) {
+            return;
+        }
+
         floatingActionButton.setVisibility(View.GONE);
 
         notificationHistoryAdapter = new NotificationHistoryRecyclerAdapter();
@@ -63,6 +67,11 @@ public class NotificationHistoryActivity extends ResourceListActivity
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (isFinishing()) {
+            return;
+        }
+
         getFetLifeApplication().getEventBus().register(this);
     }
 
