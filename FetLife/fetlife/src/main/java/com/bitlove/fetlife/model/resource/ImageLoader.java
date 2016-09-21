@@ -1,21 +1,14 @@
 package com.bitlove.fetlife.model.resource;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.widget.ImageView;
 
-import com.bitlove.fetlife.R;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Downloader;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,13 +44,13 @@ public class ImageLoader {
         }
     }
 
-    private FetLifeImageDownloader imageDowloader;
+    private FetLifeImageDownloader imageDownloader;
 
     public ImageLoader(Context context) {
-        imageDowloader = new FetLifeImageDownloader(context, Integer.MAX_VALUE);
+        imageDownloader = new FetLifeImageDownloader(context, Integer.MAX_VALUE);
 
         Picasso.Builder picassoBuilder  = new Picasso.Builder(context);
-        picassoBuilder.downloader(imageDowloader);
+        picassoBuilder.downloader(imageDownloader);
         Picasso picasso = picassoBuilder.build();
         picasso.setIndicatorsEnabled(false);
         picasso.setLoggingEnabled(true);
@@ -76,7 +69,7 @@ public class ImageLoader {
             if (imageUrlParts.length >= 2) {
                 urlToLoad = imageUrlParts[0];
                 String token = imageUrlParts[1];
-                imageDowloader.urlTokenMap.put(urlToLoad, token);
+                imageDownloader.urlTokenMap.put(urlToLoad, token);
             } else {
                 urlToLoad = imageUrl;
             }
