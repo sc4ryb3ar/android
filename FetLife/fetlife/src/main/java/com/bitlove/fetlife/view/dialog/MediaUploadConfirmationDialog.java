@@ -74,7 +74,7 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
         leftButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
+                dismissAllowingStateLoss();
             }
         });
 
@@ -85,7 +85,7 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
-                dismiss();
+                dismissAllowingStateLoss();
             }
         });
         return view;

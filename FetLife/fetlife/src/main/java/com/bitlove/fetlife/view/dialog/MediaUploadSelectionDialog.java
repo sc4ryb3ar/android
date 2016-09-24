@@ -104,7 +104,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        dismiss();
+        dismissAllowingStateLoss();
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
                 MediaUploadConfirmationDialog.show(getActivity(), data.getData().toString(), false);
