@@ -249,38 +249,29 @@ public class MessagesActivity extends ResourceListActivity
 
     public void onSend(View v) {
         final String text = textInput.getText().toString();
+
+        if (text == null || text.trim().length() == 0) {
+            return;
+        }
+
         textInput.setText("");
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (text == null || text.trim().length() == 0) {
-                    return;
-                }
+        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
 
-                if (text.equalsIgnoreCase("fetlifeeastereggcrash")) {
-                    throw new RuntimeException("Surprise!");
-                }
+        Message message = new Message();
+        message.setPending(true);
+        message.setDate(System.currentTimeMillis());
+        message.setClientId(UUID.randomUUID().toString());
+        message.setConversationId(conversationId);
+        message.setBody(text.trim());
+        message.setSenderId(currentUser.getId());
+        message.setSenderNickname(currentUser.getNickname());
+        message.save();
 
-                Message message = new Message();
-                message.setPending(true);
-                message.setDate(System.currentTimeMillis());
-                message.setClientId(UUID.randomUUID().toString());
-                message.setConversationId(conversationId);
-                message.setBody(text.trim());
-                User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
-                message.setSenderId(currentUser.getId());
-                message.setSenderNickname(currentUser.getNickname());
-                message.save();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        messagesAdapter.refresh();
-                    }
-                });
-                FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
-            }
-        }).start();
+        FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
+
+        messagesAdapter.refresh();
+
     }
 
 }

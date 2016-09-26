@@ -31,7 +31,6 @@ public class ConversationsActivity extends ResourceListActivity
 
     private static final int CONVERSATIONS_PAGE_COUNT = 25;
 
-    private FlowContentObserver conversationsModelObserver;
     private ConversationsRecyclerAdapter conversationsAdapter;
 
     private int requestedPage = 1;
@@ -111,8 +110,6 @@ public class ConversationsActivity extends ResourceListActivity
             return;
         }
 
-        conversationsModelObserver = new FlowContentObserver();
-        conversationsModelObserver.registerForContentChanges(this, Conversation.class);
         conversationsAdapter.refresh();
 
         showProgress();
@@ -128,8 +125,6 @@ public class ConversationsActivity extends ResourceListActivity
     @Override
     protected void onStop() {
         super.onStop();
-
-        conversationsModelObserver.unregisterForContentChanges(this);
 
         getFetLifeApplication().getEventBus().unregister(this);
     }

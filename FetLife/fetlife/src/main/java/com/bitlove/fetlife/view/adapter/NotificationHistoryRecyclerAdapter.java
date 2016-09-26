@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.ResourceListActivity;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -134,8 +136,12 @@ public class NotificationHistoryRecyclerAdapter extends RecyclerView.Adapter<Not
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (undo.pending.compareAndSet(true, false)) {
-                    notificationHistoryItem.delete();
+                if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() != null) {
+                    if (undo.pending.compareAndSet(true, false)) {
+                        notificationHistoryItem.delete();
+                    }
+                } else {
+                    //Non-critical case so do not bother the user with notification
                 }
             }
         }, undoDuration);

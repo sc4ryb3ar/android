@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
 
             style="@style/FriendLowerText"
+            android:visibility="gone"
 
             android:layout_toRightOf="@id/friend_icon"
             android:layout_alignParentBottom="true"

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
@@ -21,6 +22,7 @@ import com.bitlove.fetlife.model.pojos.FriendSuggestion_Table;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.ResourceListActivity;
+import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -135,10 +137,15 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
 
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
-                    return;
+                try {
+                    if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
+                        return;
+                    }
+                    getDefaultUIUtil().onDraw(c, recyclerView, ((FriendRequestViewHolder) viewHolder).swipableLayout, dX, dY, actionState, isCurrentlyActive);
+                } catch (NullPointerException npe) {
+                    //Should not happen at all. It happened however twice on one weird device. Let Crashlytics keep reporting this issue, but at least do not crash
+                    Crashlytics.logException(npe);
                 }
-                getDefaultUIUtil().onDraw(c, recyclerView, ((FriendRequestViewHolder) viewHolder).swipableLayout, dX, dY, actionState, isCurrentlyActive);
             }
 
             @Override
@@ -221,14 +228,18 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (undo.pending.compareAndSet(true, false)) {
-                    if (accepted) {
-                        friendSuggestion.setPending(true);
-                        friendSuggestion.save();
-                        FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
-                    } else {
-                        friendSuggestion.delete();
+                if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() != null) {
+                    if (undo.pending.compareAndSet(true, false)) {
+                        if (accepted) {
+                            friendSuggestion.setPending(true);
+                            friendSuggestion.save();
+                            FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
+                        } else {
+                            friendSuggestion.delete();
+                        }
                     }
+                } else {
+                    FetLifeApplication.getInstance().showLongToast(R.string.message_friend_decision_failed);
                 }
             }
         }, undoDuration);
@@ -273,10 +284,14 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (undo.pending.compareAndSet(true, false)) {
-                    friendRequest.setPending(true);
-                    friendRequest.save();
-                    FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
+                if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() != null) {
+                    if (undo.pending.compareAndSet(true, false)) {
+                        friendRequest.setPending(true);
+                        friendRequest.save();
+                        FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
+                    }
+                } else {
+                    FetLifeApplication.getInstance().showLongToast(R.string.message_friend_decision_failed);
                 }
             }
         }, friendrequestUndoDuration);

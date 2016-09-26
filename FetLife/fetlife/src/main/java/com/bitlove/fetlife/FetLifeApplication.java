@@ -101,14 +101,27 @@ public class FetLifeApplication extends Application {
     }
 
     public void showToast(final String text) {
-        if (foregroundActivity != null && !foregroundActivity.isFinishing()) {
-            foregroundActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(foregroundActivity, text, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+//        if (foregroundActivity != null && !foregroundActivity.isFinishing()) {
+//            foregroundActivity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(foregroundActivity, text, Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
+        showToast(text, Toast.LENGTH_SHORT);
+    }
+
+    public void showLongToast(final int resourceId) {
+        showLongToast(getResources().getString(resourceId));
+    }
+
+    public void showLongToast(final String text) {
+        showToast(text, Toast.LENGTH_LONG);
+    }
+
+    private void showToast(final String text, int length) {
+        Toast.makeText(FetLifeApplication.this, text, length).show();
     }
 
     public synchronized void setForegroundActivity(Activity foregroundActivity) {

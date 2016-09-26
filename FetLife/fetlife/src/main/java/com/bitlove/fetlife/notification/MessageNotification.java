@@ -1,8 +1,10 @@
 package com.bitlove.fetlife.notification;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 
 import com.bitlove.fetlife.FetLifeApplication;
@@ -53,11 +55,20 @@ public class MessageNotification extends OneSignalNotification {
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, conversationId, nickname, true)).startActivities();
+            try {
+                TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, conversationId, nickname, true)).startActivities();
+            } catch (NullPointerException npe) {
+                //Apply workaround for OS bug
+                startLegacyConversationAndMessageActivity(fetLifeApplication);
+            }
         } else {
-            ConversationsActivity.startActivity(fetLifeApplication);
-            MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
+            startLegacyConversationAndMessageActivity(fetLifeApplication);
         }
+    }
+
+    private void startLegacyConversationAndMessageActivity(FetLifeApplication fetLifeApplication) {
+        ConversationsActivity.startActivity(fetLifeApplication);
+        MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
 
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
-        itemList = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.date,false).queryList();
+        itemList = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.pending,false).orderBy(Message_Table.date,false).queryList();
     }
 
     @Override
