@@ -258,6 +258,10 @@ public class MessagesActivity extends ResourceListActivity
 
         User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
 
+        if (currentUser == null) {
+            return;
+        }
+
         Message message = new Message();
         message.setPending(true);
         message.setDate(System.currentTimeMillis());
