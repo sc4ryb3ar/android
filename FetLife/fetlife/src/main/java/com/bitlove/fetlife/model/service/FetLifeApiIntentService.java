@@ -38,6 +38,7 @@ import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
+import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
@@ -48,6 +49,7 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -491,7 +493,21 @@ public class FetLifeApiIntentService extends IntentService {
         String caption = params[2];
         boolean friendsOnly = getBoolFromParams(params, 3, false);
 
-        RequestBody pictureBody = RequestBody.create(MediaType.parse(contentResolver.getType(uri)), BytesUtil.getBytes(contentResolver.openInputStream(uri)));
+        InputStream inputStream;
+        String mimeType = null;
+        try {
+            mimeType = contentResolver.getType(uri);
+            inputStream = contentResolver.openInputStream(uri);
+        } catch (Exception e) {
+            inputStream = null;
+        }
+
+        if (mimeType == null || inputStream == null) {
+            Crashlytics.logException(new Exception("Media file to upload not found"));
+            return false;
+        }
+
+        RequestBody pictureBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
         RequestBody isAvatarPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(false));
         RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(friendsOnly));
         RequestBody captionPart = RequestBody.create(MediaType.parse("text/plain"), caption);

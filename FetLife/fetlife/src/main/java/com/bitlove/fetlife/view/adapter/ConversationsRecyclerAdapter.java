@@ -115,7 +115,7 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
 class ConversationViewHolder extends RecyclerView.ViewHolder {
 
     ImageView avatarImage;
-    TextView headerText, messageText, dateText, lowerText, newMessageIndicator;
+    TextView headerText, messageText, dateText, newMessageIndicator;
 
     public ConversationViewHolder(View itemView) {
         super(itemView);
@@ -124,7 +124,6 @@ class ConversationViewHolder extends RecyclerView.ViewHolder {
         headerText = (TextView) itemView.findViewById(R.id.conversation_header);
         messageText = (TextView) itemView.findViewById(R.id.conversation_message_text);
         dateText = (TextView) itemView.findViewById(R.id.conversation_date);
-        lowerText = (TextView) itemView.findViewById(R.id.conversation_lower);
         avatarImage = (ImageView) itemView.findViewById(R.id.conversation_icon);
     }
 }

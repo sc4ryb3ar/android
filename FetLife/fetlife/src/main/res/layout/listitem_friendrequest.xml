@@ -65,6 +65,8 @@
 
             style="@style/FriendRequestLowerText"
 
+            android:visibility="gone"
+
             android:layout_toRightOf="@id/friendrequest_icon"
             android:layout_alignParentBottom="true"
 
