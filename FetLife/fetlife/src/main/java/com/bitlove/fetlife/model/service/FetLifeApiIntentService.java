@@ -27,6 +27,7 @@ import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.AuthBody;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
+import com.bitlove.fetlife.model.pojos.Feed;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
@@ -34,6 +35,7 @@ import com.bitlove.fetlife.model.pojos.FriendSuggestion;
 import com.bitlove.fetlife.model.pojos.FriendSuggestion_Table;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
+import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
@@ -60,6 +62,7 @@ import retrofit.Response;
 public class FetLifeApiIntentService extends IntentService {
 
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.cpnversations";
+    public static final String ACTION_APICALL_FEED = "com.bitlove.fetlife.action.apicall.feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
     public static final String ACTION_APICALL_SEND_MESSAGES = "com.bitlove.fetlife.action.apicall.send_messages";
@@ -146,11 +149,14 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_LOGON_USER:
                     result = logonUser(params);
                     break;
+                case ACTION_APICALL_FEED:
+                    result = retrieveFeed(params);
+                    break;
                 case ACTION_APICALL_CONVERSATIONS:
                     result = retrieveConversations(params);
                     break;
                 case ACTION_APICALL_FRIENDS:
-                    result = retriveFriends(params);
+                    result = retrieveFriends(params);
                     break;
                 case ACTION_APICALL_FRIENDREQUESTS:
                     result = retriveFriendRequests(params);
@@ -523,6 +529,29 @@ public class FetLifeApiIntentService extends IntentService {
         return response.isSuccess();
     }
 
+    private boolean retrieveFeed(String[] params) throws IOException {
+        final int limit = getIntFromParams(params, 0, 25);
+        final int page = getIntFromParams(params, 1, 1);
+
+        Call<Feed> getFeedCall = getFetLifeApi().getFeed(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
+        Response<Feed> feedResponse = getFeedCall.execute();
+        if (feedResponse.isSuccess()) {
+            final Feed feed = feedResponse.body();
+            final List<Story> stories = feed.getStories();
+            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
+                @Override
+                public void execute(DatabaseWrapper databaseWrapper) {
+                    for (Story story : stories) {
+                        story.save();
+                    }
+                }
+            });
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private boolean retrieveConversations(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
@@ -553,7 +582,7 @@ public class FetLifeApiIntentService extends IntentService {
         return currentUser.getAccessToken();
     }
 
-    private boolean retriveFriends(String[] params) throws IOException {
+    private boolean retrieveFriends(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 10);
         final int page = getIntFromParams(params, 1, 1);
 
