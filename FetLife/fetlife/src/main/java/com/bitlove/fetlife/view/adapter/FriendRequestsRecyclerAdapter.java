@@ -186,7 +186,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             onFriendRequestRemove(friendRequestList.get(position), position, viewHolder, recyclerView, accepted);
         } else {
             position--;
-            position -= friendSuggestionList.size();
+            position -= friendRequestList.size();
             onFriendSuggestionRemove(friendSuggestionList.get(position), position, viewHolder, recyclerView, accepted);
         }
     }
