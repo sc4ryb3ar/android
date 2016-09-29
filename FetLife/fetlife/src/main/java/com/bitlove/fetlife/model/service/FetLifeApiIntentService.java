@@ -75,6 +75,9 @@ public class FetLifeApiIntentService extends IntentService {
     private static final int PARAM_NEWMESSAGE_LIMIT = 50;
     private static final int PARAM_OLDMESSAGE_LIMIT = 25;
 
+    private static final int MAX_SUBJECT_LENGTH = 36;
+    private static final String SUBJECT_SHORTENED_SUFFIX = "\u2026";
+
     private static String actionInProgress = null;
 
     public FetLifeApiIntentService() {
@@ -409,7 +412,13 @@ public class FetLifeApiIntentService extends IntentService {
             return false;
         }
 
-        Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), startMessage.getBody(), startMessage.getBody());
+        String message = startMessage.getBody();
+        String subject = message;
+        if (message.length() > MAX_SUBJECT_LENGTH) {
+            subject = subject.substring(0, MAX_SUBJECT_LENGTH-SUBJECT_SHORTENED_SUFFIX.length()).trim().concat(SUBJECT_SHORTENED_SUFFIX);
+        }
+
+        Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), subject, message);
         Response<Conversation> postConversationResponse = postConversationCall.execute();
         if (postConversationResponse.isSuccess()) {
             pendingConversation.delete();

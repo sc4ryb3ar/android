@@ -445,7 +445,7 @@ class FriendRequestHeaderViewHolder extends FriendRequestScreenViewHolder {
 class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
 
     ImageView avatarImage;
-    TextView headerText, upperText, dateText, lowerText;
+    TextView headerText, upperText, dateText;
     View swipableLayout, acceptBackgroundLayout, rejectBackgroundLayout;
 
     public FriendRequestItemViewHolder(View itemView) {
@@ -459,7 +459,6 @@ class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
 
         upperText = (TextView) itemView.findViewById(R.id.friendrequest_upper);
         dateText = (TextView) itemView.findViewById(R.id.friendrequest_right);
-        lowerText = (TextView) itemView.findViewById(R.id.friendrequest_lower);
         avatarImage = (ImageView) itemView.findViewById(R.id.friendrequest_icon);
     }
 }
