@@ -538,14 +538,17 @@ public class FetLifeApiIntentService extends IntentService {
         if (feedResponse.isSuccess()) {
             final Feed feed = feedResponse.body();
             final List<Story> stories = feed.getStories();
-            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
-                @Override
-                public void execute(DatabaseWrapper databaseWrapper) {
-                    for (Story story : stories) {
-                        story.save();
-                    }
-                }
-            });
+            getFetLifeApplication().getInMemoryStorage().addFeed(page,stories);
+
+//            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
+//                @Override
+//                public void execute(DatabaseWrapper databaseWrapper) {
+//                    for (Story story : stories) {
+//                        story.save();
+//                    }
+//                }
+//            });
+            
             return true;
         } else {
             return false;
