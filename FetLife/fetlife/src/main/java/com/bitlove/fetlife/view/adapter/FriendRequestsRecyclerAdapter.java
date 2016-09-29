@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRequestViewHolder> {
+public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRequestScreenViewHolder> {
 
     private static final int FRIENDREQUEST_UNDO_DURATION = 5000;
     private static final int VIEWTYPE_HEADER = 0;
@@ -108,7 +108,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
+                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
                     return;
                 }
                 FriendRequestsRecyclerAdapter.this.onItemRemove(viewHolder, recyclerView, swipeDir == ItemTouchHelper.RIGHT);
@@ -117,59 +117,54 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             @Override
             public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
                 if (viewHolder != null) {
-                    if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
+                    if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
                         return;
                     }
-                    getDefaultUIUtil().onSelected(((FriendRequestViewHolder) viewHolder).swipableLayout);
+                    getDefaultUIUtil().onSelected(((FriendRequestItemViewHolder) viewHolder).swipableLayout);
                 }
             }
 
             @Override
             public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
+                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
                     return;
                 }
-                FriendRequestViewHolder friendRequestViewHolder = ((FriendRequestViewHolder) viewHolder);
-                friendRequestViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                friendRequestViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
-                getDefaultUIUtil().clearView(((FriendRequestViewHolder) viewHolder).swipableLayout);
+                FriendRequestItemViewHolder friendRequestItemViewHolder = ((FriendRequestItemViewHolder) viewHolder);
+                friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
+                friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
+                getDefaultUIUtil().clearView(friendRequestItemViewHolder.swipableLayout);
             }
 
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                try {
-                    if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
-                        return;
-                    }
-                    getDefaultUIUtil().onDraw(c, recyclerView, ((FriendRequestViewHolder) viewHolder).swipableLayout, dX, dY, actionState, isCurrentlyActive);
-                } catch (NullPointerException npe) {
-                    //Should not happen at all. It happened however twice on one weird device. Let Crashlytics keep reporting this issue, but at least do not crash
-                    Crashlytics.logException(npe);
+                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
+                    return;
                 }
+                getDefaultUIUtil().onDraw(c, recyclerView, ((FriendRequestItemViewHolder) viewHolder).swipableLayout, dX, dY, actionState, isCurrentlyActive);
             }
 
             @Override
             public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if (getItemViewType(viewHolder.getAdapterPosition()) == VIEWTYPE_HEADER) {
+                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
                     return;
                 }
-                FriendRequestViewHolder friendRequestViewHolder = ((FriendRequestViewHolder) viewHolder);
+                FriendRequestItemViewHolder friendRequestItemViewHolder = ((FriendRequestItemViewHolder) viewHolder);
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && isCurrentlyActive) {
                     if (dX > 0) {
-                        friendRequestViewHolder.acceptBackgroundLayout.setVisibility(View.VISIBLE);
-                        friendRequestViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
+                        friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.VISIBLE);
+                        friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
                     } else if (dX < 0) {
-                        friendRequestViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                        friendRequestViewHolder.rejectBackgroundLayout.setVisibility(View.VISIBLE);
+                        friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
+                        friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.VISIBLE);
                     } else {
-                        friendRequestViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                        friendRequestViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
+                        friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
+                        friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
                     }
                 } else {
-                    friendRequestViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                    friendRequestViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
+                    friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
+                    friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
                 }
-                getDefaultUIUtil().onDrawOver(c, recyclerView, friendRequestViewHolder.swipableLayout, dX, dY, actionState, isCurrentlyActive);
+                getDefaultUIUtil().onDrawOver(c, recyclerView, friendRequestItemViewHolder.swipableLayout, dX, dY, actionState, isCurrentlyActive);
             }
         };
 
@@ -307,47 +302,60 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
     }
 
     @Override
-    public FriendRequestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FriendRequestScreenViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
         if (viewType == VIEWTYPE_HEADER) {
             itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem_friendrequest_header, parent, false);
+            return new FriendRequestHeaderViewHolder(itemView);
         } else {
             itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem_friendrequest, parent, false);
+            return new FriendRequestItemViewHolder(itemView);
         }
-        return new FriendRequestViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(FriendRequestViewHolder friendRequestViewHolder, int position) {
+    public void onBindViewHolder(FriendRequestScreenViewHolder friendRequestScreenViewHolder, int position) {
         if (getItemViewType(position) == VIEWTYPE_HEADER) {
-            onBindHeaderViewHolder(friendRequestViewHolder, position == 0);
+            if (!(friendRequestScreenViewHolder instanceof  FriendRequestHeaderViewHolder)) {
+                Crashlytics.logException(new ClassCastException("friendRequestScreenViewHolder is not a FriendRequestHeaderViewHolder"));
+                return;
+            }
+            onBindHeaderViewHolder((FriendRequestHeaderViewHolder) friendRequestScreenViewHolder, position == 0);
         } else if (--position < friendRequestList.size()) {
-            onBindFriendReuestViewHolder(friendRequestViewHolder, friendRequestList.get(position));
+            if (!(friendRequestScreenViewHolder instanceof  FriendRequestItemViewHolder)) {
+                Crashlytics.logException(new ClassCastException("friendRequestScreenViewHolder is not a FriendRequestItemViewHolder"));
+                return;
+            }
+            onBindFriendRequestItemViewHolder((FriendRequestItemViewHolder) friendRequestScreenViewHolder, friendRequestList.get(position));
         } else {
+            if (!(friendRequestScreenViewHolder instanceof  FriendRequestItemViewHolder)) {
+                Crashlytics.logException(new ClassCastException("friendRequestScreenViewHolder is not a FriendRequestItemViewHolder"));
+                return;
+            }
             position--;
             position -= friendRequestList.size();
-            onBindFriendSuggestionViewHolder(friendRequestViewHolder, friendSuggestionList.get(position));
+            onBindFriendSuggestionViewHolder((FriendRequestItemViewHolder) friendRequestScreenViewHolder, friendSuggestionList.get(position));
         }
     }
 
-    private void onBindHeaderViewHolder(FriendRequestViewHolder friendRequestViewHolder, boolean friendRequestItem) {
+    private void onBindHeaderViewHolder(FriendRequestHeaderViewHolder friendRequestHeaderViewHolder, boolean friendRequestItem) {
         if (friendRequestItem) {
-            friendRequestViewHolder.headerText.setText(R.string.header_friendrequest);
-            friendRequestViewHolder.itemView.setVisibility(friendRequestList.isEmpty() ? View.GONE : View.VISIBLE);
+            friendRequestHeaderViewHolder.headerText.setText(R.string.header_friendrequest);
+            friendRequestHeaderViewHolder.itemView.setVisibility(friendRequestList.isEmpty() ? View.GONE : View.VISIBLE);
         } else {
-            friendRequestViewHolder.headerText.setText(R.string.header_friendsuggestion);
-            friendRequestViewHolder.itemView.setVisibility(friendSuggestionList.isEmpty() ? View.GONE : View.VISIBLE);
+            friendRequestHeaderViewHolder.headerText.setText(R.string.header_friendsuggestion);
+            friendRequestHeaderViewHolder.itemView.setVisibility(friendSuggestionList.isEmpty() ? View.GONE : View.VISIBLE);
         }
     }
 
-    public void onBindFriendReuestViewHolder(FriendRequestViewHolder friendRequestViewHolder, final FriendRequest friendRequest) {
+    public void onBindFriendRequestItemViewHolder(FriendRequestItemViewHolder friendRequestItemViewHolder, final FriendRequest friendRequest) {
 
-        friendRequestViewHolder.headerText.setText(friendRequest.getNickname());
-        friendRequestViewHolder.upperText.setText(friendRequest.getMetaInfo());
+        friendRequestItemViewHolder.headerText.setText(friendRequest.getNickname());
+        friendRequestItemViewHolder.upperText.setText(friendRequest.getMetaInfo());
 
-//        FriendRequestViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
+//        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
 
-        friendRequestViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onFriendRequestClickListener != null) {
@@ -356,7 +364,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             }
         });
 
-        friendRequestViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
+        friendRequestItemViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onFriendRequestClickListener != null) {
@@ -365,19 +373,19 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             }
         });
 
-        friendRequestViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
+        friendRequestItemViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friendRequest.getAvatarLink();
-        imageLoader.loadImage(friendRequestViewHolder.itemView.getContext(), avatarUrl, friendRequestViewHolder.avatarImage, R.drawable.dummy_avatar);
+        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
-    public void onBindFriendSuggestionViewHolder(FriendRequestViewHolder FriendRequestViewHolder, final FriendSuggestion friendSuggestion) {
+    public void onBindFriendSuggestionViewHolder(FriendRequestItemViewHolder friendRequestItemViewHolder, final FriendSuggestion friendSuggestion) {
 
-        FriendRequestViewHolder.headerText.setText(friendSuggestion.getNickname());
-        FriendRequestViewHolder.upperText.setText(friendSuggestion.getMetaInfo());
+        friendRequestItemViewHolder.headerText.setText(friendSuggestion.getNickname());
+        friendRequestItemViewHolder.upperText.setText(friendSuggestion.getMetaInfo());
 
-//        FriendRequestViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
+//        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
 
-        FriendRequestViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onFriendSuggestionClickListener != null) {
@@ -386,7 +394,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             }
         });
 
-        FriendRequestViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
+        friendRequestItemViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onFriendSuggestionClickListener != null) {
@@ -395,9 +403,9 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             }
         });
 
-        FriendRequestViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
+        friendRequestItemViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friendSuggestion.getAvatarLink();
-        imageLoader.loadImage(FriendRequestViewHolder.itemView.getContext(), avatarUrl, FriendRequestViewHolder.avatarImage, R.drawable.dummy_avatar);
+        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
     public void refresh() {
@@ -417,13 +425,30 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
     }
 }
 
-class FriendRequestViewHolder extends RecyclerView.ViewHolder {
+class FriendRequestScreenViewHolder extends RecyclerView.ViewHolder {
+    public FriendRequestScreenViewHolder(View itemView) {
+        super(itemView);
+    }
+}
+
+class FriendRequestHeaderViewHolder extends FriendRequestScreenViewHolder {
+
+    TextView headerText;
+
+    public FriendRequestHeaderViewHolder(View itemView) {
+        super(itemView);
+        headerText = (TextView) itemView.findViewById(R.id.friendrequest_header);
+    }
+}
+
+
+class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
 
     ImageView avatarImage;
     TextView headerText, upperText, dateText, lowerText;
     View swipableLayout, acceptBackgroundLayout, rejectBackgroundLayout;
 
-    public FriendRequestViewHolder(View itemView) {
+    public FriendRequestItemViewHolder(View itemView) {
         super(itemView);
 
         headerText = (TextView) itemView.findViewById(R.id.friendrequest_header);
