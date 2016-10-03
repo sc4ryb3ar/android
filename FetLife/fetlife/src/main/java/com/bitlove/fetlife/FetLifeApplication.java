@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
@@ -43,6 +44,7 @@ public class FetLifeApplication extends Application {
 
     private EventBus eventBus;
     private UserSessionManager userSessionManager;
+    private InMemoryStorage inMemoryStorage;
 
     public static FetLifeApplication getInstance() {
         return instance;
@@ -89,7 +91,11 @@ public class FetLifeApplication extends Application {
         imageLoader = new ImageLoader(this);
         notificationParser = new NotificationParser();
         eventBus = EventBus.getDefault();
+        inMemoryStorage = new InMemoryStorage();
+    }
 
+    public InMemoryStorage getInMemoryStorage() {
+        return inMemoryStorage;
     }
 
     public UserSessionManager getUserSessionManager() {
