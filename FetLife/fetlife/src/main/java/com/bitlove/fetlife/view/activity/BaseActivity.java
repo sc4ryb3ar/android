@@ -17,6 +17,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected boolean waitingForResult;
     protected ProgressBar progressIndicator;
 
+
+
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
