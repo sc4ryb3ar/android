@@ -12,6 +12,8 @@
         android:id="@+id/text_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:textColorLink="@color/text_color_link"
         android:layout_margin="@dimen/text_margin"/>
 
 </android.support.v4.widget.NestedScrollView>
