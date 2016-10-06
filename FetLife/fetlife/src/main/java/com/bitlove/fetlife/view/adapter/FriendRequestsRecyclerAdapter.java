@@ -17,8 +17,8 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
-import com.bitlove.fetlife.model.pojos.FriendSuggestion;
-import com.bitlove.fetlife.model.pojos.FriendSuggestion_Table;
+import com.bitlove.fetlife.model.pojos.SharedProfile;
+import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.ResourceListActivity;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRequestScreenViewHolder> {
+public class FriendRequestsRecyclerAdapter extends SwipeableRecyclerAdapter<FriendRequestScreenViewHolder> {
 
     private static final int FRIENDREQUEST_UNDO_DURATION = 5000;
     private static final int VIEWTYPE_HEADER = 0;
@@ -41,9 +41,9 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         public void onAvatarClick(FriendRequest friendRequest);
     }
 
-    public interface OnFriendSuggestionClickListener {
-        public void onItemClick(FriendSuggestion friendSuggestion);
-        public void onAvatarClick(FriendSuggestion friendSuggestion);
+    public interface OnSharedProfileClickListener {
+        public void onItemClick(SharedProfile friendSuggestion);
+        public void onAvatarClick(SharedProfile friendSuggestion);
     }
 
     static class Undo {
@@ -53,9 +53,9 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
     private final ImageLoader imageLoader;
 
     private List<FriendRequest> friendRequestList;
-    private List<FriendSuggestion> friendSuggestionList;
+    private List<SharedProfile> friendSuggestionList;
     OnFriendRequestClickListener onFriendRequestClickListener;
-    OnFriendSuggestionClickListener onFriendSuggestionClickListener;
+    OnSharedProfileClickListener onSharedProfileClickListener;
 
     public FriendRequestsRecyclerAdapter(ImageLoader imageLoader, boolean clearItems) {
         this.imageLoader = imageLoader;
@@ -70,8 +70,24 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         this.onFriendRequestClickListener = onFriendRequestClickListener;
     }
 
-    public void setOnFriendSuggestionClickListener(OnFriendSuggestionClickListener onFriendSuggestionClickListener) {
-        this.onFriendSuggestionClickListener = onFriendSuggestionClickListener;
+    public void setOnSharedProfileClickListener(OnSharedProfileClickListener onSharedProfileClickListener) {
+        this.onSharedProfileClickListener = onSharedProfileClickListener;
+    }
+
+    public void refresh() {
+        loadItems();
+        //TODO: think of possibility of update only specific items instead of the whole list
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return friendRequestList.size() + friendSuggestionList.size() + 2;
     }
 
     private void loadItems() {
@@ -83,7 +99,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         }
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            friendSuggestionList = new Select().from(FriendSuggestion.class).where(FriendSuggestion_Table.pending.is(false)).queryList();
+            friendSuggestionList = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(false)).queryList();
         } catch (Throwable t) {
             friendSuggestionList = new ArrayList<>();
         }
@@ -99,80 +115,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
     }
 
     @Override
-    public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
-                    return;
-                }
-                FriendRequestsRecyclerAdapter.this.onItemRemove(viewHolder, recyclerView, swipeDir == ItemTouchHelper.RIGHT);
-            }
-
-            @Override
-            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-                if (viewHolder != null) {
-                    if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
-                        return;
-                    }
-                    getDefaultUIUtil().onSelected(((FriendRequestItemViewHolder) viewHolder).swipableLayout);
-                }
-            }
-
-            @Override
-            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
-                    return;
-                }
-                FriendRequestItemViewHolder friendRequestItemViewHolder = ((FriendRequestItemViewHolder) viewHolder);
-                friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
-                getDefaultUIUtil().clearView(friendRequestItemViewHolder.swipableLayout);
-            }
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
-                    return;
-                }
-                getDefaultUIUtil().onDraw(c, recyclerView, ((FriendRequestItemViewHolder) viewHolder).swipableLayout, dX, dY, actionState, isCurrentlyActive);
-            }
-
-            @Override
-            public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if (!(viewHolder instanceof FriendRequestItemViewHolder)) {
-                    return;
-                }
-                FriendRequestItemViewHolder friendRequestItemViewHolder = ((FriendRequestItemViewHolder) viewHolder);
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && isCurrentlyActive) {
-                    if (dX > 0) {
-                        friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.VISIBLE);
-                        friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
-                    } else if (dX < 0) {
-                        friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                        friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.VISIBLE);
-                    } else {
-                        friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                        friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
-                    }
-                } else {
-                    friendRequestItemViewHolder.acceptBackgroundLayout.setVisibility(View.GONE);
-                    friendRequestItemViewHolder.rejectBackgroundLayout.setVisibility(View.GONE);
-                }
-                getDefaultUIUtil().onDrawOver(c, recyclerView, friendRequestItemViewHolder.swipableLayout, dX, dY, actionState, isCurrentlyActive);
-            }
-        };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
-    void onItemRemove(final RecyclerView.ViewHolder viewHolder, final RecyclerView recyclerView, boolean accepted) {
+    protected void onItemRemove(final FriendRequestScreenViewHolder viewHolder, final RecyclerView recyclerView, boolean accepted) {
         int position = viewHolder.getAdapterPosition();
         if (position == 0 || position == friendRequestList.size()+1) {
             return;
@@ -182,11 +125,11 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         } else {
             position--;
             position -= friendRequestList.size();
-            onFriendSuggestionRemove(friendSuggestionList.get(position), position, viewHolder, recyclerView, accepted);
+            onSharedProfileRemove(friendSuggestionList.get(position), position, viewHolder, recyclerView, accepted);
         }
     }
 
-    void onFriendSuggestionRemove(final FriendSuggestion friendSuggestion, final int listPosition, final RecyclerView.ViewHolder viewHolder, final RecyclerView recyclerView, boolean accepted) {
+    void onSharedProfileRemove(final SharedProfile friendSuggestion, final int listPosition, final RecyclerView.ViewHolder viewHolder, final RecyclerView recyclerView, boolean accepted) {
 
         final Undo undo = new Undo();
 
@@ -216,10 +159,10 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         notifyItemRemoved(adapterPosition);
         snackbar.show();
 
-        startDelayedFriendSuggestionDecision(friendSuggestion, accepted, undo, FRIENDREQUEST_UNDO_DURATION, recyclerView.getContext());
+        startDelayedSharedProfileDecision(friendSuggestion, accepted, undo, FRIENDREQUEST_UNDO_DURATION, recyclerView.getContext());
     }
 
-    private void startDelayedFriendSuggestionDecision(final FriendSuggestion friendSuggestion, final boolean accepted, final Undo undo, final int undoDuration, final Context context) {
+    private void startDelayedSharedProfileDecision(final SharedProfile friendSuggestion, final boolean accepted, final Undo undo, final int undoDuration, final Context context) {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -334,7 +277,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
             }
             position--;
             position -= friendRequestList.size();
-            onBindFriendSuggestionViewHolder((FriendRequestItemViewHolder) friendRequestScreenViewHolder, friendSuggestionList.get(position));
+            onBindSharedProfileViewHolder((FriendRequestItemViewHolder) friendRequestScreenViewHolder, friendSuggestionList.get(position));
         }
     }
 
@@ -378,7 +321,7 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
-    public void onBindFriendSuggestionViewHolder(FriendRequestItemViewHolder friendRequestItemViewHolder, final FriendSuggestion friendSuggestion) {
+    public void onBindSharedProfileViewHolder(FriendRequestItemViewHolder friendRequestItemViewHolder, final SharedProfile friendSuggestion) {
 
         friendRequestItemViewHolder.headerText.setText(friendSuggestion.getNickname());
         friendRequestItemViewHolder.upperText.setText(friendSuggestion.getMetaInfo());
@@ -388,8 +331,8 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onFriendSuggestionClickListener != null) {
-                    onFriendSuggestionClickListener.onItemClick(friendSuggestion);
+                if (onSharedProfileClickListener != null) {
+                    onSharedProfileClickListener.onItemClick(friendSuggestion);
                 }
             }
         });
@@ -397,8 +340,8 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         friendRequestItemViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onFriendSuggestionClickListener != null) {
-                    onFriendSuggestionClickListener.onAvatarClick(friendSuggestion);
+                if (onSharedProfileClickListener != null) {
+                    onSharedProfileClickListener.onAvatarClick(friendSuggestion);
                 }
             }
         });
@@ -408,24 +351,9 @@ public class FriendRequestsRecyclerAdapter extends RecyclerView.Adapter<FriendRe
         imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
-    public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return friendRequestList.size() + friendSuggestionList.size() + 2;
-    }
 }
 
-class FriendRequestScreenViewHolder extends RecyclerView.ViewHolder {
+abstract class FriendRequestScreenViewHolder extends SwipeableViewHolder {
     public FriendRequestScreenViewHolder(View itemView) {
         super(itemView);
     }
@@ -439,8 +367,22 @@ class FriendRequestHeaderViewHolder extends FriendRequestScreenViewHolder {
         super(itemView);
         headerText = (TextView) itemView.findViewById(R.id.friendrequest_header);
     }
-}
 
+    @Override
+    public View getSwipeableLayout() {
+        return null;
+    }
+
+    @Override
+    public View getSwipeRightBackground() {
+        return null;
+    }
+
+    @Override
+    public View getSwipeLeftBackground() {
+        return null;
+    }
+}
 
 class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
 
@@ -461,5 +403,20 @@ class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
         dateText = (TextView) itemView.findViewById(R.id.friendrequest_right);
         lowerText = (TextView) itemView.findViewById(R.id.friendrequest_lower);
         avatarImage = (ImageView) itemView.findViewById(R.id.friendrequest_icon);
+    }
+
+    @Override
+    public View getSwipeableLayout() {
+        return swipableLayout;
+    }
+
+    @Override
+    public View getSwipeRightBackground() {
+        return acceptBackgroundLayout;
+    }
+
+    @Override
+    public View getSwipeLeftBackground() {
+        return rejectBackgroundLayout;
     }
 }

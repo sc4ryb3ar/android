@@ -31,10 +31,10 @@ import com.bitlove.fetlife.model.pojos.Feed;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
-import com.bitlove.fetlife.model.pojos.FriendSuggestion;
-import com.bitlove.fetlife.model.pojos.FriendSuggestion_Table;
+import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
+import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
@@ -359,10 +359,10 @@ public class FetLifeApiIntentService extends IntentService {
                 stackedResult = true;
             }
         }
-        List<FriendSuggestion> pendingFriendSuggestions = new Select().from(FriendSuggestion.class).where(FriendSuggestion_Table.pending.is(true)).queryList();
-        for (FriendSuggestion pendingFriendSuggestion : pendingFriendSuggestions) {
-            if (!sendPendingFriendSuggestion(pendingFriendSuggestion)) {
-                pendingFriendSuggestion.delete();
+        List<SharedProfile> pendingSharedProfiles = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(true)).queryList();
+        for (SharedProfile pendingSharedProfile : pendingSharedProfiles) {
+            if (!sendPendingFriendSuggestion(pendingSharedProfile)) {
+                pendingSharedProfile.delete();
             } else if (!stackedResult) {
                 stackedResult = true;
             }
@@ -370,11 +370,11 @@ public class FetLifeApiIntentService extends IntentService {
         return stackedResult;
     }
 
-    private boolean sendPendingFriendSuggestion(FriendSuggestion pendingFriendSuggestion) throws IOException {
-        Call<FriendRequest> createFriendRequestCall = getFetLifeApi().createFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendSuggestion.getId());
+    private boolean sendPendingFriendSuggestion(SharedProfile pendingSharedProfile) throws IOException {
+        Call<FriendRequest> createFriendRequestCall = getFetLifeApi().createFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingSharedProfile.getId());
         Response<FriendRequest> friendRequestResponse = createFriendRequestCall.execute();
         if (friendRequestResponse.isSuccess()) {
-            pendingFriendSuggestion.delete();
+            pendingSharedProfile.delete();
             getFetLifeApplication().getEventBus().post(new FriendRequestSendSucceededEvent());
             return true;
         } else {

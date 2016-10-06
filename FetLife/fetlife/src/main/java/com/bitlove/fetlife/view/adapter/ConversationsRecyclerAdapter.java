@@ -25,13 +25,12 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
     private final ImageLoader imageLoader;
 
     public interface OnConversationClickListener {
-        public void onItemClick(Conversation conversation);
-
-        public void onAvatarClick(Conversation conversation);
+        void onItemClick(Conversation conversation);
+        void onAvatarClick(Conversation conversation);
     }
 
     private List<Conversation> itemList;
-    OnConversationClickListener onConversationClickListener;
+    private OnConversationClickListener onConversationClickListener;
 
     public ConversationsRecyclerAdapter(ImageLoader imageLoader) {
         this.imageLoader = imageLoader;
@@ -42,9 +41,29 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
         this.onConversationClickListener = onConversationClickListener;
     }
 
+    public void refresh() {
+        loadItems();
+        //TODO: think of possibility of update only specific items instead of the whole list
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         itemList = new Select().from(Conversation.class).orderBy(Conversation_Table.date,false).queryList();
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+
+    public Conversation getItem(int position) {
+        return itemList.get(position);
     }
 
     @Override
@@ -89,26 +108,6 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
         conversationViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = conversation.getAvatarLink();
         imageLoader.loadImage(conversationViewHolder.itemView.getContext(), avatarUrl, conversationViewHolder.avatarImage, R.drawable.dummy_avatar);
-    }
-
-    public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return itemList.size();
-    }
-
-    public Conversation getItem(int position) {
-        return itemList.get(position);
     }
 }
 

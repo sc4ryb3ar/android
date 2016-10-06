@@ -25,8 +25,8 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendViewHolde
     private final ImageLoader imageLoader;
 
     public interface OnFriendClickListener {
-        public void onItemClick(Friend friend);
-        public void onAvatarClick(Friend friend);
+        void onItemClick(Friend friend);
+        void onAvatarClick(Friend friend);
     }
 
     private List<Friend> itemList;
@@ -41,6 +41,17 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendViewHolde
         this.onFriendClickListener = onFriendClickListener;
     }
 
+    public void refresh() {
+        loadItems();
+        //TODO: think of possibility of update only specific items instead of the whole list
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
@@ -48,6 +59,15 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendViewHolde
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+
+    public Friend getItem(int position) {
+        return itemList.get(position);
     }
 
     @Override
@@ -87,26 +107,6 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendViewHolde
         friendViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friend.getAvatarLink();
         imageLoader.loadImage(friendViewHolder.itemView.getContext(), avatarUrl, friendViewHolder.avatarImage, R.drawable.dummy_avatar);
-    }
-
-    public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return itemList.size();
-    }
-
-    public Friend getItem(int position) {
-        return itemList.get(position);
     }
 }
 

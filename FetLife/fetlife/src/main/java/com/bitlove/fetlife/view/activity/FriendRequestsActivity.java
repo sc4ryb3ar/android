@@ -16,7 +16,7 @@ import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.FriendSuggestion;
+import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.FriendRequestsRecyclerAdapter;
 import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
@@ -73,14 +73,14 @@ public class FriendRequestsActivity extends ResourceListActivity
                 }
             }
         });
-        friendRequestsAdapter.setOnFriendSuggestionClickListener(new FriendRequestsRecyclerAdapter.OnFriendSuggestionClickListener() {
+        friendRequestsAdapter.setOnSharedProfileClickListener(new FriendRequestsRecyclerAdapter.OnSharedProfileClickListener() {
             @Override
-            public void onItemClick(FriendSuggestion friendSuggestion) {
+            public void onItemClick(SharedProfile sharedProfile) {
             }
 
             @Override
-            public void onAvatarClick(FriendSuggestion friendSuggestion) {
-                String url = friendSuggestion.getLink();
+            public void onAvatarClick(SharedProfile sharedProfile) {
+                String url = sharedProfile.getLink();
                 if (url != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
