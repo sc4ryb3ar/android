@@ -32,6 +32,7 @@ import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
 import com.bitlove.fetlife.model.pojos.FriendSuggestion;
 import com.bitlove.fetlife.model.pojos.FriendSuggestion_Table;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.Token;
@@ -59,6 +60,7 @@ import retrofit.Response;
 
 public class FetLifeApiIntentService extends IntentService {
 
+    public static final String ACTION_APICALL_MEMBER = "com.bitlove.fetlife.action.apicall.member";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.cpnversations";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
@@ -150,7 +152,7 @@ public class FetLifeApiIntentService extends IntentService {
                     result = retrieveConversations(params);
                     break;
                 case ACTION_APICALL_FRIENDS:
-                    result = retriveFriends(params);
+                    result = retrieveFriends(params);
                     break;
                 case ACTION_APICALL_FRIENDREQUESTS:
                     result = retriveFriendRequests(params);
@@ -169,6 +171,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
+                    break;
+                case ACTION_APICALL_MEMBER:
+                    result = getMember(params);
                     break;
             }
 
@@ -553,7 +558,18 @@ public class FetLifeApiIntentService extends IntentService {
         return currentUser.getAccessToken();
     }
 
-    private boolean retriveFriends(String[] params) throws IOException {
+    private boolean getMember(String... params) throws IOException {
+        Call<Member> getMemberCall = getFetLifeApi().getMember(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), params[0]);
+        Response<Member> getMemberResponse = getMemberCall.execute();
+        if (getMemberResponse.isSuccess()) {
+            getMemberResponse.body().save();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean retrieveFriends(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 10);
         final int page = getIntFromParams(params, 1, 1);
 
