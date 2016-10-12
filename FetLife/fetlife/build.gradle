@@ -18,8 +18,8 @@ android {
         applicationId "com.bitlove.fetlife"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 10717
-        versionName "1.7.17"
+        versionCode 10718
+        versionName "1.7.18"
 
         vectorDrawables.useSupportLibrary = true
 
