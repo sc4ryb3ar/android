@@ -182,7 +182,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             if (result) {
                 sendLoadFinishedNotification(action);
-            } else if (action != ACTION_APICALL_LOGON_USER && getFetLifeApplication().getFetLifeService().getLastResponseCode() == 403) {
+            } else if (action != ACTION_APICALL_LOGON_USER && getFetLifeApplication().getFetLifeService().getLastResponseCode() == 401 && getFetLifeApplication().getFetLifeService().getLastResponseCode() == 403) {
                 if (refreshToken(currentUser)) {
                     onHandleIntent(intent);
                 } else {
