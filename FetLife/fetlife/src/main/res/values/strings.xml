@@ -85,12 +85,9 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v1.7.17<br/>
+            <p/>v1.7.18<br/>
                     <ul>
-                        <li>Crash fix for Shared Profile Feature</li>
-                        <li>Crash fix at Friend Request Screen</li>
-                        <li>Fix for issue long first messages</li>
-                        <li>Other bug and crash fixes</li>
+                        <li>Fix for periodical connection issues</li>
                     </ul>
 
             <p/>v1.7<br/>
