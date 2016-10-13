@@ -54,6 +54,11 @@ public class FriendsActivity extends ResourceListActivity
     }
 
     @Override
+    protected void onCreateActivityComponents() {
+        addActivityComponent(new MenuActivityComponent());
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

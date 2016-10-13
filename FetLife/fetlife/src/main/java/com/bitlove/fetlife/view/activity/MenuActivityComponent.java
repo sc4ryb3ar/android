@@ -3,6 +3,7 @@ package com.bitlove.fetlife.view.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,7 +21,7 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
 
-public class MenuActivityComponent implements NavigationView.OnNavigationItemSelectedListener {
+public class MenuActivityComponent extends ActivityComponent {
 
     public interface MenuActivityCallBack {
         boolean finishAtMenuNavigation();
@@ -31,7 +32,8 @@ public class MenuActivityComponent implements NavigationView.OnNavigationItemSel
     protected NavigationView navigationView;
     protected View navigationHeaderView;
 
-    public void onActivityCreate(BaseActivity baseActivity) {
+    @Override
+    public void onActivityCreated(BaseActivity baseActivity, Bundle savedInstanceState) {
 
         this.menuActivity = baseActivity;
 
@@ -74,7 +76,7 @@ public class MenuActivityComponent implements NavigationView.OnNavigationItemSel
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(baseActivity);
 
         User currentUser = menuActivity.getFetLifeApplication().getUserSessionManager().getCurrentUser();
         if (currentUser != null) {
@@ -98,7 +100,8 @@ public class MenuActivityComponent implements NavigationView.OnNavigationItemSel
         }
     }
 
-    public boolean onActivityOptionsItemSelected(MenuItem item) {
+    @Override
+    public Boolean onActivityOptionsItemSelected(BaseActivity baseActivity, MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -109,13 +112,15 @@ public class MenuActivityComponent implements NavigationView.OnNavigationItemSel
         return false;
     }
 
-    public boolean onActivityCreateOptionsMenu(Menu menu) {
+    @Override
+    public Boolean onActivityCreateOptionsMenu(BaseActivity baseActivity, Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuActivity.getMenuInflater().inflate(R.menu.activity_resource, menu);
         return true;
     }
 
-    public boolean onActivityBackPressed() {
+    @Override
+    public Boolean onActivityBackPressed(BaseActivity baseActivity) {
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -125,7 +130,8 @@ public class MenuActivityComponent implements NavigationView.OnNavigationItemSel
         }
     }
 
-    public boolean onActivityKeyDown(int keyCode, KeyEvent e) {
+    @Override
+    public Boolean onActivityKeyDown(BaseActivity baseActivity, int keyCode, KeyEvent e) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);
             if (!drawer.isDrawerOpen(GravityCompat.START)) {
@@ -137,7 +143,7 @@ public class MenuActivityComponent implements NavigationView.OnNavigationItemSel
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public Boolean onActivityNavigationItemSelected(BaseActivity baseActivity, MenuItem item) {
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();

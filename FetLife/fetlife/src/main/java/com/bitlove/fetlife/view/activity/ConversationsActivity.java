@@ -18,16 +18,11 @@ import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.ConversationsRecyclerAdapter;
-import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-public class ConversationsActivity extends ResourceListActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class ConversationsActivity extends ResourceListActivity implements MenuActivityComponent.MenuActivityCallBack {
 
     private static final int CONVERSATIONS_PAGE_COUNT = 25;
 
@@ -103,6 +98,11 @@ public class ConversationsActivity extends ResourceListActivity
     }
 
     @Override
+    protected void onCreateActivityComponents() {
+        addActivityComponent(new MenuActivityComponent());
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -130,7 +130,7 @@ public class ConversationsActivity extends ResourceListActivity
     }
 
     @Override
-    protected boolean finishAtMenuNavigation() {
+    public boolean finishAtMenuNavigation() {
         return false;
     }
 

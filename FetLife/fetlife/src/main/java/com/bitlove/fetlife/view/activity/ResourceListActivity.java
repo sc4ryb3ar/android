@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import com.bitlove.fetlife.R;
 
-public class ResourceListActivity extends ResourceActivity implements MenuActivityComponent.MenuActivityCallBack {
+public abstract class ResourceListActivity extends ResourceActivity implements MenuActivityComponent.MenuActivityCallBack {
 
     protected FloatingActionButton floatingActionButton;
     protected RecyclerView recyclerView;
@@ -21,15 +21,11 @@ public class ResourceListActivity extends ResourceActivity implements MenuActivi
     protected View inputIcon;
     protected EditText textInput;
 
-    private MenuActivityComponent menuActivityComponent;
-
     @Override
     protected void onResourceCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setActivityContentView();
-        menuActivityComponent = initMenuActivityComponent();
-        menuActivityComponent.onActivityCreate(this);
 
         //TODO: consider removing this
         floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
@@ -64,40 +60,6 @@ public class ResourceListActivity extends ResourceActivity implements MenuActivi
     @Override
     public boolean finishAtMenuNavigation() {
         return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (menuActivityComponent == null || !menuActivityComponent.onActivityBackPressed()) {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (menuActivityComponent != null) {
-            return menuActivityComponent.onActivityCreateOptionsMenu(menu);
-        } else {
-            return super.onCreateOptionsMenu(menu);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (menuActivityComponent != null) {
-            return menuActivityComponent.onActivityOptionsItemSelected(item);
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent e) {
-        if (menuActivityComponent == null || !menuActivityComponent.onActivityKeyDown(keyCode,e)) {
-            return super.onKeyDown(keyCode, e);
-        } else {
-            return true;
-        }
     }
 
 }
