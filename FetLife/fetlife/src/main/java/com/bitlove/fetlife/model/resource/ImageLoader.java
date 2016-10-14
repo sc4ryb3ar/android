@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * Class that is responsible for loading Images either from the inmemory or device cache or from the Inetrnet itself
+ */
 public class ImageLoader {
 
     private static final String TOKEN_MIDFIX = "?token=";

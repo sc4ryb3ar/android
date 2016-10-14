@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity;
+package com.bitlove.fetlife.view.activity.component;
 
 import android.app.Activity;
 import android.app.Application;
@@ -7,6 +7,8 @@ import android.support.design.widget.NavigationView;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.bitlove.fetlife.view.activity.BaseActivity;
 
 public abstract class ActivityComponent {
 

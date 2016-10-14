@@ -20,25 +20,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<ConversationViewHolder> {
+public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Conversation, ConversationViewHolder> {
 
     private final ImageLoader imageLoader;
 
-    public interface OnConversationClickListener {
-        void onItemClick(Conversation conversation);
-        void onAvatarClick(Conversation conversation);
-    }
-
     private List<Conversation> itemList;
-    private OnConversationClickListener onConversationClickListener;
 
     public ConversationsRecyclerAdapter(ImageLoader imageLoader) {
         this.imageLoader = imageLoader;
         loadItems();
-    }
-
-    public void setOnItemClickListener(OnConversationClickListener onConversationClickListener) {
-        this.onConversationClickListener = onConversationClickListener;
     }
 
     public void refresh() {
@@ -90,8 +80,8 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
         conversationViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onConversationClickListener != null) {
-                    onConversationClickListener.onItemClick(conversation);
+                if (getOnItemClickListener() != null) {
+                    getOnItemClickListener().onItemClick(conversation);
                 }
             }
         });
@@ -99,8 +89,8 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
         conversationViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onConversationClickListener != null) {
-                    onConversationClickListener.onAvatarClick(conversation);
+                if (getOnItemClickListener() != null) {
+                    getOnItemClickListener().onAvatarClick(conversation);
                 }
             }
         });
@@ -109,9 +99,13 @@ public class ConversationsRecyclerAdapter extends RecyclerView.Adapter<Conversat
         String avatarUrl = conversation.getAvatarLink();
         imageLoader.loadImage(conversationViewHolder.itemView.getContext(), avatarUrl, conversationViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
+
+    @Override
+    protected void onItemRemove(ConversationViewHolder viewHolder, RecyclerView recyclerView, boolean swipedRight) {
+    }
 }
 
-class ConversationViewHolder extends RecyclerView.ViewHolder {
+class ConversationViewHolder extends SwipeableViewHolder {
 
     ImageView avatarImage;
     TextView headerText, messageText, dateText, newMessageIndicator;
@@ -124,5 +118,20 @@ class ConversationViewHolder extends RecyclerView.ViewHolder {
         messageText = (TextView) itemView.findViewById(R.id.conversation_message_text);
         dateText = (TextView) itemView.findViewById(R.id.conversation_date);
         avatarImage = (ImageView) itemView.findViewById(R.id.conversation_icon);
+    }
+
+    @Override
+    public View getSwipeableLayout() {
+        return null;
+    }
+
+    @Override
+    public View getSwipeRightBackground() {
+        return null;
+    }
+
+    @Override
+    public View getSwipeLeftBackground() {
+        return null;
     }
 }

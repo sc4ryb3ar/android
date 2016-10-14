@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity;
+package com.bitlove.fetlife.view.activity.resource;
 
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -13,6 +13,9 @@ import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
+import com.bitlove.fetlife.view.activity.BaseActivity;
+import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
+import com.bitlove.fetlife.view.activity.component.EventDisplayHandler;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;

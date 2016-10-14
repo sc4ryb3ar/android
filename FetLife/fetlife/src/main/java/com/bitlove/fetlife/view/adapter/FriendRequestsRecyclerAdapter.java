@@ -1,12 +1,10 @@
 package com.bitlove.fetlife.view.adapter;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +19,7 @@ import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.ResourceListActivity;
+import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -30,21 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FriendRequestsRecyclerAdapter extends SwipeableRecyclerAdapter<FriendRequestScreenViewHolder> {
+public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<FriendRequest, FriendRequestScreenViewHolder> {
 
     private static final int FRIENDREQUEST_UNDO_DURATION = 5000;
     private static final int VIEWTYPE_HEADER = 0;
     private static final int VIEWTYPE_ITEM = 1;
-
-    public interface OnFriendRequestClickListener {
-        public void onItemClick(FriendRequest friendRequest);
-        public void onAvatarClick(FriendRequest friendRequest);
-    }
-
-    public interface OnSharedProfileClickListener {
-        public void onItemClick(SharedProfile friendSuggestion);
-        public void onAvatarClick(SharedProfile friendSuggestion);
-    }
 
     static class Undo {
         AtomicBoolean pending = new AtomicBoolean(true);
@@ -54,8 +42,8 @@ public class FriendRequestsRecyclerAdapter extends SwipeableRecyclerAdapter<Frie
 
     private List<FriendRequest> friendRequestList;
     private List<SharedProfile> friendSuggestionList;
-    OnFriendRequestClickListener onFriendRequestClickListener;
-    OnSharedProfileClickListener onSharedProfileClickListener;
+    private ResourceListRecyclerAdapter.OnResourceClickListener<FriendRequest> onFriendRequestClickListener;
+    private ResourceListRecyclerAdapter.OnResourceClickListener<SharedProfile> onSharedProfileClickListener;
 
     public FriendRequestsRecyclerAdapter(ImageLoader imageLoader, boolean clearItems) {
         this.imageLoader = imageLoader;
@@ -66,11 +54,11 @@ public class FriendRequestsRecyclerAdapter extends SwipeableRecyclerAdapter<Frie
         }
     }
 
-    public void setOnFriendRequestClickListener(OnFriendRequestClickListener onFriendRequestClickListener) {
+    public void setOnFriendRequestClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<FriendRequest> onFriendRequestClickListener) {
         this.onFriendRequestClickListener = onFriendRequestClickListener;
     }
 
-    public void setOnSharedProfileClickListener(OnSharedProfileClickListener onSharedProfileClickListener) {
+    public void setOnSharedProfileClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<SharedProfile> onSharedProfileClickListener) {
         this.onSharedProfileClickListener = onSharedProfileClickListener;
     }
 

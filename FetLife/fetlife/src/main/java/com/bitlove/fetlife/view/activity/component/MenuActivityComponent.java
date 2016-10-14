@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity;
+package com.bitlove.fetlife.view.activity.component;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,15 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.view.activity.standalone.AboutActivity;
+import com.bitlove.fetlife.view.activity.standalone.AddNfcFriendActivity;
+import com.bitlove.fetlife.view.activity.BaseActivity;
+import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.activity.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.activity.resource.FriendsActivity;
+import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
+import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
 
 public class MenuActivityComponent extends ActivityComponent {

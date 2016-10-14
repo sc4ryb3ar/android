@@ -20,24 +20,19 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendViewHolder> {
+public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, FriendViewHolder> {
 
     private final ImageLoader imageLoader;
 
-    public interface OnFriendClickListener {
-        void onItemClick(Friend friend);
-        void onAvatarClick(Friend friend);
-    }
-
     private List<Friend> itemList;
-    OnFriendClickListener onFriendClickListener;
+    ResourceListRecyclerAdapter.OnResourceClickListener<Friend> onFriendClickListener;
 
     public FriendsRecyclerAdapter(ImageLoader imageLoader) {
         this.imageLoader = imageLoader;
         loadItems();
     }
 
-    public void setOnItemClickListener(OnFriendClickListener onFriendClickListener) {
+    public void setOnItemClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<Friend> onFriendClickListener) {
         this.onFriendClickListener = onFriendClickListener;
     }
 
@@ -108,9 +103,14 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendViewHolde
         String avatarUrl = friend.getAvatarLink();
         imageLoader.loadImage(friendViewHolder.itemView.getContext(), avatarUrl, friendViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
+
+    @Override
+    protected void onItemRemove(FriendViewHolder viewHolder, RecyclerView recyclerView, boolean swipedRight) {
+
+    }
 }
 
-class FriendViewHolder extends RecyclerView.ViewHolder {
+class FriendViewHolder extends SwipeableViewHolder {
 
     ImageView avatarImage;
     TextView headerText, upperText, dateText, lowerText;
@@ -123,5 +123,20 @@ class FriendViewHolder extends RecyclerView.ViewHolder {
         dateText = (TextView) itemView.findViewById(R.id.friend_right);
         lowerText = (TextView) itemView.findViewById(R.id.friend_lower);
         avatarImage = (ImageView) itemView.findViewById(R.id.friend_icon);
+    }
+
+    @Override
+    public View getSwipeableLayout() {
+        return null;
+    }
+
+    @Override
+    public View getSwipeRightBackground() {
+        return null;
+    }
+
+    @Override
+    public View getSwipeLeftBackground() {
+        return null;
     }
 }

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
-import com.bitlove.fetlife.view.activity.ResourceListActivity;
+import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -24,26 +24,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NotificationHistoryRecyclerAdapter extends SwipeableRecyclerAdapter<NotificationHistoryItemViewHolder> {
+public class NotificationHistoryRecyclerAdapter extends ResourceListRecyclerAdapter<NotificationHistoryItem, NotificationHistoryItemViewHolder> {
 
     private static final int NOTIFICATION_HISTORYITEM_REMOVE_UNDO_DURATION = 5000;
-
-    public interface OnNotificationHistoryItemClickListener {
-        void onItemClick(NotificationHistoryItem notificationHistoryItem);
-    }
 
     static class Undo {
         AtomicBoolean pending = new AtomicBoolean(true);
     }
 
     private List<NotificationHistoryItem> notificationHistoryItems;
-    private OnNotificationHistoryItemClickListener onNotificationHistoryClickListener;
+    private ResourceListRecyclerAdapter.OnResourceClickListener<NotificationHistoryItem> onNotificationHistoryClickListener;
 
     public NotificationHistoryRecyclerAdapter() {
         loadItems();
     }
 
-    public void setOnNotificationHistoryItemClickListener(OnNotificationHistoryItemClickListener notificationHistoryItemClickListener) {
+    public void setOnNotificationHistoryItemClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<NotificationHistoryItem> notificationHistoryItemClickListener) {
         this.onNotificationHistoryClickListener = notificationHistoryItemClickListener;
     }
 

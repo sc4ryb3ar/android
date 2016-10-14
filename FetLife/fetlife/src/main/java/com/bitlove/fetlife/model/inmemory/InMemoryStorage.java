@@ -7,6 +7,9 @@ import com.bitlove.fetlife.model.pojos.Story;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Store class for resource objects that should nto into the Database
+ */
 public class InMemoryStorage {
 
     private SparseArray<List<Story>> feeds = new SparseArray<>();

@@ -2,7 +2,6 @@ package com.bitlove.fetlife.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.view.activity.component.ActivityComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     @Override
     protected void onStart() {
         super.onStart();
+        getFetLifeApplication().getEventBus().register(this);
         for (ActivityComponent activityComponent : activityComponentList) {
             activityComponent.onActivityStarted(this);
         }
@@ -94,6 +95,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     @Override
     protected void onStop() {
         super.onStop();
+        getFetLifeApplication().getEventBus().unregister(this);
         for (ActivityComponent activityComponent : activityComponentList) {
             activityComponent.onActivityStopped(this);
         }
@@ -249,7 +251,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         });
     }
 
-    protected FetLifeApplication getFetLifeApplication() {
+    public FetLifeApplication getFetLifeApplication() {
         return (FetLifeApplication) getApplication();
     }
 
