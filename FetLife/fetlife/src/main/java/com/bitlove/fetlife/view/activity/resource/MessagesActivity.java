@@ -124,20 +124,6 @@ public class MessagesActivity extends ResourceActivity
     @Override
     protected void onResourceStart() {
 
-        inputLayout = findViewById(R.id.text_input_layout);
-        inputIcon = findViewById(R.id.text_send_icon);
-        textInput = (EditText) findViewById(R.id.text_input);
-//        textInput.setFilters(new InputFilter[]{new InputFilter() {
-//            @Override
-//            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-//                  //Custom Emoji Support will go here
-//        }});
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(recyclerLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
         messagesAdapter.refresh();
 
         if (!Conversation.isLocal(conversationId)) {
