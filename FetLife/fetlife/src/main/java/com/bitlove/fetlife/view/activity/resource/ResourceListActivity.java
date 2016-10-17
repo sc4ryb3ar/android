@@ -36,9 +36,6 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     @Override
     @CallSuper
     protected void onResourceCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setActivityContentView();
 
         //TODO: consider removing this
         floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
@@ -91,7 +88,8 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         }
     }
 
-    protected void setActivityContentView() {
+    @Override
+    protected void onSetContentView() {
         setContentView(R.layout.activity_resource_list);
     }
 

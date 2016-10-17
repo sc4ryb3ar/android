@@ -74,9 +74,12 @@ public class MessagesActivity extends ResourceActivity
     }
 
     @Override
-    protected void onResourceCreate(Bundle savedInstanceState) {
-
+    protected void onSetContentView() {
         setContentView(R.layout.activity_resource_list);
+    }
+
+    @Override
+    protected void onResourceCreate(Bundle savedInstanceState) {
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);

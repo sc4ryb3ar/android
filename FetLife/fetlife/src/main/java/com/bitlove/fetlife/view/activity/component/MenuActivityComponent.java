@@ -53,8 +53,8 @@ public class MenuActivityComponent extends ActivityComponent {
         Toolbar toolbar = (Toolbar) menuActivity.findViewById(R.id.toolbar);
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) menuActivity.findViewById(R.id.nav_view);
-        navigationHeaderView = navigationView.getHeaderView(0);
-        if (toolbar == null || drawer == null || navigationView == null || navigationHeaderView == null) {
+
+        if (toolbar == null || drawer == null || navigationView == null || (navigationHeaderView = navigationView.getHeaderView(0)) == null) {
             return;
         }
 
@@ -148,7 +148,7 @@ public class MenuActivityComponent extends ActivityComponent {
                 return true;
             }
         }
-        return false;
+        return null;
     }
 
     @Override

@@ -36,12 +36,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         onCreateActivityComponents();
+        onSetContentView();
         for (ActivityComponent activityComponent : activityComponentList) {
             activityComponent.onActivityCreated(this, savedInstanceState);
         }
     }
 
     protected abstract void onCreateActivityComponents();
+
+    protected abstract void onSetContentView();
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
@@ -209,7 +212,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             }
             result |= componentResult;
         }
-        if (result == null) {
+        if (result == null  || !result) {
             return super.onKeyDown(keyCode, e);
         }
         return result;
