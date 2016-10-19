@@ -113,7 +113,7 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
 class FriendViewHolder extends SwipeableViewHolder {
 
     ImageView avatarImage;
-    TextView headerText, upperText, dateText, lowerText;
+    TextView headerText, upperText, dateText;
 
     public FriendViewHolder(View itemView) {
         super(itemView);
@@ -121,7 +121,6 @@ class FriendViewHolder extends SwipeableViewHolder {
         headerText = (TextView) itemView.findViewById(R.id.friend_header);
         upperText = (TextView) itemView.findViewById(R.id.friend_upper);
         dateText = (TextView) itemView.findViewById(R.id.friend_right);
-        lowerText = (TextView) itemView.findViewById(R.id.friend_lower);
         avatarImage = (ImageView) itemView.findViewById(R.id.friend_icon);
     }
 

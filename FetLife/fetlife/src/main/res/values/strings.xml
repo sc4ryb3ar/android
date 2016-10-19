@@ -78,12 +78,24 @@
 
             <h1>Official FetLife App v%1$s</h1>
 
-            <p>Version History</p>
+            <p><b><br/>Got Bugs?</b></p>
+
+            If you find a bug please start by reading through the our current list of open issues and if you can\'t find anything about your bug please submit a new bug at our GitHub page:
+            <br/>https://github.com/fetlife/android/issues
+
+            <p><b><br/>Version History</b></p>
+
+            <p/>v1.7.17<br/>
+                    <ul>
+                        <li>Crash fix for Shared Profile Feature</li>
+                        <li>Crash fix at Friend Request Screen</li>
+                        <li>Fix for issue long first messages</li>
+                        <li>Other bug and crash fixes</li>
+                    </ul>
 
             <p/>v1.7<br/>
                     <ul>
                         <li>Caption for picture upload</li>
-                        <li>Bug fixes</li>
                     </ul>
 
             <p/>v1.6<br/>

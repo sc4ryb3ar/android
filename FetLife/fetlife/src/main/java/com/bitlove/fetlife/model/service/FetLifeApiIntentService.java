@@ -32,6 +32,7 @@ import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
@@ -65,6 +66,7 @@ public class FetLifeApiIntentService extends IntentService {
     //Action names for Api service calls
     //***
 
+    public static final String ACTION_APICALL_MEMBER = "com.bitlove.fetlife.action.apicall.member";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.cpnversations";
     public static final String ACTION_APICALL_FEED = "com.bitlove.fetlife.action.apicall.feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
@@ -75,7 +77,6 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.friendrequests";
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
-
 
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
@@ -90,6 +91,9 @@ public class FetLifeApiIntentService extends IntentService {
     private static final int PARAM_OLDMESSAGE_LIMIT = 25;
 
     //Reference holder for the action that is being processed
+    private static final int MAX_SUBJECT_LENGTH = 36;
+    private static final String SUBJECT_SHORTENED_SUFFIX = "\u2026";
+
     private static String actionInProgress = null;
 
     /**
@@ -210,12 +214,17 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
                     break;
+                case ACTION_APICALL_MEMBER:
+                    result = getMember(params);
+                    break;
             }
+
+            int lastResponseCode = getFetLifeApplication().getFetLifeService().getLastResponseCode();
 
             if (result) {
                 //If the call succeed notify all subscribers about
                 sendLoadFinishedNotification(action);
-            } else if (action != ACTION_APICALL_LOGON_USER && getFetLifeApplication().getFetLifeService().getLastResponseCode() == 403) {
+            } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401 || lastResponseCode == 403)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
                 if (refreshToken(currentUser)) {
                     //If token refresh succeed restart the original request
@@ -233,7 +242,7 @@ public class FetLifeApiIntentService extends IntentService {
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
             sendConnectionFailedNotification(action);
-        } catch (InvalidDBConfiguration|SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
+        } catch (InvalidDBConfiguration |SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
             //the exception go in case of it is not the case
             //TODO: create separate DB Manager class to synchronize db executions and DB close due to user logout
@@ -493,7 +502,6 @@ public class FetLifeApiIntentService extends IntentService {
         return response.isSuccess();
     }
 
-
     //****
     //Multimedia (POST) related methods / Api calls
     //****
@@ -632,6 +640,25 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private String getAccessToken() {
+        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        if (currentUser == null) {
+            return null;
+        }
+        return currentUser.getAccessToken();
+    }
+
+    private boolean getMember(String... params) throws IOException {
+        Call<Member> getMemberCall = getFetLifeApi().getMember(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), params[0]);
+        Response<Member> getMemberResponse = getMemberCall.execute();
+        if (getMemberResponse.isSuccess()) {
+            getMemberResponse.body().save();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private boolean retrieveFriends(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 10);
         final int page = getIntFromParams(params, 1, 1);
@@ -739,14 +766,6 @@ public class FetLifeApiIntentService extends IntentService {
     //****
     //Helper access methods to retrieve references from other holders
     //****
-
-    private String getAccessToken() {
-        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
-        if (currentUser == null) {
-            return null;
-        }
-        return currentUser.getAccessToken();
-    }
 
     private FetLifeApplication getFetLifeApplication() {
         return (FetLifeApplication) getApplication();
