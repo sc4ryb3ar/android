@@ -86,5 +86,8 @@ public interface FetLifeApi {
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/me/feed")
+    Call<Feed> getFeed2(@Header("Authorization") String authHeader);
+
 
 }

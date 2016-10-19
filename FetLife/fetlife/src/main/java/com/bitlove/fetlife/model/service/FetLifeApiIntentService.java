@@ -596,7 +596,8 @@ public class FetLifeApiIntentService extends IntentService {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
 
-        Call<Feed> getFeedCall = getFetLifeApi().getFeed(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
+//        Call<Feed> getFeedCall = getFetLifeApi().getFeed(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
+        Call<Feed> getFeedCall = getFetLifeApi().getFeed2(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken());
         Response<Feed> feedResponse = getFeedCall.execute();
         if (feedResponse.isSuccess()) {
             final Feed feed = feedResponse.body();

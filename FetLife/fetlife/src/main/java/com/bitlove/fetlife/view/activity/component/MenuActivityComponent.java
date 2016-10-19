@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.view.activity.resource.FeedActivity;
 import com.bitlove.fetlife.view.activity.standalone.AboutActivity;
 import com.bitlove.fetlife.view.activity.standalone.AddNfcFriendActivity;
 import com.bitlove.fetlife.view.activity.BaseActivity;
@@ -177,6 +178,8 @@ public class MenuActivityComponent extends ActivityComponent {
             MediaUploadSelectionDialog.show(menuActivity);
         } else if (id == R.id.nav_settings) {
             SettingsActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_feed) {
+            FeedActivity.startActivity(menuActivity);
         }
 
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);
