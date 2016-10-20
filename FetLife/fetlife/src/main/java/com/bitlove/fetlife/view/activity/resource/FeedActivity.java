@@ -13,6 +13,7 @@ import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.ConversationsRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -42,7 +43,7 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     protected ResourceListRecyclerAdapter<Story, ?> createRecyclerAdapter(Bundle savedInstanceState) {
-        return null;
+        return new FeedRecyclerAdapter(getFetLifeApplication());
     }
 
     @Override

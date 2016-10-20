@@ -21,6 +21,7 @@ import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
@@ -91,6 +92,9 @@ public class FetLifeApplication extends Application {
         } catch (PackageManager.NameNotFoundException e) {
             versionText = getString(R.string.text_unknown);
         }
+
+        //Init Fresco image library
+        Fresco.initialize(this);
 
         //Init crash logging
         Fabric.with(this, new Crashlytics());
