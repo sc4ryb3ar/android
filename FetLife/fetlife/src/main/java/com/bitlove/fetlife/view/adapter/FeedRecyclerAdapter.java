@@ -7,28 +7,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.GridLayout;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Event;
-import com.bitlove.fetlife.model.pojos.Feed;
-import com.bitlove.fetlife.model.pojos.Story;
-import com.bitlove.fetlife.model.resource.ImageLoader;
+import com.bitlove.fetlife.model.pojos.FeedStory;
+import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.Target;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, FeedViewHolder> {
+public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<FeedStory, FeedViewHolder> {
 
     private final FetLifeApplication fetLifeApplication;
-    private List<Story> itemList;
+    private List<FeedStory> itemList;
 
     public FeedRecyclerAdapter(FetLifeApplication fetLifeApplication) {
         this.fetLifeApplication = fetLifeApplication;
@@ -56,7 +53,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
         return itemList.size();
     }
 
-    public Story getItem(int position) {
+    public FeedStory getItem(int position) {
         return itemList.get(position);
     }
 
@@ -69,17 +66,17 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     @Override
     public void onBindViewHolder(FeedViewHolder feedViewHolder, int position) {
 
-        final Story feedStory = itemList.get(position);
-        List<Event> events = feedStory.getEvents();
+        final FeedStory feedFeedStory = itemList.get(position);
 
-        feedViewHolder.headerText.setText(feedStory.getName());
-        feedViewHolder.timeText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(feedStory.getEvents().get(0).getTarget().getCreatedAt())));
+                feedViewHolder.headerText.setText(getTitle(feedFeedStory));
+        feedViewHolder.timeText.setText(getTime(feedFeedStory));
+//        feedViewHolder.timeText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(feedFeedStory.getEvents().get(0).getTarget().getCreatedAt())));
 
         feedViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getOnItemClickListener() != null) {
-                    getOnItemClickListener().onItemClick(feedStory);
+                    getOnItemClickListener().onItemClick(feedFeedStory);
                 }
             }
         });
@@ -88,14 +85,28 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
             @Override
             public void onClick(View v) {
                 if (getOnItemClickListener() != null) {
-                    getOnItemClickListener().onAvatarClick(feedStory);
+                    getOnItemClickListener().onAvatarClick(feedFeedStory);
                 }
             }
         });
 
-        String avatarUrl = feedStory.getEvents().get(0).getTarget().getMember().getAvatarLink();
+        String avatarUrl = feedFeedStory.getEvents().get(0).getTarget().getMember().getAvatarLink();
         Uri avatarUri = Uri.parse(avatarUrl);
         feedViewHolder.avatarImage.setImageURI(avatarUri);
+    }
+
+    private String getTitle(FeedStory feedFeedStory) {
+        List<Event> events = feedFeedStory.getEvents();
+        if (events.isEmpty()) {
+            throw new IllegalArgumentException("A feed story must contain at least one event");
+        }
+
+        Member member = events.get(0).getTarget().getMember();
+
+        switch (feedFeedStory.getName()) {
+            default:
+                return member.getNickname() + " " + feedFeedStory.getName() + events.size();
+        }
     }
 
     @Override
@@ -105,6 +116,8 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
 class FeedViewHolder extends SwipeableViewHolder {
 
+    private final GridLayout gridExpandArea;
+    private final GridLayout listExpandArea;
     SimpleDraweeView avatarImage;
     TextView headerText, timeText;
 
@@ -115,7 +128,8 @@ class FeedViewHolder extends SwipeableViewHolder {
         timeText = (TextView) itemView.findViewById(R.id.feeditem_time);
         avatarImage = (SimpleDraweeView) itemView.findViewById(R.id.feeditem_icon);
 
-        
+        gridExpandArea = (GridLayout) itemView.findViewById(R.id.feeditem_grid_expandable);
+        listExpandArea = (GridLayout) itemView.findViewById(R.id.feeditem_list_expandable);
     }
 
     @Override

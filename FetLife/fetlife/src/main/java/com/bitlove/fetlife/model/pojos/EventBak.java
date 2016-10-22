@@ -1,69 +1,67 @@
 package com.bitlove.fetlife.model.pojos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "events",
-        "name"
+        "secondary_target",
+        "target"
 })
-public class Story {
+public class EventBak {
 
-    @JsonProperty("events")
-    private List<Event> events = new ArrayList<Event>();
-    @JsonProperty("name")
-    private String name;
+    @JsonProperty("secondary_target")
+    private SecondaryTarget secondaryTarget;
+    @JsonProperty("target")
+    private Target target;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      *
      * @return
-     * The events
+     * The secondaryTarget
      */
-    @JsonProperty("events")
-    public List<Event> getEvents() {
-        return events;
+    @JsonProperty("secondary_target")
+    public SecondaryTarget getSecondaryTarget() {
+        return secondaryTarget;
     }
 
     /**
      *
-     * @param events
-     * The events
+     * @param secondaryTarget
+     * The secondary_target
      */
-    @JsonProperty("events")
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    @JsonProperty("secondary_target")
+    public void setSecondaryTarget(SecondaryTarget secondaryTarget) {
+        this.secondaryTarget = secondaryTarget;
     }
 
     /**
      *
      * @return
-     * The name
+     * The target
      */
-    @JsonProperty("name")
-    public String getName() {
-        return name;
+    @JsonProperty("target")
+    public Target getTarget() {
+        return target;
     }
 
     /**
      *
-     * @param name
-     * The name
+     * @param target
+     * The target
      */
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
+    @JsonProperty("target")
+    public void setTarget(Target target) {
+        this.target = target;
     }
 
     @JsonAnyGetter
@@ -75,5 +73,4 @@ public class Story {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
-
 }

@@ -12,7 +12,7 @@ if (propFile.canRead()) {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.0"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "com.bitlove.fetlife"

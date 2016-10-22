@@ -10,67 +10,30 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.HashMap;
 import java.util.Map;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "secondary_target",
-        "target"
-})
 public class Event {
 
+    @JsonProperty("id")
+    public String id;
+
     @JsonProperty("secondary_target")
-    private SecondaryTarget secondaryTarget;
+    private Target secondaryTarget;
     @JsonProperty("target")
     private Target target;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    /**
-     *
-     * @return
-     * The secondaryTarget
-     */
-    @JsonProperty("secondary_target")
-    public SecondaryTarget getSecondaryTarget() {
+    public Target getSecondaryTarget() {
         return secondaryTarget;
     }
 
-    /**
-     *
-     * @param secondaryTarget
-     * The secondary_target
-     */
-    @JsonProperty("secondary_target")
-    public void setSecondaryTarget(SecondaryTarget secondaryTarget) {
+    public void setSecondaryTarget(Target secondaryTarget) {
         this.secondaryTarget = secondaryTarget;
     }
 
-    /**
-     *
-     * @return
-     * The target
-     */
-    @JsonProperty("target")
     public Target getTarget() {
         return target;
     }
 
-    /**
-     *
-     * @param target
-     * The target
-     */
-    @JsonProperty("target")
     public void setTarget(Target target) {
         this.target = target;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
 }

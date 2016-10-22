@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,17 +22,25 @@ import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.cache.CacheKeyFactory;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
 import io.fabric.sdk.android.Fabric;
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.regex.Pattern;
+
 /**
  * Main Application class. The lifecycle of the object of this class is the same as the App itself
  */
 public class FetLifeApplication extends Application {
+
+    private static final String IMAGE_TOKEN_MIDFIX = "?token=";
 
     /**
      * Preference key for version number for last upgrade was executed.
@@ -94,6 +103,7 @@ public class FetLifeApplication extends Application {
         }
 
         //Init Fresco image library
+        initFrescoImageLibrary();
         Fresco.initialize(this);
 
         //Init crash logging
@@ -126,6 +136,52 @@ public class FetLifeApplication extends Application {
         notificationParser = new NotificationParser();
         eventBus = EventBus.getDefault();
         inMemoryStorage = new InMemoryStorage();
+    }
+
+    private void initFrescoImageLibrary() {
+        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this).setCacheKeyFactory(new CacheKeyFactory() {
+            @Override
+            public CacheKey getBitmapCacheKey(ImageRequest request, Object callerContext) {
+                Uri uri = request.getSourceUri();
+                return getCacheKey(uri);
+            }
+
+            @Override
+            public CacheKey getPostprocessedBitmapCacheKey(ImageRequest request, Object callerContext) {
+                Uri uri = request.getSourceUri();
+                return getCacheKey(uri);
+            }
+
+            @Override
+            public CacheKey getEncodedCacheKey(ImageRequest request, Object callerContext) {
+                Uri uri = request.getSourceUri();
+                return getCacheKey(uri);
+            }
+
+            private CacheKey getCacheKey(Uri uri) {
+                String imageUrl = uri.toString();
+                final String cacheUrl;
+
+                String[] imageUrlParts = imageUrl.split(Pattern.quote(IMAGE_TOKEN_MIDFIX));
+                if (imageUrlParts.length >= 2) {
+                    cacheUrl = imageUrlParts[0];
+                    String token = imageUrlParts[1];
+                } else {
+                    cacheUrl = imageUrl;
+                }
+
+                CacheKey cacheKey = new CacheKey() {
+                    @Override
+                    public boolean containsUri(Uri uri) {
+                        return uri.toString().startsWith(cacheUrl);
+                    }
+                };
+
+                return cacheKey;
+            }
+        }).build();
+
+        Fresco.initialize(this, imagePipelineConfig);
     }
 
     //****
