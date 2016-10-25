@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    style="@style/FeedItem"
+    >
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/feeditem_icon"
 
-        style="@style/FriendAvatar"
+        style="@style/FeedAvatar"
 
         android:layout_width="?android:attr/listPreferredItemHeight"
         android:layout_height="?android:attr/listPreferredItemHeight"
@@ -22,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        style="@style/FriendHeader"
+        style="@style/FeedHeader"
 
         android:layout_toRightOf="@id/feeditem_icon"
         android:layout_alignParentTop="true"
@@ -37,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        style="@style/FriendUpperText"
+        style="@style/FeedTime"
 
         android:layout_toRightOf="@id/feeditem_icon"
         android:layout_below="@id/feeditem_header"

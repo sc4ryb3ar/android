@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.view.adapter;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,11 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Event;
+import com.bitlove.fetlife.model.pojos.FeedProcessor;
 import com.bitlove.fetlife.model.pojos.FeedStory;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Target;
@@ -66,17 +70,29 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<FeedStory, 
     @Override
     public void onBindViewHolder(FeedViewHolder feedViewHolder, int position) {
 
-        final FeedStory feedFeedStory = itemList.get(position);
+        Context context = feedViewHolder.avatarImage.getContext();
 
-                feedViewHolder.headerText.setText(getTitle(feedFeedStory));
-        feedViewHolder.timeText.setText(getTime(feedFeedStory));
+        final FeedStory feedStory = itemList.get(position);
+
+        FeedProcessor feedProcesser = new FeedProcessor(feedStory);
+
+        Member member = feedProcesser.getDisplayMember();
+        Event templateEvent = feedProcesser.getTemplateEvent();
+        int eventCount = feedProcesser.getEventCount();
+
+        List<Event> events = feedProcesser.getEvents();
+        FeedProcessor.FeedStoryType storyType = feedProcesser.getStoryType();
+
+
+        feedViewHolder.headerText.setText(getTitle(storyType, member, eventCount, context));
+        //feedViewHolder.timeText.setText(getTime(feedFeedStory));
 //        feedViewHolder.timeText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(feedFeedStory.getEvents().get(0).getTarget().getCreatedAt())));
 
         feedViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getOnItemClickListener() != null) {
-                    getOnItemClickListener().onItemClick(feedFeedStory);
+                    getOnItemClickListener().onItemClick(feedStory);
                 }
             }
         });
@@ -85,27 +101,34 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<FeedStory, 
             @Override
             public void onClick(View v) {
                 if (getOnItemClickListener() != null) {
-                    getOnItemClickListener().onAvatarClick(feedFeedStory);
+                    getOnItemClickListener().onAvatarClick(feedStory);
                 }
             }
         });
 
-        String avatarUrl = feedFeedStory.getEvents().get(0).getTarget().getMember().getAvatarLink();
-        Uri avatarUri = Uri.parse(avatarUrl);
-        feedViewHolder.avatarImage.setImageURI(avatarUri);
+        feedViewHolder.avatarImage.setBackgroundResource(R.drawable.dummy_avatar);
+
+        String avatarLink;
+        if (member == null || (avatarLink = member.getAvatarLink()) == null) {
+            feedViewHolder.avatarImage.setImageURI((String)null);
+        } else {
+            Uri avatarUri = Uri.parse(avatarLink);
+            feedViewHolder.avatarImage.setImageURI(avatarUri);
+        }
     }
 
-    private String getTitle(FeedStory feedFeedStory) {
-        List<Event> events = feedFeedStory.getEvents();
-        if (events.isEmpty()) {
-            throw new IllegalArgumentException("A feed story must contain at least one event");
-        }
+    private String getTitle(FeedProcessor.FeedStoryType storyType, Member member, int eventCount, Context context) {
 
-        Member member = events.get(0).getTarget().getMember();
-
-        switch (feedFeedStory.getName()) {
+        switch (storyType) {
+            case FRIENDS:
+                return context.getString(R.string.feed_title_friends, member.getNickname(), eventCount);
+            case LOVED:
+                return context.getString(R.string.feed_title_like, member.getNickname(), eventCount);
             default:
-                return member.getNickname() + " " + feedFeedStory.getName() + events.size();
+                if (member == null) {
+                    return storyType.toString();
+                }
+                return member.getNickname() + " " + storyType.toString() + " " + eventCount;
         }
     }
 
@@ -117,7 +140,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<FeedStory, 
 class FeedViewHolder extends SwipeableViewHolder {
 
     private final GridLayout gridExpandArea;
-    private final GridLayout listExpandArea;
+    private final LinearLayout listExpandArea;
     SimpleDraweeView avatarImage;
     TextView headerText, timeText;
 
@@ -129,7 +152,7 @@ class FeedViewHolder extends SwipeableViewHolder {
         avatarImage = (SimpleDraweeView) itemView.findViewById(R.id.feeditem_icon);
 
         gridExpandArea = (GridLayout) itemView.findViewById(R.id.feeditem_grid_expandable);
-        listExpandArea = (GridLayout) itemView.findViewById(R.id.feeditem_list_expandable);
+        listExpandArea = (LinearLayout) itemView.findViewById(R.id.feeditem_list_expandable);
     }
 
     @Override

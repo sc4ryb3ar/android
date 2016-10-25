@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MessagesActivity extends ResourceActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, MenuActivityComponent.MenuActivityCallBack{
 
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
     private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
@@ -298,4 +298,8 @@ public class MessagesActivity extends ResourceActivity
 
     }
 
+    @Override
+    public boolean finishAtMenuNavigation() {
+        return true;
+    }
 }
