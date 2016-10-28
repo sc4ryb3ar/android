@@ -28,7 +28,6 @@ import com.bitlove.fetlife.model.pojos.AuthBody;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Feed;
-import com.bitlove.fetlife.model.pojos.FeedStory;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
@@ -37,6 +36,7 @@ import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
+import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
@@ -601,7 +601,7 @@ public class FetLifeApiIntentService extends IntentService {
         Response<Feed> feedResponse = getFeedCall.execute();
         if (feedResponse.isSuccess()) {
             final Feed feed = feedResponse.body();
-            final List<FeedStory> stories = feed.getStories();
+            final List<Story> stories = feed.getStories();
             getFetLifeApplication().getInMemoryStorage().addFeed(page,stories);
 
 //            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {

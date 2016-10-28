@@ -87,6 +87,18 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    public static class FeedSettings extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            getPreferenceManager().setSharedPreferencesName(userPreferenceName);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.feed_preferences);
+        }
+    }
+
     public static class ProfileSettings extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -130,6 +142,9 @@ public class SettingsActivity extends PreferenceActivity {
             return true;
         }
         if (ProfileSettings.class.getName().equals(fragmentName)) {
+            return true;
+        }
+        if (FeedSettings.class.getName().equals(fragmentName)) {
             return true;
         }
         return false;

@@ -2,7 +2,7 @@ package com.bitlove.fetlife.model.inmemory;
 
 import android.util.SparseArray;
 
-import com.bitlove.fetlife.model.pojos.FeedStory;
+import com.bitlove.fetlife.model.pojos.Story;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class InMemoryStorage {
 
-    private SparseArray<List<FeedStory>> feeds = new SparseArray<>();
+    private SparseArray<List<Story>> feeds = new SparseArray<>();
 
     public void clearFeed() {
         synchronized (feeds) {
@@ -20,15 +20,15 @@ public class InMemoryStorage {
         }
     }
 
-    public void addFeed(int page, List<FeedStory> stories) {
+    public void addFeed(int page, List<Story> stories) {
         synchronized (feeds) {
             feeds.put(page,stories);
         }
     }
 
-    public List<FeedStory> getFeed() {
+    public List<Story> getFeed() {
         synchronized (feeds) {
-            List<FeedStory> feed = new ArrayList<>();
+            List<Story> feed = new ArrayList<>();
             for (int i = 0; i < feeds.size(); i++) {
                 feed.addAll(feeds.get(feeds.keyAt(i)));
             }

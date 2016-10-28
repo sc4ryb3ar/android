@@ -1,67 +1,54 @@
+
 package com.bitlove.fetlife.model.pojos;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Target {
 
-    @JsonProperty("activity")
-    private String activity;
-    @JsonProperty("content_type")
-    private String contentType;
-    @JsonProperty("created_at")
-    private String createdAt;
-    @JsonProperty("id")
-    private String id;
-    @JsonProperty("member")
-    private Member member;
-    @JsonProperty("status")
-    private String status;
+    @JsonProperty("relation")
+    private Relation relation;
+    @JsonProperty("love")
+    private Love love;
 
-    public String getActivity() {
-        return activity;
+    /**
+     *
+     * @return
+     *     The love
+     */
+    @JsonProperty("love")
+    public Love getLove() {
+        return love;
     }
 
-    public void setActivity(String activity) {
-        this.activity = activity;
+    /**
+     *
+     * @param love
+     *     The love
+     */
+    @JsonProperty("love")
+    public void setLove(Love love) {
+        this.love = love;
+    }
+    /**
+     * 
+     * @return
+     *     The relation
+     */
+    @JsonProperty("relation")
+    public Relation getRelation() {
+        return relation;
     }
 
-    public String getContentType() {
-        return contentType;
+    /**
+     * 
+     * @param relation
+     *     The relation
+     */
+    @JsonProperty("relation")
+    public void setRelation(Relation relation) {
+        this.relation = relation;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

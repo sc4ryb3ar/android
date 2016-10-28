@@ -3,6 +3,7 @@ package com.bitlove.fetlife.view.activity.resource;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     protected RecyclerView recyclerView;
     protected ResourceListRecyclerAdapter<Resource, ?> recyclerAdapter;
 
+    protected SwipeRefreshLayout swipeRefreshLayout;
     protected LinearLayoutManager recyclerLayoutManager;
     protected View inputLayout;
     protected View inputIcon;
@@ -68,6 +70,15 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
             }
         });
         recyclerView.setAdapter(recyclerAdapter);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestedPage = 1;
+                FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(pageCount));
+            }
+        });
 
         String apiCallAction = getApiCallAction();
         if (apiCallAction != null) {
@@ -144,6 +155,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         if (serviceCallFinishedEvent.getServiceCallAction() == getApiCallAction()) {
             recyclerAdapter.refresh();
             dismissProgress();
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -152,6 +164,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         if (serviceCallFailedEvent.getServiceCallAction() == getApiCallAction()) {
             recyclerAdapter.refresh();
             dismissProgress();
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -161,6 +174,4 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
             showProgress();
         }
     }
-
-
 }

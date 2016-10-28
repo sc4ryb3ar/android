@@ -184,7 +184,19 @@
     <string name="title_activity_feed">Feed</string>
     <string name="menu_feed">Feed</string>
     <string name="feed_title_friends">%1$s became friend with %2$d users</string>
-    <string name="feed_title_like">%1$s loved %2$d</string>
-    <string name="feed_title_subject_picture">picture</string>
-    <string name="feed_title_subject_pictures">pictures</string>
+    <string name="feed_title_like_picture">loved one picture</string>
+    <string name="feed_title_like_pictures">loved %1$d pictures</string>
+    <string name="feed_title_like_temp">%1$s loved one thingy</string>
+    <string name="feed_title_like_temps">%1$s loved %2$d thingies</string>
+    <string name="feed_title_like_unknown">Not yet supported Like Event</string>
+    <string name="feed_title_new_relation">became friend with one member</string>
+    <string name="feed_title_new_relations">>became friend with %1$d members</string>
+    <string name="feed_title_relation_unknown">Not yet supported relation event</string>
+    <string name="settings_title_feede">Feed Settings</string>
+    <string name="settings_summary_feed">Settings about how the feed stories should be displayed on the feed screen</string>
+    <string name="settings_category_feed_autoexpand">Auto Expand Feed Stores</string>
+    <string name="settings_title_feed_auto_expand_like">New Loves</string>
+    <string name="settings_summary_feed_auto_expand_like">Auto expand feed stories about when a followed user loved something</string>
+    <string name="settings_title_feed_auto_expand_relation">New Relations</string>
+    <string name="settings_summary_feed_auto_expand_relation">Auto expand feed stories about when a followed user become friend with someone</string>
 </resources>

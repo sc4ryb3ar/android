@@ -1,77 +1,52 @@
+
 package com.bitlove.fetlife.model.pojos;
 
-import java.util.HashMap;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "type"
-})
 public class SecondaryTarget {
 
-    @JsonProperty("id")
-    private String id;
-    @JsonProperty("type")
-    private Object type;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @JsonProperty("member")
+    private Member member;
+    @JsonProperty("picture")
+    private Picture picture;
 
     /**
      *
      * @return
-     * The id
+     *     The picture
      */
-    @JsonProperty("id")
-    public String getId() {
-        return id;
+    @JsonProperty("picture")
+    public Picture getPicture() {
+        return picture;
     }
 
     /**
      *
-     * @param id
-     * The id
+     * @param picture
+     *     The picture
      */
-    @JsonProperty("id")
-    public void setId(String id) {
-        this.id = id;
+    @JsonProperty("picture")
+    public void setPicture(Picture picture) {
+        this.picture = picture;
     }
-
     /**
-     *
+     * 
      * @return
-     * The type
+     *     The member
      */
-    @JsonProperty("type")
-    public Object getType() {
-        return type;
+    @JsonProperty("member")
+    public Member getMember() {
+        return member;
     }
 
     /**
-     *
-     * @param type
-     * The type
+     * 
+     * @param member
+     *     The member
      */
-    @JsonProperty("type")
-    public void setType(Object type) {
-        this.type = type;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    @JsonProperty("member")
+    public void setMember(Member member) {
+        this.member = member;
     }
 
 }
-

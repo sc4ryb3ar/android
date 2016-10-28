@@ -7,4 +7,6 @@
     <string name="settings_key_notification_info_enabled">notification_info_enabled</string>
     <string name="settings_key_profile_password_always">preference_password_always</string>
     <string name="settings_key_profile_clear_data">profile_clear_user_data</string>
+    <string name="settings_key_feed_auto_expand_like">settings_key_feed_auto_expand_like</string>
+    <string name="settings_key_feed_auto_expand_relation">settings_key_feed_auto_expand_relation</string>
 </resources>

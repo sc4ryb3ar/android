@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.bitlove.fetlife.model.pojos.FeedStory;
+import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
-import com.bitlove.fetlife.view.adapter.FeedRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 
-public class FeedActivity extends ResourceListActivity<FeedStory> implements MenuActivityComponent.MenuActivityCallBack {
+public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack {
 
     public static void startActivity(Context context) {
         context.startActivity(createIntent(context));
@@ -18,7 +18,7 @@ public class FeedActivity extends ResourceListActivity<FeedStory> implements Men
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, FeedActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }
 
@@ -33,7 +33,7 @@ public class FeedActivity extends ResourceListActivity<FeedStory> implements Men
     }
 
     @Override
-    protected ResourceListRecyclerAdapter<FeedStory, ?> createRecyclerAdapter(Bundle savedInstanceState) {
+    protected ResourceListRecyclerAdapter<Story, ?> createRecyclerAdapter(Bundle savedInstanceState) {
         return new FeedRecyclerAdapter(getFetLifeApplication());
     }
 
@@ -43,10 +43,10 @@ public class FeedActivity extends ResourceListActivity<FeedStory> implements Men
     }
 
     @Override
-    public void onItemClick(FeedStory feedStory) {
+    public void onItemClick(Story feedStory) {
     }
 
     @Override
-    public void onAvatarClick(FeedStory feedStory) {
+    public void onAvatarClick(Story feedStory) {
     }
 }

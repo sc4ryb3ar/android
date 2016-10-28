@@ -106,16 +106,3 @@ public abstract class SwipeableRecyclerAdapter<T extends SwipeableViewHolder> ex
 
     protected abstract void onItemRemove(T viewHolder, RecyclerView recyclerView, boolean swipedRight);
 }
-
-abstract class SwipeableViewHolder extends RecyclerView.ViewHolder {
-
-    public SwipeableViewHolder(View itemView) {
-        super(itemView);
-    }
-
-    public abstract View getSwipeableLayout();
-
-    public abstract View getSwipeRightBackground();
-
-    public abstract View getSwipeLeftBackground();
-}

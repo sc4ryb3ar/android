@@ -1,7 +1,5 @@
 package com.bitlove.fetlife.view.adapter;
 
-import android.support.v7.widget.RecyclerView;
-
 public abstract class ResourceListRecyclerAdapter<Resource, ResourceViewHolder extends SwipeableViewHolder> extends SwipeableRecyclerAdapter<ResourceViewHolder> {
 
     public abstract void refresh();

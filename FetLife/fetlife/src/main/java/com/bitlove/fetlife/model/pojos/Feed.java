@@ -1,32 +1,33 @@
-package com.bitlove.fetlife.model.pojos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.bitlove.fetlife.model.pojos;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Feed {
 
-    private List<FeedStory> stories = new ArrayList<FeedStory>();
+    @JsonProperty("stories")
+    private List<Story> stories = new ArrayList<Story>();
 
     /**
-     *
+     * 
      * @return
-     * The stories
+     *     The stories
      */
     @JsonProperty("stories")
-    public List<FeedStory> getStories() {
+    public List<Story> getStories() {
         return stories;
     }
 
     /**
-     *
+     * 
      * @param stories
-     * The stories
+     *     The stories
      */
     @JsonProperty("stories")
-    public void setStories(List<FeedStory> stories) {
+    public void setStories(List<Story> stories) {
         this.stories = stories;
     }
-}
 
+}
