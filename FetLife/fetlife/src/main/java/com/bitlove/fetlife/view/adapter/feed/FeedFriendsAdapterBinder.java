@@ -19,7 +19,6 @@ import com.bitlove.fetlife.model.pojos.Relation;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Target;
 import com.bitlove.fetlife.util.DateUtil;
-import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.text.SimpleDateFormat;
@@ -35,7 +34,7 @@ public class FeedFriendsAdapterBinder {
         this.feedRecyclerAdapter = feedRecyclerAdapter;
     }
 
-    public void bindRelationStory(final FeedViewHolder feedViewHolder, final Story story, final ResourceListRecyclerAdapter.OnResourceClickListener<Story> onItemClickListener) {
+    public void bindRelationStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
 
         Context context = feedViewHolder.avatarImage.getContext();
 
@@ -46,7 +45,7 @@ public class FeedFriendsAdapterBinder {
             return;
         }
 
-        Member followed;
+        final Member followed;
         BaseAdapter gridAdapter = null, listAdapter = null;
         String createdAt = null, meta = null, name = null, title = null;
         Integer expandableResourceId = null;
@@ -60,7 +59,7 @@ public class FeedFriendsAdapterBinder {
             meta = followed.getMetaInfo();
             title = events.size() == 1 ? context.getString(R.string.feed_title_new_relation) : context.getString(R.string.feed_title_new_relations, events.size());
 
-            gridAdapter = new PictureGridAdapter(events);
+            gridAdapter = new PictureGridAdapter(events, onItemClickListener);
             expandableResourceId = R.id.feeditem_grid_expandable;
 
         } catch (NullPointerException npe) {
@@ -93,18 +92,6 @@ public class FeedFriendsAdapterBinder {
                     v.findViewById(R.id.feeditem_separator).setVisibility(visible ? View.GONE : View.VISIBLE);
                     expandHistory.put(position,!visible);
                 }
-                if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(story);
-                }
-            }
-        });
-
-        feedViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onAvatarClick(story);
-                }
             }
         });
 
@@ -120,7 +107,7 @@ public class FeedFriendsAdapterBinder {
         feedViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onAvatarClick(story);
+                onItemClickListener.onMemberClick(followed);
             }
         });
 
@@ -128,7 +115,7 @@ public class FeedFriendsAdapterBinder {
         if (gridAdapter != null) {
             GridView gridLayout = feedViewHolder.gridExpandArea;
             gridLayout.setAdapter(gridAdapter);
-            boolean expandByPreference = FetLifeApplication.getInstance().getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_feed_auto_expand_relation),false);
+            boolean expandByPreference = fetLifeApplication.getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_feed_auto_expand_relation),false);
             boolean expanded = expandHistory.get(position,expandByPreference);
             gridLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);
             feedViewHolder.separatorView.setVisibility(expanded ? View.VISIBLE : View.GONE);
@@ -138,9 +125,11 @@ public class FeedFriendsAdapterBinder {
 
     static class PictureGridAdapter extends BaseAdapter {
         private List<Event> events;
+        private final FeedRecyclerAdapter.OnFeedItemClickListener onFeedItemClickListener;
 
-        PictureGridAdapter(List<Event> events) {
+        PictureGridAdapter(List<Event> events, FeedRecyclerAdapter.OnFeedItemClickListener onFeedItemClickListener) {
             this.events = events;
+            this.onFeedItemClickListener = onFeedItemClickListener;
         }
 
         @Override
@@ -159,11 +148,13 @@ public class FeedFriendsAdapterBinder {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             Uri pictureUri;
+            final Member targetMember;
 
             try {
-                String avatarLink = getItem(position).getTarget().getRelation().getTargetMember().getAvatarLink();
+                targetMember = getItem(position).getTarget().getRelation().getTargetMember();
+                String avatarLink = targetMember.getAvatarLink();
                 pictureUri = Uri.parse(avatarLink);
             } catch (NullPointerException npe) {
                 return new LinearLayout(parent.getContext());
@@ -176,9 +167,14 @@ public class FeedFriendsAdapterBinder {
 
             SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflater.inflate(R.layout.listitem_feed_griditem, parent, false);
             simpleDraweeView.setImageURI(pictureUri);
+            simpleDraweeView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onFeedItemClickListener.onMemberClick(targetMember);
+                }
+            });
 
             return simpleDraweeView;
-
         }
     }
 

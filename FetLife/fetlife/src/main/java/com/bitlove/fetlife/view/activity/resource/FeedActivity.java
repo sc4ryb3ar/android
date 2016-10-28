@@ -2,15 +2,17 @@ package com.bitlove.fetlife.view.activity.resource;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 
-public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack {
+public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack, FeedRecyclerAdapter.OnFeedItemClickListener {
 
     public static void startActivity(Context context) {
         context.startActivity(createIntent(context));
@@ -34,7 +36,7 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     protected ResourceListRecyclerAdapter<Story, ?> createRecyclerAdapter(Bundle savedInstanceState) {
-        return new FeedRecyclerAdapter(getFetLifeApplication());
+        return new FeedRecyclerAdapter(getFetLifeApplication(), this);
     }
 
     @Override
@@ -48,5 +50,15 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     public void onAvatarClick(Story feedStory) {
+    }
+
+    @Override
+    public void onMemberClick(Member member) {
+        String url = member.getLink();
+        if (url != null) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
+        }
     }
 }

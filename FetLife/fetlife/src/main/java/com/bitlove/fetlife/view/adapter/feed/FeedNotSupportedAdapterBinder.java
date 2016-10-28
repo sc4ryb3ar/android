@@ -4,6 +4,7 @@ package com.bitlove.fetlife.view.adapter.feed;
 import android.content.Context;
 import android.view.View;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
@@ -13,7 +14,7 @@ public class FeedNotSupportedAdapterBinder {
     public FeedNotSupportedAdapterBinder(FeedRecyclerAdapter feedRecyclerAdapter) {
     }
 
-    public void bindNotSupportedStory(final FeedViewHolder feedViewHolder, final Story story, final ResourceListRecyclerAdapter.OnResourceClickListener<Story> onItemClickListener) {
+    public void bindNotSupportedStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
         Context context = feedViewHolder.avatarImage.getContext();
 
         String title  = "Not yet supported story type: " + story.getName();

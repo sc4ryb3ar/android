@@ -21,15 +21,12 @@ import com.bitlove.fetlife.model.pojos.SecondaryTarget;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Target;
 import com.bitlove.fetlife.util.DateUtil;
-import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class FeedLikeAdapterBinder {
 
@@ -41,7 +38,7 @@ public class FeedLikeAdapterBinder {
         this.feedRecyclerAdapter = feedRecyclerAdapter;
     }
 
-    public void bindLikeStory(final FeedViewHolder feedViewHolder, final Story story, final ResourceListRecyclerAdapter.OnResourceClickListener<Story> onItemClickListener) {
+    public void bindLikeStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
 
         Context context = feedViewHolder.avatarImage.getContext();
 
@@ -52,7 +49,7 @@ public class FeedLikeAdapterBinder {
             return;
         }
 
-        Member liker;
+        final Member liker;
         BaseAdapter gridAdapter = null, listAdapter = null;
         String createdAt = null, name = null, meta = null, title = null;
         Integer expandableResourceId = null;
@@ -68,7 +65,7 @@ public class FeedLikeAdapterBinder {
                 name = liker.getNickname();
                 meta = liker.getMetaInfo();
                 title = events.size() == 1 ? context.getString(R.string.feed_title_like_picture) : context.getString(R.string.feed_title_like_pictures, events.size());
-                gridAdapter = new PictureGridAdapter(events);
+                gridAdapter = new PictureGridAdapter(events, onItemClickListener);
                 expandableResourceId = R.id.feeditem_grid_expandable;
             }
 
@@ -102,18 +99,6 @@ public class FeedLikeAdapterBinder {
                     v.findViewById(R.id.feeditem_separator).setVisibility(visible ? View.GONE : View.VISIBLE);
                     expandHistory.put(position,!visible);
                 }
-                if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(story);
-                }
-            }
-        });
-
-        feedViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onAvatarClick(story);
-                }
             }
         });
 
@@ -129,14 +114,14 @@ public class FeedLikeAdapterBinder {
         feedViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onAvatarClick(story);
+                onItemClickListener.onMemberClick(liker);
             }
         });
 
         if (gridAdapter != null) {
             GridView gridLayout = feedViewHolder.gridExpandArea;
             gridLayout.setAdapter(gridAdapter);
-            boolean expandByPreference = FetLifeApplication.getInstance().getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_feed_auto_expand_like),false);
+            boolean expandByPreference = fetLifeApplication.getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_feed_auto_expand_like),false);
             boolean expanded = expandHistory.get(position,expandByPreference);
             gridLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);
             feedViewHolder.separatorView.setVisibility(expanded ? View.VISIBLE : View.GONE);
@@ -145,11 +130,14 @@ public class FeedLikeAdapterBinder {
     }
 
     static class PictureGridAdapter extends BaseAdapter {
+        private final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener;
+
         private List<Picture> pictures = new ArrayList<>();
         private ArrayList<String> gridLinks = new ArrayList<>();
         private ArrayList<String> displayLinks = new ArrayList<>();
 
-        PictureGridAdapter(List<Event> events) {
+        PictureGridAdapter(List<Event> events, FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
+            this.onItemClickListener = onItemClickListener;
             for (Event event : events) {
                 Picture picture = event.getSecondaryTarget().getPicture();
                 pictures.add(picture);
@@ -198,7 +186,13 @@ public class FeedLikeAdapterBinder {
                     TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
                     TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
                     TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
-                    Picture picture = pictures.get(position);
+                    final Picture picture = pictures.get(position);
+                    imageName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onItemClickListener.onMemberClick(picture.getMember());
+                        }
+                    });
                     imageDescription.setText(picture.getBody());
                     imageMeta.setText(picture.getMember().getMetaInfo());
                     imageName.setText(picture.getMember().getNickname());
@@ -208,7 +202,13 @@ public class FeedLikeAdapterBinder {
                             TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
                             TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
                             TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
-                            Picture picture = pictures.get(position);
+                            final Picture picture = pictures.get(position);
+                            imageName.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    onItemClickListener.onMemberClick(picture.getMember());
+                                }
+                            });
                             imageDescription.setText(picture.getBody());
                             imageMeta.setText(picture.getMember().getMetaInfo());
                             imageName.setText(picture.getMember().getNickname());
