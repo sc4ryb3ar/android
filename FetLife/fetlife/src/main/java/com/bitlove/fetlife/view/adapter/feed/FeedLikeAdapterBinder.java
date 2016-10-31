@@ -182,7 +182,7 @@ public class FeedLikeAdapterBinder {
                 @Override
                 public void onClick(View v) {
                     LayoutInflater inflater = LayoutInflater.from(v.getContext());
-                    final View overlay = inflater.inflate(R.layout.feed_image_swipe_overlay, null);
+                    final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
                     TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
                     TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
                     TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
