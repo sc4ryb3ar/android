@@ -18,6 +18,7 @@ import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
+import com.bitlove.fetlife.util.RemoteLogger;
 import com.bitlove.fetlife.view.activity.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
@@ -51,6 +52,11 @@ public class FetLifeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (!RemoteLogger.isLogging(this)) {
+            RemoteLogger.toggleLogging(this);
+            RemoteLogger.appendLog(this,"Logging is turned on");
+        }
 
         //Setup default instance and callbacks
         instance = this;

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.notification.OneSignalNotification;
+import com.bitlove.fetlife.util.RemoteLogger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,12 +24,18 @@ public class OneSignalBackgroundDataReceiver extends WakefulBroadcastReceiver {
 //        try {
 
             Bundle dataBundle = intent.getBundleExtra("data");
-            if (BuildConfig.DEBUG) {
-                for (String key: dataBundle.keySet())
-                {
-                    Log.d (getClass().getSimpleName(), key + " is a key in the bundle");
-                }
+
+        try {
+            FetLifeApplication.getInstance().showLongToast(OneSignalBackgroundDataReceiver.class.getSimpleName() + ": pushMessageArrived");
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalBackgroundDataReceiver.class.getSimpleName() + ": pushMessageArrived");
+            for (String key: dataBundle.keySet())
+            {
+                RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalBackgroundDataReceiver.class.getSimpleName() + ":\t " + key + ":" + dataBundle.get(key));
             }
+        } catch (Throwable t) {
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalBackgroundDataReceiver.class.getSimpleName() + ": logging failed due to: " + t.getMessage());
+        }
+
 
 //            String message = dataBundle.getString("message");
 //            JSONObject customJSON = new JSONObject(dataBundle.getString("custom"));

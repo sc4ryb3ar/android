@@ -11,6 +11,7 @@ import com.bitlove.fetlife.event.NotificationReceivedEvent;
 import com.bitlove.fetlife.notification.AnonymNotification;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
+import com.bitlove.fetlife.util.RemoteLogger;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationDisplayedResult;
 import com.onesignal.OSNotificationPayload;
@@ -23,6 +24,17 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
     @Override
     protected boolean onNotificationProcessing(OSNotificationPayload notification) {
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
+
+        try {
+            FetLifeApplication.getInstance().showLongToast(OneSignalNotificationExtenderService.class.getSimpleName() + ": pushMessageArrived");
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalNotificationExtenderService.class.getSimpleName() + ": pushMessageArrived");
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalNotificationExtenderService.class.getSimpleName() + ":\t " + "title" + ":" + notification.title);
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalNotificationExtenderService.class.getSimpleName() + ":\t " + "message" + ":" + notification.message);
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalNotificationExtenderService.class.getSimpleName() + ":\t " + "launchUrl" + ":" + notification.launchUrl);
+        } catch (Throwable t) {
+            RemoteLogger.appendLog(FetLifeApplication.getInstance(), OneSignalNotificationExtenderService.class.getSimpleName() + ": logging failed due to: " + t.getMessage());
+        }
+
 
         NotificationParser notificationParser = fetLifeApplication.getNotificationParser();
         OneSignalNotification oneSignalNotification = notificationParser.parseNotification(fetLifeApplication, notification.title, notification.message, notification.launchUrl, notification.additionalData, notification.notificationId, notification.group);
