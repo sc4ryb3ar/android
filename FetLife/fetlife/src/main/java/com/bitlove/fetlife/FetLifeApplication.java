@@ -70,7 +70,6 @@ public class FetLifeApplication extends Application {
 
         //Init push notifications
         OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
-        OneSignal.enableNotificationsWhenActive(true);
 
         //Init user session manager
         userSessionManager = new UserSessionManager(this);

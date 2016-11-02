@@ -1,9 +1,6 @@
 package com.bitlove.fetlife.inbound;
 
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
-import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
@@ -13,19 +10,16 @@ import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationDisplayedResult;
-import com.onesignal.OSNotificationPayload;
-import com.onesignal.OneSignal;
-
-import org.json.JSONException;
+import com.onesignal.OSNotificationReceivedResult;
 
 public class OneSignalNotificationExtenderService extends NotificationExtenderService {
 
     @Override
-    protected boolean onNotificationProcessing(OSNotificationPayload notification) {
+    protected boolean onNotificationProcessing(OSNotificationReceivedResult notification) {
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
 
         NotificationParser notificationParser = fetLifeApplication.getNotificationParser();
-        OneSignalNotification oneSignalNotification = notificationParser.parseNotification(fetLifeApplication, notification.title, notification.message, notification.launchUrl, notification.additionalData, notification.notificationId, notification.group);
+        OneSignalNotification oneSignalNotification = notificationParser.parseNotification(fetLifeApplication, notification.payload.title, notification.payload.body, notification.payload.launchURL, notification.payload.additionalData, notification.payload.notificationID, notification.payload.groupKey);
 
         boolean handledInternally = oneSignalNotification.handle(fetLifeApplication);
 
@@ -36,7 +30,7 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
             } else {
                 OverrideSettings overrideSettings = new OverrideSettings();
                 OSNotificationDisplayedResult displayedResult  = displayNotification(overrideSettings);
-                oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.notificationId);
+                oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.androidNotificationId);
             }
         }
 

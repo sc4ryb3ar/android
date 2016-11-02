@@ -19,7 +19,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 10718
-        versionName "1.7.18"
+        versionName "1.7.18_john"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -121,7 +121,6 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.onesignal:OneSignal:2.+@aar'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'joda-time:joda-time:2.9.1'
 
@@ -135,6 +134,9 @@ dependencies {
     }
 
     testCompile 'junit:junit:4.12'
+
+    compile 'com.onesignal:OneSignal:3.+@aar'
+
 }
 
 
