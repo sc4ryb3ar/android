@@ -111,7 +111,6 @@ public class FetLifeApplication extends Application {
 
         //Init push notifications
         OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
-        OneSignal.enableNotificationsWhenActive(true);
 
         //Register activity call back to keep track of currently displayed Activity
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());

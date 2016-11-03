@@ -40,8 +40,9 @@ public class StackedNotification extends OneSignalNotification {
             case NotificationParser.JSON_VALUE_GROUP_INFO:
                 NotificationHistoryActivity.startActivity(fetLifeApplication, true);
                 break;
-            case NotificationParser.JSON_VALUE_GROUP_FETLIFE:
-            case NotificationParser.JSON_VALUE_GROUP_MESSAGE:
+            case NotificationParser.JSON_VALUE_GROUP_LEGACY_FETLIFE:
+            case NotificationParser.JSON_VALUE_GROUP_LEGACY_MESSAGE:
+            case NotificationParser.JSON_VALUE_GROUP_FETLIFE_MESSAGE:
                 MessageNotification sampleMessageNotification = isSameConversations(subNotificaions);
                 if (sampleMessageNotification != null) {
                     startMessageActivity(fetLifeApplication, sampleMessageNotification);

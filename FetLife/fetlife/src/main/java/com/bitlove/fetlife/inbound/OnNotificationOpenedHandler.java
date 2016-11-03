@@ -1,23 +1,24 @@
 package com.bitlove.fetlife.inbound;
 
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
+import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
-
-import org.json.JSONObject;
 
 /**
  * Inbound and extension point for OneSignal notification library to react on user interaction when user clciked on a notification
  */
 public class OnNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
+
     @Override
-    public void notificationOpened(String message, JSONObject additionalData, boolean isActive) {
+    public void notificationOpened(OSNotificationOpenResult osNotificationOpenResult) {
         FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
-        if (additionalData == null) {
+        if (osNotificationOpenResult == null) {
             return;
         }
-        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(fetLifeApplication, additionalData.optString(NotificationParser.JSON_FIELD_STRING_TITLE), message, additionalData.optString(NotificationParser.JSON_FIELD_STRING_LAUNCHURL), additionalData, null, additionalData.optString(NotificationParser.JSON_FIELD_STRING_GROUP));
+
+        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(fetLifeApplication, osNotificationOpenResult);
         oneSignalNotification.onClick(fetLifeApplication);
     }
+
 }

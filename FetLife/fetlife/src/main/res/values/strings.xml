@@ -85,9 +85,10 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v1.7.18<br/>
+            <p/>v1.7.19<br/>
                     <ul>
-                        <li>Fix for periodical connection issues</li>
+                        <li>Fix for open notification issues</li>
+                        <li>Fix for not receiving notifications issues for Devices with 7.x Android OS version</li>
                     </ul>
 
             <p/>v1.7<br/>
