@@ -3,6 +3,7 @@ package com.bitlove.fetlife.view.activity.resource;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -81,6 +82,9 @@ public class MessagesActivity extends ResourceActivity
     @Override
     protected void onResourceCreate(Bundle savedInstanceState) {
 
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setVisibility(View.GONE);
+
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
@@ -92,6 +96,7 @@ public class MessagesActivity extends ResourceActivity
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerLayoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(recyclerLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -113,7 +118,6 @@ public class MessagesActivity extends ResourceActivity
         String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
         setTitle(conversationTitle);
         messagesAdapter = new MessagesRecyclerAdapter(conversationId);
-        recyclerLayoutManager.setReverseLayout(true);
         recyclerView.setAdapter(messagesAdapter);
     }
 
@@ -132,11 +136,6 @@ public class MessagesActivity extends ResourceActivity
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
 //                  //Custom Emoji Support will go here
 //        }});
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(recyclerLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         messagesAdapter.refresh();
 
