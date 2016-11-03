@@ -6,20 +6,16 @@ import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 
-import org.json.JSONObject;
-
 public class OnNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
 
     @Override
-    public void notificationOpened(OSNotificationOpenResult result) {
+    public void notificationOpened(OSNotificationOpenResult osNotificationOpenResult) {
         FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
-        if (result == null) {
+        if (osNotificationOpenResult == null) {
             return;
         }
 
-
-
-        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(fetLifeApplication, result.notification.payload.additionalData.optString(NotificationParser.JSON_FIELD_STRING_TITLE), result.notification.payload.body, result.notification.payload.additionalData.optString(NotificationParser.JSON_FIELD_STRING_LAUNCHURL), result.notification.payload.additionalData, null, result.notification.payload.additionalData.optString(NotificationParser.JSON_FIELD_STRING_GROUP));
+        OneSignalNotification oneSignalNotification = fetLifeApplication.getNotificationParser().parseNotification(fetLifeApplication, osNotificationOpenResult);
         oneSignalNotification.onClick(fetLifeApplication);
     }
 

@@ -2,8 +2,11 @@ package com.bitlove.fetlife.notification;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
+import com.onesignal.OSNotification;
+import com.onesignal.OSNotificationOpenResult;
+import com.onesignal.OSNotificationPayload;
+import com.onesignal.OSNotificationReceivedResult;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -14,9 +17,6 @@ public class NotificationParser {
     public static final String JSON_FIELD_STRING_LAUNCHURL = "launchURL";
     public static final String JSON_FIELD_STRING_TITLE = "title";
     public static final String JSON_FIELD_STRING_GROUP = "grp";
-//    public static final String JSON_FIELD_JSONOBJECT_ADDITIONA_DATA = "a";
-//    public static final String JSON_FIELD_STRING_U = "u";
-//    public static final String JSON_FIELD_STRING_ID = "i";
 
     public static final String JSON_FIELD_STRING_CONVERSATIONID = "conversation_id";
     public static final String JSON_FIELD_STRING_NICKNAME = "nickname";
@@ -25,45 +25,60 @@ public class NotificationParser {
     public static final java.lang.String JSON_FIELD_STRING_VERSION = "version";
 
     private static final String JSON_FIELD_STRING_TYPE = "type";
-    private static final String JSON_FIELD_STACKED_NOTIFICATION = "stacked_notifications";
     private static final java.lang.String JSON_FIELD_INT_MIN_VERSION = "min_version";
     private static final java.lang.String JSON_FIELD_INT_MAX_VERSION = "max_version";
     private static final String JSON_FIELD_STRING_FLAVOR = "flavor";
 
     public static final String JSON_VALUE_GROUP_INFO = "info";
-    public static final String JSON_VALUE_GROUP_FETLIFE = "fetlife";
-    public static final String JSON_VALUE_GROUP_MESSAGE = "messages";
+    public static final String JSON_VALUE_GROUP_FETLIFE_MESSAGE = "fetlife_messages";
 
-//    public OneSignalNotification parseNotification(String message, JSONObject notificationJson) {
-//
-//        String url = notificationJson.optString(JSON_FIELD_STRING_U);
-//        String id = notificationJson.optString(JSON_FIELD_STRING_ID);
-//        JSONObject additionalData = notificationJson.optJSONObject(JSON_FIELD_JSONOBJECT_ADDITIONA_DATA);
-//
-//        return parseNotification(message, url, additionalData, id);
-//    }
+    public static final String JSON_VALUE_TYPE_INFO = "info";
 
-    public OneSignalNotification parseNotification(FetLifeApplication fetLifeApplication, String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
+    public static final String JSON_VALUE_TYPE_NEW_CONVERSATION = "conversation_new";
+    public static final String JSON_VALUE_TYPE_CONVERSATION_RESPONSE = "conversation_response";
+    public static final String JSON_VALUE_TYPE_FRIEND_REQUEST = "friend_request";
 
-        //Check Stacked Notifications
-        JSONArray subNotifications;
-        if (additionalData != null && (subNotifications = additionalData.optJSONArray(JSON_FIELD_STACKED_NOTIFICATION)) != null) {
-            List<OneSignalNotification> subNotificationList = new ArrayList<>(subNotifications.length());
-            for (int i = 0; i < subNotifications.length(); i++) {
-                JSONObject notificationObject = subNotifications.optJSONObject(i);
-                String subTitle = notificationObject.optString(JSON_FIELD_STRING_TITLE);
-                String subMessage = notificationObject.optString(JSON_FIELD_STRING_TITLE);
-                String subLaunchUrl = notificationObject.optString(JSON_FIELD_STRING_TITLE);
-                String subGroup = notificationObject.optString(JSON_FIELD_STRING_GROUP);
-                OneSignalNotification subNotification = parseNotification(fetLifeApplication, subTitle, subMessage, subLaunchUrl, notificationObject, null, subGroup);
-                if (group == null || group.trim().length() == 0) {
-                    group = subGroup;
-                }
-                subNotificationList.add(subNotification);
-            }
-            StackedNotification stackedNotification = new StackedNotification(title, message, launchUrl, additionalData, id, group, subNotificationList);
-            return stackedNotification;
+    //Backward compatibility
+
+    public static final String JSON_VALUE_TYPE_LEGACY_VERSION = "version";
+    public static final String JSON_VALUE_GROUP_LEGACY_FETLIFE = "fetlife";
+    public static final String JSON_VALUE_GROUP_LEGACY_MESSAGE = "messages";
+    public static final String JSON_VALUE_TYPE_LEGACY_CONVERSATION_CREATED = "conversation_created";
+    public static final String JSON_VALUE_TYPE_LEGACY_MESSAGE_CREATED = "message_created";
+    public static final String JSON_VALUE_TYPE_LEGACY_FRIEND_REQUEST_CREATED = "friendship_request_created";
+
+    public OneSignalNotification parseNotification(FetLifeApplication fetLifeApplication, OSNotificationOpenResult osNotificationOpenResult) {
+
+        OSNotification notification = osNotificationOpenResult.notification;
+        List<OSNotificationPayload> groupedNotifications = notification.groupedNotifications;
+
+        if (groupedNotifications == null || groupedNotifications.isEmpty()) {
+            return parseNotification(fetLifeApplication, notification.payload);
         }
+
+        List<OneSignalNotification> subNotificationList = new ArrayList<>(groupedNotifications.size());
+
+        for (OSNotificationPayload payload : groupedNotifications) {
+            OneSignalNotification subNotification = parseNotification(fetLifeApplication, payload);
+            subNotificationList.add(subNotification);
+        }
+
+        StackedNotification stackedNotification = new StackedNotification(notification.payload.title, notification.payload.groupMessage, notification.payload.launchURL, notification.payload.additionalData, notification.payload.notificationID, notification.payload.groupKey, subNotificationList);
+        return stackedNotification;
+    }
+
+    public OneSignalNotification parseNotification(FetLifeApplication fetLifeApplication, OSNotificationReceivedResult osNotificationReceivedResult) {
+        return parseNotification(fetLifeApplication, osNotificationReceivedResult.payload);
+    }
+
+    private OneSignalNotification parseNotification(FetLifeApplication fetLifeApplication, OSNotificationPayload osNotificationPayload) {
+
+        JSONObject additionalData = osNotificationPayload.additionalData;
+        String id = osNotificationPayload.notificationID;
+        String title = osNotificationPayload.title;
+        String message = osNotificationPayload.body;
+        String launchUrl = osNotificationPayload.launchURL;
+        String group = osNotificationPayload.groupKey;
 
         //Check Version relevance
 
@@ -107,14 +122,17 @@ public class NotificationParser {
         }
 
         switch (type) {
-            case "info":
+            case JSON_VALUE_TYPE_INFO:
                 return new InfoNotification(title, message, launchUrl, additionalData, id, group);
-            case "version":
+            case JSON_VALUE_TYPE_LEGACY_VERSION:
                 return new VersionNotification(title, message, launchUrl, additionalData, id, group);
-            case "conversation_created":
-            case "message_created":
+            case JSON_VALUE_TYPE_LEGACY_CONVERSATION_CREATED:
+            case JSON_VALUE_TYPE_LEGACY_MESSAGE_CREATED:
+            case JSON_VALUE_TYPE_NEW_CONVERSATION:
+            case JSON_VALUE_TYPE_CONVERSATION_RESPONSE:
                 return new MessageNotification(title, message, launchUrl, additionalData, id, group);
-            case "friendship_request_created":
+            case JSON_VALUE_TYPE_FRIEND_REQUEST:
+            case JSON_VALUE_TYPE_LEGACY_FRIEND_REQUEST_CREATED:
                 return new FriendRequestNotification(title, message, launchUrl, additionalData, id, group);
 //            case "friendship_request_accepted":
 //                return new FriendAddedNotification(title, message, launchUrl, additionalData, id, group);
