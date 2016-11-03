@@ -110,7 +110,7 @@ public class FetLifeApplication extends Application {
         Fabric.with(this, new Crashlytics());
 
         //Init push notifications
-        OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
+        OneSignal.startInit(this).inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
 
         //Register activity call back to keep track of currently displayed Activity
         registerActivityLifecycleCallbacks(new ForegroundActivityObserver());

@@ -26,7 +26,7 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
         OneSignalNotification oneSignalNotification = notificationParser.parseNotification(fetLifeApplication, notification);
 
         //Handle the incoming notification do what is needed at the state of onreceived.
-        boolean handledInternally = oneSignalNotification.handle(fetLifeApplication) || notification.isAppInFocus;
+        boolean handledInternally = oneSignalNotification.handle(fetLifeApplication);
 
         //Check if the Notification was not fully handled internally and if it is not disabled by the user settings
         if (!handledInternally && oneSignalNotification.isEnabled(fetLifeApplication)) {
