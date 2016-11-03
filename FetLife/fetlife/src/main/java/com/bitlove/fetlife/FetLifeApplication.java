@@ -69,7 +69,7 @@ public class FetLifeApplication extends Application {
         Fabric.with(this, new Crashlytics());
 
         //Init push notifications
-        OneSignal.startInit(this).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
+        OneSignal.startInit(this).inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
 
         //Init user session manager
         userSessionManager = new UserSessionManager(this);
