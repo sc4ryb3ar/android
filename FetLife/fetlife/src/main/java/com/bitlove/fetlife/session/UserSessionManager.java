@@ -245,6 +245,14 @@ public class UserSessionManager {
     private void initUserPreferences(String userKey) {
         String userPreferenceName = getUserPreferenceName(userKey);
         SettingsActivity.init(userPreferenceName);
+        final SharedPreferences defaultValueSp = fetLifeApplication.getSharedPreferences(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, Context.MODE_PRIVATE);
+
+        //TODO: finish solving this and backward compatibility
+        if(!defaultValueSp.getBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, false))
+        {
+        }
+
+        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, false);
         PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
         activePreferences = getUserPreferences(userKey);
     }

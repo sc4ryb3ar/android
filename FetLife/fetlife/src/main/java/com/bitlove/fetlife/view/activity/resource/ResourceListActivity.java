@@ -22,6 +22,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public abstract class ResourceListActivity<Resource> extends ResourceActivity implements MenuActivityComponent.MenuActivityCallBack {
 
+    private static final int PAGE_COUNT = 25;
+
     protected FloatingActionButton floatingActionButton;
     protected RecyclerView recyclerView;
     protected ResourceListRecyclerAdapter<Resource, ?> recyclerAdapter;
@@ -32,8 +34,8 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     protected View inputIcon;
     protected EditText textInput;
 
+    protected int retrievedItems = 0;
     protected int requestedPage = 1;
-    protected int pageCount = 25;
 
     @Override
     @CallSuper
@@ -75,8 +77,9 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                retrievedItems = 0;
                 requestedPage = 1;
-                FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(pageCount));
+                FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(PAGE_COUNT));
             }
         });
 
@@ -87,11 +90,11 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     if (dy > 0) {
                         int visibleItemCount = recyclerLayoutManager.getChildCount();
-                        int pastVisiblesItems = recyclerLayoutManager.findFirstVisibleItemPosition();
-                        int lastVisiblePosition = visibleItemCount + pastVisiblesItems;
+                        int pastVisibleItems = recyclerLayoutManager.findFirstVisibleItemPosition();
+                        int lastVisiblePosition = visibleItemCount + pastVisibleItems;
 
-                        if (lastVisiblePosition >= (requestedPage * pageCount)) {
-                            startResourceCall(pageCount, ++requestedPage);
+                        if (lastVisiblePosition >= retrievedItems) {
+                            startResourceCall(PAGE_COUNT, ++requestedPage);
                         }
                     }
                 }
@@ -113,9 +116,10 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         if (apiCallAction != null) {
             showProgress();
             if (!FetLifeApiIntentService.isActionInProgress(apiCallAction)) {
-                startResourceCall(pageCount);
+                startResourceCall(PAGE_COUNT);
             }
             requestedPage = 1;
+            retrievedItems = 0;
         }
     }
 
@@ -153,6 +157,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction() == getApiCallAction()) {
+            retrievedItems += serviceCallFinishedEvent.getItemCount();
             recyclerAdapter.refresh();
             dismissProgress();
             swipeRefreshLayout.setRefreshing(false);

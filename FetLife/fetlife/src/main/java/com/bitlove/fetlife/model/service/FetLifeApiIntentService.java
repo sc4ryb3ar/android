@@ -180,7 +180,7 @@ public class FetLifeApiIntentService extends IntentService {
             }
 
             //default success result of execution
-            boolean result = false;
+            int result = -1;
 
             //Call the appropriate method based on the action to be executed
             switch (action) {
@@ -203,7 +203,7 @@ public class FetLifeApiIntentService extends IntentService {
                     result = retrieveMessages(currentUser, params);
                     break;
                 case ACTION_APICALL_SEND_MESSAGES:
-                    result = sendPendingMessages(currentUser, false);
+                    result = sendPendingMessages(currentUser, 0);
                     break;
                 case ACTION_APICALL_SET_MESSAGES_READ:
                     result = setMessagesRead(params);
@@ -221,9 +221,9 @@ public class FetLifeApiIntentService extends IntentService {
 
             int lastResponseCode = getFetLifeApplication().getFetLifeService().getLastResponseCode();
 
-            if (result) {
+            if (result >= 0) {
                 //If the call succeed notify all subscribers about
-                sendLoadFinishedNotification(action);
+                sendLoadFinishedNotification(action, result);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401 || lastResponseCode == 403)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
                 if (refreshToken(currentUser)) {
@@ -297,7 +297,7 @@ public class FetLifeApiIntentService extends IntentService {
 
 
     //Call for logging in the user
-    private boolean logonUser(String... params) throws IOException {
+    private int logonUser(String... params) throws IOException {
         Call<Token> tokenCall = getFetLifeApplication().getFetLifeService().getFetLifeApi().login(
                 BuildConfig.CLIENT_ID,
                 BuildConfig.CLIENT_SECRET,
@@ -311,7 +311,7 @@ public class FetLifeApiIntentService extends IntentService {
             //Retrieve user information from the backend after Authentication
             User user = retrieveCurrentUser(accessToken);
             if (user == null) {
-                return false;
+                return -1;
             }
             //Save the user information with the tokens into the backend
             user.setAccessToken(accessToken);
@@ -319,9 +319,9 @@ public class FetLifeApiIntentService extends IntentService {
 
             //Notify the Session Manager about finished logon process
             getFetLifeApplication().getUserSessionManager().onUserLogIn(user, getBoolFromParams(params, 2, true));
-            return true;
+            return 1;
         } else {
-            return false;
+            return -1;
         }
     }
 
@@ -342,7 +342,7 @@ public class FetLifeApiIntentService extends IntentService {
     //****
 
     //Go through all the pending messages and send them one by one
-    private boolean sendPendingMessages(User user, boolean positiveStackedResult) throws IOException {
+    private int sendPendingMessages(User user, int sentMessageCount) throws IOException {
         List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.pending.is(true)).queryList();
         //Got through all pending messages (if there is any) and try to send them
         for (Message pendingMessage : pendingMessages) {
@@ -351,14 +351,14 @@ public class FetLifeApiIntentService extends IntentService {
             if (Conversation.isLocal(conversationId)) {
                 if (startNewConversation(user, conversationId, pendingMessage)) {
                     //db changed, reload remaining pending messages with starting this method recursively
-                    return sendPendingMessages(user, true);
+                    return sendPendingMessages(user, sentMessageCount++);
                 }
-            } else if (sendPendingMessage(pendingMessage) && !positiveStackedResult) {
-                positiveStackedResult = true;
+            } else if (sendPendingMessage(pendingMessage)) {
+                sentMessageCount++;
             }
         }
-        //Return success result if at least one pending message could have been sent so thhere was change in the current state
-        return positiveStackedResult;
+        //Return success result if at least one pending message could have been sent so there was change in the current state
+        return sentMessageCount == 0 ? -1 : sentMessageCount;
     }
 
     private boolean startNewConversation(User user, String localConversationId, Message startMessage) throws IOException {
@@ -429,26 +429,26 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private boolean sendPendingFriendRequests() throws IOException {
+    private int sendPendingFriendRequests() throws IOException {
 
-        boolean stackedResult = false;
+        int sentCount = 0;
         List<FriendRequest> pendingFriendRequests = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(true)).queryList();
         for (FriendRequest pendingFriendRequest : pendingFriendRequests) {
             if (!sendPendingFriendRequest(pendingFriendRequest)) {
                 pendingFriendRequest.delete();
-            } else if (!stackedResult) {
-                stackedResult = true;
+            } else {
+                sentCount++;
             }
         }
         List<SharedProfile> pendingSharedProfiles = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(true)).queryList();
         for (SharedProfile pendingSharedProfile : pendingSharedProfiles) {
             if (!sendPendingSharedProfile(pendingSharedProfile)) {
                 pendingSharedProfile.delete();
-            } else if (!stackedResult) {
-                stackedResult = true;
+            } else {
+                sentCount++;
             }
         }
-        return stackedResult;
+        return sentCount == 0 ? -1 : sentCount;
     }
 
     private boolean sendPendingSharedProfile(SharedProfile pendingSharedProfile) throws IOException {
@@ -494,19 +494,19 @@ public class FetLifeApiIntentService extends IntentService {
     //Other not pending state based POST methods
     //****
 
-    private boolean setMessagesRead(String[] params) throws IOException {
+    private int setMessagesRead(String[] params) throws IOException {
         String conversationId = params[0];
         String[] messageIds = Arrays.copyOfRange(params, 1, params.length);
         Call<ResponseBody> setMessagesReadCall = getFetLifeApi().setMessagesRead(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), conversationId, messageIds);
         Response<ResponseBody> response = setMessagesReadCall.execute();
-        return response.isSuccess();
+        return response.isSuccess() ? 1 : -1;
     }
 
     //****
     //Multimedia (POST) related methods / Api calls
     //****
 
-    private boolean uploadPicture(String[] params) throws IOException {
+    private int uploadPicture(String[] params) throws IOException {
 
         Uri uri = Uri.parse(params[0]);
         ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
@@ -526,7 +526,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         if (mimeType == null || inputStream == null) {
             Crashlytics.logException(new Exception("Media file to upload not found"));
-            return false;
+            return -1;
         }
 
         RequestBody pictureBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
@@ -542,7 +542,7 @@ public class FetLifeApiIntentService extends IntentService {
             getContentResolver().delete(uri, null, null);
         }
 
-        return response.isSuccess();
+        return response.isSuccess() ? 1 : -1;
     }
 
 
@@ -550,7 +550,7 @@ public class FetLifeApiIntentService extends IntentService {
     //Retrieve (GET) related methods / Api calls
     //****
 
-    private boolean retrieveMessages(User user, String... params) throws IOException {
+    private int retrieveMessages(User user, String... params) throws IOException {
         final String conversationId = params[0];
 
         final boolean loadNewMessages = getBoolFromParams(params, 1, true);
@@ -586,13 +586,13 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                 }
             });
-            return true;
+            return messages.size();
         } else {
-            return false;
+            return -1;
         }
     }
 
-    private boolean retrieveFeed(String[] params) throws IOException {
+    private int retrieveFeed(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
 
@@ -613,13 +613,13 @@ public class FetLifeApiIntentService extends IntentService {
 //                }
 //            });
 
-            return true;
+            return stories.size();
         } else {
-            return false;
+            return -1;
         }
     }
 
-    private boolean retrieveConversations(String[] params) throws IOException {
+    private int retrieveConversations(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
 
@@ -635,9 +635,9 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                 }
             });
-            return true;
+            return conversations.size();
         } else {
-            return false;
+            return -1;
         }
     }
 
@@ -649,18 +649,18 @@ public class FetLifeApiIntentService extends IntentService {
         return currentUser.getAccessToken();
     }
 
-    private boolean getMember(String... params) throws IOException {
+    private int getMember(String... params) throws IOException {
         Call<Member> getMemberCall = getFetLifeApi().getMember(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), params[0]);
         Response<Member> getMemberResponse = getMemberCall.execute();
         if (getMemberResponse.isSuccess()) {
             getMemberResponse.body().save();
-            return true;
+            return 1;
         } else {
-            return false;
+            return -1;
         }
     }
 
-    private boolean retrieveFriends(String[] params) throws IOException {
+    private int retrieveFriends(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 10);
         final int page = getIntFromParams(params, 1, 1);
 
@@ -676,13 +676,13 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                 }
             });
-            return true;
+            return friends.size();
         } else {
-            return false;
+            return -1;
         }
     }
 
-    private boolean retrieveFriendRequests(String[] params) throws IOException {
+    private int retrieveFriendRequests(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 10);
         final int page = getIntFromParams(params, 1, 1);
 
@@ -704,9 +704,9 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                 }
             });
-            return true;
+            return friendRequests.size();
         } else {
-            return false;
+            return -1;
         }
     }
 
@@ -730,13 +730,13 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private void sendLoadFinishedNotification(String action) {
+    private void sendLoadFinishedNotification(String action, int count) {
         switch (action) {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginFinishedEvent());
                 break;
             default:
-                getFetLifeApplication().getEventBus().post(new ServiceCallFinishedEvent(action));
+                getFetLifeApplication().getEventBus().post(new ServiceCallFinishedEvent(action, count));
                 break;
         }
     }
