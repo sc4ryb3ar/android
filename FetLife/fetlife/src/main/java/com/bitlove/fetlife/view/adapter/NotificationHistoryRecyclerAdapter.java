@@ -33,14 +33,9 @@ public class NotificationHistoryRecyclerAdapter extends ResourceListRecyclerAdap
     }
 
     private List<NotificationHistoryItem> notificationHistoryItems;
-    private ResourceListRecyclerAdapter.OnResourceClickListener<NotificationHistoryItem> onNotificationHistoryClickListener;
 
     public NotificationHistoryRecyclerAdapter() {
         loadItems();
-    }
-
-    public void setOnNotificationHistoryItemClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<NotificationHistoryItem> notificationHistoryItemClickListener) {
-        this.onNotificationHistoryClickListener = notificationHistoryItemClickListener;
     }
 
     public void refresh() {
@@ -86,8 +81,8 @@ public class NotificationHistoryRecyclerAdapter extends ResourceListRecyclerAdap
         notificationHistoryItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onNotificationHistoryClickListener != null) {
-                    onNotificationHistoryClickListener.onItemClick(notificationHistoryItem);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onItemClick(notificationHistoryItem);
                 }
             }
         });

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
+import com.bitlove.fetlife.model.pojos.FriendRequestScreenModelObject;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<FriendRequest, FriendRequestScreenViewHolder> {
+public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<FriendRequestScreenModelObject, FriendRequestScreenViewHolder> {
 
     private static final int FRIENDREQUEST_UNDO_DURATION = 5000;
     private static final int VIEWTYPE_HEADER = 0;
@@ -42,8 +43,6 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
 
     private List<FriendRequest> friendRequestList;
     private List<SharedProfile> friendSuggestionList;
-    private ResourceListRecyclerAdapter.OnResourceClickListener<FriendRequest> onFriendRequestClickListener;
-    private ResourceListRecyclerAdapter.OnResourceClickListener<SharedProfile> onSharedProfileClickListener;
 
     public FriendRequestsRecyclerAdapter(ImageLoader imageLoader, boolean clearItems) {
         this.imageLoader = imageLoader;
@@ -52,14 +51,6 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         } else {
             loadItems();
         }
-    }
-
-    public void setOnFriendRequestClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<FriendRequest> onFriendRequestClickListener) {
-        this.onFriendRequestClickListener = onFriendRequestClickListener;
-    }
-
-    public void setOnSharedProfileClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<SharedProfile> onSharedProfileClickListener) {
-        this.onSharedProfileClickListener = onSharedProfileClickListener;
     }
 
     public void refresh() {
@@ -289,8 +280,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onFriendRequestClickListener != null) {
-                    onFriendRequestClickListener.onItemClick(friendRequest);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onItemClick(friendRequest);
                 }
             }
         });
@@ -298,8 +289,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         friendRequestItemViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onFriendRequestClickListener != null) {
-                    onFriendRequestClickListener.onAvatarClick(friendRequest);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onAvatarClick(friendRequest);
                 }
             }
         });
@@ -319,8 +310,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onSharedProfileClickListener != null) {
-                    onSharedProfileClickListener.onItemClick(friendSuggestion);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onItemClick(friendSuggestion);
                 }
             }
         });
@@ -328,8 +319,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         friendRequestItemViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onSharedProfileClickListener != null) {
-                    onSharedProfileClickListener.onAvatarClick(friendSuggestion);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onAvatarClick(friendSuggestion);
                 }
             }
         });

@@ -25,15 +25,10 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
     private final ImageLoader imageLoader;
 
     private List<Friend> itemList;
-    ResourceListRecyclerAdapter.OnResourceClickListener<Friend> onFriendClickListener;
 
     public FriendsRecyclerAdapter(ImageLoader imageLoader) {
         this.imageLoader = imageLoader;
         loadItems();
-    }
-
-    public void setOnItemClickListener(ResourceListRecyclerAdapter.OnResourceClickListener<Friend> onFriendClickListener) {
-        this.onFriendClickListener = onFriendClickListener;
     }
 
     public void refresh() {
@@ -84,8 +79,8 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
         friendViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onFriendClickListener != null) {
-                    onFriendClickListener.onItemClick(friend);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onItemClick(friend);
                 }
             }
         });
@@ -93,8 +88,8 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
         friendViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onFriendClickListener != null) {
-                    onFriendClickListener.onAvatarClick(friend);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onAvatarClick(friend);
                 }
             }
         });

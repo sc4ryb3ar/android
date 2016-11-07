@@ -7,7 +7,7 @@ import com.raizlabs.android.dbflow.annotation.Table;
 
 @Table(database = FetLifeDatabase.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SharedProfile extends Member {
+public class SharedProfile extends Member implements FriendRequestScreenModelObject{
 
     @Column
     private boolean pending;

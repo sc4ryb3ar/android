@@ -12,7 +12,7 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 @Table(database = FetLifeDatabase.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FriendRequest extends BaseModel {
+public class FriendRequest extends BaseModel implements FriendRequestScreenModelObject {
 
     public static enum PendingState {
         NEW,

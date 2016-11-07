@@ -80,8 +80,8 @@ public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Co
         conversationViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getOnItemClickListener() != null) {
-                    getOnItemClickListener().onItemClick(conversation);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onItemClick(conversation);
                 }
             }
         });
@@ -89,8 +89,8 @@ public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Co
         conversationViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getOnItemClickListener() != null) {
-                    getOnItemClickListener().onAvatarClick(conversation);
+                if (onResourceClickListener != null) {
+                    onResourceClickListener.onAvatarClick(conversation);
                 }
             }
         });

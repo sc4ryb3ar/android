@@ -9,7 +9,7 @@ public abstract class ResourceListRecyclerAdapter<Resource, ResourceViewHolder e
         void onAvatarClick(Resource resource);
     }
 
-    private OnResourceClickListener<Resource> onResourceClickListener;
+    protected OnResourceClickListener<Resource> onResourceClickListener;
 
     public void setOnItemClickListener(OnResourceClickListener<Resource> onConversationClickListener) {
         this.onResourceClickListener = onConversationClickListener;
