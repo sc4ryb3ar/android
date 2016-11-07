@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.Event;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
@@ -25,6 +26,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
     public interface OnFeedItemClickListener {
         void onMemberClick(Member member);
+        void onEventClick(Event event);
     }
 
     private final FetLifeApplication fetLifeApplication;
@@ -34,8 +36,9 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     private SparseArray<Boolean> expandedMap = new SparseArray<>();
 
     FeedLikeAdapterBinder feedLikeAdapterBinder = new FeedLikeAdapterBinder(this);
-    FeedFriendsAdapterBinder feedFriendsAdapterBinder = new FeedFriendsAdapterBinder(this);
+    FeedRelationshipAdapterBinder feedRelationshipAdapterBinder = new FeedRelationshipAdapterBinder(this);
     FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder = new FeedNotSupportedAdapterBinder(this);
+    FeedRsvpAdapterBinder feedRsvpAdapterBinder = new FeedRsvpAdapterBinder(this);
 
     public FeedRecyclerAdapter(FetLifeApplication fetLifeApplication, OnFeedItemClickListener onFeedItemClickListener) {
         this.fetLifeApplication = fetLifeApplication;
@@ -83,8 +86,14 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
             case "like_created":
                 feedLikeAdapterBinder.bindLikeStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                 break;
+            case "follow_created":
+                feedRelationshipAdapterBinder.bindFollowStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
+                break;
             case "friend_created":
-                feedFriendsAdapterBinder.bindRelationStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
+                feedRelationshipAdapterBinder.bindFriendStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
+                break;
+            case "rsvp_created":
+                feedRsvpAdapterBinder.bindRsvpStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                 break;
             default:
                 feedNotSupportedAdapterBinder.bindNotSupportedStory(fetLifeApplication, feedViewHolder,story, onFeedItemClickListener);

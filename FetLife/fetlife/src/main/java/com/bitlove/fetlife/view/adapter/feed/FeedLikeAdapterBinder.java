@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Event;
+import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.SecondaryTarget;
@@ -44,7 +44,7 @@ public class FeedLikeAdapterBinder {
 
         final int position = feedViewHolder.getAdapterPosition();
 
-        final List<Event> events = story.getEvents();
+        final List<FeedEvent> events = story.getEvents();
         if (events.isEmpty()) {
             return;
         }
@@ -136,9 +136,9 @@ public class FeedLikeAdapterBinder {
         private ArrayList<String> gridLinks = new ArrayList<>();
         private ArrayList<String> displayLinks = new ArrayList<>();
 
-        PictureGridAdapter(List<Event> events, FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
+        PictureGridAdapter(List<FeedEvent> events, FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
             this.onItemClickListener = onItemClickListener;
-            for (Event event : events) {
+            for (FeedEvent event : events) {
                 Picture picture = event.getSecondaryTarget().getPicture();
                 pictures.add(picture);
                 gridLinks.add(picture.getVariants().getMedium().getUrl());

@@ -3,19 +3,18 @@ package com.bitlove.fetlife.model.pojos;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonInclude;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 public class Story {
 
     @JsonProperty("name")
     private String name;
     @JsonProperty("events")
-    private List<Event> events = new ArrayList<Event>();
+    private List<FeedEvent> events = new ArrayList<FeedEvent>();
 
     /**
-     * 
+     *
      * @return
      *     The name
      */
@@ -25,7 +24,7 @@ public class Story {
     }
 
     /**
-     * 
+     *
      * @param name
      *     The name
      */
@@ -35,22 +34,22 @@ public class Story {
     }
 
     /**
-     * 
+     *
      * @return
      *     The events
      */
     @JsonProperty("events")
-    public List<Event> getEvents() {
+    public List<FeedEvent> getEvents() {
         return events;
     }
 
     /**
-     * 
+     *
      * @param events
      *     The events
      */
     @JsonProperty("events")
-    public void setEvents(List<Event> events) {
+    public void setEvents(List<FeedEvent> events) {
         this.events = events;
     }
 

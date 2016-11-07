@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Event;
+import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Relation;
 import com.bitlove.fetlife.model.pojos.Story;
@@ -24,23 +24,36 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class FeedFriendsAdapterBinder {
+public class FeedRelationshipAdapterBinder {
+
+    private enum RelationType {
+        FRIEND,
+        FOLLOW
+    }
 
     private SparseArray<Boolean> expandHistory = new SparseArray<>();
 
     private final FeedRecyclerAdapter feedRecyclerAdapter;
 
-    public FeedFriendsAdapterBinder(FeedRecyclerAdapter feedRecyclerAdapter) {
+    public FeedRelationshipAdapterBinder(FeedRecyclerAdapter feedRecyclerAdapter) {
         this.feedRecyclerAdapter = feedRecyclerAdapter;
     }
 
-    public void bindRelationStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
+    public void bindFriendStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
+        bindRelationStory(fetLifeApplication, feedViewHolder, story, onItemClickListener, RelationType.FRIEND);
+    }
+
+    public void bindFollowStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
+        bindRelationStory(fetLifeApplication, feedViewHolder, story, onItemClickListener, RelationType.FOLLOW);
+    }
+
+    private void bindRelationStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, final Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, RelationType relationtype) {
 
         Context context = feedViewHolder.avatarImage.getContext();
 
         final int position = feedViewHolder.getAdapterPosition();
 
-        final List<Event> events = story.getEvents();
+        final List<FeedEvent> events = story.getEvents();
         if (events.isEmpty()) {
             return;
         }
@@ -57,7 +70,14 @@ public class FeedFriendsAdapterBinder {
             createdAt = relation.getCreatedAt();
             name = followed.getNickname();
             meta = followed.getMetaInfo();
-            title = events.size() == 1 ? context.getString(R.string.feed_title_new_relation) : context.getString(R.string.feed_title_new_relations, events.size());
+            switch (relationtype) {
+                case FRIEND:
+                    title = events.size() == 1 ? context.getString(R.string.feed_title_new_friend) : context.getString(R.string.feed_title_new_friends, events.size());
+                    break;
+                case FOLLOW:
+                    title = events.size() == 1 ? context.getString(R.string.feed_title_new_follow) : context.getString(R.string.feed_title_new_follows, events.size());
+                    break;
+            }
 
             gridAdapter = new PictureGridAdapter(events, onItemClickListener);
             expandableResourceId = R.id.feeditem_grid_expandable;
@@ -124,10 +144,10 @@ public class FeedFriendsAdapterBinder {
     }
 
     static class PictureGridAdapter extends BaseAdapter {
-        private List<Event> events;
+        private List<FeedEvent> events;
         private final FeedRecyclerAdapter.OnFeedItemClickListener onFeedItemClickListener;
 
-        PictureGridAdapter(List<Event> events, FeedRecyclerAdapter.OnFeedItemClickListener onFeedItemClickListener) {
+        PictureGridAdapter(List<FeedEvent> events, FeedRecyclerAdapter.OnFeedItemClickListener onFeedItemClickListener) {
             this.events = events;
             this.onFeedItemClickListener = onFeedItemClickListener;
         }
@@ -138,7 +158,7 @@ public class FeedFriendsAdapterBinder {
         }
 
         @Override
-        public Event getItem(int position) {
+        public FeedEvent getItem(int position) {
             return events.get(position);
         }
 

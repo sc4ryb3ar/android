@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.bitlove.fetlife.model.pojos.Event;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
@@ -54,10 +55,24 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     public void onMemberClick(Member member) {
+        openUrl(member.getLink());
         String url = member.getLink();
         if (url != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onEventClick(Event event) {
+        openUrl(null);
+    }
+
+    private void openUrl(String link) {
+        if (link != null) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(link));
             startActivity(intent);
         }
     }

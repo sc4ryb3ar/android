@@ -11,6 +11,8 @@ public class Target {
     private Relation relation;
     @JsonProperty("love")
     private Love love;
+    @JsonProperty("rsvp")
+    private Rsvp rsvp;
 
     /**
      *
@@ -32,7 +34,7 @@ public class Target {
         this.love = love;
     }
     /**
-     * 
+     *
      * @return
      *     The relation
      */
@@ -42,7 +44,7 @@ public class Target {
     }
 
     /**
-     * 
+     *
      * @param relation
      *     The relation
      */
@@ -51,4 +53,13 @@ public class Target {
         this.relation = relation;
     }
 
+    @JsonProperty("rsvp")
+    public Rsvp getRsvp() {
+        return rsvp;
+    }
+
+    @JsonProperty("rsvp")
+    public void setRsvp(Rsvp rsvp) {
+        this.rsvp = rsvp;
+    }
 }
