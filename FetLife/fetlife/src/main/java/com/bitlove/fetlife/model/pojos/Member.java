@@ -78,11 +78,30 @@ public class Member extends BaseModel {
     public void setAvatar(Avatar avatar) {
         this.avatar = avatar;
         if (avatar != null) {
-            Variants variants = avatar.getVariants();
+            AvatarVariants variants = avatar.getVariants();
             if (variants != null) {
-                setAvatarLink(variants.getIconUrl());
+                setAvatarLink(variants.getMedium());
             }
         }
+    }
+
+    public PictureInterface getAvatarPicture() {
+        return new PictureInterface() {
+            @Override
+            public Member getMember() {
+                return Member.this;
+            }
+
+            @Override
+            public String getBody() {
+                return "";
+            }
+
+            @Override
+            public PictureVariantsInterface getVariants() {
+                return avatar.getVariants();
+            }
+        };
     }
 
     public String getMetaInfo() {

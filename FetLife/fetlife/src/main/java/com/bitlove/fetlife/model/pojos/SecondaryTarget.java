@@ -30,7 +30,7 @@ public class SecondaryTarget {
         this.picture = picture;
     }
     /**
-     * 
+     *
      * @return
      *     The member
      */
@@ -40,7 +40,7 @@ public class SecondaryTarget {
     }
 
     /**
-     * 
+     *
      * @param member
      *     The member
      */

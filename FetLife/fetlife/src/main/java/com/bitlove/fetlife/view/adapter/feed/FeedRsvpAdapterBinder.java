@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,14 +16,10 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Event;
 import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.Rsvp;
-import com.bitlove.fetlife.model.pojos.SecondaryTarget;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Target;
 import com.bitlove.fetlife.util.DateUtil;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

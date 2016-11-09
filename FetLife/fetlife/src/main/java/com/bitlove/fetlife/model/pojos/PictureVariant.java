@@ -3,13 +3,13 @@ package com.bitlove.fetlife.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Original {
+public class PictureVariant {
 
     @JsonProperty("url")
     private String url;
 
     /**
-     * 
+     *
      * @return
      *     The url
      */
@@ -19,7 +19,7 @@ public class Original {
     }
 
     /**
-     * 
+     *
      * @param url
      *     The url
      */

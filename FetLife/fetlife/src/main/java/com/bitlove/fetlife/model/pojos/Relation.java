@@ -1,9 +1,7 @@
 
 package com.bitlove.fetlife.model.pojos;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 public class Relation {
 
@@ -19,7 +17,7 @@ public class Relation {
     private String contentType;
 
     /**
-     * 
+     *
      * @return
      *     The targetMember
      */
@@ -39,7 +37,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @return
      *     The member
      */
@@ -49,7 +47,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @param member
      *     The member
      */
@@ -59,7 +57,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @return
      *     The id
      */
@@ -69,7 +67,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @param id
      *     The id
      */
@@ -79,7 +77,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @return
      *     The createdAt
      */
@@ -89,7 +87,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @param createdAt
      *     The created_at
      */
@@ -99,7 +97,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @return
      *     The contentType
      */
@@ -109,7 +107,7 @@ public class Relation {
     }
 
     /**
-     * 
+     *
      * @param contentType
      *     The content_type
      */

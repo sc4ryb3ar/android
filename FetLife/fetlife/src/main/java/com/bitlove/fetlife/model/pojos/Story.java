@@ -4,14 +4,30 @@ package com.bitlove.fetlife.model.pojos;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bitlove.fetlife.util.EnumUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Story {
+
+    public static enum FeedStoryType {
+
+        LIKE_CREATED,
+        FOLLOW_CREATED,
+        COMMENT_CREATED,
+        PICTURE_CREATED,
+        FRIEND_CREATED,
+        RSVP_CREATED
+
+    }
 
     @JsonProperty("name")
     private String name;
     @JsonProperty("events")
     private List<FeedEvent> events = new ArrayList<FeedEvent>();
+
+    public FeedStoryType getType() {
+        return EnumUtil.safeParse(FeedStoryType.class, name);
+    }
 
     /**
      *

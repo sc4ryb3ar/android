@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Avatar {
 
     @JsonProperty("variants")
-    private Variants variants;
+    private AvatarVariants variants;
 
-    public Variants getVariants() {
+    public AvatarVariants getVariants() {
         return variants;
     }
 
-    public void setVariants(Variants variants) {
+    public void setVariants(AvatarVariants variants) {
         this.variants = variants;
     }
 }

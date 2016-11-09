@@ -3,7 +3,7 @@ package com.bitlove.fetlife.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Picture {
+public class Picture implements PictureInterface {
 
     @JsonProperty("variants")
     private PictureVariants variants;
@@ -27,7 +27,7 @@ public class Picture {
     private String body;
 
     /**
-     * 
+     *
      * @return
      *     The variants
      */
@@ -37,7 +37,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param variants
      *     The variants
      */
@@ -47,7 +47,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The url
      */
@@ -57,7 +57,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param url
      *     The url
      */
@@ -67,7 +67,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The member
      */
@@ -77,7 +77,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param member
      *     The member
      */
@@ -87,7 +87,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The loveCount
      */
@@ -97,7 +97,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param loveCount
      *     The love_count
      */
@@ -107,7 +107,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The isLovedByMe
      */
@@ -117,7 +117,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param isLovedByMe
      *     The is_loved_by_me
      */
@@ -127,7 +127,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The id
      */
@@ -137,7 +137,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param id
      *     The id
      */
@@ -147,7 +147,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The createdAt
      */
@@ -157,7 +157,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param createdAt
      *     The created_at
      */
@@ -167,7 +167,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The contentType
      */
@@ -177,7 +177,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param contentType
      *     The content_type
      */
@@ -187,7 +187,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The commentCount
      */
@@ -197,7 +197,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param commentCount
      *     The comment_count
      */
@@ -207,7 +207,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @return
      *     The body
      */
@@ -217,7 +217,7 @@ public class Picture {
     }
 
     /**
-     * 
+     *
      * @param body
      *     The body
      */

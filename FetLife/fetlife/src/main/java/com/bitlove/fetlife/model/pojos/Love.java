@@ -1,9 +1,7 @@
 
 package com.bitlove.fetlife.model.pojos;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 public class Love {
 
@@ -17,7 +15,7 @@ public class Love {
     private String id;
 
     /**
-     * 
+     *
      * @return
      *     The targetType
      */
@@ -27,7 +25,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @param targetType
      *     The target_type
      */
@@ -37,7 +35,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @return
      *     The targetId
      */
@@ -47,7 +45,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @param targetId
      *     The target_id
      */
@@ -57,7 +55,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @return
      *     The member
      */
@@ -67,7 +65,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @param member
      *     The member
      */
@@ -77,7 +75,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @return
      *     The id
      */
@@ -87,7 +85,7 @@ public class Love {
     }
 
     /**
-     * 
+     *
      * @param id
      *     The id
      */
