@@ -203,8 +203,13 @@ public class FetLifeApplication extends Application {
         showToast(text, Toast.LENGTH_LONG);
     }
 
-    private void showToast(final String text, int length) {
-        Toast.makeText(FetLifeApplication.this, text, length).show();
+    private void showToast(final String text, final int length) {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(FetLifeApplication.this, text, length).show();
+            }
+        });
     }
 
     //****

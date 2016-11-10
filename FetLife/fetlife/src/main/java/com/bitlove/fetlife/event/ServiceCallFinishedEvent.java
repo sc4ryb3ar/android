@@ -6,12 +6,9 @@ public class ServiceCallFinishedEvent {
     private String serviceCallAction;
     private int itemCount;
 
-    public ServiceCallFinishedEvent(String serviceCallAction, int itemCount) {
+    public ServiceCallFinishedEvent(String serviceCallAction, int itemCount, String... params) {
         this.serviceCallAction = serviceCallAction;
         this.itemCount = itemCount;
-    }
-
-    public ServiceCallFinishedEvent(String action, int count, String... params) {
         this.params = params;
     }
 

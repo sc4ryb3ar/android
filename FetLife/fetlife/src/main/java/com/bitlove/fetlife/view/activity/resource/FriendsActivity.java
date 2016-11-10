@@ -9,9 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFailedEvent;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
