@@ -86,8 +86,12 @@ public interface FetLifeApi {
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 
-    @GET("/api/v2/me/feed")
-    Call<Feed> getFeed2(@Header("Authorization") String authHeader);
+    @FormUrlEncoded
+    @PUT("/api/v2/me/loves")
+    Call<ResponseBody> putLove(@Header("Authorization") String authHeader, @Field("content_id") String contentId, @Field("content_type") String contentType);
+
+    @DELETE("/api/v2/me/loves")
+    Call<ResponseBody> deleteLove(@Header("Authorization") String authHeader, @Query("content_id") String contentId, @Query("content_type") String contentType);
 
 
 }

@@ -24,33 +24,43 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
-                <ImageView
+                <com.malinskiy.materialicons.widget.IconTextView
+                    android:id="@+id/feedImageLove"
+                    android:text="{zmdi_favorite_outline}"
+                    android:textColor="@color/text_color_secondary"
+                    android:textSize="30dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@android:drawable/btn_star"/>
+                    android:layout_gravity="center_horizontal"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:visibility="gone"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
+                <com.malinskiy.materialicons.widget.IconTextView
+                    android:id="@+id/feedImageComment"
+                    android:textSize="30dp"
+                    android:text="{zmdi_comment_text}"
+                    android:textColor="@color/text_color_secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"/>
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
-                <ImageView
+                <com.malinskiy.materialicons.widget.IconTextView
+                    android:id="@+id/feedImageVisit"
+                    android:text="{zmdi_eye}"
+                    android:textSize="30dp"
+                    android:textColor="@color/text_color_secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@android:drawable/ic_menu_edit"/>
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@android:drawable/ic_menu_view"/>
+                    android:layout_gravity="center_horizontal"/>
             </FrameLayout>
 
         </LinearLayout>

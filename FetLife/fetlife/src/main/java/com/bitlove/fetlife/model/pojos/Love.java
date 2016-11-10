@@ -13,6 +13,16 @@ public class Love {
     private Member member;
     @JsonProperty("id")
     private String id;
+    @JsonProperty("created_at")
+    private String createdAt;
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     /**
      *

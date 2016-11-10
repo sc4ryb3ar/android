@@ -27,6 +27,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     public interface OnFeedItemClickListener {
         void onMemberClick(Member member);
         void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url);
+        void onVisitItem(Object object, String url);
     }
 
     private final FetLifeApplication fetLifeApplication;
@@ -34,12 +35,13 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
     private List<Story> itemList;
 
-    FeedImageAdapterBinder feedImageAdapterBinder = new FeedImageAdapterBinder(this);
-
-    FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder = new FeedNotSupportedAdapterBinder(this);
+    FeedImageAdapterBinder feedImageAdapterBinder;
+    FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder;
 
     public FeedRecyclerAdapter(FetLifeApplication fetLifeApplication, OnFeedItemClickListener onFeedItemClickListener) {
         this.fetLifeApplication = fetLifeApplication;
+        feedImageAdapterBinder = new FeedImageAdapterBinder(fetLifeApplication, this);
+        feedNotSupportedAdapterBinder = new FeedNotSupportedAdapterBinder(this);
         this.onFeedItemClickListener = onFeedItemClickListener;
         loadItems();
     }

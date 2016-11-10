@@ -85,23 +85,8 @@ public class Member extends BaseModel {
         }
     }
 
-    public PictureInterface getAvatarPicture() {
-        return new PictureInterface() {
-            @Override
-            public Member getMember() {
-                return Member.this;
-            }
-
-            @Override
-            public String getBody() {
-                return "";
-            }
-
-            @Override
-            public PictureVariantsInterface getVariants() {
-                return avatar.getVariants();
-            }
-        };
+    public Picture getAvatarPicture() {
+        return avatar.getAsPicture(Member.this);
     }
 
     public String getMetaInfo() {

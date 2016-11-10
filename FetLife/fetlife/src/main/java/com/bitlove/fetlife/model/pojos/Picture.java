@@ -3,7 +3,7 @@ package com.bitlove.fetlife.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Picture implements PictureInterface {
+public class Picture {
 
     @JsonProperty("variants")
     private PictureVariants variants;

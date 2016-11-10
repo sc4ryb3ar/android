@@ -69,6 +69,11 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
         openUrl(url);
     }
 
+    @Override
+    public void onVisitItem(Object object, String url) {
+        openUrl(url);
+    }
+
     private void openUrl(String link) {
         if (link != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW);

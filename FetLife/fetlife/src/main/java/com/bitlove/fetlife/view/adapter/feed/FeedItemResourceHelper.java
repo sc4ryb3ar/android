@@ -3,7 +3,7 @@ package com.bitlove.fetlife.view.adapter.feed;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.FeedEvent;
-import com.bitlove.fetlife.model.pojos.PictureInterface;
+import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.PictureVariantsInterface;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Rsvp;
@@ -98,7 +98,7 @@ public class FeedItemResourceHelper {
         }
     }
 
-    public PictureInterface getPicture(FeedEvent feedEvent) {
+    public Picture getPicture(FeedEvent feedEvent) {
         try {
             switch (feedStoryType) {
                 case LIKE_CREATED:
@@ -121,8 +121,10 @@ public class FeedItemResourceHelper {
             String createdAt;
             switch (feedStoryType) {
                 case LIKE_CREATED:
+                    createdAt = feedEvent.getTarget().getLove().getCreatedAt();
+                    break;
                 case COMMENT_CREATED:
-                    createdAt = feedEvent.getSecondaryTarget().getPicture().getCreatedAt();
+                    createdAt = feedEvent.getTarget().getComment().getCreatedAt();
                     break;
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:

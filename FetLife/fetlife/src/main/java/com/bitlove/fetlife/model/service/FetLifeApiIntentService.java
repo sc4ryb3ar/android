@@ -73,6 +73,8 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
     public static final String ACTION_APICALL_SEND_MESSAGES = "com.bitlove.fetlife.action.apicall.send_messages";
     public static final String ACTION_APICALL_SET_MESSAGES_READ = "com.bitlove.fetlife.action.apicall.set_messages_read";
+    public static final String ACTION_APICALL_ADD_LOVE = "com.bitlove.fetlife.action.apicall.add_love";
+    public static final String ACTION_APICALL_REMOVE_LOVE = "com.bitlove.fetlife.action.apicall.remove_love";
     public static final String ACTION_APICALL_LOGON_USER = "com.bitlove.fetlife.action.apicall.logon_user";
     public static final String ACTION_APICALL_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.friendrequests";
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
@@ -208,6 +210,12 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_SET_MESSAGES_READ:
                     result = setMessagesRead(params);
                     break;
+                case ACTION_APICALL_ADD_LOVE:
+                    result = addLove(params);
+                    break;
+                case ACTION_APICALL_REMOVE_LOVE:
+                    result = removeLove(params);
+                    break;
                 case ACTION_APICALL_SEND_FRIENDREQUESTS:
                     result = sendPendingFriendRequests();
                     break;
@@ -254,7 +262,6 @@ public class FetLifeApiIntentService extends IntentService {
             setActionInProgress(null);
         }
     }
-
 
     //****
     //Authentication related methods / Api calls
@@ -493,12 +500,29 @@ public class FetLifeApiIntentService extends IntentService {
     //****
     //Other not pending state based POST methods
     //****
+    //TODO make these also pending in case of connection failed and retry later
 
     private int setMessagesRead(String[] params) throws IOException {
         String conversationId = params[0];
         String[] messageIds = Arrays.copyOfRange(params, 1, params.length);
         Call<ResponseBody> setMessagesReadCall = getFetLifeApi().setMessagesRead(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), conversationId, messageIds);
         Response<ResponseBody> response = setMessagesReadCall.execute();
+        return response.isSuccess() ? 1 : -1;
+    }
+
+    private int addLove(String[] params) throws IOException {
+        String contentId = params[0];
+        String contentType = params[1];
+        Call<ResponseBody> addLoveCall = getFetLifeApi().putLove(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), contentId, contentType);
+        Response<ResponseBody> response = addLoveCall.execute();
+        return response.isSuccess() ? 1 : -1;
+    }
+
+    private int removeLove(String[] params) throws IOException {
+        String contentId = params[0];
+        String contentType = params[1];
+        Call<ResponseBody> removeLoveCall = getFetLifeApi().deleteLove(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), contentId, contentType);
+        Response<ResponseBody> response = removeLoveCall.execute();
         return response.isSuccess() ? 1 : -1;
     }
 
