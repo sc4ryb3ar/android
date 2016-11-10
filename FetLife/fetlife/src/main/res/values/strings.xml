@@ -207,4 +207,6 @@
     <string name="feed_title_rsvps_yes">is going to %1$d events</string>
     <string name="feed_title_rsvp_maybe">is maybe going to an event</string>
     <string name="feed_title_rsvps_maybe">is maybe going to %1$d events</string>
+    <string name="feed_title_new_comment">added a new comment</string>
+    <string name="feed_title_new_comments">added %1$d new comments</string>
 </resources>

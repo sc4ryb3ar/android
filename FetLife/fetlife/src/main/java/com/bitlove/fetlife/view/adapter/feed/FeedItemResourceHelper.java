@@ -36,6 +36,8 @@ public class FeedItemResourceHelper {
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_like_picture) : fetLifeApplication.getString(R.string.feed_title_like_pictures, eventCount);
             case FRIEND_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_friend) : fetLifeApplication.getString(R.string.feed_title_new_friends, eventCount);
+            case COMMENT_CREATED:
+                return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_comment) : fetLifeApplication.getString(R.string.feed_title_new_comments, eventCount);
             case FOLLOW_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_follow) : fetLifeApplication.getString(R.string.feed_title_new_follows, eventCount);
             case RSVP_CREATED:
@@ -86,6 +88,8 @@ public class FeedItemResourceHelper {
                     return event.getTarget().getRelation().getMember();
                 case RSVP_CREATED:
                     return event.getTarget().getRsvp().getMember();
+                case COMMENT_CREATED:
+                    return event.getTarget().getComment().getMember();
                 default:
                     return null;
             }
@@ -102,6 +106,8 @@ public class FeedItemResourceHelper {
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:
                     return feedEvent.getSecondaryTarget().getMember().getAvatarPicture();
+                case COMMENT_CREATED:
+                    return feedEvent.getSecondaryTarget().getPicture();
                 default:
                     return null;
             }
@@ -115,10 +121,13 @@ public class FeedItemResourceHelper {
             String createdAt;
             switch (feedStoryType) {
                 case LIKE_CREATED:
+                case COMMENT_CREATED:
                     createdAt = feedEvent.getSecondaryTarget().getPicture().getCreatedAt();
                     break;
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:
+                    createdAt = feedEvent.getTarget().getRelation().getCreatedAt();
+                    break;
                 default:
                     return null;
             }
@@ -141,6 +150,8 @@ public class FeedItemResourceHelper {
             switch (feedStoryType) {
                 case RSVP_CREATED:
                     return feedEvent.getTarget().getRsvp().getEvent().getName();
+                case COMMENT_CREATED:
+                    return null;
                 default:
                     return null;
             }
@@ -154,6 +165,8 @@ public class FeedItemResourceHelper {
             switch (feedStoryType) {
                 case RSVP_CREATED:
                     return feedEvent.getTarget().getRsvp().getEvent().getLocation();
+                case COMMENT_CREATED:
+                    return feedEvent.getTarget().getComment().getBody();
                 default:
                     return null;
             }
@@ -167,6 +180,8 @@ public class FeedItemResourceHelper {
             switch (feedStoryType) {
                 case RSVP_CREATED:
                     return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(feedEvent.getTarget().getRsvp().getEvent().getStartDateTime()));
+                case COMMENT_CREATED:
+                    return null;
                 default:
                     return null;
             }
@@ -178,6 +193,7 @@ public class FeedItemResourceHelper {
     public boolean imageOnlyListItems() {
         switch (feedStoryType) {
             case RSVP_CREATED:
+            case COMMENT_CREATED:
                 return false;
             case FOLLOW_CREATED:
             case FRIEND_CREATED:
@@ -188,6 +204,7 @@ public class FeedItemResourceHelper {
 
     public boolean listOnly() {
         switch (feedStoryType) {
+            case COMMENT_CREATED:
             case RSVP_CREATED:
                 return true;
             default:

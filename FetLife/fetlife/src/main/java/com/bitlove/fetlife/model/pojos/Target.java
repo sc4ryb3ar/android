@@ -13,6 +13,16 @@ public class Target {
     private Love love;
     @JsonProperty("rsvp")
     private Rsvp rsvp;
+    @JsonProperty("comment")
+    private Comment comment;
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
 
     /**
      *
