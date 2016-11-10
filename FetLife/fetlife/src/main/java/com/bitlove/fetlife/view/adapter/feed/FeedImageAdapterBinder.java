@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.event.ServiceCallFailedEvent;
+import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Picture;
@@ -26,6 +28,10 @@ import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.malinskiy.materialicons.widget.IconTextView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -229,22 +235,19 @@ public class FeedImageAdapterBinder {
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
 
         IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
-        final boolean isLoved = picture.isIsLovedByMe();
+        boolean isLoved = picture.isIsLovedByMe();
         imageLove.setText(isLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
+        imageLove.setTextColor(overlay.getContext().getResources().getColor(isLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
         imageLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 IconTextView imageLove = (IconTextView) v;
-                boolean newInLoved = !isLoved;
-                imageLove.setText(newInLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-                if (newInLoved) {
-                    imageLove.setTextColor(v.getContext().getResources().getColor(android.R.color.holo_red_dark));
-                } else {
-                    imageLove.setTextColor(v.getContext().getResources().getColor(R.color.text_color_secondary));
-                }
-                String action = newInLoved ? FetLifeApiIntentService.ACTION_APICALL_ADD_LOVE : FetLifeApiIntentService.ACTION_APICALL_REMOVE_LOVE;
-                FetLifeApiIntentService.startApiCall(fetLifeApplication, action, picture.getId(), picture.getContentType());
-                picture.setIsLovedByMe(newInLoved);
+                boolean isLoved = picture.isIsLovedByMe();
+                boolean newIsLoved = !isLoved;
+                imageLove.setText(newIsLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
+                imageLove.setTextColor(v.getContext().getResources().getColor(newIsLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
+                startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
+                picture.setIsLovedByMe(newIsLoved);
             }
         });
 
@@ -265,6 +268,33 @@ public class FeedImageAdapterBinder {
         imageDescription.setText(picture.getBody());
         imageMeta.setText(picture.getMember().getMetaInfo());
         imageName.setText(picture.getMember().getNickname());
+    }
+
+    private void startLoveCallWithObserver(final FetLifeApplication fetLifeApplication, final Picture picture, final boolean loved) {
+        final String action = loved ? FetLifeApiIntentService.ACTION_APICALL_ADD_LOVE : FetLifeApiIntentService.ACTION_APICALL_REMOVE_LOVE;
+        fetLifeApplication.getEventBus().register(new Object() {
+            @Subscribe(threadMode = ThreadMode.MAIN)
+            public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
+                if (serviceCallFinishedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFinishedEvent.getParams())) {
+                    fetLifeApplication.getEventBus().unregister(this);
+                }
+            }
+
+            @Subscribe(threadMode = ThreadMode.MAIN)
+            public void onResourceListCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
+                if (serviceCallFailedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFailedEvent.getParams())) {
+                    picture.setIsLovedByMe(!loved);
+                    fetLifeApplication.getEventBus().unregister(this);
+                }
+            }
+            private boolean checkParams(String... params) {
+                if (params == null || params.length != 2) {
+                    return false;
+                }
+                return picture.getId().equals(params[0]) && picture.getContentType().equals(params[1]);
+            }
+        });
+        FetLifeApiIntentService.startApiCall(fetLifeApplication, action, picture.getId(), picture.getContentType());
     }
 
     class PictureGridAdapter extends BaseAdapter {

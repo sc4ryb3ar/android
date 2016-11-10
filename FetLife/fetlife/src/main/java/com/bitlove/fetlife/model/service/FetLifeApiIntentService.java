@@ -158,7 +158,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         //Check for network state
         if (NetworkUtil.getConnectivityStatus(this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
-            sendConnectionFailedNotification(action);
+            sendConnectionFailedNotification(action, params);
             return;
         }
 
@@ -231,7 +231,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             if (result >= 0) {
                 //If the call succeed notify all subscribers about
-                sendLoadFinishedNotification(action, result);
+                sendLoadFinishedNotification(action, result, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401 || lastResponseCode == 403)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
                 if (refreshToken(currentUser)) {
@@ -245,11 +245,11 @@ public class FetLifeApiIntentService extends IntentService {
                 //TODO: error handling for endless loop
             } else {
                 //If the call failed notify all subscribers about
-                sendLoadFailedNotification(action);
+                sendLoadFailedNotification(action, params);
             }
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
-            sendConnectionFailedNotification(action);
+            sendConnectionFailedNotification(action, params);
         } catch (InvalidDBConfiguration |SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
             //the exception go in case of it is not the case
@@ -754,35 +754,35 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private void sendLoadFinishedNotification(String action, int count) {
+    private void sendLoadFinishedNotification(String action, int count, String... params) {
         switch (action) {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginFinishedEvent());
                 break;
             default:
-                getFetLifeApplication().getEventBus().post(new ServiceCallFinishedEvent(action, count));
+                getFetLifeApplication().getEventBus().post(new ServiceCallFinishedEvent(action, count, params));
                 break;
         }
     }
 
-    private void sendLoadFailedNotification(String action) {
+    private void sendLoadFailedNotification(String action, String... params) {
         switch (action) {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginFailedEvent());
                 break;
             default:
-                getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(action));
+                getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(action, false, params));
                 break;
         }
     }
 
-    private void sendConnectionFailedNotification(String action) {
+    private void sendConnectionFailedNotification(String action, String... params) {
         switch (action) {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginFailedEvent(true));
                 break;
             default:
-                getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(action, true));
+                getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(action, true, params));
                 break;
         }
     }

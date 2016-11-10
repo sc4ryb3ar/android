@@ -156,7 +156,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction() == getApiCallAction()) {
+        if (serviceCallFinishedEvent.getServiceCallAction().equals(getApiCallAction())) {
             retrievedItems += serviceCallFinishedEvent.getItemCount();
             recyclerAdapter.refresh();
             dismissProgress();
@@ -166,7 +166,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
-        if (serviceCallFailedEvent.getServiceCallAction() == getApiCallAction()) {
+        if (serviceCallFailedEvent.getServiceCallAction().equals(getApiCallAction())) {
             recyclerAdapter.refresh();
             dismissProgress();
             swipeRefreshLayout.setRefreshing(false);
@@ -175,7 +175,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallStarted(ServiceCallStartedEvent serviceCallStartedEvent) {
-        if (serviceCallStartedEvent.getServiceCallAction() == getApiCallAction()) {
+        if (serviceCallStartedEvent.getServiceCallAction().equals(getApiCallAction())) {
             showProgress();
         }
     }
