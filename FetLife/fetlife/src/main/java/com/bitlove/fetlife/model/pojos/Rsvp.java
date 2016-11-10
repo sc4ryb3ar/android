@@ -1,9 +1,15 @@
 
 package com.bitlove.fetlife.model.pojos;
 
+import com.bitlove.fetlife.util.EnumUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Rsvp {
+
+    public enum RsvpStatus {
+        YES,
+        MAYBE
+    }
 
     @JsonProperty("id")
     private String id;
@@ -17,6 +23,10 @@ public class Rsvp {
     private Event event;
     @JsonProperty("status")
     private String status;
+
+    public RsvpStatus getRsvpStatus() {
+        return EnumUtil.safeParse(RsvpStatus.class, status);
+    }
 
     /**
      *

@@ -1,4 +1,5 @@
 
+
 package com.bitlove.fetlife.view.adapter.feed;
 
 import android.content.Context;
@@ -16,7 +17,6 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.PictureInterface;
-import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.util.DateUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -51,7 +51,7 @@ public class FeedImageAdapterBinder {
 
         final int position = feedViewHolder.getAdapterPosition();
 
-        String title = feedItemResourceHelper.getTitle(events.size());
+        String title = feedItemResourceHelper.getHeader(events);
         if (title == null) {
             throw new IllegalArgumentException();
         }
@@ -60,7 +60,6 @@ public class FeedImageAdapterBinder {
         feedViewHolder.nameText.setText(member.getNickname());
         feedViewHolder.metaText.setText(member.getMetaInfo());
 
-        final PictureInterface firstPicture = feedItemResourceHelper.getPicture(events.get(0));
         String createdAt = feedItemResourceHelper.getCreatedAt(events.get(0));
 
         feedViewHolder.timeText.setText(createdAt);
@@ -99,26 +98,11 @@ public class FeedImageAdapterBinder {
         });
 
 
-        if (events.size() == 1) {
+        if (listLayout(events, feedItemResourceHelper)) {
 
             LinearLayout linearLayout = feedViewHolder.listExpandArea;
 
-            LayoutInflater inflater = LayoutInflater.from(context);
-
-            SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflater.inflate(R.layout.listitem_feed_imageitem, linearLayout, false);
-            simpleDraweeView.setImageURI(firstPicture.getVariants().getLargeUrl());
-            simpleDraweeView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LayoutInflater inflater = LayoutInflater.from(v.getContext());
-                    final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                    setOverlayContent(overlay, firstPicture, onItemClickListener);
-                    new ImageViewer.Builder(v.getContext(), new String[]{firstPicture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
-                }
-            });
-
-            linearLayout.removeAllViews();
-            linearLayout.addView(simpleDraweeView);
+            addViews(events, linearLayout, onItemClickListener, feedItemResourceHelper);
 
             boolean expandByPreference = fetLifeApplication.getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_feed_auto_expand_like),false);
             boolean expanded = expandHistory.get(position,expandByPreference);
@@ -137,6 +121,80 @@ public class FeedImageAdapterBinder {
             feedViewHolder.separatorView.setVisibility(expanded ? View.VISIBLE : View.GONE);
             feedViewHolder.listExpandArea.setVisibility(View.GONE);
         }
+    }
+
+    private void addViews(List<FeedEvent> events, LinearLayout linearLayout, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, FeedItemResourceHelper feedItemResourceHelper) {
+        linearLayout.removeAllViews();
+
+        if (feedItemResourceHelper.imageOnlyListItems()) {
+            addImageOnlyListItemViews(events, linearLayout, onItemClickListener, feedItemResourceHelper);
+        } else {
+            addImageTextListItemViews(events, linearLayout, onItemClickListener, feedItemResourceHelper);
+        }
+    }
+
+    private void addImageTextListItemViews(List<FeedEvent> events, LinearLayout linearLayout, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, final FeedItemResourceHelper feedItemResourceHelper) {
+        Context context = linearLayout.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        for (final FeedEvent feedEvent : events) {
+
+            View itemView = inflater.inflate(R.layout.listitem_feed_innerlistitem, linearLayout, false);
+
+            SimpleDraweeView itemImage = (SimpleDraweeView) itemView.findViewById(R.id.feed_innerlist_icon);
+            final PictureInterface picture = feedItemResourceHelper.getPicture(events.get(0));
+            itemImage.setVisibility(picture != null ? View.VISIBLE : View.GONE);
+            if (picture != null) {
+                itemImage.setImageURI(picture.getVariants().getMediumUrl());
+            }
+
+            TextView itemHeader = (TextView) itemView.findViewById(R.id.feed_innerlist_header);
+            itemHeader.setText(feedItemResourceHelper.getItemTitle(feedEvent));
+            TextView itemText = (TextView) itemView.findViewById(R.id.feed_innerlist_upper);
+            itemText.setText(feedItemResourceHelper.getItemBody(feedEvent));
+            TextView timeText = (TextView) itemView.findViewById(R.id.feed_innerlist_right);
+            timeText.setText(feedItemResourceHelper.getItemCaption(feedEvent));
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
+                }
+            });
+
+            linearLayout.addView(itemView);
+
+        }
+    }
+
+    private void addImageOnlyListItemViews(List<FeedEvent> events, LinearLayout linearLayout, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, FeedItemResourceHelper feedItemResourceHelper) {
+        Context context = linearLayout.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        for (FeedEvent event : events) {
+
+            final PictureInterface picture = feedItemResourceHelper.getPicture(events.get(0));
+
+            SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflater.inflate(R.layout.listitem_feed_imageitem, linearLayout, false);
+            simpleDraweeView.setImageURI(picture.getVariants().getLargeUrl());
+            simpleDraweeView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LayoutInflater inflater = LayoutInflater.from(v.getContext());
+                    final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
+                    setOverlayContent(overlay, picture, onItemClickListener);
+                    new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
+                }
+            });
+
+            linearLayout.removeAllViews();
+            linearLayout.addView(simpleDraweeView);
+        }
+    }
+
+    private boolean listLayout(List<FeedEvent> events, FeedItemResourceHelper feedItemResourceHelper) {
+        if (feedItemResourceHelper.listOnly()) {
+            return true;
+        }
+        return events.size() == 1;
     }
 
     private void setOverlayContent(View overlay, final PictureInterface picture, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {

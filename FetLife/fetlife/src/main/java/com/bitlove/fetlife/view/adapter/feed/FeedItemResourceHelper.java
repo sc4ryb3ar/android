@@ -6,8 +6,10 @@ import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.PictureInterface;
 import com.bitlove.fetlife.model.pojos.PictureVariantsInterface;
 import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.Rsvp;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.util.DateUtil;
+import com.bitlove.fetlife.util.EnumUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -22,7 +24,13 @@ public class FeedItemResourceHelper {
         this.feedStoryType = feedStoryType;
     }
 
-    public String getTitle(int eventCount) {
+    public Story.FeedStoryType getFeedStoryType() {
+        return feedStoryType;
+    }
+
+    public String getHeader(List<FeedEvent> events) {
+        int eventCount = events.size();
+        FeedEvent feedEvent = events.get(0);
         switch (feedStoryType) {
             case LIKE_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_like_picture) : fetLifeApplication.getString(R.string.feed_title_like_pictures, eventCount);
@@ -30,6 +38,15 @@ public class FeedItemResourceHelper {
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_friend) : fetLifeApplication.getString(R.string.feed_title_new_friends, eventCount);
             case FOLLOW_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_follow) : fetLifeApplication.getString(R.string.feed_title_new_follows, eventCount);
+            case RSVP_CREATED:
+                switch (feedEvent.getTarget().getRsvp().getRsvpStatus()) {
+                    case YES:
+                        return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_rsvp_yes) : fetLifeApplication.getString(R.string.feed_title_rsvps_yes, eventCount);
+                    case MAYBE:
+                        return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_rsvp_maybe) : fetLifeApplication.getString(R.string.feed_title_rsvps_maybe, eventCount);
+                    default:
+                        return null;
+                }
             default:
                 return null;
         }
@@ -67,6 +84,8 @@ public class FeedItemResourceHelper {
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:
                     return event.getTarget().getRelation().getMember();
+                case RSVP_CREATED:
+                    return event.getTarget().getRsvp().getMember();
                 default:
                     return null;
             }
@@ -110,6 +129,69 @@ public class FeedItemResourceHelper {
             }
         } catch (NullPointerException npe) {
             return null;
+        }
+    }
+
+    public String getUrl(FeedEvent feedEvent) {
+        return null;
+    }
+
+    public String getItemTitle(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case RSVP_CREATED:
+                    return feedEvent.getTarget().getRsvp().getEvent().getName();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public String getItemBody(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case RSVP_CREATED:
+                    return feedEvent.getTarget().getRsvp().getEvent().getLocation();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public String getItemCaption(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case RSVP_CREATED:
+                    return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(feedEvent.getTarget().getRsvp().getEvent().getStartDateTime()));
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public boolean imageOnlyListItems() {
+        switch (feedStoryType) {
+            case RSVP_CREATED:
+                return false;
+            case FOLLOW_CREATED:
+            case FRIEND_CREATED:
+            default:
+                return true;
+        }
+    }
+
+    public boolean listOnly() {
+        switch (feedStoryType) {
+            case RSVP_CREATED:
+                return true;
+            default:
+                return false;
         }
     }
 }

@@ -65,8 +65,8 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     }
 
     @Override
-    public void onEventClick(Event event) {
-        openUrl(null);
+    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url) {
+        openUrl(url);
     }
 
     private void openUrl(String link) {

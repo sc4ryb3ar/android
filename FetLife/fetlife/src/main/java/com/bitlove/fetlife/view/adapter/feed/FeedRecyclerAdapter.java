@@ -26,7 +26,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
     public interface OnFeedItemClickListener {
         void onMemberClick(Member member);
-        void onEventClick(Event event);
+        void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url);
     }
 
     private final FetLifeApplication fetLifeApplication;
@@ -35,7 +35,6 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     private List<Story> itemList;
 
     FeedImageAdapterBinder feedImageAdapterBinder = new FeedImageAdapterBinder(this);
-    FeedRsvpAdapterBinder feedRsvpAdapterBinder = new FeedRsvpAdapterBinder(this);
 
     FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder = new FeedNotSupportedAdapterBinder(this);
 
@@ -89,7 +88,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 case RSVP_CREATED:
-                    feedRsvpAdapterBinder.bindRsvpStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
+                    feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 default:
                     feedNotSupportedAdapterBinder.bindNotSupportedStory(fetLifeApplication, feedViewHolder,story, onFeedItemClickListener);
