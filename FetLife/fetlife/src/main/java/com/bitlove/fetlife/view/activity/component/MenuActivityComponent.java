@@ -30,6 +30,8 @@ import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
 import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
+import com.malinskiy.materialicons.IconDrawable;
+import com.malinskiy.materialicons.Iconify;
 
 public class MenuActivityComponent extends ActivityComponent {
 
@@ -54,6 +56,10 @@ public class MenuActivityComponent extends ActivityComponent {
         Toolbar toolbar = (Toolbar) menuActivity.findViewById(R.id.toolbar);
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) menuActivity.findViewById(R.id.nav_view);
+        navigationView.getMenu().findItem(R.id.nav_feed).setIcon(
+                new IconDrawable(menuActivity, Iconify.IconValue.zmdi_view_list)
+                        .colorRes(R.color.text_color_secondary)
+                        .actionBarSize());
 
         if (toolbar == null || drawer == null || navigationView == null || (navigationHeaderView = navigationView.getHeaderView(0)) == null) {
             return;
@@ -126,6 +132,7 @@ public class MenuActivityComponent extends ActivityComponent {
     public Boolean onActivityCreateOptionsMenu(BaseActivity baseActivity, Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuActivity.getMenuInflater().inflate(R.menu.activity_resource, menu);
+        // Set an icon in the ActionBar
         return true;
     }
 

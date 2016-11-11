@@ -144,12 +144,32 @@ public class FeedItemResourceHelper {
     }
 
     public String getUrl(FeedEvent feedEvent) {
-        return null;
+        try {
+            switch (feedStoryType) {
+                case LIKE_CREATED:
+                    return feedEvent.getSecondaryTarget().getPicture().getUrl();
+                case COMMENT_CREATED:
+//                    return feedEvent.getTarget().getComment().getUrl();
+                    return null;
+                case RSVP_CREATED:
+                    return feedEvent.getTarget().getRsvp().getUrl();
+                case FRIEND_CREATED:
+                case FOLLOW_CREATED:
+                    return feedEvent.getSecondaryTarget().getMember().getLink();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
     }
 
     public String getItemTitle(FeedEvent feedEvent) {
         try {
             switch (feedStoryType) {
+                case FOLLOW_CREATED:
+                case FRIEND_CREATED:
+                    return feedEvent.getSecondaryTarget().getMember().getNickname();
                 case RSVP_CREATED:
                     return feedEvent.getTarget().getRsvp().getEvent().getName();
                 case COMMENT_CREATED:
@@ -165,6 +185,9 @@ public class FeedItemResourceHelper {
     public String getItemBody(FeedEvent feedEvent) {
         try {
             switch (feedStoryType) {
+                case FOLLOW_CREATED:
+                case FRIEND_CREATED:
+                    return feedEvent.getSecondaryTarget().getMember().getMetaInfo();
                 case RSVP_CREATED:
                     return feedEvent.getTarget().getRsvp().getEvent().getLocation();
                 case COMMENT_CREATED:
@@ -180,6 +203,9 @@ public class FeedItemResourceHelper {
     public String getItemCaption(FeedEvent feedEvent) {
         try {
             switch (feedStoryType) {
+                case FOLLOW_CREATED:
+                case FRIEND_CREATED:
+                    return null;
                 case RSVP_CREATED:
                     return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(feedEvent.getTarget().getRsvp().getEvent().getStartDateTime()));
                 case COMMENT_CREATED:
@@ -196,9 +222,9 @@ public class FeedItemResourceHelper {
         switch (feedStoryType) {
             case RSVP_CREATED:
             case COMMENT_CREATED:
-                return false;
             case FOLLOW_CREATED:
             case FRIEND_CREATED:
+                return false;
             default:
                 return true;
         }
@@ -208,6 +234,15 @@ public class FeedItemResourceHelper {
         switch (feedStoryType) {
             case COMMENT_CREATED:
             case RSVP_CREATED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean browseImageOnClick() {
+        switch (feedStoryType) {
+            case LIKE_CREATED:
                 return true;
             default:
                 return false;

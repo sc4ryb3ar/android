@@ -32,6 +32,8 @@ public class UserSessionManager {
     private static final String CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN = "member_token";
 
     private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
+    private static final String USER_PREF_KEY_NOTIFPREF_APPLIED = "USER_PREF_KEY_NOTIFPREF_APPLIED";
+    private static final String USER_PREF_KEY_FEEDPREF_APPLIED = "USER_PREF_KEY_FEEDPREF_APPLIED";
 
     private final FetLifeApplication fetLifeApplication;
 
@@ -245,16 +247,22 @@ public class UserSessionManager {
     private void initUserPreferences(String userKey) {
         String userPreferenceName = getUserPreferenceName(userKey);
         SettingsActivity.init(userPreferenceName);
-        final SharedPreferences defaultValueSp = fetLifeApplication.getSharedPreferences(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, Context.MODE_PRIVATE);
 
-        //TODO: finish solving this and backward compatibility
-        if(!defaultValueSp.getBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, false))
-        {
+        activePreferences = getUserPreferences(userKey);
+
+        if (!activePreferences.getBoolean(USER_PREF_KEY_NOTIFPREF_APPLIED, false)) {
+            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+            activePreferences.edit().putBoolean(USER_PREF_KEY_NOTIFPREF_APPLIED, true);
         }
 
-        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, false);
-        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
-        activePreferences = getUserPreferences(userKey);
+        if (!activePreferences.getBoolean(USER_PREF_KEY_FEEDPREF_APPLIED, false)) {
+            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, true);
+            activePreferences.edit().putBoolean(USER_PREF_KEY_FEEDPREF_APPLIED, true);
+        }
+
+//        final SharedPreferences defaultValueSp = fetLifeApplication.getSharedPreferences(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, Context.MODE_PRIVATE);
+//        if(!defaultValueSp.getBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, false)) {
+//        }
     }
 
     private SharedPreferences getUserPreferences(String userKey) {

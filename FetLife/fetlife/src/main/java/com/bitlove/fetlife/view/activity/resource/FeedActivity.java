@@ -70,6 +70,11 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     }
 
     @Override
+    public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url) {
+        openUrl(url);
+    }
+
+    @Override
     public void onVisitItem(Object object, String url) {
         openUrl(url);
     }

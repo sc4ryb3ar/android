@@ -13,6 +13,8 @@ public class Rsvp {
 
     @JsonProperty("id")
     private String id;
+    @JsonProperty("url")
+    private String url;
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("member")
@@ -46,6 +48,14 @@ public class Rsvp {
     @JsonProperty("id")
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     /**
