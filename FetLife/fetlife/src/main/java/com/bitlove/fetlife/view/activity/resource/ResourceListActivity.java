@@ -34,7 +34,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     protected View inputIcon;
     protected EditText textInput;
 
-    protected int retrievedItems = 0;
+    protected int requestedItems = 0;
     protected int requestedPage = 1;
 
     @Override
@@ -77,7 +77,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                retrievedItems = 0;
+                requestedItems = 0;
                 requestedPage = 1;
                 FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(PAGE_COUNT));
             }
@@ -93,7 +93,8 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
                         int pastVisibleItems = recyclerLayoutManager.findFirstVisibleItemPosition();
                         int lastVisiblePosition = visibleItemCount + pastVisibleItems;
 
-                        if (lastVisiblePosition >= retrievedItems) {
+                        if (lastVisiblePosition >= requestedItems) {
+                            requestedItems++;
                             startResourceCall(PAGE_COUNT, ++requestedPage);
                         }
                     }
@@ -119,7 +120,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
                 startResourceCall(PAGE_COUNT);
             }
             requestedPage = 1;
-            retrievedItems = 0;
+            requestedItems = 0;
         }
     }
 
@@ -157,7 +158,11 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction().equals(getApiCallAction())) {
-            retrievedItems += serviceCallFinishedEvent.getItemCount();
+            int receivedItems = serviceCallFinishedEvent.getItemCount();
+            if (receivedItems > 0) {
+                //One Item we already expected at the call
+                requestedItems += receivedItems -1;
+            }
             recyclerAdapter.refresh();
             dismissProgress();
             swipeRefreshLayout.setRefreshing(false);
