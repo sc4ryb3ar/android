@@ -185,6 +185,14 @@
     <string name="title_activity_feed">Feed</string>
     <string name="menu_feed">Feed</string>
     <string name="feed_title_friends">%1$s became friend with %2$d users</string>
+    <string name="feed_title_new_post">uploaded one new writing</string>
+    <string name="feed_title_new_posts">posted %1$d new writings</string>
+    <string name="feed_title_group_join">joined to one group</string>
+    <string name="feed_title_group_joins">joined to %1$d groups</string>
+    <string name="feed_title_new_picture">uploaded one new picture</string>
+    <string name="feed_title_new_pictures">uploaded %1$d new pictures</string>
+    <string name="feed_title_like_writing">loved one writing</string>
+    <string name="feed_title_like_writings">loved %1$d writings</string>
     <string name="feed_title_like_picture">loved one picture</string>
     <string name="feed_title_like_pictures">loved %1$d pictures</string>
     <string name="feed_title_like_temp">%1$s loved one thingy</string>
@@ -208,4 +216,7 @@
     <string name="feed_title_rsvps_maybe">is maybe going to %1$d events</string>
     <string name="feed_title_new_comment">added a new comment</string>
     <string name="feed_title_new_comments">added %1$d new comments</string>
+    <string name="feed_title_new_postcomment">commented a post</string>
+    <string name="feed_title_new_postcomments">commented %1$d posts</string>
+    <string name="feed_caption_member_count" >%1$d members</string>
 </resources>

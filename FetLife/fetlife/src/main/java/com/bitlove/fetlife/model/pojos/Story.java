@@ -16,8 +16,15 @@ public class Story {
         COMMENT_CREATED,
         PICTURE_CREATED,
         FRIEND_CREATED,
-        RSVP_CREATED
+        POST_CREATED,
+        RSVP_CREATED,
+        GROUP_MEMBERSHIP_CREATED,
+        POST_COMMENT_CREATED,
 
+        GROUP_COMMENT_CREATED,
+        WALL_POST_CREATED,
+        PROFILE_UPDATED,
+        STATUS_CREATED
     }
 
     @JsonProperty("name")

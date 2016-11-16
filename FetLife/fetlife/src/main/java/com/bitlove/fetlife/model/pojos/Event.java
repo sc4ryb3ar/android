@@ -31,6 +31,16 @@ public class Event {
     private String cost;
     @JsonProperty("dress_code")
     private String dressCode;
+    @JsonProperty("url")
+    private String url;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     /**
      *

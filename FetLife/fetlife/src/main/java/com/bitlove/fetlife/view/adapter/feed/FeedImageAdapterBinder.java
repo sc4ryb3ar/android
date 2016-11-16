@@ -3,7 +3,6 @@
 package com.bitlove.fetlife.view.adapter.feed;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -24,12 +23,9 @@ import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MaterialIcons;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.malinskiy.materialicons.IconDrawable;
-import com.malinskiy.materialicons.Iconify;
 import com.malinskiy.materialicons.widget.IconTextView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -155,10 +151,30 @@ public class FeedImageAdapterBinder {
             View itemView = inflater.inflate(R.layout.listitem_feed_innerlistitem, linearLayout, false);
 
             SimpleDraweeView itemImage = (SimpleDraweeView) itemView.findViewById(R.id.feed_innerlist_icon);
-            final Picture picture = feedItemResourceHelper.getPicture(events.get(0));
-            itemImage.setVisibility(picture != null ? View.VISIBLE : View.GONE);
+            final Picture picture = feedItemResourceHelper.getPicture(feedEvent);
             if (picture != null) {
+                itemImage.setVisibility(View.VISIBLE);
+                itemImage.getHierarchy().setPlaceholderImage(null);
                 itemImage.setImageURI(picture.getVariants().getMediumUrl());
+                itemImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (feedItemResourceHelper.browseImageOnClick()) {
+                            //TODO: reuse the same imageclick code instead of having it several places in this class
+                            LayoutInflater inflater = LayoutInflater.from(v.getContext());
+                            final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
+                            setOverlayContent(overlay, picture, onItemClickListener);
+                            new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
+                        } else {
+                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
+                        }
+                    }
+                });
+            } else if (feedItemResourceHelper.useImagePlaceHolder(feedEvent)) {
+                itemImage.setVisibility(View.VISIBLE);
+                itemImage.getHierarchy().setPlaceholderImage(R.drawable.dummy_avatar);
+            } else {
+                itemImage.setVisibility(View.GONE);
             }
 
             String itemHeaderText = feedItemResourceHelper.getItemTitle(feedEvent);
@@ -171,7 +187,7 @@ public class FeedImageAdapterBinder {
             itemSingleText.setText(itemTextText);
             TextView itemText = (TextView) itemView.findViewById(R.id.feed_innerlist_upper);
             itemText.setText(itemTextText);
-            TextView timeText = (TextView) itemView.findViewById(R.id.feed_innerlist_right);
+            TextView timeText = (TextView) itemView.findViewById(R.id.feed_innerlist_caption);
             timeText.setText(itemTimeText);
 
             if (itemHeaderText == null && itemTimeText == null) {
@@ -325,8 +341,8 @@ public class FeedImageAdapterBinder {
             for (FeedEvent event : events) {
                 Picture picture = feedItemResourceHelper.getPicture(event);
                 pictures.add(picture);
-                gridLinks.add(picture.getVariants().getMediumUrl());
-                displayLinks.add(picture.getVariants().getHugeUrl());
+                gridLinks.add(picture != null ? picture.getVariants().getMediumUrl() : null);
+                displayLinks.add(picture != null ? picture.getVariants().getHugeUrl() : null);
             }
         }
 
@@ -347,21 +363,17 @@ public class FeedImageAdapterBinder {
 
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
-            Uri pictureUri;
-
-            try {
-                pictureUri = Uri.parse(gridLinks.get(position));
-            } catch (NullPointerException npe) {
-                return new LinearLayout(parent.getContext());
-            }
-            if (pictureUri == null) {
-                return new LinearLayout(parent.getContext());
-            }
+            Uri pictureUri = gridLinks.get(position) != null ? Uri.parse(gridLinks.get(position)) : null;
 
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
             SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflater.inflate(R.layout.listitem_feed_griditem, parent, false);
             simpleDraweeView.setImageURI(pictureUri);
+            if (pictureUri == null) {
+                simpleDraweeView.getHierarchy().setPlaceholderImage(R.drawable.dummy_avatar);
+            } else {
+                simpleDraweeView.getHierarchy().setPlaceholderImage(null);
+            }
             if (feedItemResourceHelper.browseImageOnClick()) {
                 simpleDraweeView.setOnClickListener(new View.OnClickListener() {
                     @Override

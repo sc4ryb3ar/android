@@ -94,7 +94,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
                         int lastVisiblePosition = visibleItemCount + pastVisibleItems;
 
                         if (lastVisiblePosition >= requestedItems) {
-                            requestedItems++;
+                            requestedItems += PAGE_COUNT;
                             startResourceCall(PAGE_COUNT, ++requestedPage);
                         }
                     }
@@ -120,7 +120,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
                 startResourceCall(PAGE_COUNT);
             }
             requestedPage = 1;
-            requestedItems = 0;
+            requestedItems = PAGE_COUNT;
         }
     }
 
@@ -161,7 +161,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
             int receivedItems = serviceCallFinishedEvent.getItemCount();
             if (receivedItems > 0) {
                 //One Item we already expected at the call
-                requestedItems += receivedItems -1;
+                requestedItems += receivedItems - PAGE_COUNT;
             }
             recyclerAdapter.refresh();
             dismissProgress();

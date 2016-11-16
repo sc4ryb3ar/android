@@ -15,6 +15,36 @@ public class Target {
     private Rsvp rsvp;
     @JsonProperty("comment")
     private Comment comment;
+    @JsonProperty("picture")
+    private Picture picture;
+    @JsonProperty("writing")
+    private Writing writing;
+    @JsonProperty("group_membership")
+    private GroupMembership groupMembership;
+
+    public GroupMembership getGroupMembership() {
+        return groupMembership;
+    }
+
+    public void setGroupMembership(GroupMembership groupMembership) {
+        this.groupMembership = groupMembership;
+    }
+
+    public Writing getWriting() {
+        return writing;
+    }
+
+    public void setWriting(Writing writing) {
+        this.writing = writing;
+    }
+
+    public Picture getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Picture picture) {
+        this.picture = picture;
+    }
 
     public Comment getComment() {
         return comment;

@@ -2,7 +2,7 @@ package com.bitlove.fetlife.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Comment {
+public class Writing {
 
     @JsonProperty("id")
     private String id;
@@ -16,18 +16,14 @@ public class Comment {
     private Integer loveCount;
     @JsonProperty("is_loved_by_me")
     private Boolean isLovedByMe;
+    @JsonProperty("comment_count")
+    private Integer commentCount;
+    @JsonProperty("title")
+    private String title;
     @JsonProperty("body")
     private String body;
     @JsonProperty("url")
     private String url;
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
     /**
      *
@@ -152,6 +148,46 @@ public class Comment {
     /**
      *
      * @return
+     * The commentCount
+     */
+    @JsonProperty("comment_count")
+    public Integer getCommentCount() {
+        return commentCount;
+    }
+
+    /**
+     *
+     * @param commentCount
+     * The comment_count
+     */
+    @JsonProperty("comment_count")
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    /**
+     *
+     * @return
+     * The title
+     */
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     *
+     * @param title
+     * The title
+     */
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     *
+     * @return
      * The body
      */
     @JsonProperty("body")
@@ -169,4 +205,25 @@ public class Comment {
         this.body = body;
     }
 
+    /**
+     *
+     * @return
+     * The url
+     */
+    @JsonProperty("url")
+    public String getUrl() {
+        return url;
+    }
+
+    /**
+     *
+     * @param url
+     * The url
+     */
+    @JsonProperty("url")
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 }
+

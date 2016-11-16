@@ -2,7 +2,7 @@ package com.bitlove.fetlife.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Comment {
+public class PostComment {
 
     @JsonProperty("id")
     private String id;

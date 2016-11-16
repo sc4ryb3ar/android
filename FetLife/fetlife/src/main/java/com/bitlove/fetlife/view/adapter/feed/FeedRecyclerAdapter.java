@@ -85,13 +85,17 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
         try {
             switch (story.getType()) {
-                case LIKE_CREATED:
                 case FOLLOW_CREATED:
-                case FRIEND_CREATED:
                 case RSVP_CREATED:
+                case COMMENT_CREATED:
+                case POST_CREATED:
+                case PICTURE_CREATED:
+                case POST_COMMENT_CREATED:
+                case GROUP_MEMBERSHIP_CREATED:
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
-                case COMMENT_CREATED:
+                case LIKE_CREATED:
+                case FRIEND_CREATED:
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 default:

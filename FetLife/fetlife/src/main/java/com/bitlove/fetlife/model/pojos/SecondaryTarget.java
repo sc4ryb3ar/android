@@ -9,6 +9,16 @@ public class SecondaryTarget {
     private Member member;
     @JsonProperty("picture")
     private Picture picture;
+    @JsonProperty("writing")
+    private Writing writing;
+
+    public Writing getWriting() {
+        return writing;
+    }
+
+    public void setWriting(Writing writing) {
+        this.writing = writing;
+    }
 
     /**
      *
