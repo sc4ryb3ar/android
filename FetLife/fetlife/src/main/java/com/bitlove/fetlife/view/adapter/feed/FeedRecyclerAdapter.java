@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Event;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
@@ -36,12 +35,12 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
     private List<Story> itemList;
 
-    FeedImageAdapterBinder feedImageAdapterBinder;
+    FeedAdapterBinder feedImageAdapterBinder;
     FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder;
 
     public FeedRecyclerAdapter(FetLifeApplication fetLifeApplication, OnFeedItemClickListener onFeedItemClickListener) {
         this.fetLifeApplication = fetLifeApplication;
-        feedImageAdapterBinder = new FeedImageAdapterBinder(fetLifeApplication, this);
+        feedImageAdapterBinder = new FeedAdapterBinder(fetLifeApplication, this);
         feedNotSupportedAdapterBinder = new FeedNotSupportedAdapterBinder(this);
         this.onFeedItemClickListener = onFeedItemClickListener;
         loadItems();
@@ -92,10 +91,12 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
                 case PICTURE_CREATED:
                 case POST_COMMENT_CREATED:
                 case GROUP_MEMBERSHIP_CREATED:
-                    feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
-                    break;
                 case LIKE_CREATED:
                 case FRIEND_CREATED:
+                case VIDEO_COMMENT_CREATED:
+                    feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
+                    break;
+                case PEOPLE_INTO_CREATED:
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 default:

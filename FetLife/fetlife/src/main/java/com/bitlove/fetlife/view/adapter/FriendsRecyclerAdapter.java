@@ -13,6 +13,7 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.Friend_Table;
 import com.bitlove.fetlife.model.resource.ImageLoader;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -96,7 +97,8 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
 
         friendViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friend.getAvatarLink();
-        imageLoader.loadImage(friendViewHolder.itemView.getContext(), avatarUrl, friendViewHolder.avatarImage, R.drawable.dummy_avatar);
+        friendViewHolder.avatarImage.setImageURI(avatarUrl);
+//        imageLoader.loadImage(friendViewHolder.itemView.getContext(), avatarUrl, friendViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
 
 class FriendViewHolder extends SwipeableViewHolder {
 
-    ImageView avatarImage;
+    SimpleDraweeView avatarImage;
     TextView headerText, upperText, dateText;
 
     public FriendViewHolder(View itemView) {
@@ -116,7 +118,7 @@ class FriendViewHolder extends SwipeableViewHolder {
         headerText = (TextView) itemView.findViewById(R.id.friend_header);
         upperText = (TextView) itemView.findViewById(R.id.friend_upper);
         dateText = (TextView) itemView.findViewById(R.id.friend_right);
-        avatarImage = (ImageView) itemView.findViewById(R.id.friend_icon);
+        avatarImage = (SimpleDraweeView) itemView.findViewById(R.id.friend_icon);
     }
 
     @Override

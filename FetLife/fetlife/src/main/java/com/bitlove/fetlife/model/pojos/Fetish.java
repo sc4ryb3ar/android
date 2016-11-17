@@ -1,7 +1,11 @@
 package com.bitlove.fetlife.model.pojos;
 
+import android.content.Context;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import com.bitlove.fetlife.R;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,16 +13,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "approved",
-        "created_at",
-        "id",
-        "into_count",
-        "name",
-        "people_intos_count",
-        "updated_at"
-})
 public class Fetish {
 
     @JsonProperty("approved")
@@ -35,8 +29,16 @@ public class Fetish {
     private int peopleIntosCount;
     @JsonProperty("updated_at")
     private String updatedAt;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @JsonProperty("url")
+    private String url;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     /**
      *
@@ -176,16 +178,6 @@ public class Fetish {
     @JsonProperty("updated_at")
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }

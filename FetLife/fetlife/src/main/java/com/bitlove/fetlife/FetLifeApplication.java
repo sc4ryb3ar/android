@@ -104,7 +104,6 @@ public class FetLifeApplication extends Application {
 
         //Init Fresco image library
         initFrescoImageLibrary();
-        Fresco.initialize(this);
 
         //Init crash logging
         Fabric.with(this, new Crashlytics());
@@ -169,18 +168,46 @@ public class FetLifeApplication extends Application {
                     cacheUrl = imageUrl;
                 }
 
-                CacheKey cacheKey = new CacheKey() {
-                    @Override
-                    public boolean containsUri(Uri uri) {
-                        return uri.toString().startsWith(cacheUrl);
-                    }
-                };
-
+                CacheKey cacheKey = new FrescoTokenLessCacheKey(cacheUrl);
                 return cacheKey;
+
             }
         }).build();
 
         Fresco.initialize(this, imagePipelineConfig);
+    }
+
+    static class FrescoTokenLessCacheKey implements CacheKey {
+
+        final String cacheUrl;
+
+        FrescoTokenLessCacheKey(String cacheUrl) {
+            this.cacheUrl = cacheUrl;
+        }
+
+        @Override
+        public int hashCode() {
+            return cacheUrl.hashCode();
+        }
+
+        @Override
+        public boolean containsUri(Uri uri) {
+            return uri.toString().startsWith(cacheUrl);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof FrescoTokenLessCacheKey) {
+                FrescoTokenLessCacheKey otherKey = (FrescoTokenLessCacheKey) obj;
+                return cacheUrl.equals(otherKey.cacheUrl);
+            }
+            return super.equals(obj);
+        }
+
+        @Override
+        public String toString() {
+            return cacheUrl;
+        }
     }
 
     //****

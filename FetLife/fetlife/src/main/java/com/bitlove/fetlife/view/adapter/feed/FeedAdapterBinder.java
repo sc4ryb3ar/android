@@ -32,21 +32,21 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FeedImageAdapterBinder {
+public class FeedAdapterBinder {
 
     private final FeedRecyclerAdapter feedRecyclerAdapter;
     private final FetLifeApplication fetLifeApplication;
 
     private SparseArray<Boolean> expandHistory = new SparseArray<>();
 
-    public FeedImageAdapterBinder(FetLifeApplication fetLifeApplication, FeedRecyclerAdapter feedRecyclerAdapter) {
+    public FeedAdapterBinder(FetLifeApplication fetLifeApplication, FeedRecyclerAdapter feedRecyclerAdapter) {
         this.fetLifeApplication = fetLifeApplication;
         this.feedRecyclerAdapter = feedRecyclerAdapter;
     }
 
     public void bindImageStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
 
-        FeedItemResourceHelper feedItemResourceHelper = new FeedItemResourceHelper(fetLifeApplication, story.getType());
+        FeedItemResourceHelper feedItemResourceHelper = new FeedItemResourceHelper(fetLifeApplication, story);
 
         List<FeedEvent> events = story.getEvents();
         final Member member = feedItemResourceHelper.getMember(events);
@@ -214,25 +214,33 @@ public class FeedImageAdapterBinder {
         }
     }
 
-    private void addImageOnlyListItemViews(List<FeedEvent> events, LinearLayout linearLayout, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, FeedItemResourceHelper feedItemResourceHelper) {
+    private void addImageOnlyListItemViews(final List<FeedEvent> events, LinearLayout linearLayout, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, final FeedItemResourceHelper feedItemResourceHelper) {
         Context context = linearLayout.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        for (FeedEvent event : events) {
+        for (final FeedEvent event : events) {
 
             final Picture picture = feedItemResourceHelper.getPicture(event);
 
             SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflater.inflate(R.layout.listitem_feed_imageitem, linearLayout, false);
             simpleDraweeView.setImageURI(picture.getVariants().getLargeUrl());
-            simpleDraweeView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LayoutInflater inflater = LayoutInflater.from(v.getContext());
-                    final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                    setOverlayContent(overlay, picture, onItemClickListener);
-                    new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
-                }
-            });
-
+            if (feedItemResourceHelper.browseImageOnClick()) {
+                simpleDraweeView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        LayoutInflater inflater = LayoutInflater.from(v.getContext());
+                        final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
+                        setOverlayContent(overlay, picture, onItemClickListener);
+                        new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
+                    }
+                });
+            } else {
+                simpleDraweeView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event));
+                    }
+                });
+            }
             linearLayout.removeAllViews();
             linearLayout.addView(simpleDraweeView);
         }

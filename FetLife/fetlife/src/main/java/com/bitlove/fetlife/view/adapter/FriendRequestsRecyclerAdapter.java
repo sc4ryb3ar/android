@@ -22,6 +22,7 @@ import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -297,7 +298,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
 
         friendRequestItemViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friendRequest.getAvatarLink();
-        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
+        friendRequestItemViewHolder.avatarImage.setImageURI(avatarUrl);
+//        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
     public void onBindSharedProfileViewHolder(FriendRequestItemViewHolder friendRequestItemViewHolder, final SharedProfile friendSuggestion) {
@@ -327,7 +329,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
 
         friendRequestItemViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friendSuggestion.getAvatarLink();
-        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
+        friendRequestItemViewHolder.avatarImage.setImageURI(avatarUrl);
+//        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
 }
@@ -365,7 +368,7 @@ class FriendRequestHeaderViewHolder extends FriendRequestScreenViewHolder {
 
 class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
 
-    ImageView avatarImage;
+    SimpleDraweeView avatarImage;
     TextView headerText, upperText, dateText;
     View swipableLayout, acceptBackgroundLayout, rejectBackgroundLayout;
 
@@ -380,7 +383,7 @@ class FriendRequestItemViewHolder extends FriendRequestScreenViewHolder {
 
         upperText = (TextView) itemView.findViewById(R.id.friendrequest_upper);
         dateText = (TextView) itemView.findViewById(R.id.friendrequest_right);
-        avatarImage = (ImageView) itemView.findViewById(R.id.friendrequest_icon);
+        avatarImage = (SimpleDraweeView) itemView.findViewById(R.id.friendrequest_icon);
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.bitlove.fetlife.model.pojos.Conversation;
 
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.resource.ImageLoader;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.SimpleDateFormat;
@@ -97,7 +98,8 @@ public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Co
 
         conversationViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = conversation.getAvatarLink();
-        imageLoader.loadImage(conversationViewHolder.itemView.getContext(), avatarUrl, conversationViewHolder.avatarImage, R.drawable.dummy_avatar);
+        conversationViewHolder.avatarImage.setImageURI(avatarUrl);
+//        imageLoader.loadImage(conversationViewHolder.itemView.getContext(), avatarUrl, conversationViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Co
 
 class ConversationViewHolder extends SwipeableViewHolder {
 
-    ImageView avatarImage;
+    SimpleDraweeView avatarImage;
     TextView headerText, messageText, dateText, newMessageIndicator;
 
     public ConversationViewHolder(View itemView) {
@@ -117,7 +119,7 @@ class ConversationViewHolder extends SwipeableViewHolder {
         headerText = (TextView) itemView.findViewById(R.id.conversation_header);
         messageText = (TextView) itemView.findViewById(R.id.conversation_message_text);
         dateText = (TextView) itemView.findViewById(R.id.conversation_date);
-        avatarImage = (ImageView) itemView.findViewById(R.id.conversation_icon);
+        avatarImage = (SimpleDraweeView) itemView.findViewById(R.id.conversation_icon);
     }
 
     @Override

@@ -21,6 +21,16 @@ public class Target {
     private Writing writing;
     @JsonProperty("group_membership")
     private GroupMembership groupMembership;
+    @JsonProperty("people_into")
+    private PeopleInto peopleInto;
+
+    public PeopleInto getPeopleInto() {
+        return peopleInto;
+    }
+
+    public void setPeopleInto(PeopleInto peopleInto) {
+        this.peopleInto = peopleInto;
+    }
 
     public GroupMembership getGroupMembership() {
         return groupMembership;

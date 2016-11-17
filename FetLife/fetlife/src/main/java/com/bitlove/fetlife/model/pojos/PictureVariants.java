@@ -13,6 +13,42 @@ public class PictureVariants implements PictureVariantsInterface{
     private PictureVariant huge;
     @JsonProperty("original")
     private PictureVariant original;
+    @JsonProperty("80")
+    private PictureVariant _80;
+    @JsonProperty("150")
+    private PictureVariant _150;
+    @JsonProperty("345")
+    private PictureVariant _345;
+
+    @JsonProperty("80")
+    public PictureVariant get80() {
+        return _80;
+    }
+
+    @JsonProperty("80")
+    public void set80(PictureVariant _80) {
+        this._80 = _80;
+    }
+
+    @JsonProperty("150")
+    public PictureVariant get150() {
+        return _150;
+    }
+
+    @JsonProperty("150")
+    public void set150(PictureVariant _150) {
+        this._150 = _150;
+    }
+
+    @JsonProperty("345")
+    public PictureVariant get345() {
+        return _345;
+    }
+
+    @JsonProperty("345")
+    public void set345(PictureVariant _345) {
+        this._345 = _345;
+    }
 
     public PictureVariant getHuge() {
         return huge;

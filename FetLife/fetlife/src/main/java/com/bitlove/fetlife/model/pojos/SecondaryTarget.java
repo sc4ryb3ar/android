@@ -7,10 +7,20 @@ public class SecondaryTarget {
 
     @JsonProperty("member")
     private Member member;
+    @JsonProperty("video")
+    private Video video;
     @JsonProperty("picture")
     private Picture picture;
     @JsonProperty("writing")
     private Writing writing;
+
+    public Video getVideo() {
+        return video;
+    }
+
+    public void setVideo(Video video) {
+        this.video = video;
+    }
 
     public Writing getWriting() {
         return writing;

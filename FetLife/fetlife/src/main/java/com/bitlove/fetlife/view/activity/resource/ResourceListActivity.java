@@ -77,7 +77,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestedItems = 0;
+                requestedItems = PAGE_COUNT;
                 requestedPage = 1;
                 FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(PAGE_COUNT));
             }
