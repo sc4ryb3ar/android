@@ -82,12 +82,27 @@ public class FeedItemResourceHelper {
     public boolean getExpandPreference() {
         int preferenceResource = -1;
         switch (feedStoryType) {
+            case POST_COMMENT_CREATED:
+            case VIDEO_COMMENT_CREATED:
+            case COMMENT_CREATED:
+            case GROUP_COMMENT_CREATED:
+
+            case POST_CREATED:
+            case WALL_POST_CREATED:
+
+            case PROFILE_UPDATED:
+            case STATUS_CREATED:
+            case PEOPLE_INTO_CREATED:
+
+            case RSVP_CREATED:
+
+            case PROMOTED_TO_GROUP_LEADER:
+            case GROUP_MEMBERSHIP_CREATED:
+                break;
             case LIKE_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_like;
                 break;
             case FRIEND_CREATED:
-                preferenceResource = R.string.settings_key_feed_auto_expand_relation;
-                break;
             case FOLLOW_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_relation;
                 break;
