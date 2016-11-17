@@ -17,7 +17,6 @@ import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
-import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
@@ -80,7 +79,6 @@ public class FetLifeApplication extends Application {
     //****
 
     private FetLifeService fetLifeService;
-    private ImageLoader imageLoader;
     private NotificationParser notificationParser;
     private EventBus eventBus;
     private UserSessionManager userSessionManager;
@@ -130,7 +128,6 @@ public class FetLifeApplication extends Application {
             throw new RuntimeException(e);
         }
 
-        imageLoader = new ImageLoader(this);
         notificationParser = new NotificationParser();
         eventBus = EventBus.getDefault();
         inMemoryStorage = new InMemoryStorage();
@@ -273,10 +270,6 @@ public class FetLifeApplication extends Application {
 
     public FetLifeService getFetLifeService() {
         return fetLifeService;
-    }
-
-    public ImageLoader getImageLoader() {
-        return imageLoader;
     }
 
     public NotificationParser getNotificationParser() {

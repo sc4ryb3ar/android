@@ -6,13 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.Friend_Table;
-import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -23,12 +21,9 @@ import java.util.List;
 
 public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, FriendViewHolder> {
 
-    private final ImageLoader imageLoader;
-
     private List<Friend> itemList;
 
-    public FriendsRecyclerAdapter(ImageLoader imageLoader) {
-        this.imageLoader = imageLoader;
+    public FriendsRecyclerAdapter() {
         loadItems();
     }
 

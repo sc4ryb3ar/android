@@ -52,7 +52,7 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
 
     @Override
     protected ResourceListRecyclerAdapter<Conversation, ?> createRecyclerAdapter(Bundle savedInstanceState) {
-        return new ConversationsRecyclerAdapter(getFetLifeApplication().getImageLoader());
+        return new ConversationsRecyclerAdapter();
     }
 
     @Override

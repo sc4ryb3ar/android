@@ -54,7 +54,7 @@ public class FriendRequestsActivity extends ResourceListActivity<BaseModel> impl
 
     @Override
     protected ResourceListRecyclerAdapter createRecyclerAdapter(Bundle savedInstanceState) {
-        return new FriendRequestsRecyclerAdapter(getFetLifeApplication().getImageLoader(), savedInstanceState == null);
+        return new FriendRequestsRecyclerAdapter(savedInstanceState == null);
     }
 
     @Override

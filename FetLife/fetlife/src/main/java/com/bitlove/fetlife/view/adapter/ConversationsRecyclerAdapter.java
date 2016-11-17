@@ -13,7 +13,6 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Conversation;
 
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
-import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -23,12 +22,9 @@ import java.util.List;
 
 public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Conversation, ConversationViewHolder> {
 
-    private final ImageLoader imageLoader;
-
     private List<Conversation> itemList;
 
-    public ConversationsRecyclerAdapter(ImageLoader imageLoader) {
-        this.imageLoader = imageLoader;
+    public ConversationsRecyclerAdapter() {
         loadItems();
     }
 

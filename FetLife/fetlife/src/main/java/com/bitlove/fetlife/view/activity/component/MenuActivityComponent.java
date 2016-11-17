@@ -30,6 +30,7 @@ import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
 import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 
@@ -100,8 +101,8 @@ public class MenuActivityComponent extends ActivityComponent {
             headerTextView.setText(currentUser.getNickname());
             TextView headerSubTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_subtext);
             headerSubTextView.setText(currentUser.getMetaInfo());
-            ImageView headerAvatar = (ImageView) navigationHeaderView.findViewById(R.id.nav_header_image);
-            menuActivity.getFetLifeApplication().getImageLoader().loadImage(menuActivity, currentUser.getAvatarLink(), headerAvatar, R.drawable.dummy_avatar);
+            SimpleDraweeView headerAvatar = (SimpleDraweeView) navigationHeaderView.findViewById(R.id.nav_header_image);
+            headerAvatar.setImageURI(currentUser.getAvatarLink());
             final String selfLink = currentUser.getLink();
             if (selfLink != null) {
                 headerAvatar.setOnClickListener(new View.OnClickListener() {

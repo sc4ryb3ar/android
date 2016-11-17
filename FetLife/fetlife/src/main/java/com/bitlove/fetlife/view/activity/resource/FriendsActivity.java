@@ -80,7 +80,7 @@ public class FriendsActivity extends ResourceListActivity<Friend> implements Nav
 
     @Override
     protected ResourceListRecyclerAdapter createRecyclerAdapter(Bundle savedInstanceState) {
-        return new FriendsRecyclerAdapter(getFetLifeApplication().getImageLoader());
+        return new FriendsRecyclerAdapter();
     }
 
     @Override

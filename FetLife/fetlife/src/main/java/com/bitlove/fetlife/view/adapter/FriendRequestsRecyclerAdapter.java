@@ -18,7 +18,6 @@ import com.bitlove.fetlife.model.pojos.FriendRequestScreenModelObject;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
-import com.bitlove.fetlife.model.resource.ImageLoader;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
@@ -40,13 +39,10 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         AtomicBoolean pending = new AtomicBoolean(true);
     }
 
-    private final ImageLoader imageLoader;
-
     private List<FriendRequest> friendRequestList;
     private List<SharedProfile> friendSuggestionList;
 
-    public FriendRequestsRecyclerAdapter(ImageLoader imageLoader, boolean clearItems) {
-        this.imageLoader = imageLoader;
+    public FriendRequestsRecyclerAdapter(boolean clearItems) {
         if (clearItems) {
             clearItems();
         } else {
