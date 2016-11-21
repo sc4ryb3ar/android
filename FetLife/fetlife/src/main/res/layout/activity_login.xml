@@ -89,8 +89,7 @@
                     android:layout_gravity="center"
                     android:theme="@style/AppTheme.Light_Accent"
                     android:textColor="@color/text_color_secondary"
-                    android:checked="true"
-                    android:text="@string/logon_check_ask_for_password"/>
+                    android:text="@string/logon_check_remember_me"/>
 
                 <Button
                     android:id="@+id/log_on_button"

@@ -95,6 +95,7 @@ public class FetLifeApiIntentService extends IntentService {
     //Reference holder for the action that is being processed
     private static final int MAX_SUBJECT_LENGTH = 36;
     private static final String SUBJECT_SHORTENED_SUFFIX = "\u2026";
+    private static final String TEXT_PLAIN = "text/plain";
 
     private static String actionInProgress = null;
 
@@ -136,7 +137,7 @@ public class FetLifeApiIntentService extends IntentService {
         return actionInProgress.equals(action);
     }
 
-    //Main synchronized method (by default by Intent Service implementtion) method
+    //Main synchronized method (by default by Intent Service implementation) method
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -250,7 +251,7 @@ public class FetLifeApiIntentService extends IntentService {
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
             sendConnectionFailedNotification(action, params);
-        } catch (InvalidDBConfiguration |SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
+        } catch (InvalidDBConfiguration|SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
             //the exception go in case of it is not the case
             //TODO: create separate DB Manager class to synchronize db executions and DB close due to user logout
@@ -351,10 +352,10 @@ public class FetLifeApiIntentService extends IntentService {
     //Go through all the pending messages and send them one by one
     private int sendPendingMessages(User user, int sentMessageCount) throws IOException {
         List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.pending.is(true)).queryList();
-        //Got through all pending messages (if there is any) and try to send them
+        //Go through all pending messages (if there is any) and try to send them
         for (Message pendingMessage : pendingMessages) {
             String conversationId = pendingMessage.getConversationId();
-            //If the conversation id is local (not created by the backend) its a new conversation, so start a new conversation call
+            //If the conversation id is local (not created by the backend) it's a new conversation, so start a new conversation call
             if (Conversation.isLocal(conversationId)) {
                 if (startNewConversation(user, conversationId, pendingMessage)) {
                     //db changed, reload remaining pending messages with starting this method recursively
@@ -364,7 +365,7 @@ public class FetLifeApiIntentService extends IntentService {
                 sentMessageCount++;
             }
         }
-        //Return success result if at least one pending message could have been sent so there was change in the current state
+        //Return success result if at least one pending message could have been sent so there was a change in the current state
         return sentMessageCount == 0 ? -1 : sentMessageCount;
     }
 
@@ -378,7 +379,7 @@ public class FetLifeApiIntentService extends IntentService {
         Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), startMessage.getBody(), startMessage.getBody());
         Response<Conversation> postConversationResponse = postConversationCall.execute();
         if (postConversationResponse.isSuccess()) {
-            //Delete the local conversation and create a new one, as the id of the conversaiotn is changed (from local to backend based)
+            //Delete the local conversation and create a new one, as the id of the conversation is changed (from local to backend based)
             pendingConversation.delete();
 
             Conversation conversation = postConversationResponse.body();
@@ -389,11 +390,11 @@ public class FetLifeApiIntentService extends IntentService {
             //Delete the temporary local start messages as it is now accessible via a backend call with its real backend related id
             //This will ensure we wont have any duplication
             startMessage.delete();
-            //Retrieve the init message fot teh conversation with the real backend id
+            //Retrieve the init message fot the conversation with the real backend id
             retrieveMessages(user, serverConversationId);
 
             //Update all other messages the user initiated in the meanwhile so they are not mapped to the new conversation
-            //They will be now pending messages ready to be sent so a next scan (will be forced after returing from this method) will find them and send them
+            //They will be now pending messages ready to be sent so a next scan (will be forced after returning from this method) will find them and send them
             List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.conversationId.is(localConversationId)).queryList();
             for (Message pendingMessage : pendingMessages) {
                 pendingMessage.setConversationId(serverConversationId);
@@ -414,9 +415,9 @@ public class FetLifeApiIntentService extends IntentService {
         Response<Message> postMessageResponse = postMessagesCall.execute();
         String conversationId = pendingMessage.getConversationId();
         if (postMessageResponse.isSuccess()) {
-            //Update the message state of the retruned message object
+            //Update the message state of the returned message object
             final Message message = postMessageResponse.body();
-            //Messages are identifed in the db by client id so original pedning message will be overridden here with the correct state
+            //Messages are identifed in the db by client id so original pending message will be overridden here with the correct state
             message.setClientId(pendingMessage.getClientId());
             message.setPending(false);
             message.setConversationId(conversationId);
@@ -424,10 +425,10 @@ public class FetLifeApiIntentService extends IntentService {
             getFetLifeApplication().getEventBus().post(new MessageSendSucceededEvent(conversationId));
             return true;
         } else {
-            //If the call failed make the the pending message to a failed message
-            //Note if the post is fialed due to connection issue an exception will be thrown, so here we make the assumption the failer is permanent.
+            //If the call failed make the pending message to a failed message
+            //Note if the post is failed due to connection issue an exception will be thrown, so here we make the assumption the failure is permanent.
             //TODO check the result code and based on that send the message permamntly failed or keep it still pending
-            //TODO add functionality for the user to be able to retry sending mfailed messages
+            //TODO add functionality for the user to be able to retry sending failed messages
             pendingMessage.setPending(false);
             pendingMessage.setFailed(true);
             pendingMessage.save();
@@ -554,10 +555,10 @@ public class FetLifeApiIntentService extends IntentService {
         }
 
         RequestBody pictureBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
-        RequestBody isAvatarPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(false));
-        RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(friendsOnly));
-        RequestBody captionPart = RequestBody.create(MediaType.parse("text/plain"), caption);
-        RequestBody isFromUserPart = RequestBody.create(MediaType.parse("text/plain"), Boolean.toString(true));
+        RequestBody isAvatarPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(false));
+        RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(friendsOnly));
+        RequestBody captionPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), caption);
+        RequestBody isFromUserPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(true));
 
         Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pictureBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
         Response<ResponseBody> response = uploadPictureCall.execute();
@@ -628,6 +629,7 @@ public class FetLifeApiIntentService extends IntentService {
             final List<Story> stories = feed.getStories();
             getFetLifeApplication().getInMemoryStorage().addFeed(page,stories);
 
+//            Kept for later if/when we move to database persistence
 //            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
 //                @Override
 //                public void execute(DatabaseWrapper databaseWrapper) {

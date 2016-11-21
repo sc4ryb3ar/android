@@ -8,4 +8,9 @@
     <string name="settings_default_profile_password_always">true</string>
     <string name="settings_default_feed_auto_expand_relation">true</string>
     <string name="settings_default_feed_auto_expand_like">true</string>
+    <string name="settings_default_feed_auto_expand_profile">true</string>
+    <string name="settings_default_feed_auto_expand_post">true</string>
+    <string name="settings_default_feed_auto_expand_event">true</string>
+    <string name="settings_default_feed_auto_expand_group">true</string>
+    <string name="settings_default_feed_auto_expand_media">true</string>
 </resources>

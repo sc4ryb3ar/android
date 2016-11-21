@@ -237,7 +237,7 @@ public class FetLifeApplication extends Application {
     }
 
     //****
-    //Getter and helper methos for App foreground state
+    //Getter and helper methods for App foreground state
     //****
 
     public Activity getForegroundActivity() {
@@ -295,7 +295,7 @@ public class FetLifeApplication extends Application {
 
 
     //****
-    //Version upgrade method to senure backward compatibility
+    //Version upgrade method to ensure backward compatibility
     //****
 
     private void applyVersionUpgradeIfNeeded() {
@@ -315,7 +315,7 @@ public class FetLifeApplication extends Application {
 
 
     //****
-    //Version upgrade method to senure backward compatibility
+    //Class to help monitoring Activity State
     //****
 
     private class ForegroundActivityObserver implements ActivityLifecycleCallbacks {

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Store class for resource objects that should nto into the Database
+ * Store class for resource objects that should not go into the Database
  */
 public class InMemoryStorage {
 

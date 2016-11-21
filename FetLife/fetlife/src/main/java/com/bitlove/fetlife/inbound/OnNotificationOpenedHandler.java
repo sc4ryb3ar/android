@@ -6,7 +6,7 @@ import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 
 /**
- * Inbound and extension point for OneSignal notification library to react on user interaction when user clciked on a notification
+ * Inbound and extension point for OneSignal notification library to react on user interaction when user clicked on a notification
  */
 public class OnNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
 

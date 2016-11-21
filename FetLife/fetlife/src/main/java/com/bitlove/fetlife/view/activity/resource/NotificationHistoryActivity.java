@@ -23,8 +23,6 @@ import org.greenrobot.eventbus.ThreadMode;
 public class NotificationHistoryActivity extends ResourceListActivity<NotificationHistoryItem>
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private NotificationHistoryRecyclerAdapter notificationHistoryAdapter;
-
     public static void startActivity(Context context, boolean newTask) {
         context.startActivity(createIntent(context, newTask));
     }
@@ -76,7 +74,7 @@ public class NotificationHistoryActivity extends ResourceListActivity<Notificati
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotificationReceived(NotificationReceivedEvent notificationReceivedEvent) {
-        notificationHistoryAdapter.refresh();
+        recyclerAdapter.refresh();
     }
 
     @Override
@@ -93,7 +91,7 @@ public class NotificationHistoryActivity extends ResourceListActivity<Notificati
             case R.id.action_clear_notification_history:
                 //TODO: think of moving it to a db thread
                 new Delete().from(NotificationHistoryItem.class).query();
-                notificationHistoryAdapter.refresh();
+                recyclerAdapter.refresh();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
