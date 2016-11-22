@@ -13,4 +13,5 @@
     <string name="settings_default_feed_auto_expand_event">true</string>
     <string name="settings_default_feed_auto_expand_group">true</string>
     <string name="settings_default_feed_auto_expand_media">true</string>
+    <string name="settings_default_feed_auto_expand_comment">true</string>
 </resources>

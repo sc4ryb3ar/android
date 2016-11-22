@@ -23,7 +23,7 @@
 
   <string name="error_connection_failed">Der Server konnte nicht erreicht werden. Bitte überprüfe deine Internetverbindung.</string>
   <string name="error_apicall_failed">Verbindung fehlgeschlagen. Bitte versuche es später noch einmal</string>
-  <string name="authentication_failed">Bitte versuche es noch einmal!</string>
+  <string name="error_authentication_failed">Bitte versuche es noch einmal!</string>
 
   <string name="new_message_indication">NEU</string>
   <string name="version_prefix">"App Version: "</string>

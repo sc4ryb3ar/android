@@ -11,7 +11,7 @@ import com.bitlove.fetlife.view.activity.BaseActivity;
 public class EventDisplayHandler {
 
     public void onAuthenticationFailed(BaseActivity baseActivity, AuthenticationFailedEvent authenticationFailedEvent) {
-        baseActivity.showToast(baseActivity.getString(R.string.authentication_failed));
+        baseActivity.showToast(baseActivity.getString(R.string.error_authentication_failed));
     }
 
     public void onServiceCallFailed(BaseActivity baseActivity, ServiceCallFailedEvent serviceCallFailedEvent) {

@@ -33,6 +33,8 @@ public class FeedNotSupportedAdapterBinder {
         feedViewHolder.listExpandArea.setVisibility(View.GONE);
         feedViewHolder.separatorView.setVisibility(View.GONE);
         feedViewHolder.avatarImage.setImageURI((String)null);
+
+        feedViewHolder.feedContainer.setVisibility(View.GONE);
    }
 
 }
