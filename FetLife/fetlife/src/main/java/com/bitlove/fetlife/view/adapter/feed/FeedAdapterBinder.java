@@ -46,6 +46,8 @@ public class FeedAdapterBinder {
 
     public void bindImageStory(FetLifeApplication fetLifeApplication, final FeedViewHolder feedViewHolder, Story story, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
 
+        feedViewHolder.feedContainer.setVisibility(View.VISIBLE);
+
         FeedItemResourceHelper feedItemResourceHelper = new FeedItemResourceHelper(fetLifeApplication, story);
 
         List<FeedEvent> events = story.getEvents();
@@ -112,7 +114,8 @@ public class FeedAdapterBinder {
 
             LinearLayout linearLayout = feedViewHolder.listExpandArea;
 
-            boolean expandByPreference = fetLifeApplication.getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_feed_auto_expand_like),false);
+
+            boolean expandByPreference = feedItemResourceHelper.getExpandPreference();
             boolean expanded = expandHistory.get(position,expandByPreference);
             feedViewHolder.gridExpandArea.setVisibility(View.GONE);
             linearLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);

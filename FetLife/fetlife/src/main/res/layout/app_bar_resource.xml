@@ -24,7 +24,6 @@
                 style="?android:attr/progressBarStyle"
                 android:visibility="invisible"
                 android:padding="@dimen/toolbar_progress_indicator_padding"
-                android:layout_marginRight="48dp"
                 android:layout_gravity="right"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

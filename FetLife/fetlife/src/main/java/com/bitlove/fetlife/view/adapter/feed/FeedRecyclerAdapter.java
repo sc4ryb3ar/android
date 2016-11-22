@@ -95,10 +95,13 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
                 case LIKE_CREATED:
                 case FRIEND_CREATED:
                 case VIDEO_COMMENT_CREATED:
-                    feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
-                    break;
                 case PEOPLE_INTO_CREATED:
                 case STATUS_CREATED:
+                    feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
+                    break;
+                case STATUS_COMMENT_CREATED:
+                case WALL_POST_CREATED:
+                case GROUP_POST_CREATED:
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 default:
@@ -122,11 +125,12 @@ class FeedViewHolder extends SwipeableViewHolder {
     LinearLayout listExpandArea;
     SimpleDraweeView avatarImage;
     TextView nameText, metaText, feedText, timeText;
-    View separatorView;
+    View separatorView, feedContainer;
 
     public FeedViewHolder(View itemView) {
         super(itemView);
 
+        feedContainer = itemView.findViewById(R.id.feeditem_container);
         feedText = (TextView) itemView.findViewById(R.id.feeditem_text);
         nameText = (TextView) itemView.findViewById(R.id.feeditem_name);
         metaText = (TextView) itemView.findViewById(R.id.feeditem_meta);

@@ -22,10 +22,10 @@ public class Story {
         POST_COMMENT_CREATED, // 2111
 //        UPDATED_ABOUT, // 1743
         RSVP_CREATED, // 1600
-//        STATUS_COMMENT_CREATED, // 1513
+        STATUS_COMMENT_CREATED, // 1513
         STATUS_CREATED, // 1445
-//        WALL_POST_CREATED, // 1238
-//        GROUP_POST_CREATED, // 1073
+        WALL_POST_CREATED, // 1238
+        GROUP_POST_CREATED, // 1073
 //        USER_SIGNED_UP, // 696
         POST_CREATED, // 448
         VIDEO_COMMENT_CREATED, // 375

@@ -15,6 +15,26 @@ public class SecondaryTarget {
     private Writing writing;
     @JsonProperty("group_post")
     private GroupPost groupPost;
+    @JsonProperty("status")
+    private Status status;
+    @JsonProperty("wall_post")
+    private WallPost wallPost;
+
+    public WallPost getWallPost() {
+        return wallPost;
+    }
+
+    public void setWallPost(WallPost wallPost) {
+        this.wallPost = wallPost;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     public GroupPost getGroupPost() {
         return groupPost;

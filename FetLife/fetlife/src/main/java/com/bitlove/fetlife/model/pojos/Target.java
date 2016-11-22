@@ -25,6 +25,26 @@ public class Target {
     private PeopleInto peopleInto;
     @JsonProperty("status")
     private Status status;
+    @JsonProperty("group_post")
+    private GroupPost groupPost;
+    @JsonProperty("wall_post")
+    private WallPost wallPost;
+
+    public GroupPost getGroupPost() {
+        return groupPost;
+    }
+
+    public void setGroupPost(GroupPost groupPost) {
+        this.groupPost = groupPost;
+    }
+
+    public WallPost getWallPost() {
+        return wallPost;
+    }
+
+    public void setWallPost(WallPost wallPost) {
+        this.wallPost = wallPost;
+    }
 
     public Status getStatus() {
         return status;
