@@ -220,6 +220,10 @@
     <string name="feed_title_new_comments">added %1$d new comments</string>
     <string name="feed_title_new_videocomment">commented a video</string>
     <string name="feed_title_new_videocomments">commented %1$d videos</string>
+    <string name="feed_title_new_groupcomment">commented a group post</string>
+    <string name="feed_title_new_groupcomments">commented %1$d group posts</string>
+    <string name="feed_title_new_status">added a new status</string>
+    <string name="feed_title_new_statuses">added %1$d status messages</string>
     <string name="feed_title_new_postcomment">commented a post</string>
     <string name="feed_title_new_postcomments">commented %1$d posts</string>
     <string name="feed_title_people_into_fetish">set a relation with fetish</string>

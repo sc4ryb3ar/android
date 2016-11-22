@@ -89,6 +89,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
                 case COMMENT_CREATED:
                 case POST_CREATED:
                 case PICTURE_CREATED:
+                case GROUP_COMMENT_CREATED:
                 case POST_COMMENT_CREATED:
                 case GROUP_MEMBERSHIP_CREATED:
                 case LIKE_CREATED:
@@ -97,6 +98,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 case PEOPLE_INTO_CREATED:
+                case STATUS_CREATED:
                     feedImageAdapterBinder.bindImageStory(fetLifeApplication, feedViewHolder, story, onFeedItemClickListener);
                     break;
                 default:

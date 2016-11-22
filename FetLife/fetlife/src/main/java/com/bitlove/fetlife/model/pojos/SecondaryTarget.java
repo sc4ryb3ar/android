@@ -13,6 +13,16 @@ public class SecondaryTarget {
     private Picture picture;
     @JsonProperty("writing")
     private Writing writing;
+    @JsonProperty("group_post")
+    private GroupPost groupPost;
+
+    public GroupPost getGroupPost() {
+        return groupPost;
+    }
+
+    public void setGroupPost(GroupPost groupPost) {
+        this.groupPost = groupPost;
+    }
 
     public Video getVideo() {
         return video;

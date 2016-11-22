@@ -23,6 +23,16 @@ public class Target {
     private GroupMembership groupMembership;
     @JsonProperty("people_into")
     private PeopleInto peopleInto;
+    @JsonProperty("status")
+    private Status status;
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     public PeopleInto getPeopleInto() {
         return peopleInto;
