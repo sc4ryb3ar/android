@@ -8,7 +8,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.NetworkUtil;
 
 /**
- * Application inbound point invoked by the Android SO in case of the any change with the Internet/network state
+ * Application inbound point invoked by the Android OS in case of change of the Internet/network state
  */
 public class NetworkStateChangeReceiver extends BroadcastReceiver {
 

@@ -46,8 +46,6 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
             }
         });
         floatingActionButton.setContentDescription(getString(R.string.button_new_conversation_discription));
-
-
     }
 
     @Override

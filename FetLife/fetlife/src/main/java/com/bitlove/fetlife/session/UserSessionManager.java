@@ -61,7 +61,7 @@ public class UserSessionManager {
         }
     }
 
-    public synchronized void onUserLogIn(User loggedInUser, boolean passwordAlways) {
+    public synchronized void onUserLogIn(User loggedInUser, boolean rememberPassword) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
@@ -69,7 +69,7 @@ public class UserSessionManager {
         } else {
             updateUserRecord(loggedInUser);
         }
-        setPasswordAlwaysPreference(getUserKey(loggedInUser), passwordAlways);
+        setPasswordAlwaysPreference(getUserKey(loggedInUser), !rememberPassword);
     }
 
     public synchronized void onUserLogOut() {

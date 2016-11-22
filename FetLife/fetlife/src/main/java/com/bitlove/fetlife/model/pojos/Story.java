@@ -11,6 +11,34 @@ public class Story {
 
     public static enum FeedStoryType {
 
+        /*
+        updated_about 1743
+        status_comment_created 1513
+        group_post_created 1073
+        user_signed_up 696
+        updated_fetish_status 309
+        location_updated 276
+        post_updated 262
+        role_updated 257
+        ds_relationship_updated 45
+        ds_relationship_created 254
+        event_created 77
+        rsvp_updated 204
+        nickname_updated 146
+        video_created 139
+        sexual_orientation_updated 118
+        updated_websites 107
+        relationship_created 215
+        relationship_updated 80
+
+        supported_fetlife 71
+        vote_created 34
+        sex_updated 26
+        volunteered_to_be_group_leader 3
+        improvement_comment_created 1
+        invited_user_signed_up 1
+        */
+
         LIKE_CREATED,
         FOLLOW_CREATED,
         COMMENT_CREATED,

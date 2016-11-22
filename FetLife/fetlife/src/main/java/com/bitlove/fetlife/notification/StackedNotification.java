@@ -79,7 +79,7 @@ public class StackedNotification extends OneSignalNotification {
     }
 
     private void startMessageActivity(FetLifeApplication fetLifeApplication, MessageNotification sampleMessageNotification) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true)).startActivities();
         } else {
             ConversationsActivity.startActivity(fetLifeApplication);

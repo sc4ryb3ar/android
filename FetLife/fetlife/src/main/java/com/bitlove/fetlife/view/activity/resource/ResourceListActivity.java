@@ -79,7 +79,10 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
             public void onRefresh() {
                 requestedItems = PAGE_COUNT;
                 requestedPage = 1;
-                FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(PAGE_COUNT));
+                String apiAction = getApiCallAction();
+                if (apiAction != null) {
+                    FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(PAGE_COUNT));
+                }
             }
         });
 

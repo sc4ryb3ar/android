@@ -6,7 +6,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 public abstract class SwipeableRecyclerAdapter<T extends SwipeableViewHolder> extends RecyclerView.Adapter<T> {
-    
+
     @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, getSwipeDirections()) {
@@ -41,8 +41,8 @@ public abstract class SwipeableRecyclerAdapter<T extends SwipeableViewHolder> ex
                 if (swipeableViewHolder.getSwipeableLayout() == null) {
                     return;
                 }
-                setSwipeRightBackgroundVisibility(swipeableViewHolder,View.GONE);
-                setSwipeLeftBackgroundVisibility(swipeableViewHolder,View.GONE);
+                setSwipeRightBackgroundVisibility(swipeableViewHolder, View.GONE);
+                setSwipeLeftBackgroundVisibility(swipeableViewHolder, View.GONE);
                 getDefaultUIUtil().clearView(swipeableViewHolder.getSwipeableLayout());
             }
 
@@ -64,18 +64,18 @@ public abstract class SwipeableRecyclerAdapter<T extends SwipeableViewHolder> ex
 
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && isCurrentlyActive) {
                     if (dX > 0) {
-                        setSwipeRightBackgroundVisibility(swipeableViewHolder,View.VISIBLE);
-                        setSwipeLeftBackgroundVisibility(swipeableViewHolder,View.GONE);
+                        setSwipeRightBackgroundVisibility(swipeableViewHolder, View.VISIBLE);
+                        setSwipeLeftBackgroundVisibility(swipeableViewHolder, View.GONE);
                     } else if (dX < 0) {
-                        setSwipeRightBackgroundVisibility(swipeableViewHolder,View.GONE);
-                        setSwipeLeftBackgroundVisibility(swipeableViewHolder,View.VISIBLE);
+                        setSwipeRightBackgroundVisibility(swipeableViewHolder, View.GONE);
+                        setSwipeLeftBackgroundVisibility(swipeableViewHolder, View.VISIBLE);
                     } else {
-                        setSwipeRightBackgroundVisibility(swipeableViewHolder,View.GONE);
-                        setSwipeLeftBackgroundVisibility(swipeableViewHolder,View.GONE);
+                        setSwipeRightBackgroundVisibility(swipeableViewHolder, View.GONE);
+                        setSwipeLeftBackgroundVisibility(swipeableViewHolder, View.GONE);
                     }
                 } else {
-                    setSwipeRightBackgroundVisibility(swipeableViewHolder,View.GONE);
-                    setSwipeLeftBackgroundVisibility(swipeableViewHolder,View.GONE);
+                    setSwipeRightBackgroundVisibility(swipeableViewHolder, View.GONE);
+                    setSwipeLeftBackgroundVisibility(swipeableViewHolder, View.GONE);
                 }
                 getDefaultUIUtil().onDrawOver(c, recyclerView, swipeableViewHolder.getSwipeableLayout(), dX, dY, actionState, isCurrentlyActive);
             }
