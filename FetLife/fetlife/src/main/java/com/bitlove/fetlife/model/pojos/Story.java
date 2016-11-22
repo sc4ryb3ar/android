@@ -11,52 +11,45 @@ public class Story {
 
     public static enum FeedStoryType {
 
-        /*
-        updated_about 1743
-        status_comment_created 1513
-        group_post_created 1073
-        user_signed_up 696
-        updated_fetish_status 309
-        location_updated 276
-        post_updated 262
-        role_updated 257
-        ds_relationship_updated 45
-        ds_relationship_created 254
-        event_created 77
-        rsvp_updated 204
-        nickname_updated 146
-        video_created 139
-        sexual_orientation_updated 118
-        updated_websites 107
-        relationship_created 215
-        relationship_updated 80
-
-        supported_fetlife 71
-        vote_created 34
-        sex_updated 26
-        volunteered_to_be_group_leader 3
-        improvement_comment_created 1
-        invited_user_signed_up 1
-        */
-
-        LIKE_CREATED,
-        FOLLOW_CREATED,
-        COMMENT_CREATED,
-        PICTURE_CREATED,
-        FRIEND_CREATED,
-        POST_CREATED,
-        RSVP_CREATED,
-        GROUP_MEMBERSHIP_CREATED,
-        GROUP_COMMENT_CREATED,
-        POST_COMMENT_CREATED,
-        VIDEO_COMMENT_CREATED,
-        PEOPLE_INTO_CREATED,
-        STATUS_CREATED,
-
-        PROMOTED_TO_GROUP_LEADER,
-        WALL_POST_CREATED,
-        PROFILE_UPDATED,
-        DS_RELATIONSHIP_STATUS_UPDATED
+        LIKE_CREATED, // 182660
+        FRIEND_CREATED, // 31992
+        COMMENT_CREATED, // 18851
+        FOLLOW_CREATED, // 15933
+        GROUP_COMMENT_CREATED, // 9340
+        PICTURE_CREATED, // 7063
+        PEOPLE_INTO_CREATED, // 6195
+        GROUP_MEMBERSHIP_CREATED, // 5102
+        POST_COMMENT_CREATED, // 2111
+//        UPDATED_ABOUT, // 1743
+        RSVP_CREATED, // 1600
+//        STATUS_COMMENT_CREATED, // 1513
+        STATUS_CREATED, // 1445
+//        WALL_POST_CREATED, // 1238
+//        GROUP_POST_CREATED, // 1073
+//        USER_SIGNED_UP, // 696
+        POST_CREATED, // 448
+        VIDEO_COMMENT_CREATED, // 375
+//        UPDATED_FETISH_STATUS, // 309
+//        LOCATION_UPDATED, // 276
+//        POST_UPDATED, // 262
+//        ROLE_UPDATED, // 257
+//        DS_RELATIONSHIP_CREATED, // 254
+//        RELATIONSHIP_CREATED, // 215
+//        RSVP_UPDATED, //204
+//        NICKNAME_UPDATED, //146
+//        VIDEO_CREATED, //139
+//        SEXUAL_ORIENTATION_UPDATED, //118
+//        UPDATED_WEBSITES, //107
+//        RELATIONSHIP_UPDATED, //80
+//        EVENT_CREATED, //77
+//        SUPPORTED_FETLIFE, //71
+//        DS_RELATIONSHIP_UPDATED, //45
+//        VOTE_CREATED, //34
+//        SEX_UPDATED, //26
+//        PROMOTED_TO_GROUP_LEADER, //10
+//        VOLUNTEERED_TO_BE_GROUP_LEADER, //3
+//        IMPROVEMENT_COMMENT_CREATED, //1
+//        INVITED_USER_SIGNED_UP //1
     }
 
     @JsonProperty("name")

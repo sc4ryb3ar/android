@@ -97,10 +97,8 @@ public class FeedItemResourceHelper {
                 preferenceResource = R.string.settings_key_feed_auto_expand_comment;
                 break;
             case POST_CREATED:
-            case WALL_POST_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_post;
                 break;
-            case PROFILE_UPDATED:
             case STATUS_CREATED:
             case PEOPLE_INTO_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_profile;
@@ -108,7 +106,6 @@ public class FeedItemResourceHelper {
             case RSVP_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_event;
                 break;
-            case PROMOTED_TO_GROUP_LEADER:
             case GROUP_MEMBERSHIP_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_group;
                 break;
