@@ -43,6 +43,9 @@ If you would like to have less kinky icon and app name to make the app look like
 
 3. (Optional) disable application install from unknown sources.
 
+
+If you are interested in testing our upcoming features before they get into the last stable release feel free to download our preview version: [fetlife-2.0_Preview.apk](https://github.com/fetlife/android/releases/download/v2.0-preview/fetlife-2.0_Preview.apk)
+
 ### Kinksters Helping Kinksters
 
 Want to install the app on your phone but are not technically savvy? Ask your local kinky geek! Technically savvy and want to give back to the community... bring your laptop with you the next time you attend an event and install / update the app for anyone who's interested in having it install on their phone. *#KinkstersHelpingKinksters*
