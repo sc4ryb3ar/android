@@ -8,6 +8,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+/**
+ * Custom TextView to workaround issues with some Android Custom OS that occur when a text is selected within a scrollabe view
+ */
 public class WorkaroundTextView extends TextView {
 
     public WorkaroundTextView(Context context) {
