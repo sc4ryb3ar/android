@@ -3,7 +3,6 @@ package com.bitlove.fetlife.session;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
@@ -11,7 +10,7 @@ import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
-import com.bitlove.fetlife.view.activity.SettingsActivity;
+import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -33,6 +32,8 @@ public class UserSessionManager {
     private static final String CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN = "member_token";
 
     private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
+    private static final String USER_PREF_KEY_NOTIFPREF_APPLIED = "USER_PREF_KEY_NOTIFPREF_APPLIED";
+    private static final String USER_PREF_KEY_FEEDPREF_APPLIED = "USER_PREF_KEY_FEEDPREF_APPLIED";
 
     private final FetLifeApplication fetLifeApplication;
 
@@ -60,7 +61,7 @@ public class UserSessionManager {
         }
     }
 
-    public synchronized void onUserLogIn(User loggedInUser, boolean passwordAlways) {
+    public synchronized void onUserLogIn(User loggedInUser, boolean rememberPassword) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
@@ -68,7 +69,7 @@ public class UserSessionManager {
         } else {
             updateUserRecord(loggedInUser);
         }
-        setPasswordAlwaysPreference(getUserKey(loggedInUser), passwordAlways);
+        setPasswordAlwaysPreference(getUserKey(loggedInUser), !rememberPassword);
     }
 
     public synchronized void onUserLogOut() {
@@ -246,8 +247,22 @@ public class UserSessionManager {
     private void initUserPreferences(String userKey) {
         String userPreferenceName = getUserPreferenceName(userKey);
         SettingsActivity.init(userPreferenceName);
-        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+
         activePreferences = getUserPreferences(userKey);
+
+        if (!activePreferences.getBoolean(USER_PREF_KEY_NOTIFPREF_APPLIED, false)) {
+            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+            activePreferences.edit().putBoolean(USER_PREF_KEY_NOTIFPREF_APPLIED, true);
+        }
+
+        if (!activePreferences.getBoolean(USER_PREF_KEY_FEEDPREF_APPLIED, false)) {
+            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, true);
+            activePreferences.edit().putBoolean(USER_PREF_KEY_FEEDPREF_APPLIED, true);
+        }
+
+//        final SharedPreferences defaultValueSp = fetLifeApplication.getSharedPreferences(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, Context.MODE_PRIVATE);
+//        if(!defaultValueSp.getBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, false)) {
+//        }
     }
 
     private SharedPreferences getUserPreferences(String userKey) {

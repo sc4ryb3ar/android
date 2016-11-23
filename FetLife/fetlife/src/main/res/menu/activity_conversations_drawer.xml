@@ -8,6 +8,11 @@
             android:title="@string/menu_conversations" />
 
         <item
+            android:id="@+id/nav_feed"
+            android:icon="@android:drawable/ic_menu_view"
+            android:title="@string/menu_feed" />
+
+        <item
             android:id="@+id/nav_friends"
             android:icon="@android:drawable/ic_menu_search"
             android:title="@string/menu_friends" />
