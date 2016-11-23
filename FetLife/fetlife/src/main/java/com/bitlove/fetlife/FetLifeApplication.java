@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.multidex.MultiDexApplication;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
@@ -37,7 +38,7 @@ import java.util.regex.Pattern;
 /**
  * Main Application class. The lifecycle of the object of this class is the same as the App itself
  */
-public class FetLifeApplication extends Application {
+public class FetLifeApplication extends MultiDexApplication {
 
     private static final String IMAGE_TOKEN_MIDFIX = "?token=";
 
