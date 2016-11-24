@@ -21,7 +21,7 @@ Welcome to FetLife's open-source Android app!
 - Image upload taken by Camera
 - Fine tune Notification Settings
 - Use Vanilla version to hide what kind of App you use
-- Use the defaut unicode emoji set in your coverations
+- Activity Feed
 
 ### Requirements
 
@@ -37,14 +37,11 @@ Welcome to FetLife's open-source Android app!
 1. Enable installing application from unknwon sources.
 For more information about how to do it please read the following [guideline](https://developer.android.com/distribute/tools/open-distribution.html#unknown-sources)
 
-2. Download and install the [fetlife-1.7.20.apk](https://github.com/fetlife/android/releases/download/v1.7.20/fetlife-1.7.20.apk) to your device
+2. Download and install the [fetlife-2.0.0.apk](https://github.com/fetlife/android/releases/download/v2.0.0/fetlife-2.0.0.apk) to your device
 
-If you would like to have less kinky icon and app name to make the app look like a usual app on your device, you can rather download our vanilla version [fetlife-vanilla-1.7.20.apk](https://github.com/fetlife/android/releases/download/v1.7.20/fetlife-vanilla-1.7.20.apk)
+If you would like to have less kinky icon and app name to make the app look like a usual app on your device, you can rather download our vanilla version [fetlife-vanilla-2.0.0.apk](https://github.com/fetlife/android/releases/download/v2.0.0/fetlife-vanilla-2.0.0.apk)
 
 3. (Optional) disable application install from unknown sources.
-
-
-If you are interested in testing our upcoming features before they get into the last stable release feel free to download our preview version: [fetlife-2.0.0.apk](https://github.com/fetlife/android/releases/download/v2.0.0/fetlife-2.0.0.apk)
 
 ### Kinksters Helping Kinksters
 
