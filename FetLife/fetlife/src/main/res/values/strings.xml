@@ -125,6 +125,9 @@
 
     <!-- *** Settings texts *** -->
 
+    <string name="settings_category_general_start">Start Screen Setting</string>
+    <string name="settings_title_general_feed_as_start">Use Activity Feed as start screen</string>
+    <string name="settings_summary_general_feed_as_start">Show Activity Feed Screen after opening the App</string>
     <string name="settings_title_notifications">Notification Settings</string>
     <string name="settings_summary_notifications">Manage when and how to receive notifications</string>
     <string name="settings_category_notification_text">Notification Text</string>
@@ -307,5 +310,7 @@
     <string name="button_new_conversation_discription">New Conversation</string>
     <string name="button_send_description">Send Message</string>
     <string name="action_settings">Settings</string>
+    <string name="settings_title_general">General Settings</string>
+    <string name="settings_summary_general">Manage general App settings</string>
 
 </resources>

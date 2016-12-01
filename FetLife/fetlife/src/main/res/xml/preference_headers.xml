@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
     <header
+        android:fragment="com.bitlove.fetlife.view.activity.standalone.SettingsActivity$GeneralSettings"
+        android:title="@string/settings_title_general"
+        android:summary="@string/settings_summary_general" />
+    <header
         android:fragment="com.bitlove.fetlife.view.activity.standalone.SettingsActivity$NotificationSettings"
         android:title="@string/settings_title_notifications"
         android:summary="@string/settings_summary_notifications" />

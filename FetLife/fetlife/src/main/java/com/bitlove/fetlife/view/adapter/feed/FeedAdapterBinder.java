@@ -3,9 +3,12 @@
 package com.bitlove.fetlife.view.adapter.feed;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.text.Html;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -34,6 +37,7 @@ import java.util.List;
 
 public class FeedAdapterBinder {
 
+    private static final int OVERLAY_HITREC_PADDING = 200;
     private final FeedRecyclerAdapter feedRecyclerAdapter;
     private final FetLifeApplication fetLifeApplication;
 
@@ -166,7 +170,7 @@ public class FeedAdapterBinder {
                             //TODO: reuse the same imageclick code instead of having it several places in this class
                             LayoutInflater inflater = LayoutInflater.from(v.getContext());
                             final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                            setOverlayContent(overlay, picture, onItemClickListener);
+                            setOverlayContent(overlay, picture, onItemClickListener, feedItemResourceHelper);
                             new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                         } else {
                             onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
@@ -180,9 +184,9 @@ public class FeedAdapterBinder {
                 itemImage.setVisibility(View.GONE);
             }
 
-            String itemHeaderText = feedItemResourceHelper.getItemTitle(feedEvent);
-            String itemTextText = feedItemResourceHelper.getItemBody(feedEvent);
-            String itemTimeText = feedItemResourceHelper.getItemCaption(feedEvent);
+            String itemHeaderText = feedItemResourceHelper.getFormattedText(feedItemResourceHelper.getItemTitle(feedEvent));
+            String itemTextText = feedItemResourceHelper.getFormattedText(feedItemResourceHelper.getItemBody(feedEvent));
+            String itemTimeText = feedItemResourceHelper.getFormattedText(feedItemResourceHelper.getItemCaption(feedEvent));
 
             TextView itemHeader = (TextView) itemView.findViewById(R.id.feed_innerlist_header);
             itemHeader.setText(itemHeaderText);
@@ -232,7 +236,7 @@ public class FeedAdapterBinder {
                     public void onClick(View v) {
                         LayoutInflater inflater = LayoutInflater.from(v.getContext());
                         final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                        setOverlayContent(overlay, picture, onItemClickListener);
+                        setOverlayContent(overlay, picture, onItemClickListener, feedItemResourceHelper);
                         new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                     }
                 });
@@ -256,12 +260,14 @@ public class FeedAdapterBinder {
         return events.size() == 1;
     }
 
-    private void setOverlayContent(View overlay, final Picture picture, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
+    private void setOverlayContent(View overlay, final Picture picture, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, FeedItemResourceHelper feedItemResourceHelper) {
         TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
         TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
 
-        IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
+        final IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
+        increaseTouchArea(imageLove);
+
         boolean isLoved = picture.isIsLovedByMe();
         imageLove.setText(isLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
         imageLove.setTextColor(overlay.getContext().getResources().getColor(isLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
@@ -279,6 +285,7 @@ public class FeedAdapterBinder {
         });
 
         View imageVisit = overlay.findViewById(R.id.feedImageVisit);
+        increaseTouchArea(imageVisit);
         imageVisit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -292,9 +299,26 @@ public class FeedAdapterBinder {
                 onItemClickListener.onMemberClick(picture.getMember());
             }
         });
-        imageDescription.setText(picture.getBody());
+        imageDescription.setText(feedItemResourceHelper.getFormattedText(picture.getBody()));
         imageMeta.setText(picture.getMember().getMetaInfo());
         imageName.setText(picture.getMember().getNickname());
+    }
+
+    private void increaseTouchArea(final View view) {
+        final View parent = (View) view.getParent();
+        parent.post( new Runnable() {
+            // Post in the parent's message queue to make sure the parent
+            // lays out its children before we call getHitRect()
+            public void run() {
+                final Rect r = new Rect();
+                view.getHitRect(r);
+                r.top -= OVERLAY_HITREC_PADDING;
+                r.bottom += OVERLAY_HITREC_PADDING;
+                r.left -= OVERLAY_HITREC_PADDING;
+                r.right += OVERLAY_HITREC_PADDING;
+                parent.setTouchDelegate( new TouchDelegate( r , view));
+            }
+        });
     }
 
     private void startLoveCallWithObserver(final FetLifeApplication fetLifeApplication, final Picture picture, final boolean loved) {
@@ -391,12 +415,12 @@ public class FeedAdapterBinder {
                     public void onClick(View v) {
                         LayoutInflater inflater = LayoutInflater.from(v.getContext());
                         final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                        setOverlayContent(overlay, getItem(position), onItemClickListener);
+                        setOverlayContent(overlay, getItem(position), onItemClickListener, feedItemResourceHelper);
 
                         new ImageViewer.Builder(v.getContext(), displayLinks).setStartPosition(position).setOverlayView(overlay).setImageChangeListener(new ImageViewer.OnImageChangeListener() {
                             @Override
                             public void onImageChange(int position) {
-                                setOverlayContent(overlay, getItem(position), onItemClickListener);
+                                setOverlayContent(overlay, getItem(position), onItemClickListener, feedItemResourceHelper);
                             }
                         }).show();
                     }

@@ -75,6 +75,18 @@ public class SettingsActivity extends PreferenceActivity {
         loadHeadersFromResource(R.xml.preference_headers, target);
     }
 
+    public static class GeneralSettings extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            getPreferenceManager().setSharedPreferencesName(userPreferenceName);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.general_preferences);
+        }
+    }
+
     public static class NotificationSettings extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -145,6 +157,9 @@ public class SettingsActivity extends PreferenceActivity {
             return true;
         }
         if (FeedSettings.class.getName().equals(fragmentName)) {
+            return true;
+        }
+        if (GeneralSettings.class.getName().equals(fragmentName)) {
             return true;
         }
         return false;

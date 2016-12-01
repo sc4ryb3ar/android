@@ -81,9 +81,14 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     public void onBindViewHolder(FeedViewHolder feedViewHolder, int position) {
 
         Story story = getItem(position);
+        Story.FeedStoryType storytype = story.getType();
+        if (storytype == null) {
+            feedNotSupportedAdapterBinder.bindNotSupportedStory(fetLifeApplication, feedViewHolder,story, onFeedItemClickListener);
+            return;
+        }
 
         try {
-            switch (story.getType()) {
+            switch (storytype) {
                 case FOLLOW_CREATED:
                 case RSVP_CREATED:
                 case COMMENT_CREATED:

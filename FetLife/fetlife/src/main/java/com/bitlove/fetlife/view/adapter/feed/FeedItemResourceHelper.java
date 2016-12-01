@@ -1,5 +1,7 @@
 package com.bitlove.fetlife.view.adapter.feed;
 
+import android.text.Html;
+
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.FeedEvent;
@@ -473,6 +475,14 @@ public class FeedItemResourceHelper {
                 return true;
             default:
                 return false;
+        }
+    }
+
+    public String getFormattedText(String text) {
+        try {
+            return Html.fromHtml(text).toString();
+        } catch (Throwable t) {
+            return text;
         }
     }
 }

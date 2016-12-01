@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.activity.resource.FeedActivity;
 
 /**
  * Default Start Activity to make Activity title and App name independent
@@ -13,7 +14,11 @@ public class StartActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ConversationsActivity.startActivity(this);
+        if (getFetLifeApplication().getUserSessionManager().getActiveUserPreferences().getBoolean(getString(R.string.settings_key_general_feed_as_start),false)) {
+            FeedActivity.startActivity(this);
+        } else {
+            ConversationsActivity.startActivity(this);
+        }
         finish();
     }
 
