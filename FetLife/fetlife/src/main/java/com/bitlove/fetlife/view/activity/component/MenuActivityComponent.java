@@ -3,6 +3,7 @@ package com.bitlove.fetlife.view.activity.component;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.util.LinkUtil;
 import com.bitlove.fetlife.view.activity.resource.FeedActivity;
 import com.bitlove.fetlife.view.activity.standalone.AboutActivity;
 import com.bitlove.fetlife.view.activity.standalone.AddNfcFriendActivity;
@@ -29,6 +31,7 @@ import com.bitlove.fetlife.view.activity.resource.FriendsActivity;
 import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
 import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
+import com.bitlove.fetlife.view.activity.web.TouActivity;
 import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.malinskiy.materialicons.IconDrawable;
@@ -188,6 +191,15 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_tou) {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                TouActivity.startActivity(menuActivity);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setData(Uri.parse(LinkUtil.TOU));
+                menuActivity.startActivity(intent);
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);

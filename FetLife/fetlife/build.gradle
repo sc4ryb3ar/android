@@ -20,8 +20,8 @@ android {
         targetSdkVersion 25
         multiDexEnabled true
 
-        versionCode 20005
-        versionName "2.0.5"
+        versionCode 20007
+        versionName "2.0.7"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -151,6 +151,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile 'com.onesignal:OneSignal:3.+@aar'
+
+    compile 'com.basecamp:turbolinks:1.0.4'
 
 }
 

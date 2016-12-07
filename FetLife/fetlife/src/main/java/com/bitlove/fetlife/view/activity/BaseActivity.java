@@ -16,7 +16,12 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.event.DummyEvent;
+import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.view.activity.component.ActivityComponent;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -257,5 +262,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public FetLifeApplication getFetLifeApplication() {
         return (FetLifeApplication) getApplication();
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDummyEvent(DummyEvent dummyEvent) {
+        //Mandatory declaration to keep eventbus registration in supper class
+    }
+
 
 }

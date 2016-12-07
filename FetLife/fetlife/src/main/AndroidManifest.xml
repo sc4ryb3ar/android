@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
 
+    <uses-sdk tools:overrideLibrary="com.basecamp.turbolinks"/>
+
     <application
         android:name=".FetLifeApplication"
         android:allowBackup="true"
@@ -77,6 +79,11 @@
         <activity
             android:name=".view.activity.resource.FriendRequestsActivity"
             android:label="@string/title_activity_friendrequests"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".view.activity.web.TouActivity"
+            android:label="@string/title_activity_tou"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity

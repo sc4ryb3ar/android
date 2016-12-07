@@ -50,6 +50,11 @@
             android:title="@string/menu_about" />
 
         <item
+            android:id="@+id/nav_tou"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/menu_tou" />
+
+        <item
             android:id="@+id/nav_settings"
             android:icon="@android:drawable/ic_menu_preferences"
             android:title="@string/menu_settings" />
