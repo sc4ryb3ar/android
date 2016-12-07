@@ -188,7 +188,7 @@ public class FetLifeApiIntentService extends IntentService {
             }
 
             //default success result of execution
-            int result = -1;
+            int result = Integer.MIN_VALUE;
 
             //Call the appropriate method based on the action to be executed
             switch (action) {
@@ -235,7 +235,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             int lastResponseCode = getFetLifeApplication().getFetLifeService().getLastResponseCode();
 
-            if (result >= 0) {
+            if (result != Integer.MIN_VALUE) {
                 //If the call succeed notify all subscribers about
                 sendLoadFinishedNotification(action, result, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401 || lastResponseCode == 403)) {
@@ -364,14 +364,14 @@ public class FetLifeApiIntentService extends IntentService {
             if (Conversation.isLocal(conversationId)) {
                 if (startNewConversation(user, conversationId, pendingMessage)) {
                     //db changed, reload remaining pending messages with starting this method recursively
-                    return sendPendingMessages(user, sentMessageCount++);
+                    return sendPendingMessages(user, ++sentMessageCount);
                 }
             } else if (sendPendingMessage(pendingMessage)) {
                 sentMessageCount++;
             }
         }
         //Return success result if at least one pending message could have been sent so there was a change in the current state
-        return sentMessageCount == 0 ? -1 : sentMessageCount;
+        return sentMessageCount == 0 ? Integer.MIN_VALUE : sentMessageCount;
     }
 
     private boolean startNewConversation(User user, String localConversationId, Message startMessage) throws IOException {
@@ -461,7 +461,7 @@ public class FetLifeApiIntentService extends IntentService {
                 sentCount++;
             }
         }
-        return sentCount == 0 ? -1 : sentCount;
+        return sentCount == 0 ? Integer.MIN_VALUE : sentCount;
     }
 
     private boolean sendPendingSharedProfile(SharedProfile pendingSharedProfile) throws IOException {
@@ -513,7 +513,7 @@ public class FetLifeApiIntentService extends IntentService {
         String[] messageIds = Arrays.copyOfRange(params, 1, params.length);
         Call<ResponseBody> setMessagesReadCall = getFetLifeApi().setMessagesRead(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), conversationId, messageIds);
         Response<ResponseBody> response = setMessagesReadCall.execute();
-        return response.isSuccess() ? 1 : -1;
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
     private int addLove(String[] params) throws IOException {
@@ -521,7 +521,7 @@ public class FetLifeApiIntentService extends IntentService {
         String contentType = params[1];
         Call<ResponseBody> addLoveCall = getFetLifeApi().putLove(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), contentId, contentType);
         Response<ResponseBody> response = addLoveCall.execute();
-        return response.isSuccess() ? 1 : -1;
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
     private int removeLove(String[] params) throws IOException {
@@ -529,7 +529,7 @@ public class FetLifeApiIntentService extends IntentService {
         String contentType = params[1];
         Call<ResponseBody> removeLoveCall = getFetLifeApi().deleteLove(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), contentId, contentType);
         Response<ResponseBody> response = removeLoveCall.execute();
-        return response.isSuccess() ? 1 : -1;
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
     //****
@@ -572,7 +572,7 @@ public class FetLifeApiIntentService extends IntentService {
             getContentResolver().delete(uri, null, null);
         }
 
-        return response.isSuccess() ? 1 : -1;
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
 
@@ -680,8 +680,13 @@ public class FetLifeApiIntentService extends IntentService {
                     newItemCount++;
                 } else {
                     for (int i = lastConfirmedConversationPosition+1; i < foundPos; i++) {
-                        currentConversations.get(i).delete();
-                        deletedItemCount++;
+                        Conversation notMachedConversation = currentConversations.get(i);
+                        if (Conversation.isLocal(notMachedConversation.getId())) {
+                            lastConfirmedConversationPosition++;
+                        } else {
+                            notMachedConversation.delete();
+                            deletedItemCount++;
+                        }
                     }
                     lastConfirmedConversationPosition = foundPos;
                 }
