@@ -4,8 +4,10 @@ import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
@@ -31,6 +33,7 @@ import com.bitlove.fetlife.model.pojos.Feed;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.Friend_Table;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.pojos.Message;
@@ -42,7 +45,9 @@ import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.crashlytics.android.Crashlytics;
+import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
@@ -319,7 +324,7 @@ public class FetLifeApiIntentService extends IntentService {
             //Retrieve user information from the backend after Authentication
             User user = retrieveCurrentUser(accessToken);
             if (user == null) {
-                return -1;
+                return Integer.MIN_VALUE;
             }
             //Save the user information with the tokens into the backend
             user.setAccessToken(accessToken);
@@ -329,7 +334,7 @@ public class FetLifeApiIntentService extends IntentService {
             getFetLifeApplication().getUserSessionManager().onUserLogIn(user, getBoolFromParams(params, 2, true));
             return 1;
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -551,7 +556,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         if (mimeType == null || inputStream == null) {
             Crashlytics.logException(new Exception("Media file to upload not found"));
-            return -1;
+            return Integer.MIN_VALUE;
         }
 
         RequestBody pictureBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
@@ -613,7 +618,7 @@ public class FetLifeApiIntentService extends IntentService {
             });
             return messages.size();
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -641,7 +646,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             return stories.size();
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -653,17 +658,41 @@ public class FetLifeApiIntentService extends IntentService {
         Response<List<Conversation>> conversationsResponse = getConversationsCall.execute();
         if (conversationsResponse.isSuccess()) {
             final List<Conversation> conversations = conversationsResponse.body();
-            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
-                @Override
-                public void execute(DatabaseWrapper databaseWrapper) {
-                    for (Conversation conversation : conversations) {
-                        conversation.save();
+            final List<Conversation> currentConversations = new Select().from(Conversation.class).orderBy(Conversation_Table.date,false).queryList();
+
+            int lastConfirmedConversationPosition;
+            if (page == 1) {
+                lastConfirmedConversationPosition = -1;
+            } else {
+                lastConfirmedConversationPosition = loadLastSyncedPosition(SyncedPositionType.CONVERSATION);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Conversation conversation : conversations) {
+                int foundPos;
+                for (foundPos = lastConfirmedConversationPosition+1; foundPos < currentConversations.size(); foundPos++) {
+                    Conversation checkConversation = currentConversations.get(foundPos);
+                    if (conversation.getId().equals(checkConversation.getId())) {
+                        break;
                     }
                 }
-            });
-            return conversations.size();
+                if (foundPos >= currentConversations.size()) {
+                    newItemCount++;
+                } else {
+                    for (int i = lastConfirmedConversationPosition+1; i < foundPos; i++) {
+                        currentConversations.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedConversationPosition = foundPos;
+                }
+                conversation.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.CONVERSATION,lastConfirmedConversationPosition+newItemCount);
+
+            return conversations.size() - deletedItemCount;
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -682,7 +711,7 @@ public class FetLifeApiIntentService extends IntentService {
             getMemberResponse.body().save();
             return 1;
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -693,18 +722,43 @@ public class FetLifeApiIntentService extends IntentService {
         Call<List<Friend>> getFriendsCall = getFetLifeApi().getFriends(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
         Response<List<Friend>> friendsResponse = getFriendsCall.execute();
         if (friendsResponse.isSuccess()) {
+
             final List<Friend> friends = friendsResponse.body();
-            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
-                @Override
-                public void execute(DatabaseWrapper databaseWrapper) {
-                    for (Friend friend : friends) {
-                        friend.save();
+            List<Friend> currentFriends = new Select().from(Friend.class).orderBy(OrderBy.fromProperty(Friend_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+
+            int lastConfirmedFriendPosition;
+            if (page == 1) {
+                lastConfirmedFriendPosition = -1;
+            } else {
+                lastConfirmedFriendPosition = loadLastSyncedPosition(SyncedPositionType.FRIEND);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Friend friend : friends) {
+                int foundPos;
+                for (foundPos = lastConfirmedFriendPosition+1; foundPos < currentFriends.size(); foundPos++) {
+                    Friend checkFriend = currentFriends.get(foundPos);
+                    if (friend.getId().equals(checkFriend.getId())) {
+                        break;
                     }
                 }
-            });
-            return friends.size();
+                if (foundPos >= currentFriends.size()) {
+                    newItemCount++;
+                } else {
+                    for (int i = lastConfirmedFriendPosition+1; i < foundPos; i++) {
+                        currentFriends.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedFriendPosition = foundPos;
+                }
+                friend.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.FRIEND,lastConfirmedFriendPosition+newItemCount);
+
+            return friends.size() - deletedItemCount;
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -732,7 +786,7 @@ public class FetLifeApiIntentService extends IntentService {
             });
             return friendRequests.size();
         } else {
-            return -1;
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -827,6 +881,26 @@ public class FetLifeApiIntentService extends IntentService {
             }
         }
         return param;
+    }
+
+    private enum SyncedPositionType {
+        FRIEND,
+        CONVERSATION;
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "." + super.toString();
+        }
+    }
+
+    private void saveLastSyncedPosition(SyncedPositionType syncedPositionType, int position) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
+        preferences.edit().putInt(syncedPositionType.toString(), position).apply();
+    }
+
+    private int loadLastSyncedPosition(SyncedPositionType syncedPositionType) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
+        return preferences.getInt(syncedPositionType.toString(), -1);
     }
 
 }
