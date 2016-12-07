@@ -381,7 +381,9 @@ public class FetLifeApiIntentService extends IntentService {
             return false;
         }
 
-        Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), startMessage.getBody(), startMessage.getBody());
+        String body = startMessage.getBody();
+        String subject = body == null || body.length() > 16 ? body : body.substring(0,16).concat("…");
+        Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), subject, body);
         Response<Conversation> postConversationResponse = postConversationCall.execute();
         if (postConversationResponse.isSuccess()) {
             //Delete the local conversation and create a new one, as the id of the conversation is changed (from local to backend based)
@@ -680,11 +682,11 @@ public class FetLifeApiIntentService extends IntentService {
                     newItemCount++;
                 } else {
                     for (int i = lastConfirmedConversationPosition+1; i < foundPos; i++) {
-                        Conversation notMachedConversation = currentConversations.get(i);
-                        if (Conversation.isLocal(notMachedConversation.getId())) {
+                        Conversation notMatchedConversation = currentConversations.get(i);
+                        if (Conversation.isLocal(notMatchedConversation.getId())) {
                             lastConfirmedConversationPosition++;
                         } else {
-                            notMachedConversation.delete();
+                            notMatchedConversation.delete();
                             deletedItemCount++;
                         }
                     }
