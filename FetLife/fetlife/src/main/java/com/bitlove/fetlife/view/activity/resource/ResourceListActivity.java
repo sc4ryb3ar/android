@@ -161,10 +161,10 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction().equals(getApiCallAction())) {
-            int receivedItems = serviceCallFinishedEvent.getItemCount();
-            if (receivedItems > 0) {
+            int countIncrease = serviceCallFinishedEvent.getItemCount();
+            if (countIncrease != Integer.MIN_VALUE) {
                 //One Item we already expected at the call
-                requestedItems += receivedItems - PAGE_COUNT;
+                requestedItems += countIncrease - PAGE_COUNT;
             }
             recyclerAdapter.refresh();
             dismissProgress();
