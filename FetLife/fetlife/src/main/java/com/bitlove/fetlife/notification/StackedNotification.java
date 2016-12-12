@@ -47,7 +47,7 @@ public class StackedNotification extends OneSignalNotification {
                 if (sampleMessageNotification != null) {
                     startMessageActivity(fetLifeApplication, sampleMessageNotification);
                 } else {
-                    ConversationsActivity.startActivity(fetLifeApplication);
+                    ConversationsActivity.startActivity(fetLifeApplication, true);
                 }
                 break;
             case "":
@@ -71,7 +71,7 @@ public class StackedNotification extends OneSignalNotification {
         } else {
             OneSignalNotification firstNotification = subNotificaions.isEmpty() ? null : subNotificaions.get(0);
             if (firstNotification != null && firstNotification instanceof MessageNotification) {
-                ConversationsActivity.startActivity(fetLifeApplication);
+                ConversationsActivity.startActivity(fetLifeApplication, true);
             } else {
                 NotificationHistoryActivity.startActivity(fetLifeApplication, true);
             }
@@ -80,9 +80,9 @@ public class StackedNotification extends OneSignalNotification {
 
     private void startMessageActivity(FetLifeApplication fetLifeApplication, MessageNotification sampleMessageNotification) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true)).startActivities();
+            TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication, true)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true)).startActivities();
         } else {
-            ConversationsActivity.startActivity(fetLifeApplication);
+            ConversationsActivity.startActivity(fetLifeApplication, true);
             MessagesActivity.startActivity(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true);
         }
     }

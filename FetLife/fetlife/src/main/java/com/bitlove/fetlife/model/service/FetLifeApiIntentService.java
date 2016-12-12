@@ -382,7 +382,7 @@ public class FetLifeApiIntentService extends IntentService {
         }
 
         String body = startMessage.getBody();
-        String subject = body == null || body.length() > 16 ? body : body.substring(0,16).concat("…");
+        String subject = body == null || body.length() <= 16 ? body : body.substring(0,16).concat("…");
         Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), subject, body);
         Response<Conversation> postConversationResponse = postConversationCall.execute();
         if (postConversationResponse.isSuccess()) {
@@ -675,6 +675,7 @@ public class FetLifeApiIntentService extends IntentService {
                 for (foundPos = lastConfirmedConversationPosition+1; foundPos < currentConversations.size(); foundPos++) {
                     Conversation checkConversation = currentConversations.get(foundPos);
                     if (conversation.getId().equals(checkConversation.getId())) {
+                        conversation.setDraftMessage(checkConversation.getDraftMessage());
                         break;
                     }
                 }
@@ -683,7 +684,7 @@ public class FetLifeApiIntentService extends IntentService {
                 } else {
                     for (int i = lastConfirmedConversationPosition+1; i < foundPos; i++) {
                         Conversation notMatchedConversation = currentConversations.get(i);
-                        if (Conversation.isLocal(notMatchedConversation.getId())) {
+                        if (Conversation.isUnanswered(notMatchedConversation.getId(),getFetLifeApplication())) {
                             lastConfirmedConversationPosition++;
                         } else {
                             notMatchedConversation.delete();

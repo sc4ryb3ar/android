@@ -92,4 +92,9 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
             startActivity(intent);
         }
     }
+
+    @Override
+    public boolean finishAtMenuNavigation() {
+        return !getFetLifeApplication().getUserSessionManager().getActiveUserPreferences().getBoolean(getString(R.string.settings_key_general_feed_as_start),false);
+    }
 }

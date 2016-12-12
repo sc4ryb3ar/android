@@ -14,6 +14,9 @@ import com.bitlove.fetlife.model.pojos.Rsvp;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.EnumUtil;
+import com.crashlytics.android.Crashlytics;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -359,7 +362,23 @@ public class FeedItemResourceHelper {
                     String nickname = feedEvent.getTarget().getPeopleInto().getMember().getNickname();
                     String fetishName = feedEvent.getTarget().getPeopleInto().getFetish().getName();
                     PeopleInto peopleInto = feedEvent.getTarget().getPeopleInto();
-                    return peopleInto.getActivityEnum().toString(fetLifeApplication, nickname, fetishName, peopleInto.getStatusEnum().toString(fetLifeApplication));
+                    try {
+                        String body = peopleInto.getActivityEnum().toString(fetLifeApplication, nickname, fetishName, peopleInto.getStatusEnum().toString(fetLifeApplication));
+                        if (body == null) {
+                            throw new IllegalArgumentException();
+                        }
+                        return body;
+                    } catch (Throwable t) {
+                        //Tracking down unreproducible issue
+                        String exceptionText;
+                        try {
+                            exceptionText = "Invalid People Into: " + peopleInto == null ? "null" : new ObjectMapper().writeValueAsString(peopleInto);
+                        } catch (JsonProcessingException e) {
+                            exceptionText = e.getMessage();
+                        }
+                        Crashlytics.logException(new Exception(exceptionText));
+                        return null;
+                    }
                 case LIKE_CREATED:
                     if (feedEvent.getSecondaryTarget().getWriting() != null) {
                         return feedEvent.getSecondaryTarget().getWriting().getBody();

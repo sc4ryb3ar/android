@@ -54,7 +54,7 @@ public class MessageNotification extends OneSignalNotification {
     public void onClick(FetLifeApplication fetLifeApplication) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             try {
-                TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, conversationId, nickname, true)).startActivities();
+                TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication, true)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, conversationId, nickname, true)).startActivities();
             } catch (NullPointerException npe) {
                 //Apply workaround for OS bug
                 startLegacyConversationAndMessageActivity(fetLifeApplication);
@@ -65,7 +65,7 @@ public class MessageNotification extends OneSignalNotification {
     }
 
     private void startLegacyConversationAndMessageActivity(FetLifeApplication fetLifeApplication) {
-        ConversationsActivity.startActivity(fetLifeApplication);
+        ConversationsActivity.startActivity(fetLifeApplication, true);
         MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
     }
 

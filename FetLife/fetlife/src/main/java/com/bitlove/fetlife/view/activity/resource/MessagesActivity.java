@@ -47,7 +47,7 @@ public class MessagesActivity extends ResourceActivity
     private MessagesRecyclerAdapter messagesAdapter;
 
     private String conversationId;
-    private boolean oldMessageloadingInProgress;
+    private boolean oldMessageLoadingInProgress;
 
     protected RecyclerView recyclerView;
     protected LinearLayoutManager recyclerLayoutManager;
@@ -122,6 +122,11 @@ public class MessagesActivity extends ResourceActivity
         String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
         setTitle(conversationTitle);
         messagesAdapter = new MessagesRecyclerAdapter(conversationId);
+        Conversation conversation = messagesAdapter.getConversation();
+        String draftMessage = conversation.getDraftMessage();
+        if (draftMessage != null) {
+            textInput.append(draftMessage);
+        }
         recyclerView.setAdapter(messagesAdapter);
     }
 
@@ -150,12 +155,12 @@ public class MessagesActivity extends ResourceActivity
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy)
                 {
-                    if(!oldMessageloadingInProgress && dy < 0) {
+                    if(!oldMessageLoadingInProgress && dy < 0) {
                         int lastVisibleItem = recyclerLayoutManager.findLastVisibleItemPosition();
                         int totalItemCount = recyclerLayoutManager.getItemCount();
 
                         if (lastVisibleItem == (totalItemCount-1)) {
-                            oldMessageloadingInProgress = true;
+                            oldMessageLoadingInProgress = true;
                             //TODO: not trigger call if the old messages were already triggered and there was no older message
                             FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_MESSAGES, conversationId, Boolean.toString(false));
                         }
@@ -169,7 +174,14 @@ public class MessagesActivity extends ResourceActivity
             showProgress();
             FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES, conversationId);
         }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Conversation conversation = messagesAdapter.getConversation();
+        conversation.setDraftMessage(textInput.getText().toString());
+        conversation.save();
     }
 
     @Override
@@ -213,7 +225,7 @@ public class MessagesActivity extends ResourceActivity
     public void onMessagesCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
             setMessagesRead();
-            oldMessageloadingInProgress = false;
+            oldMessageLoadingInProgress = false;
             //TODO: solve setting this value false only if appropriate message call is finished (otherwise same call can be triggered twice)
             messagesAdapter.refresh();
             dismissProgress();
@@ -224,7 +236,7 @@ public class MessagesActivity extends ResourceActivity
     public void onMessagesCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
         if (serviceCallFailedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
             //TODO: solve setting this value false only if appropriate message call is failed (otherwise same call can be triggered twice)
-            oldMessageloadingInProgress = false;
+            oldMessageLoadingInProgress = false;
             messagesAdapter.refresh();
             dismissProgress();
         }
@@ -297,8 +309,11 @@ public class MessagesActivity extends ResourceActivity
 
         FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
 
-        messagesAdapter.refresh();
+        Conversation conversation = messagesAdapter.getConversation();
+        conversation.setDraftMessage("");
+        conversation.save();
 
+        messagesAdapter.refresh();
     }
 
     @Override

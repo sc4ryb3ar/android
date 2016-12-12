@@ -171,7 +171,7 @@ public class MenuActivityComponent extends ActivityComponent {
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             LoginActivity.startLogin(menuActivity.getFetLifeApplication());
         } else if (id == R.id.nav_conversations) {
-            ConversationsActivity.startActivity(menuActivity);
+            ConversationsActivity.startActivity(menuActivity, true);
         } else if (id == R.id.nav_friends) {
             FriendsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_friendrequests) {

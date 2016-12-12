@@ -14,7 +14,7 @@ public class AnonymNotification {
 
     public void display(FetLifeApplication fetLifeApplication) {
 
-        Intent contentIntent = ConversationsActivity.createIntent(fetLifeApplication);
+        Intent contentIntent = ConversationsActivity.createIntent(fetLifeApplication, true);
 
         PendingIntent contentPendingIntent =
                 PendingIntent.getActivity(

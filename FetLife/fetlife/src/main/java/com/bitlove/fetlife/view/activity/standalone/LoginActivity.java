@@ -161,7 +161,7 @@ public class LoginActivity extends Activity {
     public void onLoginFinished(LoginFinishedEvent loginFinishedEvent) {
         //dismissProgress();
         apply_v1_5_pwd_decision();
-        ConversationsActivity.startActivity(this);
+        ConversationsActivity.startActivity(this, false);
         finish();
     }
 

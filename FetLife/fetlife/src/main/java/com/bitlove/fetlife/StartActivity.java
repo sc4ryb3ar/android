@@ -17,7 +17,7 @@ public class StartActivity extends Activity {
         if (getFetLifeApplication().getUserSessionManager().getActiveUserPreferences().getBoolean(getString(R.string.settings_key_general_feed_as_start),false)) {
             FeedActivity.startActivity(this);
         } else {
-            ConversationsActivity.startActivity(this);
+            ConversationsActivity.startActivity(this, false);
         }
         finish();
     }

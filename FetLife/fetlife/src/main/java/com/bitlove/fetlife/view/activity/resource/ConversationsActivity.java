@@ -20,13 +20,13 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class ConversationsActivity extends ResourceListActivity<Conversation> implements MenuActivityComponent.MenuActivityCallBack {
 
-    public static void startActivity(Context context) {
-        context.startActivity(createIntent(context));
+    public static void startActivity(Context context, boolean newTask) {
+        context.startActivity(createIntent(context, newTask));
     }
 
-    public static Intent createIntent(Context context) {
+    public static Intent createIntent(Context context, boolean newTask) {
         Intent intent = new Intent(context, ConversationsActivity.class);
-        if (FetLifeApplication.getInstance().getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_general_feed_as_start),false)) {
+        if (!newTask && FetLifeApplication.getInstance().getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_general_feed_as_start),false)) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -80,7 +80,7 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
 
     @Override
     public boolean finishAtMenuNavigation() {
-        return false;
+        return getFetLifeApplication().getUserSessionManager().getActiveUserPreferences().getBoolean(getString(R.string.settings_key_general_feed_as_start),false);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
