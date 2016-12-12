@@ -24,6 +24,18 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.1.0<br/>
+                    <ul>
+                        <li>Saving typed but not sent messages as a draft in case of accidentally or intentionally leaving a conversation</li>
+<li>Fix for crash after opening notification in case of using Feed as a starting screen</li>
+<li>Fix for unexpected app exiting after pressing the back button in case of using Feed as a starting screen</li>
+<li>Fix for connection issues after sending to long first message during initiating a conversation (regression fix)</li>
+<li>Fix for connection failed toast when starting a new conversation even if the message sending was successful</li>
+<li>Fix for archived conversation were still visible in the App and caused connection issues when they tried to be opened</li>
+<li>Fix for unfriended members still appeared in the App's friend list</li>
+<li>Removed unused pull to refresh functionality from App Notification History Screen</li>
+                    </ul>
+
             <p/>v2.0.0<br/>
                     <ul>
                         <li>Feed</li>

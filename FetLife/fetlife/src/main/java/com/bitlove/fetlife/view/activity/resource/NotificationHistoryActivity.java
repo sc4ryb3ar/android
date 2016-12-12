@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +45,9 @@ public class NotificationHistoryActivity extends ResourceListActivity<Notificati
     @Override
     protected void onResourceCreate(Bundle savedInstanceState) {
         super.onResourceCreate(savedInstanceState);
+
+        swipeRefreshLayout.setEnabled(false);
+
         showToast(getResources().getString(R.string.notificationhistory_activity_hint));
     }
 
