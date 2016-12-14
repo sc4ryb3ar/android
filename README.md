@@ -48,9 +48,9 @@ If you would like to have less kinky icon and app name to make the app look like
 
 If you feel like testing our upcoming release please find it here: 
 
-[fetlife-2.1.0.apk](https://github.com/fetlife/android/releases/download/v2.1.0/fetlife-2.1.0.apk)
+[fetlife-2.1.2.apk](https://github.com/fetlife/android/releases/download/v2.1.2/fetlife-2.1.2.apk)
 
-[fetlife-vanilla-2.1.0.apk](https://github.com/fetlife/android/releases/download/v2.1.0/fetlife-vanilla-2.1.0.apk)
+[fetlife-vanilla-2.1.2.apk](https://github.com/fetlife/android/releases/download/v2.1.2/fetlife-vanilla-2.1.2.apk)
 
 
 ### Kinksters Helping Kinksters
