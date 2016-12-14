@@ -16,7 +16,11 @@ import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.EnumUtil;
 import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -372,7 +376,12 @@ public class FeedItemResourceHelper {
                         //Tracking down unreproducible issue
                         String exceptionText;
                         try {
-                            exceptionText = "Invalid People Into: " + peopleInto == null ? "null" : new ObjectMapper().writeValueAsString(peopleInto);
+                            exceptionText = "Invalid People Into: " + peopleInto == null ? "null" : new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+                                @Override
+                                public boolean hasIgnoreMarker(AnnotatedMember m) {
+                                    return m.getDeclaringClass() == BaseModel.class || super.hasIgnoreMarker(m);
+                                }
+                            }).writeValueAsString(peopleInto);
                         } catch (JsonProcessingException e) {
                             exceptionText = e.getMessage();
                         }

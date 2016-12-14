@@ -27,7 +27,7 @@ public class Conversation extends BaseModel {
         User currentUser = fetLifeApplication.getUserSessionManager().getCurrentUser();
         List<Message> messages = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.pending, false).orderBy(Message_Table.date, false).queryList();
         for (Message message: messages) {
-            if (!currentUser.getId().equals(message.getClientId())) {
+            if (!currentUser.getId().equals(message.getSenderId())) {
                 return false;
             }
         }

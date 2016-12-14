@@ -85,6 +85,7 @@ public class Member extends BaseModel {
         }
     }
 
+    @JsonIgnore
     public Picture getAvatarPicture() {
         return avatar.getAsPicture(Member.this);
     }

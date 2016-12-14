@@ -64,6 +64,7 @@ import java.util.UUID;
 
 import retrofit.Call;
 import retrofit.Response;
+import retrofit.http.Path;
 
 public class FetLifeApiIntentService extends IntentService {
 
@@ -586,6 +587,20 @@ public class FetLifeApiIntentService extends IntentService {
         final String conversationId = params[0];
 
         final boolean loadNewMessages = getBoolFromParams(params, 1, true);
+
+        Call<Conversation> getConversationCall = getFetLifeApi().getConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), conversationId);
+        Response<Conversation> conversationResponse = getConversationCall.execute();
+
+        if (conversationResponse.isSuccess()) {
+            Conversation retrievedConversation = conversationResponse.body();
+            Conversation localConversation = new Select().from(Conversation.class).where(Conversation_Table.id.is(conversationId)).querySingle();
+            if (localConversation !=null) {
+                retrievedConversation.setDraftMessage(localConversation.getDraftMessage());
+            }
+            retrievedConversation.save();
+        } else {
+            return Integer.MIN_VALUE;
+        }
 
         Call<List<Message>> getMessagesCall = null;
         if (loadNewMessages) {

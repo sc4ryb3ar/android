@@ -43,6 +43,9 @@ public interface FetLifeApi {
     @GET("/api/v2/me/conversations")
     Call<List<Conversation>> getConversations(@Header("Authorization") String authHeader, @Query("order_by") String orderBy, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/me/conversations/{conversationId}")
+    Call<Conversation> getConversation(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId);
+
     @GET("/api/v2/me/friends")
     Call<List<Friend>> getFriends(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 

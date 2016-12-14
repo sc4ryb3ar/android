@@ -29,7 +29,9 @@ import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
+import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
+import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -54,6 +56,7 @@ public class MessagesActivity extends ResourceActivity
     protected View inputLayout;
     protected View inputIcon;
     protected EditText textInput;
+    private Conversation conversation;
 
     public static void startActivity(Context context, String conversationId, String title, boolean newTask) {
         context.startActivity(createIntent(context, conversationId, title, newTask));
@@ -122,10 +125,12 @@ public class MessagesActivity extends ResourceActivity
         String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
         setTitle(conversationTitle);
         messagesAdapter = new MessagesRecyclerAdapter(conversationId);
-        Conversation conversation = messagesAdapter.getConversation();
-        String draftMessage = conversation.getDraftMessage();
-        if (draftMessage != null) {
-            textInput.append(draftMessage);
+        conversation = messagesAdapter.getConversation();
+        if (conversation != null) {
+            String draftMessage = conversation.getDraftMessage();
+            if (draftMessage != null) {
+                textInput.append(draftMessage);
+            }
         }
         recyclerView.setAdapter(messagesAdapter);
     }
@@ -180,8 +185,16 @@ public class MessagesActivity extends ResourceActivity
     protected void onPause() {
         super.onPause();
         Conversation conversation = messagesAdapter.getConversation();
-        conversation.setDraftMessage(textInput.getText().toString());
-        conversation.save();
+        if (conversation != null) {
+            conversation.setDraftMessage(textInput.getText().toString());
+            try {
+                conversation.save();
+            } catch (InvalidDBConfiguration idbce) {
+                Crashlytics.logException(idbce);
+            }
+        } else {
+            Crashlytics.logException(new Exception("Draft Message could not be saved : Conversation is bull"));
+        }
     }
 
     @Override
