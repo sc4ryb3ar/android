@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PeopleInto {
 
     public enum Activity {
+        _NO_STATUS_,
         GIVING,
         RECEIVING,
         WATCHING,
@@ -16,6 +17,9 @@ public class PeopleInto {
         EVERYTHING_TO_DO_WITH_IT;
 
         public static Activity fromString(String text) {
+            if (text == null || text.trim().length() == 0) {
+                return _NO_STATUS_;
+            }
             try {
                 return Activity.valueOf(text.toUpperCase().replaceAll(" ","_"));
             } catch (IllegalArgumentException e) {
@@ -37,6 +41,8 @@ public class PeopleInto {
                     return context.getResources().getString(R.string.pojo_value_fetish_status_watching_others_wear);
                 case EVERYTHING_TO_DO_WITH_IT:
                     return context.getResources().getString(R.string.pojo_value_fetish_status_everything_to_do_with_it);
+                case _NO_STATUS_:
+                    return "";
             }
             return null;
         }
