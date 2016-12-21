@@ -152,16 +152,16 @@
   <string name="settings_title_feed_auto_expand_media">New Media</string>
   <string name="settings_summary_feed_auto_expand_media">Auto expand feed stories about when a user uploaded a new picture or video</string>
 
-  <string name="pojo_value_fetish_status_giving">giving</string>
-  <string name="pojo_value_fetish_status_receiving">receiving</string>
-  <string name="pojo_value_fetish_status_watching">watching</string>
-  <string name="pojo_value_fetish_status_wearing">wearing</string>
-  <string name="pojo_value_fetish_status_watching_others_wear">watching others wear</string>
-  <string name="pojo_value_fetish_status_everything_to_do_with_it">everything to do with</string>
-  <string name="pojo_value_fetish_activity_into">%1$s is into %2$s %3$s</string>
-  <string name="pojo_value_fetish_activity_curious_about">%1$s is curious about %2$s %3$s</string>
-  <string name="pojo_value_fetish_activity_soft_limit">%2$s %3$s is soft limit for %1$s</string>
-  <string name="pojo_value_fetish_activity_hard_limit">%2$s %3$s is hard limit for %1$s</string>
+  <string name="pojo_value_fetish_status_giving">aktiv</string>
+  <string name="pojo_value_fetish_status_receiving">passiv</string>
+  <string name="pojo_value_fetish_status_watching">sehend</string>
+  <string name="pojo_value_fetish_status_wearing">tragend</string>
+  <string name="pojo_value_fetish_status_watching_others_wear">andere tragen sehen</string>
+  <string name="pojo_value_fetish_status_everything_to_do_with_it">alles was damit zu tun hat</string>
+  <string name="pojo_value_fetish_activity_into">%1$s steht auf %2$s %3$s</string>
+  <string name="pojo_value_fetish_activity_curious_about">%1$s ist neugierig auf %2$s %3$s</string>
+  <string name="pojo_value_fetish_activity_soft_limit">%2$s %3$s ist ein weiches Limit für %1$s</string>
+  <string name="pojo_value_fetish_activity_hard_limit">%2$s %3$s ist ein hartes Limit for %1$s</string>
 
 
   <!-- *** Strings for Notification History screen *** -->
