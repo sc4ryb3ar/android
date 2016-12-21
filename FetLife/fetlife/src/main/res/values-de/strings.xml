@@ -1,73 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Strings related to login -->
-  <string name="prompt_username">Benutzername</string>
-  <string name="prompt_password">Passwort</string>
-  <string name="prompt_new_message">Deine Nachricht</string>
-  <string name="action_sign_in_short">Login</string>
-  <string name="error_invalid_username">Dieser Benutzername ist ungültig</string>
-  <string name="error_invalid_password">Dieses Passwort ist ungültig</string>
-  <string name="error_incorrect_password">Dieses Passwort ist falsch</string>
-  <string name="error_field_required">Dies ist ein Pflichtfeld</string>
-  <string name="title_activity_conversations">Unterhaltungen</string>
-  <string name="title_activity_messages">Nachrichten</string>
+  <!-- *** About screen *** -->
 
-  <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
-  <string name="navigation_drawer_close">Navigationsleiste schließen</string>
-  <string name="sign_up">Registriere dich jetzt!</string>
-  <string name="forgot_login">Logindaten vergessen?</string>
+  <string name="version_prefix">"App Version: "</string>
+  <!-- TODO: consider translating text_about -->
 
-  <string name="menu_conversations">Unterhaltungen</string>
+  <!-- *** Error Messages *** -->
 
   <string name="error_connection_failed">Der Server konnte nicht erreicht werden. Bitte überprüfe deine Internetverbindung.</string>
   <string name="error_apicall_failed">Verbindung fehlgeschlagen. Bitte versuche es später noch einmal</string>
   <string name="error_authentication_failed">Bitte versuche es noch einmal!</string>
 
-  <string name="new_message_indication">NEU</string>
-  <string name="version_prefix">"App Version: "</string>
-  <string name="title_activity_friends">Freunde</string>
+  <!-- *** Menu items *** -->
+
+  <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
+  <string name="navigation_drawer_close">Navigationsleiste schließen</string>
+
   <string name="menu_friends">Freunde</string>
-  <string name="title_activity_friends_new_conversation">Neue Unterhaltung</string>
   <string name="menu_about">Über</string>
-  <string name="text_unknown">unbekannt</string>
-  <string name="button_new_conversation_discription">Neue Unterhaltung</string>
-  <string name="button_send_description">Nachricht senden</string>
-  <string name="input_message_description">Deine Nachricht</string>
   <string name="menu_friendrequests">Freundschaftsanfragen</string>
-  <string name="title_activity_friendrequests">Freundschaftsanfragen</string>
-  <string name="action_undo">Rückgängig</string>
-  <string name="text_friendrequests_rejected">Abgelehnt</string>
-  <string name="text_friendrequests_accepted">Akzeptiert</string>
-  <string name="text_friendrequests_toaccept">Akzeptieren</string>
-  <string name="text_friendrequests_toreject">Ablehnen</string>
-  <string name="friendrequest_activity_hint">Wische nach rechts zum Akzeptieren, nach links um abzulehnen</string>
-  <string name="undo_no_longer_possible">Rückgängig nicht mehr möglich</string>
-  <string name="menu_introduce">Profil teilen</string>
-  <string name="message_nfc_not_available">Dieses Feature benötigt NFC.</string>
-  <string name="message_android_version_not_sufficient">Dieses Feature benötigt eine neuere Android-Version.</string>
-  <string name="header_friendrequest">Freundschaftsanfragen</string>
-  <string name="header_friendsuggestion">Geteilte Profile</string>
-  <string name="nfc_tap_your_device">Lege dein Gerät an ein anderes Android-Gerät, um den Beam zu aktivieren</string>
-  <string name="message_nfc_turned_off">Bitte NFC aktivieren um dieses Feature zu nutzen</string>
-  <string name="title_activity_about">Über diese App</string>
-  <string name="snackbar_version_notification">Im \'Über\'-Fenster kannst du sehen, was neu in v%1$s ist</string>
-  <string name="text_notificationhistoryitem_toremove">Lösche</string>
-  <string name="text_notificationhistoryitem_removed">Gelöscht</string>
-  <string name="notificationhistory_activity_hint">Wische nach links, um Benachrichtigungen zu löschen</string>
-  <string name="title_activity_notificationhistory">Benachrichtigungen</string>
+  <string name="menu_introduce">Mein Profil teilen</string>
   <string name="menu_notifications">Benachrichtigungen</string>
   <string name="menu_upload_media">Lade Foto hoch</string>
-  <string name="title_intent_choose_media_upload">Wähle Medien-App</string>
-  <string name="message_image_upload_started">Beame dein Foto hoch...</string>
-  <string name="message_image_upload_finished">Dein Foto wurde hochgeladen</string>
-  <string name="message_image_upload_failed">Hochladen des Fotos fehlgeschlagen. Versuche es später nochmal</string>
-  <string name="action_clear_notification_history">Lösche alle</string>
-  <string name="message_media_picture_upload_confirmation">Ich bezeuge, dass dieses Foto von mir ist, oder dass ich die explizite Berechtigung habe, es auf Fetlife zu teilen.\nIch erzähle keine Lügen</string>
-  <string name="button_media_picture_upload_confirmation">Bestätigen</string>
-  <string name="button_media_picture_upload_cancel">Abbrechen</string>
-  <string name="title_media_picture_upload_confirmation">Füge dein Bild hinzu</string>
-  <!-- TODO: consider translating text_about -->
+  <string name="menu_conversations">Unterhaltungen</string>
+  <string name="menu_settings">Einstellungen</string>
+  <string name="menu_logout">Ausloggen</string>
+  <!-- TODO: find a better word Chronik? -->
+  <string name="menu_feed">Feed</string>
 
+  <!-- *** Screen header *** -->
+
+  <string name="title_activity_settings">Einstellungen</string>
+  <string name="title_activity_conversations">Unterhaltungen</string>
+  <string name="title_activity_messages">Nachrichten</string>
+  <string name="title_activity_friends">Freunde</string>
+  <string name="title_activity_friends_new_conversation">Neue Unterhaltung</string>
+  <string name="title_activity_friendrequests">Freundschaftsanfragen</string>
+  <string name="title_activity_about">Über diese App</string>
+  <string name="title_activity_notificationhistory">Benachrichtigungen</string>
+  <string name="title_intent_choose_media_upload">Wähle Medien-App</string>
+  <string name="title_media_picture_upload_confirmation">Füge dein Bild hinzu</string>
+
+  <!-- *** Settings texts *** -->
+
+  <string name="settings_category_general_start">Startbildschrim-Einstellungen</string>
+  <string name="settings_title_general_feed_as_start">Nutze den Feed, als Startbildschirm</string>
+  <string name="settings_summary_general_feed_as_start">Zeige den Feed, wenn du die App startest</string>
   <string name="settings_title_notifications">Benachrichtigungseinstellungen</string>
   <string name="settings_summary_notifications">Stelle ein wann und wie Benachrichtigungen empfangen werden</string>
   <string name="settings_category_notification_text">Benachrichtigungstext</string>
@@ -80,12 +58,178 @@
   <string name="settings_summary_notification_friendrequests_enabled">Aktiviere Benachrichtigungen bei eingehenden Freundschaftsanfragen</string>
   <string name="settings_title_notification_others_enabled">Andere Benachrichtigungen</string>
   <string name="settings_summary_notification_others_enabled">Aktiviere Benachrichtigungen für alle anderen Gegebenheiten</string>
-  <string name="menu_settings">Einstellungen</string>
-  <string name="title_activity_settings">Einstellungen</string>
+
+
   <string name="settings_title_notification_info_enabled">Info-Benachrichtigungen</string>
   <string name="settings_summary_notification_info_enabled">Aktiviere Benachrichtigungen für allgemeine Informationen</string>
   <string name="noification_title_new_one_or_more_notification">Neue Benachrichtigung</string>
   <string name="noification_text_new_one_or_more_notification">Auf dich warten eine oder mehr Benachrichtigungen</string>
-  <string name="menu_logout">Ausloggen</string>
+  <string name="logon_check_remember_me">Angemeldet bleiben</string>
+  <!-- TODO Übersetzen. What else? -->
+  <string name="settings_title_profile">Profile Settings</string>
+  <string name="settings_summary_profile">Manage settings relevant to your FetLife App Profile</string>
+  <string name="settings_category_profile_login">Login Settings</string>
+  <string name="settings_title_profile_password_always">Always ask for password</string>
+  <string name="settings_summary_profile_password_always">Make the app to ask password each time after the App was sent to the background</string>
+  <string name="settings_category_profile_data">User Data Settings</string>
+  <string name="settings_title_profile_clear_data">Clear local User Data</string>
+  <string name="settings_summary_profile_clear_data">Clear all data related to current FetLife profile stored on this device. Also logs out you out and disable any further notifications sent to this user</string>
+  <string name="title_delete_user_data_confirmation">Delete local User Data</string>
+  <string name="message_delete_user_data_confirmation">Do you really want to delete all App local user data and logout?\nYou won\'t receive App notifications until you log in again</string>
+  <string name="button_delete_user_data_confirmation">Yes</string>
+  <string name="button_delete_user_data_cancel">Cancel</string>
+  <string name="button_media_picture_upload_hint_caption">Caption</string>
+  <string name="button_media_picture_upload_check_friends_only">Only visible to friends</string>
+  <string name="message_friend_decision_failed">FetLife App: Your decision about friendship could not be sent as you had logged out before it could have been processed</string>
+
+  <!-- *** Feed texts *** -->
+
+  <string name="title_activity_feed">Feed</string>
+
+  <string name="feed_title_friends">%1$s became friends with %2$d users</string>
+  <string name="feed_title_new_post">uploaded a new writing</string>
+  <string name="feed_title_new_posts">posted %1$d new writings</string>
+  <string name="feed_title_new_grouppost">uploaded a new group post</string>
+  <string name="feed_title_new_groupposts">posted %1$d new group post</string>
+  <string name="feed_title_new_wallpost">uploaded a new wall post</string>
+  <string name="feed_title_new_wallposts">posted %1$d new wall post</string>
+  <string name="feed_title_group_join">joined a group</string>
+  <string name="feed_title_group_joins">joined to %1$d groups</string>
+  <string name="feed_title_new_picture">uploaded a new picture</string>
+  <string name="feed_title_new_pictures">uploaded %1$d new pictures</string>
+  <string name="feed_title_like_writing">loved a writing</string>
+  <string name="feed_title_like_writings">loved %1$d writings</string>
+  <string name="feed_title_like_video">loved a video</string>
+  <string name="feed_title_like_videos">loved %1$d videos</string>
+  <string name="feed_title_like_status">loved a status update</string>
+  <string name="feed_title_like_statuses">loved %1$d status updates</string>
+  <string name="feed_title_like_picture">loved a picture</string>
+  <string name="feed_title_like_pictures">loved %1$d pictures</string>
+  <string name="feed_title_like_unknown">Not yet supported Like Event</string>
+  <string name="feed_title_new_friend">became friends with a member</string>
+  <string name="feed_title_new_friends">became friends with %1$d members</string>
+  <string name="feed_title_new_follow">followed a member</string>
+  <string name="feed_title_new_follows">followed %1$d members</string>
+  <string name="feed_title_relation_unknown">Not yet supported relation event</string>
+
+  <string name="feed_title_rsvp_yes">is going to an event</string>
+  <string name="feed_title_rsvps_yes">is going to %1$d events</string>
+  <string name="feed_title_rsvp_maybe">is maybe going to an event</string>
+  <string name="feed_title_rsvps_maybe">is maybe going to %1$d events</string>
+  <string name="feed_title_new_comment">added a new comment</string>
+  <string name="feed_title_new_comments">added %1$d new comments</string>
+  <string name="feed_title_new_statuscomment">commented on a status update</string>
+  <string name="feed_title_new_statuscomments">commented on %1$d status updates</string>
+  <string name="feed_title_new_videocomment">commented on a video</string>
+  <string name="feed_title_new_videocomments">commented on %1$d videos</string>
+  <string name="feed_title_new_groupcomment">commented on a group post</string>
+  <string name="feed_title_new_groupcomments">commented on %1$d group posts</string>
+  <string name="feed_title_new_status">added a new status update</string>
+  <string name="feed_title_new_statuses">added %1$d status updates</string>
+  <string name="feed_title_new_postcomment">commented on a writing</string>
+  <string name="feed_title_new_postcomments">commented on %1$d writings</string>
+  <string name="feed_title_people_into_fetish">is into a fetish</string>
+  <string name="feed_title_people_into_fetishes">is into %1$d fetishes</string>
+  <string name="feed_caption_member_count" >%1$d members</string>
+
+  <string name="settings_title_feed">Feed Settings</string>
+  <string name="settings_summary_feed">Settings about how the feed stories should be displayed on the feed screen</string>
+  <string name="settings_category_feed_autoexpand">Auto Expand Feed Stories</string>
+  <string name="settings_title_feed_auto_expand_like">New Loves</string>
+  <string name="settings_summary_feed_auto_expand_like">Auto expand feed stories about when a followed user loved something</string>
+  <string name="settings_title_feed_auto_expand_relation">New Relations</string>
+  <string name="settings_summary_feed_auto_expand_relation">Auto expand feed stories about when a followed user became friends with someone</string>
+  <string name="settings_title_feed_auto_expand_profile">Profile updates</string>
+  <string name="settings_summary_feed_auto_expand_profile">Auto expand feed stories about various profile related changes</string>
+  <string name="settings_title_feed_auto_expand_comment">New Comments</string>
+  <string name="settings_summary_feed_auto_expand_comment">Auto expand feed stories about user comments</string>
+  <string name="settings_title_feed_auto_expand_post">New Post</string>
+  <string name="settings_summary_feed_auto_expand_post">Auto expand feed stories about when a user posted new a writing</string>
+  <string name="settings_title_feed_auto_expand_event">RSVP</string>
+  <string name="settings_summary_feed_auto_expand_event">Auto expand feed stories about when a user got interested in an event</string>
+  <string name="settings_title_feed_auto_expand_group">Group Story</string>
+  <string name="settings_summary_feed_auto_expand_group">Auto expand feed stories about when a user got interested in a group</string>
+  <string name="settings_title_feed_auto_expand_media">New Media</string>
+  <string name="settings_summary_feed_auto_expand_media">Auto expand feed stories about when a user uploaded a new picture or video</string>
+
+  <string name="pojo_value_fetish_status_giving">giving</string>
+  <string name="pojo_value_fetish_status_receiving">receiving</string>
+  <string name="pojo_value_fetish_status_watching">watching</string>
+  <string name="pojo_value_fetish_status_wearing">wearing</string>
+  <string name="pojo_value_fetish_status_watching_others_wear">watching others wear</string>
+  <string name="pojo_value_fetish_status_everything_to_do_with_it">everything to do with</string>
+  <string name="pojo_value_fetish_activity_into">%1$s is into %2$s %3$s</string>
+  <string name="pojo_value_fetish_activity_curious_about">%1$s is curious about %2$s %3$s</string>
+  <string name="pojo_value_fetish_activity_soft_limit">%2$s %3$s is soft limit for %1$s</string>
+  <string name="pojo_value_fetish_activity_hard_limit">%2$s %3$s is hard limit for %1$s</string>
+
+
+  <!-- *** Strings for Notification History screen *** -->
+
+  <string name="text_notificationhistoryitem_toremove">Lösche</string>
+  <string name="text_notificationhistoryitem_removed">Gelöscht</string>
+  <string name="notificationhistory_activity_hint">Wische nach links, um Benachrichtigungen zu löschen</string>
+  <string name="action_clear_notification_history">Lösche alle</string>
+
+
+  <!-- *** Strings for login screen *** -->
+
+  <string name="prompt_username">Benutzername</string>
+  <string name="prompt_password">Passwort</string>
+  <string name="prompt_new_message">Deine Nachricht</string>
+  <string name="action_sign_in_short">Login</string>
+  <string name="error_invalid_username">Dieser Benutzername ist ungültig</string>
+  <string name="error_invalid_password">Dieses Passwort ist ungültig</string>
+  <string name="error_incorrect_password">Dieses Passwort ist falsch</string>
+  <string name="error_field_required">Dies ist ein Pflichtfeld</string>
+  <string name="sign_up">Registriere dich jetzt!</string>
+  <string name="forgot_login">Logindaten vergessen?</string>
+
+
+  <!-- *** Strings for Friend Requests screen *** -->
+
+  <string name="text_friendrequests_rejected">Abgelehnt</string>
+  <string name="text_friendrequests_accepted">Akzeptiert</string>
+  <string name="text_friendrequests_toaccept">Akzeptieren</string>
+  <string name="text_friendrequests_toreject">Ablehnen</string>
+  <string name="friendrequest_activity_hint">Wische nach rechts zum Akzeptieren, nach links um abzulehnen</string>
+  <string name="header_friendrequest">Freundschaftsanfragen</string>
+  <string name="header_friendsuggestion">Geteilte Profile</string>
+
+
+  <!-- *** Strings for making new friends *** -->
+
+  <string name="message_nfc_not_available">Dieses Feature benötigt NFC.</string>
+  <string name="message_android_version_not_sufficient">Dieses Feature benötigt eine neuere Android-Version.</string>
+  <string name="message_nfc_turned_off">Bitte NFC aktivieren um dieses Feature zu nutzen</string>
+  <string name="nfc_tap_your_device">Lege dein Gerät an ein anderes Android-Gerät, um den Beam zu aktivieren</string>
+
+
+  <!-- *** Strings for Photo Upload *** -->
+
+  <string name="message_image_upload_started">Beame dein Foto hoch...</string>
+  <string name="message_image_upload_finished">Dein Foto wurde hochgeladen</string>
+  <string name="message_image_upload_failed">Hochladen des Fotos fehlgeschlagen. Versuche es später nochmal</string>
+
+  <string name="message_media_picture_upload_confirmation">Ich bezeuge, dass dieses Foto von mir ist, oder dass ich die explizite Berechtigung habe, es auf Fetlife zu teilen.\nIch erzähle keine Lügen</string>
+  <string name="button_media_picture_upload_confirmation">Bestätigen</string>
+  <string name="button_media_picture_upload_cancel">Abbrechen</string>
+
+  <!-- *** Other Strings *** -->
+
+  <string name="text_unknown">unbekannt</string>
+  <string name="new_message_indication">NEU</string>
+
+  <string name="action_undo">Rückgängig</string>
+  <string name="undo_no_longer_possible">Rückgängig nicht mehr möglich</string>
+
+  <string name="snackbar_version_notification">Im \'Über\'-Fenster kannst du sehen, was neu in v%1$s ist</string>
+
+  <string name="input_message_description">Deine Nachricht</string>
+  <string name="button_new_conversation_discription">Neue Unterhaltung</string>
+  <string name="button_send_description">Nachricht senden</string>
+  <string name="action_settings">Einstellungen</string>
+  <string name="settings_title_general">Allgemeine Einstellungen</string>
+  <string name="settings_summary_general">Überprüfe die allgemeinen Appeinstellungen</string>
 
 </resources>
