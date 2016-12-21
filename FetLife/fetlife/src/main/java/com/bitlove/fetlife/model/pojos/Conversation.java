@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.model.pojos;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,8 +8,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import java.util.List;
 import java.util.UUID;
 
 @Table(database = FetLifeDatabase.class)
@@ -18,6 +21,17 @@ public class Conversation extends BaseModel {
 
     public static boolean isLocal(String conversationId) {
         return conversationId.startsWith(PREFIX_LOCAL);
+    }
+
+    public static boolean isUnanswered(String conversationId, FetLifeApplication fetLifeApplication) {
+        User currentUser = fetLifeApplication.getUserSessionManager().getCurrentUser();
+        List<Message> messages = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.pending, false).orderBy(Message_Table.date, false).queryList();
+        for (Message message: messages) {
+            if (!currentUser.getId().equals(message.getSenderId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String createLocalConversation(Member member) {
@@ -75,6 +89,10 @@ public class Conversation extends BaseModel {
     @Column
     @JsonIgnore
     private String memberId;
+
+    @Column
+    @JsonIgnore
+    private String draftMessage;
 
     public String getId() {
         return id;
@@ -186,5 +204,13 @@ public class Conversation extends BaseModel {
 
     public void setMemberLink(String memberLink) {
         this.memberLink = memberLink;
+    }
+
+    public String getDraftMessage() {
+        return draftMessage;
+    }
+
+    public void setDraftMessage(String draftMessage) {
+        this.draftMessage = draftMessage;
     }
 }

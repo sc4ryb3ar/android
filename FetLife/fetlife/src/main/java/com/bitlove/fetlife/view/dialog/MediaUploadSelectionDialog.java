@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.view.activity.ResourceListActivity;
+import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,7 +104,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        dismiss();
+        dismissAllowingStateLoss();
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
                 MediaUploadConfirmationDialog.show(getActivity(), data.getData().toString(), false);

@@ -3,5 +3,5 @@
     <string name="app_name" translatable="false">FL</string>
     <string name="logon_title">Log in to FL</string>
     <string name="action_log_on">Log me in!</string>
-    <string name="progress_logging_in">Logging in...</string>
+    <string name="progress_logging_in">Logging you in...</string>
 </resources>

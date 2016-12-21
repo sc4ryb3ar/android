@@ -10,7 +10,7 @@ import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
-import com.bitlove.fetlife.view.activity.SettingsActivity;
+import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -31,9 +31,14 @@ public class UserSessionManager {
     private static final String CONSTANT_ONESIGNAL_TAG_NICKNAME = "nickname";
     private static final String CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN = "member_token";
 
+    private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
+    private static final String USER_PREF_KEY_NOTIFPREF_APPLIED = "USER_PREF_KEY_NOTIFPREF_APPLIED";
+    private static final String USER_PREF_KEY_FEEDPREF_APPLIED = "USER_PREF_KEY_FEEDPREF_APPLIED";
+
     private final FetLifeApplication fetLifeApplication;
 
     private User currentUser;
+    private SharedPreferences activePreferences;
 
     public UserSessionManager(FetLifeApplication fetLifeApplication) {
         this.fetLifeApplication = fetLifeApplication;
@@ -44,22 +49,27 @@ public class UserSessionManager {
         if (userKey == null) {
             return;
         }
+
+        applyVersionUpgradeIfNeeded(userKey);
+
+        initUserPreferences(userKey);
         if (!getPasswordAlwaysPreference(userKey)) {
             loadUserDb(userKey);
             initDb();
+            initUserPreferences(userKey);
             currentUser = readUserRecord();
         }
     }
 
-    public synchronized void onUserLogIn(User loggedInUser, boolean passwordAlways) {
+    public synchronized void onUserLogIn(User loggedInUser, boolean rememberPassword) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
             currentUser = loggedInUser;
-            setPasswordAlwaysPreference(getUserKey(loggedInUser), passwordAlways);
         } else {
             updateUserRecord(loggedInUser);
         }
+        setPasswordAlwaysPreference(getUserKey(loggedInUser), !rememberPassword);
     }
 
     public synchronized void onUserLogOut() {
@@ -77,9 +87,13 @@ public class UserSessionManager {
     }
 
     private synchronized void logInUser(User user) {
-        saveLastLoggedUserKey(getUserKey(user));
+        String userKey = getUserKey(user);
+
+        applyVersionUpgradeIfNeeded(userKey);
+
+        saveLastLoggedUserKey(userKey);
         loadUserDb(getUserKey(user));
-        initUserPreferences(getUserKey(user));
+        initUserPreferences(userKey);
         initDb();
         updateUserRecord(user);
         registerToPushMessages(user);
@@ -144,16 +158,20 @@ public class UserSessionManager {
         }
     }
 
-    public boolean getPasswordAlwaysPreference() {
-        return getPasswordAlwaysPreference(getUserKey(currentUser));
+    public SharedPreferences getActiveUserPreferences() {
+        return activePreferences;
+    }
+
+    public boolean getActivePasswordAlwaysPreference() {
+        return activePreferences.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
+    }
+
+    public boolean getPasswordAlwaysPreference(String userKey) {
+        return getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
     }
 
     private void setPasswordAlwaysPreference(String userKey, boolean checked) {
-        SharedPreferences sharedPreferences = getUserPreferences(userKey);
-        sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, checked).apply();
-    }
-    private boolean getPasswordAlwaysPreference(String userKey) {
-        return getUserPreferences(userKey).getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, true);
+        getUserPreferences(userKey).edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, checked).apply();
     }
 
     private String loadLastLoggedUserKey() {
@@ -227,12 +245,28 @@ public class UserSessionManager {
     }
 
     private void initUserPreferences(String userKey) {
-        SettingsActivity.init(getUserPreferenceName(userKey));
-        PreferenceManager.setDefaultValues(fetLifeApplication, getUserPreferenceName(userKey), Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+        String userPreferenceName = getUserPreferenceName(userKey);
+        SettingsActivity.init(userPreferenceName);
+
+        activePreferences = getUserPreferences(userKey);
+
+        if (!activePreferences.getBoolean(USER_PREF_KEY_NOTIFPREF_APPLIED, false)) {
+            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, false);
+            activePreferences.edit().putBoolean(USER_PREF_KEY_NOTIFPREF_APPLIED, true);
+        }
+
+        if (!activePreferences.getBoolean(USER_PREF_KEY_FEEDPREF_APPLIED, false)) {
+            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, true);
+            activePreferences.edit().putBoolean(USER_PREF_KEY_FEEDPREF_APPLIED, true);
+        }
+
+//        final SharedPreferences defaultValueSp = fetLifeApplication.getSharedPreferences(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, Context.MODE_PRIVATE);
+//        if(!defaultValueSp.getBoolean(PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES, false)) {
+//        }
     }
 
     private SharedPreferences getUserPreferences(String userKey) {
-        return fetLifeApplication.getSharedPreferences(userKey,Context.MODE_PRIVATE);
+        return fetLifeApplication.getSharedPreferences(getUserPreferenceName(userKey),Context.MODE_PRIVATE);
     }
 
     private void clearUserPreferences(String userKey) {
@@ -279,6 +313,16 @@ public class UserSessionManager {
             return false;
         }
         return user1.getNickname().equals(user2.getNickname());
+    }
+
+    private void applyVersionUpgradeIfNeeded(String userKey) {
+        SharedPreferences sharedPreferences = getUserPreferences(userKey);
+        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        if (lastVersionUpgrade < 10603) {
+            SharedPreferences oldPreference = fetLifeApplication.getSharedPreferences(userKey, Context.MODE_PRIVATE);
+            boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
+            sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
+        }
     }
 
 }

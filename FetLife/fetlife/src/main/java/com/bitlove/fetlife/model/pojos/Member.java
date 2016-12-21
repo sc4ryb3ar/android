@@ -14,6 +14,7 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+//TODO: clean up the POJOs and define relations
 @Table(database = FetLifeDatabase.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Member extends BaseModel {
@@ -77,11 +78,16 @@ public class Member extends BaseModel {
     public void setAvatar(Avatar avatar) {
         this.avatar = avatar;
         if (avatar != null) {
-            Variants variants = avatar.getVariants();
+            AvatarVariants variants = avatar.getVariants();
             if (variants != null) {
-                setAvatarLink(variants.getIconUrl());
+                setAvatarLink(variants.getMedium());
             }
         }
+    }
+
+    @JsonIgnore
+    public Picture getAvatarPicture() {
+        return avatar.getAsPicture(Member.this);
     }
 
     public String getMetaInfo() {

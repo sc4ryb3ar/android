@@ -2,6 +2,7 @@ package com.bitlove.fetlife.model.api;
 
 import com.bitlove.fetlife.model.pojos.AuthBody;
 import com.bitlove.fetlife.model.pojos.Conversation;
+import com.bitlove.fetlife.model.pojos.Feed;
 import com.bitlove.fetlife.model.pojos.Friend;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.Member;
@@ -42,11 +43,17 @@ public interface FetLifeApi {
     @GET("/api/v2/me/conversations")
     Call<List<Conversation>> getConversations(@Header("Authorization") String authHeader, @Query("order_by") String orderBy, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/me/conversations/{conversationId}")
+    Call<Conversation> getConversation(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId);
+
     @GET("/api/v2/me/friends")
     Call<List<Friend>> getFriends(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 
     @GET("/api/v2/me/conversations/{conversationId}/messages")
     Call<List<Message>> getMessages(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId, @Query("since_id") String sinceMessageId, @Query("until_id") String untilMessageId, @Query("limit") int limit);
+
+    @GET("/api/v2/members/{memberId}")
+    Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String conversationId);
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")
@@ -78,4 +85,15 @@ public interface FetLifeApi {
     Call<ResponseBody> uploadPicture(@Header("Authorization") String authHeader, @Part("picture\"; filename=\"android_app.png\" ") RequestBody picture,  @Part("is_avatar") RequestBody isAvatar, @Part("only_friends") RequestBody friendsOnly, @Part("caption") RequestBody caption, @Part("is_of_or_by_user") RequestBody isFromUser);
     //TODO: solve dynamic file name
     //https://github.com/square/retrofit/issues/1063
+
+    @GET("/api/v2/me/feed")
+    Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
+
+    @PUT("/api/v2/me/loves/{content_type}/{content_id}")
+    Call<ResponseBody> putLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);
+
+    @DELETE("/api/v2/me/loves/{content_type}/{content_id}")
+    Call<ResponseBody> deleteLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);
+
+
 }

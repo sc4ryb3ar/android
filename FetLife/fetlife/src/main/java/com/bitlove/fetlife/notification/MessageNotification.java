@@ -9,8 +9,8 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.ConversationsActivity;
-import com.bitlove.fetlife.view.activity.MessagesActivity;
+import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.activity.resource.MessagesActivity;
 
 import org.json.JSONObject;
 
@@ -53,11 +53,20 @@ public class MessageNotification extends OneSignalNotification {
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, conversationId, nickname, true)).startActivities();
+            try {
+                TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication, true)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, conversationId, nickname, true)).startActivities();
+            } catch (NullPointerException npe) {
+                //Apply workaround for OS bug
+                startLegacyConversationAndMessageActivity(fetLifeApplication);
+            }
         } else {
-            ConversationsActivity.startActivity(fetLifeApplication);
-            MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
+            startLegacyConversationAndMessageActivity(fetLifeApplication);
         }
+    }
+
+    private void startLegacyConversationAndMessageActivity(FetLifeApplication fetLifeApplication) {
+        ConversationsActivity.startActivity(fetLifeApplication, true);
+        MessagesActivity.startActivity(fetLifeApplication, conversationId, nickname, true);
     }
 
     @Override

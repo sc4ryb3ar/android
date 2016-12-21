@@ -5,9 +5,9 @@ import android.content.Context;
 import android.os.Build;
 
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.view.activity.ConversationsActivity;
-import com.bitlove.fetlife.view.activity.MessagesActivity;
-import com.bitlove.fetlife.view.activity.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.activity.resource.MessagesActivity;
+import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
 
 import org.json.JSONObject;
 
@@ -37,16 +37,17 @@ public class StackedNotification extends OneSignalNotification {
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
         switch (group) {
+            case NotificationParser.JSON_VALUE_GROUP_LEGACY_FETLIFE:
             case NotificationParser.JSON_VALUE_GROUP_INFO:
                 NotificationHistoryActivity.startActivity(fetLifeApplication, true);
                 break;
-            case NotificationParser.JSON_VALUE_GROUP_FETLIFE:
-            case NotificationParser.JSON_VALUE_GROUP_MESSAGE:
+            case NotificationParser.JSON_VALUE_GROUP_LEGACY_MESSAGE:
+            case NotificationParser.JSON_VALUE_GROUP_FETLIFE_MESSAGE:
                 MessageNotification sampleMessageNotification = isSameConversations(subNotificaions);
                 if (sampleMessageNotification != null) {
                     startMessageActivity(fetLifeApplication, sampleMessageNotification);
                 } else {
-                    ConversationsActivity.startActivity(fetLifeApplication);
+                    ConversationsActivity.startActivity(fetLifeApplication, true);
                 }
                 break;
             case "":
@@ -70,7 +71,7 @@ public class StackedNotification extends OneSignalNotification {
         } else {
             OneSignalNotification firstNotification = subNotificaions.isEmpty() ? null : subNotificaions.get(0);
             if (firstNotification != null && firstNotification instanceof MessageNotification) {
-                ConversationsActivity.startActivity(fetLifeApplication);
+                ConversationsActivity.startActivity(fetLifeApplication, true);
             } else {
                 NotificationHistoryActivity.startActivity(fetLifeApplication, true);
             }
@@ -78,10 +79,10 @@ public class StackedNotification extends OneSignalNotification {
     }
 
     private void startMessageActivity(FetLifeApplication fetLifeApplication, MessageNotification sampleMessageNotification) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true)).startActivities();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            TaskStackBuilder.create(fetLifeApplication).addNextIntent(ConversationsActivity.createIntent(fetLifeApplication, true)).addNextIntent(MessagesActivity.createIntent(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true)).startActivities();
         } else {
-            ConversationsActivity.startActivity(fetLifeApplication);
+            ConversationsActivity.startActivity(fetLifeApplication, true);
             MessagesActivity.startActivity(fetLifeApplication, sampleMessageNotification.conversationId, sampleMessageNotification.nickname, true);
         }
     }

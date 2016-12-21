@@ -10,6 +10,10 @@
         <item name="android:listDivider">@color/color_primary_dark</item>
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:itemBackground">@color/window_background</item>
+        <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+    </style>
+
+    <style name="AppPreferenceTheme" parent="@style/PreferenceThemeOverlay.v14.Material">
     </style>
 
     <style name="AppTheme.Transparent" parent="android:Theme">
@@ -41,14 +45,19 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
-    <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorAccent">@color/text_color_link</item>
+    <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/text_color_primary</item>
+        <item name="android:textColor">@color/text_color_primary</item>
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:background">@color/window_background</item>
     </style>
 
     <style name="AppTheme.Light_Accent" parent="AppTheme">
         <item name="colorAccent">@color/color_accent_light</item>
+    </style>
+
+    <style name="AppTheme.Secondary_Accent" parent="AppTheme">
+        <item name="colorAccent">@color/text_color_secondary</item>
     </style>
 
     <style name="AppTheme.No_Accent" parent="AppTheme">

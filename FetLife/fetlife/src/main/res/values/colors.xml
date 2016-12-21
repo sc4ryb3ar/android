@@ -7,6 +7,8 @@
     <color name="color_secondary">#ffffff</color>
     <color name="color_secondary_dark">#000000</color>
 
+    <color name="color_highlight">#ffff0000</color>
+
     <color name="color_accent">#ff880000</color>
     <color name="color_accent_light">#fffaffbd</color>
     <color name="color_accent_gradient_dark">#ff700000</color>
@@ -28,6 +30,7 @@
 
     <color name="area_background">#ffffff</color>
     <color name="area_background_dark">#ff111111</color>
+    <color name="area_background_dark_invert">#aa111111</color>
 
     <color name="color_accept">#32CD32</color>
     <color name="color_reject">#cd0000</color>

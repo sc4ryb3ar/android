@@ -8,13 +8,13 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.view.activity.ConversationsActivity;
+import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
 
 public class AnonymNotification {
 
     public void display(FetLifeApplication fetLifeApplication) {
 
-        Intent contentIntent = ConversationsActivity.createIntent(fetLifeApplication);
+        Intent contentIntent = ConversationsActivity.createIntent(fetLifeApplication, true);
 
         PendingIntent contentPendingIntent =
                 PendingIntent.getActivity(

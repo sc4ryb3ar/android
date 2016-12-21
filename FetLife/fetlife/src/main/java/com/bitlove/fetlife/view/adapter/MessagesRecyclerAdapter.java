@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.Conversation;
+import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Message;
 
 import com.bitlove.fetlife.model.pojos.Message_Table;
@@ -32,6 +34,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
 
     private final String conversationId;
     private List<Message> itemList;
+    private Conversation conversation;
 
     public MessagesRecyclerAdapter(String conversationId) {
         this.conversationId = conversationId;
@@ -51,7 +54,21 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
 
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
-        itemList = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.date,false).queryList();
+        conversation = new Select().from(Conversation.class).where(Conversation_Table.id.is(conversationId)).querySingle();
+        itemList = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.pending,false).orderBy(Message_Table.date,false).queryList();
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+
+    public Message getItem(int position) {
+        return itemList.get(position);
+    }
+
+    public Conversation getConversation() {
+        return conversation;
     }
 
     @Override
@@ -92,19 +109,11 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return itemList.size();
-    }
-
-    public Message getItem(int position) {
-        return itemList.get(position);
-    }
 }
 
 class MessageViewHolder extends RecyclerView.ViewHolder {
 
-    private static final int EXTEND_PADDING_MULTIPLYER = 10;
+    private static final int EXTEND_PADDING_MULTIPLIER = 10;
 
     LinearLayout messageContainer;
     TextView messageText, subText;
@@ -122,7 +131,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
 
         hPadding = (int) context.getResources().getDimension(R.dimen.listitem_horizontal_margin);
         vPadding = (int) context.getResources().getDimension(R.dimen.listitem_vertical_margin);
-        extendedHPadding = EXTEND_PADDING_MULTIPLYER * hPadding;
+        extendedHPadding = EXTEND_PADDING_MULTIPLIER * hPadding;
 
         primaryTextColor = ColorUtil.retrieverColor(context, R.color.text_color_primary);
         errorTextColor = ColorUtil.retrieverColor(context, R.color.text_color_error);

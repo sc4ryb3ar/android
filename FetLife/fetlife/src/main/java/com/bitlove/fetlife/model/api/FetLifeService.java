@@ -26,6 +26,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import retrofit.Converter;
 import retrofit.JacksonConverterFactory;
 import retrofit.Retrofit;
 
