@@ -73,7 +73,7 @@
   <string name="settings_title_profile_clear_data">Lösche lokale Nutzerdaten</string>
   <string name="settings_summary_profile_clear_data">Lösche alle Daten zu deinem FetLife-Profil, die auf diesem Gerät gespeichert wurden. Loggt dich ebenfalls aus und deaktiviert weitere Benachrichtigungen, die an diesen Nutzer geschickt werden</string>
   <string name="title_delete_user_data_confirmation">Lösche lokale Nutzerdaten</string>
-  <string name="message_delete_user_data_confirmation">Willst du wirklick alle lokalen Nutzerdaten löschen und dich ausloogen?\nDu wirst keine Benachrichtigungen mehr erhalten, bis du dich wieder anmeldest</string>
+  <string name="message_delete_user_data_confirmation">Willst du wirklick alle lokalen Nutzerdaten löschen und dich ausloggen?\nDu wirst keine Benachrichtigungen mehr erhalten, bis du dich wieder anmeldest</string>
   <string name="button_delete_user_data_confirmation">Ja</string>
   <string name="button_delete_user_data_cancel">Abbrechen</string>
   <string name="button_media_picture_upload_hint_caption">Beschreibung</string>
@@ -152,16 +152,17 @@
   <string name="settings_title_feed_auto_expand_media">Neue Medien</string>
   <string name="settings_summary_feed_auto_expand_media">Auto. erweitere Feed-Geschichten, wenn ein Nutzer ein neues Bild oder Video hochgeladen hat</string>
 
+  <!-- TODO: refractor to whole sentences -->
   <string name="pojo_value_fetish_status_giving">aktiv</string>
   <string name="pojo_value_fetish_status_receiving">passiv</string>
   <string name="pojo_value_fetish_status_watching">sehend</string>
   <string name="pojo_value_fetish_status_wearing">tragend</string>
   <string name="pojo_value_fetish_status_watching_others_wear">andere tragen sehen</string>
-  <string name="pojo_value_fetish_status_everything_to_do_with_it">alles was damit zu tun hat</string>
-  <string name="pojo_value_fetish_activity_into">%1$s steht auf %2$s %3$s</string>
-  <string name="pojo_value_fetish_activity_curious_about">%1$s ist neugierig auf %2$s %3$s</string>
-  <string name="pojo_value_fetish_activity_soft_limit">%2$s %3$s ist ein weiches Limit für %1$s</string>
-  <string name="pojo_value_fetish_activity_hard_limit">%2$s %3$s ist ein hartes Limit for %1$s</string>
+  <string name="pojo_value_fetish_status_everything_to_do_with_it">alles, was damit zu tun hat</string>
+  <string name="pojo_value_fetish_activity_into">%1$s steht auf %3$s (%2$s)</string>
+  <string name="pojo_value_fetish_activity_curious_about">%1$s ist neugierig auf %3$s (%2$s)</string>
+  <string name="pojo_value_fetish_activity_soft_limit">%3$s (%2$s) ist ein weiches Limit für %1$s</string>
+  <string name="pojo_value_fetish_activity_hard_limit">%3$s (%2$s) ist ein hartes Limit for %1$s</string>
 
 
   <!-- *** Strings for Notification History screen *** -->
