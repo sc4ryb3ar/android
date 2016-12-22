@@ -25,7 +25,6 @@
   <string name="menu_conversations">Unterhaltungen</string>
   <string name="menu_settings">Einstellungen</string>
   <string name="menu_logout">Ausloggen</string>
-  <!-- TODO: find a better word Chronik? -->
   <string name="menu_feed">Feed</string>
 
   <!-- *** Screen header *** -->
@@ -90,7 +89,8 @@
   <string name="feed_title_new_posts">postete %1$d neue Schriftstücke</string>
   <string name="feed_title_new_grouppost">hat einen neuen Gruppenpost hochgeladen</string>
   <string name="feed_title_new_groupposts">postete %1$d neue Gruppenposts</string>
-  <string name="feed_title_new_wallpost">hat einen neuen Pinwandpost hochgeladen</string> <!-- TODO: Wall is a pretty shitty word to translate in this context -->
+  <!-- TODO: need a better word for "wall" than "Pinnwand" -->
+  <string name="feed_title_new_wallpost">hat einen neuen Pinwandpost hochgeladen</string>
   <string name="feed_title_new_wallposts">postete %1$d neue Pinwandposts</string>
   <string name="feed_title_group_join">trat einer Gruppe bei</string>
   <string name="feed_title_group_joins">trat %1$d Gruppen bei</string>
@@ -133,24 +133,24 @@
 
   <string name="settings_title_feed">Feedeinstellungen</string>
   <string name="settings_summary_feed">Einstellungen, wie die Feed-Geschichten dargestellt werden sollen</string>
-  <!-- TODO Übersetzen. What else? -->
-  <string name="settings_category_feed_autoexpand">Auto Expand Feed Stories</string>
-  <string name="settings_title_feed_auto_expand_like">New Loves</string>
-  <string name="settings_summary_feed_auto_expand_like">Auto expand feed stories about when a followed user loved something</string>
-  <string name="settings_title_feed_auto_expand_relation">New Relations</string>
-  <string name="settings_summary_feed_auto_expand_relation">Auto expand feed stories about when a followed user became friends with someone</string>
-  <string name="settings_title_feed_auto_expand_profile">Profile updates</string>
-  <string name="settings_summary_feed_auto_expand_profile">Auto expand feed stories about various profile related changes</string>
-  <string name="settings_title_feed_auto_expand_comment">New Comments</string>
-  <string name="settings_summary_feed_auto_expand_comment">Auto expand feed stories about user comments</string>
-  <string name="settings_title_feed_auto_expand_post">New Post</string>
-  <string name="settings_summary_feed_auto_expand_post">Auto expand feed stories about when a user posted new a writing</string>
-  <string name="settings_title_feed_auto_expand_event">RSVP</string>
-  <string name="settings_summary_feed_auto_expand_event">Auto expand feed stories about when a user got interested in an event</string>
-  <string name="settings_title_feed_auto_expand_group">Group Story</string>
-  <string name="settings_summary_feed_auto_expand_group">Auto expand feed stories about when a user got interested in a group</string>
-  <string name="settings_title_feed_auto_expand_media">New Media</string>
-  <string name="settings_summary_feed_auto_expand_media">Auto expand feed stories about when a user uploaded a new picture or video</string>
+  <string name="settings_category_feed_autoexpand">Auto. Erweiterung der Feed-Geschichten</string>
+  <string name="settings_title_feed_auto_expand_like">Neue Liebe</string>
+  <string name="settings_summary_feed_auto_expand_like">Auto. erweitere Feed-Geschichten, wenn ein gefolgter Nutzer etwas liebte</string>
+  <string name="settings_title_feed_auto_expand_relation">Neue Beziehungen</string>
+  <string name="settings_summary_feed_auto_expand_relation">Auto. erweitere Feed-Geschichten, wenn ein gefolgter Nutzer sich mit jemanden angefreundet hat</string>
+  <string name="settings_title_feed_auto_expand_profile">Profilupdates</string>
+  <string name="settings_summary_feed_auto_expand_profile">Auto. erweitere Feed-Geschichten, bei verschiedenen Änderungen, die Profile betreffen</string>
+  <string name="settings_title_feed_auto_expand_comment">Neue Kommentare</string>
+  <string name="settings_summary_feed_auto_expand_comment">Auto. erweitere Feed-Geschichten, bei Nutzerkommentaren</string>
+  <string name="settings_title_feed_auto_expand_post">Neue Posts</string>
+  <string name="settings_summary_feed_auto_expand_post">Auto. erweitere Feed-Geschichten, wenn ein Nutzer ein Schriftstück postete</string>
+  <!-- I assume that RSVP stands for "Répondez s'il vous plaît" -->
+  <string name="settings_title_feed_auto_expand_event">Eventgeschichten</string>
+  <string name="settings_summary_feed_auto_expand_event">Auto. erweitere Feed-Geschichten, wenn ein Nutzer sich an einem Event interessiert</string>
+  <string name="settings_title_feed_auto_expand_group">Gruppengeschichten</string>
+  <string name="settings_summary_feed_auto_expand_group">Auto. erweitere Feed-Geschichten, wenn ein Nutzer sich an einer Gruppe interessiert</string>
+  <string name="settings_title_feed_auto_expand_media">Neue Medien</string>
+  <string name="settings_summary_feed_auto_expand_media">Auto. erweitere Feed-Geschichten, wenn ein Nutzer ein neues Bild oder Video hochgeladen hat</string>
 
   <string name="pojo_value_fetish_status_giving">aktiv</string>
   <string name="pojo_value_fetish_status_receiving">passiv</string>
