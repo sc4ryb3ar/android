@@ -29,7 +29,7 @@ Welcome to FetLife's open-source Android app!
 
 ### Screenshots
 
-![Screenshots of FetLife Android App](https://cloud.githubusercontent.com/assets/22100/14687516/d31bdad2-06f2-11e6-8e86-979d49a67ad3.png)
+![Screenshots of FetLife Android App](https://cloud.githubusercontent.com/assets/4168967/21648277/c3a33cfe-d29d-11e6-8fd6-f95bd47c757f.jpg)
 
 
 ### Installing the App on your Android Device
