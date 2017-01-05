@@ -239,7 +239,7 @@ public class FetLifeApiIntentService extends IntentService {
             if (result != Integer.MIN_VALUE) {
                 //If the call succeed notify all subscribers about
                 sendLoadFinishedNotification(action, result, params);
-            } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401 || lastResponseCode == 403)) {
+            } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
                 if (refreshToken(currentUser)) {
                     //If token refresh succeed restart the original request
