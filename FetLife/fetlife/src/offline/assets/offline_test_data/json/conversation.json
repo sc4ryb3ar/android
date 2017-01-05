@@ -1,0 +1,24 @@
+{
+  "id": "1",
+  "subject": "Hi Kinkster",
+  "has_new_messages": true,
+  "message_count": 1,
+  "member": {
+    "id": "1",
+    "nickname": "FetLife",
+    "avatar": {
+      "id": "1",
+      "variants": {
+        "mini": "locale://ava0",
+        "small": "locale://ava0",
+        "medium": "locale://ava0"
+      }
+    },
+    "url": "",
+    "content_type": "member",
+    "meta_line": ""
+  },
+  "is_archived": false,
+  "created_at": "2017-01-01T00:10:00.000Z",
+  "updated_at": "2017-01-01T00:10:00.000Z"
+}

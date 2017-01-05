@@ -4,6 +4,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Table(database = FetLifeDatabase.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Conversation extends BaseModel {
 
     private static final String PREFIX_LOCAL = "%" + Conversation.class.getName() + ".PREFIX_LOCAL%";

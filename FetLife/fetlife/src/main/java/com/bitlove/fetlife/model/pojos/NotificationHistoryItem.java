@@ -1,12 +1,14 @@
 package com.bitlove.fetlife.model.pojos;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 @Table(database = FetLifeDatabase.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NotificationHistoryItem extends BaseModel {
 
     public NotificationHistoryItem() {

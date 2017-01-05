@@ -1,0 +1,42 @@
+{
+  "id": "2",
+  "nickname": "Dreamlite",
+  "avatar": {
+    "id": "2",
+    "variants": {
+      "mini": "locale://ava1",
+      "small": "locale://ava1",
+      "medium": "locale://ava1"
+    }
+  },
+  "url": "",
+  "content_type": "member",
+  "meta_line": "96M Fetishist",
+  "gender": {
+    "name": "Male",
+    "abbreviation": "M"
+  },
+  "role": "Fetishist",
+  "age": 96,
+  "sexual_orientation": "Straight",
+  "about": "Proud user of:\r\n\r\n**[Official FetLife Android App][https://github.com/fetlife/android/blob/master/README.md]**\r\n\r\nDownload today and help to improve!\r\n\r\n- - - - -\r\n\r\n“Be who you are and say what you feel, because those who mind don’t matter and those who matter don’t mind.”\r\n-Dr. Seuss\r\n\r\n\"What if the meaning of life is actually the life itself?\"\r\n-spiky_elf\r\n\r\nPlease put this cat on\r\n..../\\„,„/\\ your profile\r\n...( =';'= ) to show\r\n.../♥♥\\ that you are\r\n..(.|.|..|.|.) against animal cruelty!",
+  "looking_for": [
+    "lifetime_relationship",
+    "friendship"
+  ],
+  "websites": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "url": "luxuriaparty.hu",
+      "created_at": "2015-07-27T07:29:25.000Z",
+      "updated_at": "2015-07-27T07:29:25.000Z"
+    }
+  ],
+  "country": "Netherlands",
+  "city": null,
+  "administrative_area": "Flevoland",
+  "is_supporter": true,
+  "friend_count": 100,
+  "notification_token": "1"
+}

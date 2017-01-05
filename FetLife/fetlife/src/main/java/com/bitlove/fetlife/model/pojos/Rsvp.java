@@ -2,8 +2,10 @@
 package com.bitlove.fetlife.model.pojos;
 
 import com.bitlove.fetlife.util.EnumUtil;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Rsvp {
 
     public enum RsvpStatus {

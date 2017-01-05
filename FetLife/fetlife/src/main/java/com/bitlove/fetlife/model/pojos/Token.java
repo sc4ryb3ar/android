@@ -1,8 +1,10 @@
 package com.bitlove.fetlife.model.pojos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 //TODO: handle token type
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Token {
 
     @JsonProperty("access_token")

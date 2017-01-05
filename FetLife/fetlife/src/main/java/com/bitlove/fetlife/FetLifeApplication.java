@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
+import com.bitlove.fetlife.model.api.OfflineTestService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.notification.NotificationParser;
@@ -124,7 +125,11 @@ public class FetLifeApplication extends MultiDexApplication {
 
         //Init service members
         try {
-            fetLifeService = new FetLifeService(this);
+            if (BuildConfig.OFFLINE_DATA) {
+                fetLifeService = new OfflineTestService(this);
+            } else {
+                fetLifeService = new FetLifeService(this);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

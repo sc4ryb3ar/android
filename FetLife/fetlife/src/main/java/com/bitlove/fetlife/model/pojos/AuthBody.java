@@ -1,8 +1,10 @@
 package com.bitlove.fetlife.model.pojos;
 
 import com.bitlove.fetlife.model.api.FetLifeService;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthBody {
 
     @JsonProperty("grant_type")

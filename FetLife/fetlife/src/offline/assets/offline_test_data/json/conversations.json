@@ -1,0 +1,170 @@
+[
+  {
+    "id": "1",
+    "subject": "Hi Kinkster",
+    "has_new_messages": true,
+    "message_count": 1,
+    "member": {
+      "id": "1",
+      "nickname": "FetLife",
+      "avatar": {
+        "id": "1",
+        "variants": {
+          "mini": "locale://ava0",
+          "small": "locale://ava0",
+          "medium": "locale://ava0"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:10:00.000Z",
+    "updated_at": "2017-01-01T00:10:00.000Z"
+  },
+  {
+    "id": "2",
+    "subject": "Hoi Kinkster",
+    "has_new_messages": false,
+    "message_count": 1,
+    "member": {
+      "id": "2",
+      "nickname": "dreamlite",
+      "avatar": {
+        "id": "2",
+        "variants": {
+          "mini": "locale://ava1",
+          "small": "locale://ava1",
+          "medium": "locale://ava1"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:09:00.000Z",
+    "updated_at": "2017-01-01T00:09:00.000Z"
+  },
+  {
+    "id": "3",
+    "subject": "Hallo Kinkster",
+    "has_new_messages": false,
+    "message_count": 1,
+    "member": {
+      "id": "3",
+      "nickname": "Kinky Operator",
+      "avatar": {
+        "id": "3",
+        "variants": {
+          "mini": "locale://pic2",
+          "small": "locale://pic2",
+          "medium": "locale://pic2"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:08:00.000Z",
+    "updated_at": "2017-01-01T00:08:00.000Z"
+  },
+  {
+    "id": "4",
+    "subject": "Olá Kinkster",
+    "has_new_messages": false,
+    "message_count": 4,
+    "member": {
+      "id": "4",
+      "nickname": "FetLife Pervy",
+      "avatar": {
+        "id": "4",
+        "variants": {
+          "mini": "locale://ava3",
+          "small": "locale://ava3",
+          "medium": "locale://ava3"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:07:00.000Z",
+    "updated_at": "2017-01-01T00:07:00.000Z"
+  },
+  {
+    "id": "5",
+    "subject": "Bonjour Kinkster",
+    "has_new_messages": false,
+    "message_count": 1,
+    "member": {
+      "id": "5",
+      "nickname": "FetLife Kinkster",
+      "avatar": {
+        "id": "5",
+        "variants": {
+          "mini": "locale://ava4",
+          "small": "locale://ava4",
+          "medium": "locale://ava4"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:06:00.000Z",
+    "updated_at": "2017-01-01T00:06:00.000Z"
+  },
+  {
+    "id": "6",
+    "subject": "Ciao Kinkster",
+    "has_new_messages": false,
+    "message_count": 1,
+    "member": {
+      "id": "6",
+      "nickname": "Fetish Life",
+      "avatar": {
+        "id": "6",
+        "variants": {
+          "mini": "locale://pic1",
+          "small": "locale://pic1",
+          "medium": "locale://pic1"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:05:00.000Z",
+    "updated_at": "2017-01-01T00:05:00.000Z"
+  },
+  {
+    "id": "7",
+    "subject": "Ahoj Kinkster",
+    "has_new_messages": false,
+    "message_count": 1,
+    "member": {
+      "id": "7",
+      "nickname": "Life Fetish",
+      "avatar": {
+        "id": "7",
+        "variants": {
+          "mini": "locale://ava2",
+          "small": "locale://ava2",
+          "medium": "locale://ava2"
+        }
+      },
+      "url": "",
+      "content_type": "member",
+      "meta_line": ""
+    },
+    "is_archived": false,
+    "created_at": "2017-01-01T00:04:00.000Z",
+    "updated_at": "2017-01-01T00:04:00.000Z"
+  }
+]

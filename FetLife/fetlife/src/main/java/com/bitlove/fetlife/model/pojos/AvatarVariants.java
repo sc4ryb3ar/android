@@ -1,7 +1,9 @@
 package com.bitlove.fetlife.model.pojos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AvatarVariants implements PictureVariantsInterface {
 
     @JsonProperty("medium")
