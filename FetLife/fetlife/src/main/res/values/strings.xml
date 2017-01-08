@@ -141,6 +141,16 @@
     <string name="settings_category_general_start">Start Screen Setting</string>
     <string name="settings_title_general_feed_as_start">Use Activity Feed as start screen</string>
     <string name="settings_summary_general_feed_as_start">Show Activity Feed Screen after opening the App</string>
+    <string name="settings_category_general_vanilla">App Flavor Settings</string>
+    <string name="settings_title_general_vanilla">Go Vanilla</string>
+    <string name="settings_summary_general_vanilla">Use FL instead of FetLife as App name and use simple FL icon instead of FetLife logo as an App icon</string>
+    <!--
+    <string name="title_switch_flavor_confirmation">Changing App Flavor</string>
+    <string name="message_switch_flavor_confirmation">App will be closed after change.\nDo you want to continue?</string>
+    <string name="button_switch_flavor_confirmation">Continue</string>
+    <string name="button_switch_flavor_cancel">Cancel</string>
+    -->
+
     <string name="settings_title_notifications">Notification Settings</string>
     <string name="settings_summary_notifications">Manage when and how to receive notifications</string>
     <string name="settings_category_notification_text">Notification Text</string>
@@ -268,6 +278,8 @@
 
     <!-- *** Strings for Login screen *** -->
 
+    <string name="action_log_on">Log me in</string>
+    <string name="progress_logging_in">Logging you in...</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_new_message">Your message here</string>
