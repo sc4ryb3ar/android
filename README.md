@@ -41,9 +41,10 @@ For more information about how to do it please read the following [guideline](ht
 
 3. (Optional) disable application install from unknown sources. 
 
+If you are interested in testing latest feature of the App before they released in our stable version download our preview version:
+[fetlife-2.2.0.apk](https://github.com/fetlife/android/releases/download/v2.2.0/fetlife-2.2.0.apk)
 
-If you would like to have less kinky icon and app name to make the app look like a usual app on your device, you can rather download our vanilla version [fetlife-vanilla-2.1.3.apk](https://github.com/fetlife/android/releases/download/v2.1.3/fetlife-vanilla-2.1.3.apk)
-
+Notice: From version 2.2.0 Vanilla and Kinky types of the App are going to be merged together. You can change your app name and icon from the Kinky to the Vanilla version via the settings menu item.
 
 ### Kinksters Helping Kinksters
 
