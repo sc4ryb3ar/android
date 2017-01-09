@@ -13,7 +13,7 @@ Welcome to FetLife's open-source Android app!
 - Approve or Reject your pending friend requests
 - Share your profile with others via NFC beam
 - Accept shared profiles and create a new friend request at Friend Requests screen
-- Receive all FetLife notifications on your phone 
+- Receive all FetLife notifications on your phone
 - View your notification history
 - Get information about new features at About Screen
 - Use hardware menu button to open the menu
@@ -39,7 +39,7 @@ For more information about how to do it please read the following [guideline](ht
 
 2. Download and install the [fetlife-2.1.3.apk](https://github.com/fetlife/android/releases/download/v2.1.3/fetlife-2.1.3.apk) to your device
 
-3. (Optional) disable application install from unknown sources. 
+3. (Optional) disable application install from unknown sources.
 
 If you are interested in testing latest feature of the App before they released in our stable version download our preview version:
 [fetlife-2.2.0.apk](https://github.com/fetlife/android/releases/download/v2.2.0/fetlife-2.2.0.apk)
@@ -53,7 +53,7 @@ Want to install the app on your phone but are not technically savvy? Ask your lo
 
 ### Got Bugs?
 
-If you find a bug please start by reading through the our current list of [open issues](https://github.com/fetlife/fetlife-android/issues) and if you can't find anything about your bug please [submit a new bug](https://github.com/fetlife/fetlife-android/issues/new).
+If you find a bug please start by reading through the current list of [open issues](https://github.com/fetlife/fetlife-android/issues) and if you can't find anything about your bug please [submit a new bug](https://github.com/fetlife/fetlife-android/issues/new).
 
 
 ### Want to Contribute
