@@ -598,6 +598,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         if (mimeType == null || mimeType.trim().length() == 0) {
             //let's give a try
+            Crashlytics.logException(new Exception("MimeType could not be read for image upload, falling back to image/jpeg"));
             mimeType = "image/jpeg";
         }
 
