@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
@@ -56,6 +57,7 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -549,16 +551,17 @@ public class FetLifeApiIntentService extends IntentService {
         boolean friendsOnly = getBoolFromParams(params, 3, false);
 
         InputStream inputStream;
-        String mimeType = null;
-        try {
-            mimeType = contentResolver.getType(uri);
-            inputStream = contentResolver.openInputStream(uri);
-        } catch (Exception e) {
-            inputStream = null;
+        String mimeType = getMimeType(uri, contentResolver);
+
+        if (mimeType == null) {
+            Crashlytics.logException(new Exception("Media type for file to upload not found"));
+            return Integer.MIN_VALUE;
         }
 
-        if (mimeType == null || inputStream == null) {
-            Crashlytics.logException(new Exception("Media file to upload not found"));
+        try {
+            inputStream = contentResolver.openInputStream(uri);
+        } catch (Exception e) {
+            Crashlytics.logException(new Exception("Media file to upload not found", e));
             return Integer.MIN_VALUE;
         }
 
@@ -578,6 +581,28 @@ public class FetLifeApiIntentService extends IntentService {
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
+    public static String getMimeType(Uri uri, ContentResolver contentResolver) {
+        String mimeType;
+
+        //Check uri format to avoid null
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            //If scheme is a content
+            mimeType = contentResolver.getType(uri);
+        } else {
+            //If scheme is a File
+            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
+            String extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+        }
+
+        if (mimeType == null || mimeType.trim().length() == 0) {
+            //let's give a try
+            mimeType = "image/jpeg";
+        }
+
+        return mimeType;
+    }
 
     //****
     //Retrieve (GET) related methods / Api calls

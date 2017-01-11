@@ -24,11 +24,11 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v2.2.0<br/>
+            <p/>v2.2.1<br/>
                     <ul>
                         <li>Security Improvements</li>
                         <li>Merging Vanilla and Kinky versions into one App</li>
-                        <li>Bug fixes</li>
+                        <li>Image upload Fix</li>
                     </ul>
 
             <p/>v2.1.3<br/>
