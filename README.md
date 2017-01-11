@@ -34,6 +34,12 @@ Welcome to FetLife's open-source Android app!
 
 ### Installing the App on your Android Device
 
+Download our latest stable version from GetJar App store:
+[FetLife app from GetJar](http://www.getjar.com/categories/adult-apps/social-and-messaging/FetLife-925569)
+
+
+or as an alternative option: directly from GitHub:
+
 1. Enable installing application from unknwon sources.
 For more information about how to do it please read the following [guideline](https://developer.android.com/distribute/tools/open-distribution.html#unknown-sources)
 
