@@ -18,6 +18,7 @@ import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
@@ -330,6 +331,9 @@ public class FetLifeApplication extends MultiDexApplication {
 
         @Override
         public void onActivityResumed(Activity activity) {
+            if (!isAppInForeground()) {
+                FetLifeApiIntentService.startPendingCalls(FetLifeApplication.this);
+            }
             setForegroundActivity(activity);
         }
 

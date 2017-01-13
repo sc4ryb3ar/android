@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.NetworkUtil;
 
@@ -19,14 +20,7 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
         if(status != NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
 
             //If internet is back, start services that might have some pending requests to be sent
-            //TODO add a marker to them or add all relevant service calls to a list so there is no need to add them one by one here in the future
-
-            if (!FetLifeApiIntentService.isActionInProgress(FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES)) {
-                FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
-            }
-            if (!FetLifeApiIntentService.isActionInProgress(FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS)) {
-                FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
-            }
+            FetLifeApiIntentService.startPendingCalls(context);
         }
     }
 }
