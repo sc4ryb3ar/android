@@ -238,10 +238,10 @@ public class MessagesActivity extends ResourceActivity
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessagesCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
-            setMessagesRead();
-            oldMessageLoadingInProgress = false;
             //TODO: solve setting this value false only if appropriate message call is finished (otherwise same call can be triggered twice)
+            oldMessageLoadingInProgress = false;
             messagesAdapter.refresh();
+            setMessagesRead();
             dismissProgress();
         }
     }
