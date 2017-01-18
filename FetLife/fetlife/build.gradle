@@ -128,6 +128,8 @@ dependencies {
 
     compile 'com.malinskiy:materialicons:1.0.2'
 
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
+
     //dbflow
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
     compile "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"

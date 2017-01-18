@@ -57,7 +57,7 @@ public class SettingsActivity extends PreferenceActivity {
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
     }
@@ -71,7 +71,6 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        finish();
     }
 
     @Override
@@ -191,4 +190,5 @@ public class SettingsActivity extends PreferenceActivity {
         }
         return false;
     }
+
 }

@@ -123,6 +123,9 @@
             android:theme="@style/AppTheme.Light_Accent"
             android:label="@string/title_activity_settings"></activity>
 
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
+
         <service
             android:name=".model.service.FetLifeApiIntentService"
             android:exported="false" />

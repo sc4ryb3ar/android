@@ -19,6 +19,8 @@ import android.widget.ImageView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
+import com.crashlytics.android.Crashlytics;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,12 +31,14 @@ public class MediaUploadSelectionDialog extends DialogFragment {
 
     private static final int REQUEST_CODE_GALLERY_IMAGE = 2315;
     private static final int REQUEST_CODE_CAMERA_IMAGE = 3455;
+    private static final int REQUEST_CODE_CROP_GALLERY_IMAGE = 4315;
+    private static final int REQUEST_CODE_CROP_CAMERA_IMAGE = 5455;
 
     private static final String FRAGMENT_TAG = MediaUploadSelectionDialog.class.getSimpleName();
 
     private static final String STATE_PARCELABLE_PHOTOURI = "STATE_PARCELABLE_PHOTOURI";
 
-    private Uri photoURI;
+    private Uri cameraPictureUri;
 
     @Nullable
     @Override
@@ -79,10 +83,6 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        ResourceListActivity activity = getResourceActivity();
-        if (getResourceActivity() != null) {
-            activity.onWaitingForResult();
-        }
         startActivityForResult(Intent.createChooser(intent,
                 getResources().getString(R.string.title_intent_choose_media_upload)), REQUEST_CODE_GALLERY_IMAGE);
     }
@@ -90,28 +90,59 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(STATE_PARCELABLE_PHOTOURI, photoURI);
+        outState.putParcelable(STATE_PARCELABLE_PHOTOURI, cameraPictureUri);
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            photoURI = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
+            cameraPictureUri = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        dismissAllowingStateLoss();
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
-                MediaUploadConfirmationDialog.show(getActivity(), data.getData().toString(), false);
+                startActivityForResult(CropImage.activity(data.getData()).getIntent(getActivity()), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE);
             } else if (requestCode == REQUEST_CODE_CAMERA_IMAGE) {
-                MediaUploadConfirmationDialog.show(getActivity(), photoURI.toString(), true);
+                startActivityForResult(CropImage.activity(cameraPictureUri).getIntent(getActivity()), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                dismissAllowingStateLoss();
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                Uri resultUri = result.getUri();
+                MediaUploadConfirmationDialog.show(getActivity(), resultUri.toString(), true);
+                cleanUpCameraPicture();
             }
+        } else if (resultCode == Activity.RESULT_CANCELED){
+            dismissAllowingStateLoss();
+            cleanUpCameraPicture();
+        } else {
+            Exception exception;
+            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                exception = result.getError();
+            } else {
+                exception = new Exception("Image selection failed");
+            }
+            dismissAllowingStateLoss();
+            Crashlytics.logException(exception);
+            cleanUpCameraPicture();
         }
+    }
+
+    private void cleanUpCameraPicture() {
+        if (cameraPictureUri == null) {
+            return;
+        }
+        try {
+            getActivity().getContentResolver().delete(cameraPictureUri,null,null);
+        } catch (Exception e) {
+            Crashlytics.logException(new Exception("Camera Picture could not be removed"));
+        }
+        cameraPictureUri = null;
     }
 
     private void onCameraUpload() {
@@ -127,10 +158,10 @@ public class MediaUploadSelectionDialog extends DialogFragment {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(getActivity(),
+                cameraPictureUri = FileProvider.getUriForFile(getActivity(),
                         "com.bitlove.fetlife.fileprovider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPictureUri);
                 startActivityForResult(takePictureIntent, REQUEST_CODE_CAMERA_IMAGE);
             }
         } else {
@@ -162,6 +193,15 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         // Create and show the dialog.
         DialogFragment newFragment = newInstance();
         newFragment.show(ft, FRAGMENT_TAG);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        ResourceListActivity activity = getResourceActivity();
+        if (getResourceActivity() != null) {
+            activity.onWaitingForResult();
+        }
+        super.startActivityForResult(intent, requestCode);
     }
 
     private static DialogFragment newInstance() {

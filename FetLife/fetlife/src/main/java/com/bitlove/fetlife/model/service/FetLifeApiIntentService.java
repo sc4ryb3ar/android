@@ -400,7 +400,7 @@ public class FetLifeApiIntentService extends IntentService {
             }
         }
         //Return success result if at least one pending message could have been sent so there was a change in the current state
-        return sentMessageCount == 0 ? Integer.MIN_VALUE : sentMessageCount;
+        return sentMessageCount;
     }
 
     private boolean startNewConversation(User user, String localConversationId, Message startMessage) throws IOException {
@@ -492,7 +492,8 @@ public class FetLifeApiIntentService extends IntentService {
                 sentCount++;
             }
         }
-        return sentCount == 0 ? Integer.MIN_VALUE : sentCount;
+        //TODO: check later if sending error counter would make any sense here
+        return sentCount;
     }
 
     private boolean sendPendingSharedProfile(SharedProfile pendingSharedProfile) throws IOException {
