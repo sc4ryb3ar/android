@@ -24,6 +24,12 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.3.0<br/>
+                    <ul>
+                        <li>Cropping option for uploaded pictures</li>
+                        <li>Crash and other bug fixes</li>
+                    </ul>
+
             <p/>v2.2.1<br/>
                     <ul>
                         <li>Security Improvements</li>

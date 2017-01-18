@@ -44,6 +44,7 @@ import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
+import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.annotation.Collate;
@@ -394,6 +395,7 @@ public class FetLifeApiIntentService extends IntentService {
                     return Integer.MIN_VALUE;
                 }
             } else if (sendPendingMessage(pendingMessage)) {
+                MessageDuplicationDebugUtil.checkSentMessage(pendingMessage);
                 sentMessageCount++;
             } else {
                 return Integer.MIN_VALUE;
@@ -602,7 +604,14 @@ public class FetLifeApiIntentService extends IntentService {
         Response<ResponseBody> response = uploadPictureCall.execute();
 
         if (deleteAfterUpload) {
-            getContentResolver().delete(uri, null, null);
+            try {
+                getContentResolver().delete(uri, null, null);
+            } catch (IllegalArgumentException iae) {
+                File contentFile = new File(uri.toString());
+                if (contentFile.exists()) {
+                    contentFile.delete();
+                }
+            }
         }
 
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
