@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
@@ -448,9 +449,17 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     //Send one particular message
+
+    private static long lastSentMessageDate;
+
     private boolean sendPendingMessage(Message pendingMessage) throws IOException {
+        //Server can handle only one message in every second without adding the same date to it
+        while (lastSentMessageDate/1000 == System.currentTimeMillis()/1000) {}
+
         Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody());
         Response<Message> postMessageResponse = postMessagesCall.execute();
+        lastSentMessageDate = System.currentTimeMillis();
+
         String conversationId = pendingMessage.getConversationId();
         if (postMessageResponse.isSuccess()) {
             //Update the message state of the returned message object
