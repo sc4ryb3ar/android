@@ -27,7 +27,6 @@ public class NotificationParser {
     private static final String JSON_FIELD_STRING_TYPE = "type";
     private static final java.lang.String JSON_FIELD_INT_MIN_VERSION = "min_version";
     private static final java.lang.String JSON_FIELD_INT_MAX_VERSION = "max_version";
-    private static final String JSON_FIELD_STRING_FLAVOR = "flavor";
 
     public static final String JSON_VALUE_GROUP_INFO = "info";
     public static final String JSON_VALUE_GROUP_FETLIFE_MESSAGE = "fetlife_messages";
@@ -103,14 +102,6 @@ public class NotificationParser {
                 }
             } catch (NumberFormatException nfe) {
                 //skip
-            }
-        }
-
-        //Check flavor relevance
-        String flavor = additionalData != null ? additionalData.optString(JSON_FIELD_STRING_FLAVOR) : null;
-        if (flavor != null && flavor.trim().length() > 0) {
-            if (!flavor.equalsIgnoreCase(BuildConfig.FLAVOR)) {
-                return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
             }
         }
 

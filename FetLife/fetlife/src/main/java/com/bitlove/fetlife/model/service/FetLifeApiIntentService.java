@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
@@ -43,6 +45,7 @@ import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.util.BytesUtil;
+import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.annotation.Collate;
@@ -56,6 +59,7 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -103,6 +107,9 @@ public class FetLifeApiIntentService extends IntentService {
     private static final String SUBJECT_SHORTENED_SUFFIX = "\u2026";
     private static final String TEXT_PLAIN = "text/plain";
 
+    private static final int PENDING_MESSAGE_RETRY_COUNT = 3;
+    private static final int PENDING_FRIENDREQUEST_RETRY_COUNT = 3;
+
     private static String actionInProgress = null;
 
     /**
@@ -117,6 +124,15 @@ public class FetLifeApiIntentService extends IntentService {
         intent.setAction(action);
         intent.putExtra(EXTRA_PARAMS, params);
         context.startService(intent);
+    }
+
+    public static synchronized void startPendingCalls(Context context) {
+        if (!isActionInProgress(ACTION_APICALL_SEND_MESSAGES)) {
+            startApiCall(context, ACTION_APICALL_SEND_MESSAGES);
+        }
+        if (!isActionInProgress(ACTION_APICALL_SEND_FRIENDREQUESTS)) {
+            startApiCall(context, ACTION_APICALL_SEND_FRIENDREQUESTS);
+        }
     }
 
     public FetLifeApiIntentService() {
@@ -212,7 +228,12 @@ public class FetLifeApiIntentService extends IntentService {
                     result = retrieveMessages(currentUser, params);
                     break;
                 case ACTION_APICALL_SEND_MESSAGES:
-                    result = sendPendingMessages(currentUser, 0);
+                    for (int i = PENDING_MESSAGE_RETRY_COUNT; i > 0; i--) {
+                        result = sendPendingMessages(currentUser, 0);
+                        if (result != Integer.MIN_VALUE) {
+                            break;
+                        }
+                    }
                     break;
                 case ACTION_APICALL_SET_MESSAGES_READ:
                     result = setMessagesRead(params);
@@ -224,7 +245,12 @@ public class FetLifeApiIntentService extends IntentService {
                     result = removeLove(params);
                     break;
                 case ACTION_APICALL_SEND_FRIENDREQUESTS:
-                    result = sendPendingFriendRequests();
+                    for (int i = PENDING_FRIENDREQUEST_RETRY_COUNT; i > 0; i--) {
+                        result = sendPendingFriendRequests();
+                        if (result != Integer.MIN_VALUE) {
+                            break;
+                        }
+                    }
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
@@ -239,7 +265,7 @@ public class FetLifeApiIntentService extends IntentService {
             if (result != Integer.MIN_VALUE) {
                 //If the call succeed notify all subscribers about
                 sendLoadFinishedNotification(action, result, params);
-            } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401 || lastResponseCode == 403)) {
+            } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
                 if (refreshToken(currentUser)) {
                     //If token refresh succeed restart the original request
@@ -357,7 +383,7 @@ public class FetLifeApiIntentService extends IntentService {
 
     //Go through all the pending messages and send them one by one
     private int sendPendingMessages(User user, int sentMessageCount) throws IOException {
-        List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.pending.is(true)).queryList();
+        List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.pending.is(true)).orderBy(Message_Table.date,true).queryList();
         //Go through all pending messages (if there is any) and try to send them
         for (Message pendingMessage : pendingMessages) {
             String conversationId = pendingMessage.getConversationId();
@@ -366,13 +392,18 @@ public class FetLifeApiIntentService extends IntentService {
                 if (startNewConversation(user, conversationId, pendingMessage)) {
                     //db changed, reload remaining pending messages with starting this method recursively
                     return sendPendingMessages(user, ++sentMessageCount);
+                } else {
+                    return Integer.MIN_VALUE;
                 }
             } else if (sendPendingMessage(pendingMessage)) {
+                MessageDuplicationDebugUtil.checkSentMessage(pendingMessage);
                 sentMessageCount++;
+            } else {
+                return Integer.MIN_VALUE;
             }
         }
         //Return success result if at least one pending message could have been sent so there was a change in the current state
-        return sentMessageCount == 0 ? Integer.MIN_VALUE : sentMessageCount;
+        return sentMessageCount;
     }
 
     private boolean startNewConversation(User user, String localConversationId, Message startMessage) throws IOException {
@@ -383,7 +414,7 @@ public class FetLifeApiIntentService extends IntentService {
         }
 
         String body = startMessage.getBody();
-        String subject = body == null || body.length() <= 16 ? body : body.substring(0,16).concat("…");
+        String subject = body == null || body.length() <= MAX_SUBJECT_LENGTH ? body : body.substring(0,MAX_SUBJECT_LENGTH).concat(SUBJECT_SHORTENED_SUFFIX);
         Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), subject, body);
         Response<Conversation> postConversationResponse = postConversationCall.execute();
         if (postConversationResponse.isSuccess()) {
@@ -418,9 +449,23 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     //Send one particular message
+
+    private static long lastSentMessageDate;
+
     private boolean sendPendingMessage(Message pendingMessage) throws IOException {
+        //Server can handle only one message in every second without adding the same date to it
+        do {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                break;
+            }
+        } while (lastSentMessageDate/1000 == System.currentTimeMillis()/1000);
+
         Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody());
         Response<Message> postMessageResponse = postMessagesCall.execute();
+        lastSentMessageDate = System.currentTimeMillis();
+
         String conversationId = pendingMessage.getConversationId();
         if (postMessageResponse.isSuccess()) {
             //Update the message state of the returned message object
@@ -464,7 +509,8 @@ public class FetLifeApiIntentService extends IntentService {
                 sentCount++;
             }
         }
-        return sentCount == 0 ? Integer.MIN_VALUE : sentCount;
+        //TODO: check later if sending error counter would make any sense here
+        return sentCount;
     }
 
     private boolean sendPendingSharedProfile(SharedProfile pendingSharedProfile) throws IOException {
@@ -549,16 +595,17 @@ public class FetLifeApiIntentService extends IntentService {
         boolean friendsOnly = getBoolFromParams(params, 3, false);
 
         InputStream inputStream;
-        String mimeType = null;
-        try {
-            mimeType = contentResolver.getType(uri);
-            inputStream = contentResolver.openInputStream(uri);
-        } catch (Exception e) {
-            inputStream = null;
+        String mimeType = getMimeType(uri, contentResolver);
+
+        if (mimeType == null) {
+            Crashlytics.logException(new Exception("Media type for file to upload not found"));
+            return Integer.MIN_VALUE;
         }
 
-        if (mimeType == null || inputStream == null) {
-            Crashlytics.logException(new Exception("Media file to upload not found"));
+        try {
+            inputStream = contentResolver.openInputStream(uri);
+        } catch (Exception e) {
+            Crashlytics.logException(new Exception("Media file to upload not found", e));
             return Integer.MIN_VALUE;
         }
 
@@ -572,12 +619,42 @@ public class FetLifeApiIntentService extends IntentService {
         Response<ResponseBody> response = uploadPictureCall.execute();
 
         if (deleteAfterUpload) {
-            getContentResolver().delete(uri, null, null);
+            try {
+                getContentResolver().delete(uri, null, null);
+            } catch (IllegalArgumentException iae) {
+                File contentFile = new File(uri.toString());
+                if (contentFile.exists()) {
+                    contentFile.delete();
+                }
+            }
         }
 
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
+    public static String getMimeType(Uri uri, ContentResolver contentResolver) {
+        String mimeType;
+
+        //Check uri format to avoid null
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            //If scheme is a content
+            mimeType = contentResolver.getType(uri);
+        } else {
+            //If scheme is a File
+            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
+            String extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+        }
+
+        if (mimeType == null || mimeType.trim().length() == 0) {
+            //let's give a try
+            Crashlytics.logException(new Exception("MimeType could not be read for image upload, falling back to image/jpeg"));
+            mimeType = "image/jpeg";
+        }
+
+        return mimeType;
+    }
 
     //****
     //Retrieve (GET) related methods / Api calls

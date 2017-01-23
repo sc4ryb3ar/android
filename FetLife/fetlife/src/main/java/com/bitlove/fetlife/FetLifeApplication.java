@@ -18,6 +18,7 @@ import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
@@ -330,16 +331,23 @@ public class FetLifeApplication extends MultiDexApplication {
 
         @Override
         public void onActivityResumed(Activity activity) {
+            if (!isAppInForeground()) {
+                FetLifeApiIntentService.startPendingCalls(FetLifeApplication.this);
+            }
             setForegroundActivity(activity);
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
-            setForegroundActivity(null);
+
         }
 
         @Override
         public void onActivityStopped(Activity activity) {
+            if (getForegroundActivity() == activity) {
+                setForegroundActivity(null);
+            }
+
             boolean isWaitingForResult = isWaitingForResult(activity);
             //Check if the new Screen is already displayed so the App is still in the foreground
             //Check if the Activity is topped due to configuration change like device rotation

@@ -22,11 +22,12 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/login_header"
                 style="@style/LogonHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/app_name" />
+                android:text="@string/app_name_kinky" />
 
             <LinearLayout
                 android:id="@+id/username_login_form"
@@ -36,12 +37,13 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/login_text"
                     style="@style/LogonText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="left"
-                    android:text="@string/logon_title" />
+                    android:text="@string/logon_title_kinky" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"

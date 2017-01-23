@@ -26,6 +26,9 @@ public class Conversation extends BaseModel {
     public static boolean isUnanswered(String conversationId, FetLifeApplication fetLifeApplication) {
         User currentUser = fetLifeApplication.getUserSessionManager().getCurrentUser();
         List<Message> messages = new Select().from(Message.class).where(Message_Table.conversationId.is(conversationId)).orderBy(Message_Table.pending, false).orderBy(Message_Table.date, false).queryList();
+        if (messages.isEmpty()) {
+            return false;
+        }
         for (Message message: messages) {
             if (!currentUser.getId().equals(message.getSenderId())) {
                 return false;

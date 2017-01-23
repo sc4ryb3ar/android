@@ -176,6 +176,8 @@
 
   <!-- *** Strings for login screen *** -->
 
+  <string name="action_log_on">Log mich ein, Scotty!</string>
+  <string name="progress_logging_in">Beam dich rauf...</string>
   <string name="prompt_username">Name</string>
   <string name="prompt_password">Passwort</string>
   <string name="prompt_new_message">Deine Nachricht</string>

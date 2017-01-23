@@ -1,14 +1,18 @@
 package com.bitlove.fetlife.view.activity.standalone;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +57,7 @@ public class SettingsActivity extends PreferenceActivity {
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
     }
@@ -67,7 +71,6 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        finish();
     }
 
     @Override
@@ -84,6 +87,29 @@ public class SettingsActivity extends PreferenceActivity {
 
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.general_preferences);
+
+            FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
+
+            final Preference vanillaSwitchPreference = findPreference(getString(R.string.settings_key_general_vanilla));
+            SharedPreferences globalPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+            vanillaSwitchPreference.getEditor().putBoolean(getString(R.string.settings_key_general_vanilla),globalPreferences.getBoolean(fetLifeApplication.getString(R.string.settings_key_general_vanilla),false));
+
+            vanillaSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object value) {
+                    boolean vanilla = (boolean) value;
+                    FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
+                    fetLifeApplication.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(fetLifeApplication.getPackageName(), fetLifeApplication.getPackageName() + ".StartActivity_Kinky"),
+                            vanilla ? PackageManager.COMPONENT_ENABLED_STATE_DISABLED : PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                    fetLifeApplication.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(fetLifeApplication.getPackageName(), fetLifeApplication.getPackageName() + ".StartActivity_Vanilla"),
+                            vanilla ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                    SharedPreferences globalPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+                    globalPreferences.edit().putBoolean(fetLifeApplication.getString(R.string.settings_key_general_vanilla),vanilla).apply();
+                    return true;
+                }
+            });
         }
     }
 
@@ -164,4 +190,5 @@ public class SettingsActivity extends PreferenceActivity {
         }
         return false;
     }
+
 }

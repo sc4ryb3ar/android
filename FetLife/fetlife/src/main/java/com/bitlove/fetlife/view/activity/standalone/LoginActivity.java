@@ -43,6 +43,14 @@ public class LoginActivity extends Activity {
 
         setContentView(R.layout.activity_login);
 
+        boolean vanilla = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication()).getBoolean(getFetLifeApplication().getString(R.string.settings_key_general_vanilla),false);
+        if (vanilla) {
+            TextView loginHeader = (TextView) findViewById(R.id.login_header);
+            loginHeader.setText(getString(R.string.app_name_vanilla));
+            TextView loginText = (TextView) findViewById(R.id.login_text);
+            loginText.setText(getString(R.string.logon_title_vanilla));
+        }
+
         // Set up the login form.
         mUserNameView = (EditText) findViewById(R.id.username);
 
@@ -70,7 +78,7 @@ public class LoginActivity extends Activity {
 
         logonProgressFakeButton = (Button) findViewById(R.id.logging_progress_button);
 
-        if (BuildConfig.FLAVOR_VANILLA.equals(BuildConfig.FLAVOR)) {
+        if (vanilla) {
             findViewById(R.id.link_text_sign_up).setVisibility(View.GONE);
             findViewById(R.id.link_text_forgot_password).setVisibility(View.GONE);
         }

@@ -27,6 +27,7 @@ import com.bitlove.fetlife.model.pojos.Message;
 
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
 import com.crashlytics.android.Crashlytics;
@@ -237,10 +238,10 @@ public class MessagesActivity extends ResourceActivity
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessagesCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
-            setMessagesRead();
-            oldMessageLoadingInProgress = false;
             //TODO: solve setting this value false only if appropriate message call is finished (otherwise same call can be triggered twice)
+            oldMessageLoadingInProgress = false;
             messagesAdapter.refresh();
+            setMessagesRead();
             dismissProgress();
         }
     }
@@ -318,6 +319,7 @@ public class MessagesActivity extends ResourceActivity
         message.setBody(text.trim());
         message.setSenderId(currentUser.getId());
         message.setSenderNickname(currentUser.getNickname());
+        MessageDuplicationDebugUtil.checkTypedMessage(message);
         message.save();
 
         FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
