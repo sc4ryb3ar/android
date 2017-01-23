@@ -45,6 +45,16 @@
   <string name="settings_category_general_start">Startbildschrim-Einstellungen</string>
   <string name="settings_title_general_feed_as_start">Nutze die Aktivitätschronik als Startbildschirm</string>
   <string name="settings_summary_general_feed_as_start">Zeige die Aktivitätschronik, wenn Du die App startest</string>
+  <string name="settings_category_general_vanilla">Einstellungen zur Appvariante</string>
+  <string name="settings_title_general_vanilla">Werde Vanilla</string>
+  <string name="settings_summary_general_vanilla">Nutze FL anstatt FetLife als Appnamen und nutze ein einfaches FL als Appsymbol, anstatt des FetLife-Logos</string>
+  <!--
+  <string name="title_switch_flavor_confirmation">Ändere Appvariante</string>
+  <string name="message_switch_flavor_confirmation">App wird nach der Änderung geschlossen.\nMöchtest du fortfahren?</string>
+  <string name="button_switch_flavor_confirmation">Weiter</string>
+  <string name="button_switch_flavor_cancel">Abbruch</string>
+  -->
+
   <string name="settings_title_notifications">Benachrichtigungseinstellungen</string>
   <string name="settings_summary_notifications">Stelle ein wann und wie Benachrichtigungen empfangen werden</string>
   <string name="settings_category_notification_text">Benachrichtigungstext</string>
