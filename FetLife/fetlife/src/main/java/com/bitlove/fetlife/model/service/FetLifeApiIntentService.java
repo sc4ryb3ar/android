@@ -454,7 +454,13 @@ public class FetLifeApiIntentService extends IntentService {
 
     private boolean sendPendingMessage(Message pendingMessage) throws IOException {
         //Server can handle only one message in every second without adding the same date to it
-        while (lastSentMessageDate/1000 == System.currentTimeMillis()/1000) {}
+        do {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                break;
+            }
+        } while (lastSentMessageDate/1000 == System.currentTimeMillis()/1000);
 
         Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody());
         Response<Message> postMessageResponse = postMessagesCall.execute();
