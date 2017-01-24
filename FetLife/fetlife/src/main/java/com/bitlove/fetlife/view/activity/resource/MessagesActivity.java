@@ -46,10 +46,12 @@ public class MessagesActivity extends ResourceActivity
 
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
     private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
+    private static final String EXTRA_AVATAR_RESOURCE_URL = "com.bitlove.fetlife.extra.avatar_resource_url";
 
     private MessagesRecyclerAdapter messagesAdapter;
 
     private String conversationId;
+    private String avatarUrl;
     private boolean oldMessageLoadingInProgress;
 
     protected RecyclerView recyclerView;
@@ -59,11 +61,11 @@ public class MessagesActivity extends ResourceActivity
     protected EditText textInput;
     private Conversation conversation;
 
-    public static void startActivity(Context context, String conversationId, String title, boolean newTask) {
-        context.startActivity(createIntent(context, conversationId, title, newTask));
+    public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
+        context.startActivity(createIntent(context, conversationId, title, avatarResourceUrl, newTask));
     }
 
-    public static Intent createIntent(Context context, String conversationId, String title, boolean newTask) {
+    public static Intent createIntent(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
         Intent intent = new Intent(context, MessagesActivity.class);
         if (newTask) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -71,6 +73,7 @@ public class MessagesActivity extends ResourceActivity
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.putExtra(EXTRA_CONVERSATION_ID, conversationId);
         intent.putExtra(EXTRA_CONVERSATION_TITLE, title);
+        intent.putExtra(EXTRA_AVATAR_RESOURCE_URL, avatarResourceUrl);
         return intent;
     }
 
@@ -124,7 +127,7 @@ public class MessagesActivity extends ResourceActivity
     private void setConversation(Intent intent) {
         conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
         String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
-        setTitle(conversationTitle);
+        avatarUrl = intent.getStringExtra(EXTRA_AVATAR_RESOURCE_URL);
         messagesAdapter = new MessagesRecyclerAdapter(conversationId);
         conversation = messagesAdapter.getConversation();
         if (conversation != null) {
@@ -132,7 +135,19 @@ public class MessagesActivity extends ResourceActivity
             if (draftMessage != null) {
                 textInput.append(draftMessage);
             }
+            if (avatarUrl == null) {
+                avatarUrl = conversation.getAvatarLink();
+            }
         }
+
+        if (avatarUrl != null) {
+            toolBarImage.setVisibility(View.VISIBLE);
+            toolBarImage.setImageURI(avatarUrl);
+        } else {
+            toolBarImage.setVisibility(View.INVISIBLE);
+        }
+        setTitle(conversationTitle);
+
         recyclerView.setAdapter(messagesAdapter);
     }
 

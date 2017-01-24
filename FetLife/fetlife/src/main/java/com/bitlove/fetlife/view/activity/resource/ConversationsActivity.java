@@ -65,7 +65,7 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
 
     @Override
     public void onItemClick(Conversation conversation) {
-        MessagesActivity.startActivity(ConversationsActivity.this, conversation.getId(), conversation.getNickname(), false);
+        MessagesActivity.startActivity(ConversationsActivity.this, conversation.getId(), conversation.getNickname(), conversation.getAvatarLink(), false);
     }
 
     @Override

@@ -11,12 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.view.activity.component.ActivityComponent;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
     protected boolean waitingForResult;
     protected ProgressBar progressIndicator;
+    protected SimpleDraweeView toolBarImage;
+    protected TextView toolBarTitle;
 
     List<ActivityComponent> activityComponentList = new ArrayList<>();
 
@@ -50,12 +55,26 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         initProgressIndicator();
+        toolBarImage = (SimpleDraweeView) findViewById(R.id.toolbar_image);
+        toolBarTitle = (TextView) findViewById(R.id.toolbar_title);
     }
 
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
         initProgressIndicator();
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle("");
+        toolBarTitle.setText(title);
+    }
+
+    @Override
+    public void setTitle(int titleId) {
+        super.setTitle("");
+        toolBarTitle.setText(titleId);
     }
 
     @Override

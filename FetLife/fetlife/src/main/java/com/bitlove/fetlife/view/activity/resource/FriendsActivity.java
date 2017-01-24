@@ -87,7 +87,7 @@ public class FriendsActivity extends ResourceListActivity<Friend> implements Nav
     public void onItemClick(Friend friend) {
         switch (getFriendListMode()) {
             case NEW_CONVERSATION:
-                MessagesActivity.startActivity(FriendsActivity.this, Conversation.createLocalConversation(friend), friend.getNickname(), false);
+                MessagesActivity.startActivity(FriendsActivity.this, Conversation.createLocalConversation(friend), friend.getNickname(), friend.getAvatarLink(), false);
                 finish();
                 return;
             case FRIEND_PROFILE:

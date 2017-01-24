@@ -86,6 +86,12 @@ public interface FetLifeApi {
     //TODO: solve dynamic file name
     //https://github.com/square/retrofit/issues/1063
 
+    @Multipart
+    @POST("/api/v2/me/videos")
+    Call<ResponseBody> uploadVideo(@Header("Authorization") String authHeader, @Part("video\"; filename=\"android_app.mov\" ") RequestBody video,  @Part("is_avatar") RequestBody isAvatar, @Part("only_friends") RequestBody friendsOnly, @Part("caption") RequestBody caption, @Part("is_of_or_by_user") RequestBody isFromUser);
+    //TODO: solve dynamic file name
+    //https://github.com/square/retrofit/issues/1063
+
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 
