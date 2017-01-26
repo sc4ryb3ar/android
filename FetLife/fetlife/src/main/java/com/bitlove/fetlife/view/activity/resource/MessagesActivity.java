@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.activity.resource;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -52,6 +53,7 @@ public class MessagesActivity extends ResourceActivity
 
     private String conversationId;
     private String avatarUrl;
+    private String memberLink;
     private boolean oldMessageLoadingInProgress;
 
     protected RecyclerView recyclerView;
@@ -125,9 +127,12 @@ public class MessagesActivity extends ResourceActivity
     }
 
     private void setConversation(Intent intent) {
+
         conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
         String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
         avatarUrl = intent.getStringExtra(EXTRA_AVATAR_RESOURCE_URL);
+        memberLink = null;
+
         messagesAdapter = new MessagesRecyclerAdapter(conversationId);
         conversation = messagesAdapter.getConversation();
         if (conversation != null) {
@@ -138,14 +143,34 @@ public class MessagesActivity extends ResourceActivity
             if (avatarUrl == null) {
                 avatarUrl = conversation.getAvatarLink();
             }
+            memberLink = conversation.getMemberLink();
         }
 
         if (avatarUrl != null) {
             toolBarImage.setVisibility(View.VISIBLE);
             toolBarImage.setImageURI(avatarUrl);
         } else {
-            toolBarImage.setVisibility(View.INVISIBLE);
+            toolBarImage.setVisibility(View.GONE);
         }
+        View.OnClickListener toolBarItemClickListener;
+        if (memberLink != null) {
+            toolBarItemClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(memberLink));
+                    startActivity(intent);
+                }
+            };
+        } else {
+            toolBarItemClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            };
+        }
+        toolBarImage.setOnClickListener(toolBarItemClickListener);
+        toolBarTitle.setOnClickListener(toolBarItemClickListener);
         setTitle(conversationTitle);
 
         recyclerView.setAdapter(messagesAdapter);
