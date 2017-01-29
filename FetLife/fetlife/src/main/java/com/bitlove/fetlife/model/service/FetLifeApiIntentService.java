@@ -44,7 +44,9 @@ import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.model.pojos.VideoUploadIdResult;
 import com.bitlove.fetlife.util.BytesUtil;
+import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.crashlytics.android.Crashlytics;
@@ -68,7 +70,6 @@ import java.util.UUID;
 
 import retrofit.Call;
 import retrofit.Response;
-import retrofit.http.Path;
 
 public class FetLifeApiIntentService extends IntentService {
 
@@ -89,6 +90,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.friendrequests";
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
+    public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
 
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
@@ -254,6 +256,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
+                    break;
+                case ACTION_APICALL_UPLOAD_VIDEO:
+                    result = uploadVideo(params);
                     break;
                 case ACTION_APICALL_MEMBER:
                     result = getMember(params);
@@ -450,27 +455,26 @@ public class FetLifeApiIntentService extends IntentService {
 
     //Send one particular message
 
-    private static long lastSentMessageDate;
+    private static long lastSentMessageTime;
 
     private boolean sendPendingMessage(Message pendingMessage) throws IOException {
         //Server can handle only one message in every second without adding the same date to it
-        do {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                break;
-            }
-        } while (lastSentMessageDate/1000 == System.currentTimeMillis()/1000);
 
-        Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody());
+        //Workaround for server issue as it does not handle millis
+        while (System.currentTimeMillis()/1000 == lastSentMessageTime/1000) {}
+
+        String dateString = DateUtil.toServerString(System.currentTimeMillis());
+        Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody(), dateString);
         Response<Message> postMessageResponse = postMessagesCall.execute();
-        lastSentMessageDate = System.currentTimeMillis();
 
         String conversationId = pendingMessage.getConversationId();
         if (postMessageResponse.isSuccess()) {
             //Update the message state of the returned message object
             final Message message = postMessageResponse.body();
-            //Messages are identifed in the db by client id so original pending message will be overridden here with the correct state
+
+            lastSentMessageTime = message.getDate();
+
+            //Messages are identified in the db by client id so original pending message will be overridden here with the correct state
             message.setClientId(pendingMessage.getClientId());
             message.setPending(false);
             message.setConversationId(conversationId);
@@ -595,7 +599,7 @@ public class FetLifeApiIntentService extends IntentService {
         boolean friendsOnly = getBoolFromParams(params, 3, false);
 
         InputStream inputStream;
-        String mimeType = getMimeType(uri, contentResolver);
+        String mimeType = getMimeType(uri, false, contentResolver);
 
         if (mimeType == null) {
             Crashlytics.logException(new Exception("Media type for file to upload not found"));
@@ -609,13 +613,13 @@ public class FetLifeApiIntentService extends IntentService {
             return Integer.MIN_VALUE;
         }
 
-        RequestBody pictureBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
+        RequestBody mediaBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
         RequestBody isAvatarPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(false));
         RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(friendsOnly));
         RequestBody captionPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), caption);
         RequestBody isFromUserPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(true));
 
-        Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pictureBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
+        Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), mediaBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
         Response<ResponseBody> response = uploadPictureCall.execute();
 
         if (deleteAfterUpload) {
@@ -632,7 +636,67 @@ public class FetLifeApiIntentService extends IntentService {
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
-    public static String getMimeType(Uri uri, ContentResolver contentResolver) {
+    private int uploadVideo(String[] params) throws IOException {
+
+        Uri uri = Uri.parse(params[0]);
+        ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
+
+        boolean deleteAfterUpload = getBoolFromParams(params, 1, false);
+        String caption = params[2];
+        boolean friendsOnly = getBoolFromParams(params, 3, false);
+
+        InputStream inputStream;
+        String mimeType = getMimeType(uri, true, contentResolver);
+
+        if (mimeType == null) {
+            Crashlytics.logException(new Exception("Media type for file to upload not found"));
+            return Integer.MIN_VALUE;
+        }
+
+        Call<VideoUploadIdResult> uploadVideoStartCall = getFetLifeApi().uploadVideoStart(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), caption, caption, "video.jpeg", true, true);
+        Response<VideoUploadIdResult> uploadVideoStartResponse = uploadVideoStartCall.execute();
+
+        if (!uploadVideoStartResponse.isSuccess()) {
+            return Integer.MIN_VALUE;
+        }
+
+        String videoUploadId = uploadVideoStartResponse.body().getVideoUploadId();
+
+        try {
+            inputStream = contentResolver.openInputStream(uri);
+        } catch (Exception e) {
+            Crashlytics.logException(new Exception("Media file to upload not found", e));
+            return Integer.MIN_VALUE;
+        }
+
+        RequestBody mediaBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
+        RequestBody numberPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Integer.toString(1));
+
+        Call<ResponseBody> uploadVideoPartCall = getFetLifeApi().uploadVideoPart(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), videoUploadId, mediaBody, numberPart);
+        Response<ResponseBody> uploadVideoPartResponse = uploadVideoPartCall.execute();
+
+        if (deleteAfterUpload) {
+            try {
+                getContentResolver().delete(uri, null, null);
+            } catch (IllegalArgumentException iae) {
+                File contentFile = new File(uri.toString());
+                if (contentFile.exists()) {
+                    contentFile.delete();
+                }
+            }
+        }
+
+        if (!uploadVideoPartResponse.isSuccess()) {
+            return Integer.MIN_VALUE;
+        }
+
+        Call<ResponseBody> uploadVideoFinishCall = getFetLifeApi().uploadVideoFinish(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), videoUploadId);
+        Response<ResponseBody> uploadVideoFinishResponse = uploadVideoFinishCall.execute();
+
+        return uploadVideoFinishResponse.isSuccess() ? 1 : Integer.MIN_VALUE;
+    }
+
+    public static String getMimeType(Uri uri, boolean isVideo, ContentResolver contentResolver) {
         String mimeType;
 
         //Check uri format to avoid null
@@ -650,7 +714,7 @@ public class FetLifeApiIntentService extends IntentService {
         if (mimeType == null || mimeType.trim().length() == 0) {
             //let's give a try
             Crashlytics.logException(new Exception("MimeType could not be read for image upload, falling back to image/jpeg"));
-            mimeType = "image/jpeg";
+            mimeType = isVideo ? "video/mp4" : "image/jpeg";
         }
 
         return mimeType;
