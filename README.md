@@ -48,7 +48,7 @@ For more information about how to do it please read the following [guideline](ht
 3. (Optional) disable application install from unknown sources.
 
 If you are interested in testing the latest features of the App before they are released into our stable version, please download our prerelease version:
-[fetlife-2.3.2.apk](https://github.com/fetlife/android/releases/download/v2.3.2/fetlife-2.3.2.apk)
+[fetlife-2.4.0.apk](https://github.com/fetlife/android/releases/download/v2.4.0/fetlife-2.4.0.apk)
 
 Notice: Starting from version 2.2.0, Vanilla and Kinky types of the App are going to be merged together. You can change your app name and icon from the Kinky to the Vanilla version via the settings menu item.
 
