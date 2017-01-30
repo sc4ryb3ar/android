@@ -23,18 +23,20 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
 
     private static final String ARGUMENT_MEDIA_URI = "ARGUMENT_MEDIA_URI";
     private static final String ARGUMENT_DELETE_AFTER_UPLOAD = "ARGUMENT_DELETE_AFTER_UPLOAD";
+    private static final String ARGUMENT_IS_VIDEO = "ARGUMENT_IS_VIDEO";
     private static final String FRAGMENT_TAG = MediaUploadConfirmationDialog.class.getSimpleName();
 
-    public static MediaUploadConfirmationDialog newInstance(String mediaUri, boolean deleteAfterUpload) {
+    public static MediaUploadConfirmationDialog newInstance(String mediaUri, boolean isVideo, boolean deleteAfterUpload) {
         MediaUploadConfirmationDialog mediaUploadConfirmationDialog = new MediaUploadConfirmationDialog();
         Bundle args = new Bundle();
         args.putString(ARGUMENT_MEDIA_URI, mediaUri);
+        args.putBoolean(ARGUMENT_IS_VIDEO, isVideo);
         args.putBoolean(ARGUMENT_DELETE_AFTER_UPLOAD, deleteAfterUpload);
         mediaUploadConfirmationDialog.setArguments(args);
         return mediaUploadConfirmationDialog;
     }
 
-    public static void show(Activity activity, String mediaUri, boolean deleteAfterUpload) {
+    public static void show(Activity activity, String mediaUri, boolean isVideo, boolean deleteAfterUpload) {
         FragmentTransaction ft = activity.getFragmentManager().beginTransaction();
         Fragment prev = activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (prev != null) {
@@ -43,7 +45,7 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        DialogFragment newFragment = newInstance(mediaUri, deleteAfterUpload);
+        DialogFragment newFragment = newInstance(mediaUri, isVideo, deleteAfterUpload);
         newFragment.show(ft, FRAGMENT_TAG);
     }
 
@@ -84,7 +86,11 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
         rightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
+                if (getArguments().getBoolean(ARGUMENT_IS_VIDEO, false)) {
+                    FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_VIDEO, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
+                } else {
+                    FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
+                }
                 dismissAllowingStateLoss();
             }
         });

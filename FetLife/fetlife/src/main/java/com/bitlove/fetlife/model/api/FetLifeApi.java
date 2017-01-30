@@ -9,7 +9,7 @@ import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
-import com.bitlove.fetlife.model.pojos.VideoUploadIdResult;
+import com.bitlove.fetlife.model.pojos.VideoUploadResult;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
@@ -88,8 +88,8 @@ public interface FetLifeApi {
     //https://github.com/square/retrofit/issues/1063
 
     @FormUrlEncoded
-    @POST("/api/v2/me/videos")
-    Call<VideoUploadIdResult> uploadVideoStart(@Header("Authorization") String authHeader, @Field("title") String title, @Field("description") String description, @Field("video_file_name") String videoFileName, @Field("only_friends") boolean friendsOnly, @Field("is_of_or_by_user") boolean isFromUser);
+    @POST("/api/v2/me/videos/uploads")
+    Call<VideoUploadResult> uploadVideoStart(@Header("Authorization") String authHeader, @Field("title") String title, @Field("description") String description, @Field("video_file_name") String videoFileName, @Field("only_friends") boolean friendsOnly, @Field("is_of_or_by_user") boolean isFromUser);
 
     @Multipart
     @PUT("/api/v2/me/videos/uploads/{video_upload_id}")
@@ -97,7 +97,6 @@ public interface FetLifeApi {
     //TODO: solve dynamic file name
     //https://github.com/square/retrofit/issues/1063
 
-    @FormUrlEncoded
     @POST("/api/v2/me/videos/uploads/{video_upload_id}/finish")
     Call<ResponseBody> uploadVideoFinish(@Header("Authorization") String authHeader, @Path("video_upload_id") String videoUploadId);
 
