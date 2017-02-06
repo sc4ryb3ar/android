@@ -34,21 +34,14 @@ Welcome to FetLife's open-source Android app!
 
 ### Installing the App on your Android Device
 
-Download from GetJar App Store and follow their instructions to install:
-
-[FetLife Android App at GetJar](http://www.getjar.com/categories/adult-apps/social-and-messaging/FetLife-925569)
-
-OR download directly from GitHub and go throgh the following easy steps:
+Download directly from GitHub and go throgh the following easy steps:
 
 1. Enable installing application from unknwon sources.
 For more information about how to do it please read the following [guideline](https://developer.android.com/distribute/tools/open-distribution.html#unknown-sources)
 
-2. Download and install the [fetlife-2.3.2.apk](https://github.com/fetlife/android/releases/download/v2.3.2/fetlife-2.3.2.apk) to your device.
+2. Download and install the [fetlife-2.4.0.apk](https://github.com/fetlife/android/releases/download/v2.4.0/fetlife-2.4.0.apk) to your device.
 
 3. (Optional) disable application install from unknown sources.
-
-If you are interested in testing the latest features of the App before they are released into our stable version, please download our prerelease version:
-[fetlife-2.4.0.apk](https://github.com/fetlife/android/releases/download/v2.4.0/fetlife-2.4.0.apk)
 
 Notice: Starting from version 2.2.0, Vanilla and Kinky types of the App are going to be merged together. You can change your app name and icon from the Kinky to the Vanilla version via the settings menu item.
 
