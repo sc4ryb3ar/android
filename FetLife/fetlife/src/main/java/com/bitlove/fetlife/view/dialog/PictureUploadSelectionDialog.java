@@ -27,21 +27,16 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MediaUploadSelectionDialog extends DialogFragment {
+public class PictureUploadSelectionDialog extends DialogFragment {
 
     private static final int REQUEST_CODE_GALLERY_IMAGE = 2315;
     private static final int REQUEST_CODE_CAMERA_IMAGE = 3455;
-    private static final int REQUEST_CODE_CAMERA_VIDEO = 3555;
-    private static final int REQUEST_CODE_CROP_GALLERY_IMAGE = 4315;
-    private static final int REQUEST_CODE_CROP_CAMERA_IMAGE = 5455;
 
-    private static final String FRAGMENT_TAG = MediaUploadSelectionDialog.class.getSimpleName();
+    private static final String FRAGMENT_TAG = PictureUploadSelectionDialog.class.getSimpleName();
 
     private static final String STATE_PARCELABLE_PHOTOURI = "STATE_PARCELABLE_PHOTOURI";
-    private static final String STATE_PARCELABLE_VIDEOURI = "STATE_PARCELABLE_VIDEOURI";
 
     private Uri cameraPictureUri;
-    private Uri cameraVideoUri;
 
     @Nullable
     @Override
@@ -55,8 +50,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         cameraSelectionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                onCameraUpload();
-                onVideoUpload();
+                onCameraUpload();
             }
         });
 
@@ -86,6 +80,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     private void onGalleryUpload() {
         Intent intent = new Intent();
         intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,
                 getResources().getString(R.string.title_intent_choose_media_upload)), REQUEST_CODE_GALLERY_IMAGE);
@@ -95,7 +90,6 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_PARCELABLE_PHOTOURI, cameraPictureUri);
-        outState.putParcelable(STATE_PARCELABLE_VIDEOURI, cameraVideoUri);
     }
 
     @Override
@@ -103,7 +97,6 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
             cameraPictureUri = savedInstanceState.getParcelable(STATE_PARCELABLE_PHOTOURI);
-            cameraVideoUri = savedInstanceState.getParcelable(STATE_PARCELABLE_VIDEOURI);
         }
     }
 
@@ -113,16 +106,13 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
                 startActivityForResult(CropImage.activity(data.getData()).getIntent(getActivity()), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE);
-            } else if (requestCode == REQUEST_CODE_CAMERA_VIDEO) {
-                dismissAllowingStateLoss();
-                MediaUploadConfirmationDialog.show(getActivity(), cameraVideoUri.toString(), true, true);
             } else if (requestCode == REQUEST_CODE_CAMERA_IMAGE) {
                 startActivityForResult(CropImage.activity(cameraPictureUri).getIntent(getActivity()), CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE);
             } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 dismissAllowingStateLoss();
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
-                MediaUploadConfirmationDialog.show(getActivity(), resultUri.toString(), false, true);
+                PictureUploadConfirmationDialog.show(getActivity(), resultUri.toString(), false, true);
                 cleanUpCameraPicture();
             }
         } else if (resultCode == Activity.RESULT_CANCELED){
@@ -178,30 +168,6 @@ public class MediaUploadSelectionDialog extends DialogFragment {
         }
     }
 
-    private void onVideoUpload() {
-        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takeVideoIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File videoFile = null;
-            try {
-                videoFile = createImageFile();
-            } catch (IOException ex) {
-                //TODO: display toast message
-            }
-            // Continue only if the File was successfully created
-            if (videoFile != null) {
-                cameraVideoUri = FileProvider.getUriForFile(getActivity(),
-                        "com.bitlove.fetlife.fileprovider",
-                        videoFile);
-                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraVideoUri);
-                startActivityForResult(takeVideoIntent, REQUEST_CODE_CAMERA_VIDEO);
-            }
-        } else {
-            //TODO: display toast message
-        }
-    }
-
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -238,7 +204,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     }
 
     private static DialogFragment newInstance() {
-        return new MediaUploadSelectionDialog();
+        return new PictureUploadSelectionDialog();
     }
 
     private ResourceListActivity getResourceActivity() {

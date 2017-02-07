@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
@@ -29,7 +28,8 @@ import com.bitlove.fetlife.view.activity.resource.FriendsActivity;
 import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
 import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
-import com.bitlove.fetlife.view.dialog.MediaUploadSelectionDialog;
+import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
+import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
@@ -59,6 +59,10 @@ public class MenuActivityComponent extends ActivityComponent {
         navigationView = (NavigationView) menuActivity.findViewById(R.id.nav_view);
         navigationView.getMenu().findItem(R.id.nav_feed).setIcon(
                 new IconDrawable(menuActivity, Iconify.IconValue.zmdi_view_list)
+                        .colorRes(R.color.text_color_secondary)
+                        .actionBarSize());
+        navigationView.getMenu().findItem(R.id.nav_upload_video).setIcon(
+                new IconDrawable(menuActivity, Iconify.IconValue.zmdi_videocam)
                         .colorRes(R.color.text_color_secondary)
                         .actionBarSize());
 
@@ -183,7 +187,9 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_upload_pic) {
-            MediaUploadSelectionDialog.show(menuActivity);
+            PictureUploadSelectionDialog.show(menuActivity);
+        } else if (id == R.id.nav_upload_video) {
+            VideoUploadSelectionDialog.show(menuActivity);
         } else if (id == R.id.nav_settings) {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {

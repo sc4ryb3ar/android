@@ -9,7 +9,7 @@ public class VideoChunkUploadStartedEvent extends ServiceCallStartedEvent {
     private String videoId;
 
     public VideoChunkUploadStartedEvent(String videoId, int chunk, int chunkCount) {
-        super(FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE);
+        super(FetLifeApiIntentService.ACTION_APICALL_UPLOAD_VIDEO_CHUNK);
         this.videoId = videoId;
         this.chunk = chunk;
         this.chunkCount = chunkCount;

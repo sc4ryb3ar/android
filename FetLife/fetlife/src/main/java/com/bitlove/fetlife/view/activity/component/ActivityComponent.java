@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.activity.component;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.view.KeyEvent;
@@ -59,5 +60,10 @@ public abstract class ActivityComponent {
     public Boolean onActivityKeyDown(BaseActivity baseActivity, int keyCode, KeyEvent e) {
         return null;
     }
+
+    public void onActivityResult(BaseActivity activity, int resultCode, Intent data) {
+
+    }
+
 
 }

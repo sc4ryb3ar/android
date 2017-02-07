@@ -130,7 +130,8 @@
     <string name="menu_friendrequests">Friend Requests</string>
     <string name="menu_introduce">Share My Profile</string>
     <string name="menu_notifications">Notifications</string>
-    <string name="menu_upload_media">Upload Photo</string>
+    <string name="menu_upload_photo">Upload Photo</string>
+    <string name="menu_upload_video">Upload Video</string>
     <string name="menu_conversations">Conversations</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_logout">Logout</string>
@@ -148,6 +149,7 @@
     <string name="title_activity_notificationhistory">Notifications</string>
     <string name="title_intent_choose_media_upload">Select Media App</string>
     <string name="title_media_picture_upload_confirmation">Add your picture</string>
+    <string name="title_media_video_upload_confirmation">Add your video</string>
 
     <!-- *** Settings texts *** -->
 
@@ -196,7 +198,9 @@
     <string name="button_delete_user_data_confirmation">Yes</string>
     <string name="button_delete_user_data_cancel">Cancel</string>
     <string name="button_media_picture_upload_hint_caption">Caption</string>
-    <string name="button_media_picture_upload_check_friends_only">Only visible to friends</string>
+    <string name="button_media_video_upload_hint_title">Title</string>
+    <string name="button_media_video_upload_hint_text">Text</string>
+    <string name="button_media_upload_check_friends_only">Only visible to friends</string>
     <string name="message_friend_decision_failed">FetLife App: Your decision about friendship could not be sent as you had logged out before it could have been processed</string>
 
     <!-- *** Feed texts *** -->
@@ -331,8 +335,21 @@
     <string name="message_image_upload_failed">Photo upload has failed. Try again later</string>
 
     <string name="message_media_picture_upload_confirmation">I certify this picture is of me, or that I have explicit permission to post it on FetLife.\nI tell no lie</string>
-    <string name="button_media_picture_upload_confirmation">Certify</string>
-    <string name="button_media_picture_upload_cancel">Cancel</string>
+    <string name="message_media_video_upload_confirmation">I certify this video is of me, or that I have explicit permission to post it on FetLife.\nI tell no lie</string>
+    <string name="button_media_upload_confirmation">Certify</string>
+    <string name="button_media_upload_cancel">Cancel</string>
+
+    <string name="notification_video_upload_title">Video upload</string>
+    <string name="notification_picture_upload_title">Picture upload</string>
+    <string name="notification_media_upload_text_inprogress">uploading</string>
+    <string name="notification_media_upload_text_being_cancelled">being cancelled</string>
+
+    <string name="message_video_upload_started">Beaming up your video ...</string>
+    <string name="message_video_upload_finished">Your Video has been uploaded</string>
+    <string name="message_video_upload_failed">Video upload has failed. Try again later</string>
+    <string name="message_video_upload_cancelled">Video upload has been cancelled.</string>
+    <string name="message_video_upload_being_cancelled">Video upload is being cancelled.</string>
+    <string name="message_video_upload_cancel_failed">Video upload could not be cancelled.</string>
 
     <!-- *** Other Strings *** -->
 

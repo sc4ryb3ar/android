@@ -30,6 +30,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".model.service.ServiceCallCancelReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.bitlove.fetlife.ServiceCallCancelReceiver.RECEIVE" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".StartActivity"
             android:theme="@style/AppTheme.Transparent">

@@ -18,6 +18,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -57,6 +58,8 @@ public class FetLifeService {
         context.init(null, tmf.getTrustManagers(), null);
 
         OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(5, TimeUnit.MINUTES);
+        client.setReadTimeout(5, TimeUnit.MINUTES);
         client.setHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {

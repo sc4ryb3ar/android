@@ -9,7 +9,7 @@ public class VideoChunkUploadFinishedEvent extends ServiceCallFinishedEvent {
     private String videoId;
 
     public VideoChunkUploadFinishedEvent(String videoId, int chunk, int chunkCount) {
-        super(FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, chunkCount);
+        super(FetLifeApiIntentService.ACTION_APICALL_UPLOAD_VIDEO_CHUNK, chunkCount);
         this.videoId = videoId;
         this.chunk = chunk;
         this.chunkCount = chunkCount;

@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FileUtil {
 
-    private static final int DEFAULT_CHUNK_SIZE = 5* 1024 * 1024;
+    private static final int DEFAULT_CHUNK_SIZE = (int) (1.1f * 1024f * 1024f);
 
     public static String[] splitFile(Context context, Uri uri, String name) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -86,6 +86,4 @@ public class FileUtil {
         }
         return chunkUris.toArray(new String[chunkUris.size()]);
     }
-
-
 }
