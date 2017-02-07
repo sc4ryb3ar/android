@@ -24,10 +24,19 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.4.0<br/>
+                    <ul>
+                        <li>Improved Conversation Layout (User Avatar, Direct link to user profile)</li>
+                        <li>Fixed issue of incorrect order of sent messages</li>
+                        <li>Improved bug tracking</li>
+                    </ul>
+
             <p/>v2.3.2<br/>
                     <ul>
-                        <li>Cropping option for pictures about to be uploaded</li>
-                        <li>Crash and other bug fixes</li>
+                        <li>Image crop before upload</li>
+                        <li>Improved retry strategy for pending messages</li>
+                        <li>Fixed back button behavior at the Settings screen</li>
+                        <li>Fixed issue with setting messages read from the App</li>
                     </ul>
 
             <p/>v2.2.1<br/>
