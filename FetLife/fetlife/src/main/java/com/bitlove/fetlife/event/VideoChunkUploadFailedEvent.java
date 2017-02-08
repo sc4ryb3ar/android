@@ -32,4 +32,5 @@ public class VideoChunkUploadFailedEvent extends ServiceCallFailedEvent {
     public boolean isCancelled() {
         return cancelled;
     }
+
 }

@@ -24,6 +24,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.5.0<br/>
+                    <ul>
+                        <li>Video Upload</li>
+                    </ul>
+
             <p/>v2.4.0<br/>
                     <ul>
                         <li>Improved Conversation Layout (User Avatar, Direct link to user profile)</li>
@@ -350,12 +355,13 @@
 
     <string name="notification_video_upload_title">Video upload</string>
     <string name="notification_picture_upload_title">Picture upload</string>
-    <string name="notification_media_upload_text_inprogress">uploading</string>
+    <string name="notification_media_upload_text_inprogress">uploading %1$d / %2$d MBytes</string>
     <string name="notification_media_upload_text_being_cancelled">being cancelled</string>
 
     <string name="message_video_upload_started">Beaming up your video ...</string>
     <string name="message_video_upload_finished">Your Video has been uploaded</string>
     <string name="message_video_upload_failed">Video upload has failed. Try again later</string>
+    <string name="message_video_upload_failed_file_size">Video upload has failed. Video size should be maximum %1$d MBytes</string>
     <string name="message_video_upload_cancelled">Video upload has been cancelled.</string>
     <string name="message_video_upload_being_cancelled">Video upload is being cancelled.</string>
     <string name="message_video_upload_cancel_failed">Video upload could not be cancelled.</string>

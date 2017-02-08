@@ -55,7 +55,7 @@ public class VideoUploadConfirmationDialog extends DialogFragment {
         View view = inflater.inflate(R.layout.dialogfragment_alert_generic, container);
 
         TextView title = (TextView) view.findViewById(R.id.dialogTitle);
-        title.setText(R.string.title_media_picture_upload_confirmation);
+        title.setText(R.string.title_media_video_upload_confirmation);
 
         TextView message = (TextView) view.findViewById(R.id.dialogMessage);
         message.setText(R.string.message_media_video_upload_confirmation);

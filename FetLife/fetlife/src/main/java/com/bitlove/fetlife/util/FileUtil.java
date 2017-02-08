@@ -15,24 +15,22 @@ import java.util.List;
 
 public class FileUtil {
 
-    private static final int DEFAULT_CHUNK_SIZE = (int) (1.1f * 1024f * 1024f);
-
-    public static String[] splitFile(Context context, Uri uri, String name) throws IOException {
+    public static String[] splitFile(Context context, Uri uri, String name, int chunkSize) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return splitFileV19(context, uri, name);
+            return splitFileV19(context, uri, name, chunkSize);
         } else {
-            return splitFileLegacy(context, uri, name);
+            return splitFileLegacy(context, uri, name, chunkSize);
         }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    private static String[] splitFileV19(Context context, Uri uri, String name) throws IOException {
+    private static String[] splitFileV19(Context context, Uri uri, String name, int chunkSize) throws IOException {
         ContentResolver contentResolver = context.getContentResolver();
 
         List<String> chunkUris = new ArrayList<>();
         int partCounter = 1;
 
-        int sizeOfFiles = DEFAULT_CHUNK_SIZE;
+        int sizeOfFiles = chunkSize;
         byte[] buffer = new byte[sizeOfFiles];
 
         File outputDir = context.getCacheDir();
@@ -52,13 +50,13 @@ public class FileUtil {
         return chunkUris.toArray(new String[chunkUris.size()]);
     }
 
-    private static String[] splitFileLegacy(Context context, Uri uri, String name) throws IOException {
+    private static String[] splitFileLegacy(Context context, Uri uri, String name, int chunkSize) throws IOException {
         ContentResolver contentResolver = context.getContentResolver();
 
         List<String> chunkUris = new ArrayList<>();
         int partCounter = 1;
 
-        int sizeOfFiles = DEFAULT_CHUNK_SIZE;
+        int sizeOfFiles = chunkSize;
         byte[] buffer = new byte[sizeOfFiles];
 
         File outputDir = context.getCacheDir();

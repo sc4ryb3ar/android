@@ -20,6 +20,7 @@ import com.bitlove.fetlife.event.VideoChunkUploadCancelRequestEvent;
 import com.bitlove.fetlife.event.VideoChunkUploadFailedEvent;
 import com.bitlove.fetlife.event.VideoChunkUploadFinishedEvent;
 import com.bitlove.fetlife.event.VideoChunkUploadStartedEvent;
+import com.bitlove.fetlife.event.VideoUploadFailedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.model.service.ServiceCallCancelReceiver;
 import com.bitlove.fetlife.view.activity.BaseActivity;
@@ -41,12 +42,20 @@ public class EventDisplayHandler {
         if (serviceCallFailedEvent instanceof PictureUploadFailedEvent
                 || FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE.equals(serviceCallFailedEvent.getServiceCallAction())) {
             baseActivity.showToast(baseActivity.getString(R.string.message_image_upload_failed));
+            showMessageNotification(baseActivity, PICTURE_UPLOAD_NOTIFICATION_ID++, baseActivity.getString(R.string.notification_picture_upload_title), baseActivity.getString(R.string.message_image_upload_failed));
+        } else if (serviceCallFailedEvent instanceof VideoUploadFailedEvent) {
+            baseActivity.showToast(baseActivity.getString(R.string.message_video_upload_failed_file_size, FetLifeApiIntentService.MAX_VIDEO_FILE_SIZE));
+            showMessageNotification(baseActivity, VIDEO_UPLOAD_NOTIFICATION_ID++, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.message_video_upload_failed_file_size, FetLifeApiIntentService.MAX_VIDEO_FILE_SIZE));
         } else if (serviceCallFailedEvent instanceof VideoChunkUploadFailedEvent) {
             VideoChunkUploadFailedEvent videoChunkUploadFailedEvent = (VideoChunkUploadFailedEvent) serviceCallFailedEvent;
-            dismissNotification(baseActivity, getNotificationIdFromMediaId(videoChunkUploadFailedEvent.getVideoId()));
-            baseActivity.showToast(videoChunkUploadFailedEvent.isCancelled() ? baseActivity.getString(R.string.message_video_upload_cancelled) : baseActivity.getString(R.string.message_video_upload_failed));
+            int notificationId = getNotificationIdFromMediaId(videoChunkUploadFailedEvent.getVideoId());
+            dismissNotification(baseActivity, notificationId);
+            String message = videoChunkUploadFailedEvent.isCancelled() ? baseActivity.getString(R.string.message_video_upload_cancelled) : baseActivity.getString(R.string.message_video_upload_failed);
+            showMessageNotification(baseActivity, notificationId, baseActivity.getString(R.string.notification_video_upload_title), message);
+            baseActivity.showToast(message);
         } else if (FetLifeApiIntentService.ACTION_APICALL_UPLOAD_VIDEO.equals(serviceCallFailedEvent.getServiceCallAction())) {
             baseActivity.showToast(baseActivity.getString(R.string.message_video_upload_failed));
+            showMessageNotification(baseActivity, VIDEO_UPLOAD_NOTIFICATION_ID++, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.message_video_upload_failed));
         } else {
             if (serviceCallFailedEvent.isServerConnectionFailed()) {
                 baseActivity.showToast(baseActivity.getResources().getString(R.string.error_connection_failed));
@@ -58,12 +67,16 @@ public class EventDisplayHandler {
 
     public void onServiceCallFinished(BaseActivity baseActivity, ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent instanceof PictureUploadFinishedEvent) {
-            dismissNotification(baseActivity, getNotificationIdFromMediaId(((PictureUploadFinishedEvent)serviceCallFinishedEvent).getPictureId()));
+            int notificationId = getNotificationIdFromMediaId(((PictureUploadFinishedEvent)serviceCallFinishedEvent).getPictureId());
+            dismissNotification(baseActivity, notificationId);
+            showMessageNotification(baseActivity, notificationId, baseActivity.getString(R.string.notification_picture_upload_title), baseActivity.getString(R.string.message_image_upload_finished));
             baseActivity.showToast(baseActivity.getString(R.string.message_image_upload_finished));
         } else if (serviceCallFinishedEvent instanceof VideoChunkUploadFinishedEvent) {
             VideoChunkUploadFinishedEvent videoChunkUploadFinishedEvent = (VideoChunkUploadFinishedEvent) serviceCallFinishedEvent;
             if (videoChunkUploadFinishedEvent.getChunk() == videoChunkUploadFinishedEvent.getChunkCount()) {
-                dismissNotification(baseActivity, getNotificationIdFromMediaId(((VideoChunkUploadFinishedEvent)serviceCallFinishedEvent).getVideoId()));
+                int notificationId = getNotificationIdFromMediaId(((VideoChunkUploadFinishedEvent)serviceCallFinishedEvent).getVideoId());
+                dismissNotification(baseActivity, notificationId);
+                showMessageNotification(baseActivity, notificationId, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.message_video_upload_finished));
                 baseActivity.showToast(baseActivity.getString(R.string.message_video_upload_finished));
             }
         }
@@ -76,11 +89,15 @@ public class EventDisplayHandler {
             baseActivity.showToast(baseActivity.getString(R.string.message_image_upload_started));
         } else if (serviceCallStartedEvent instanceof VideoChunkUploadStartedEvent) {
             VideoChunkUploadStartedEvent videoChunkUploadStartedEvent = (VideoChunkUploadStartedEvent) serviceCallStartedEvent;
-            if (videoChunkUploadStartedEvent.getChunk() == 1) {
+            if (videoChunkUploadStartedEvent.getChunk() == 1 && videoChunkUploadStartedEvent.getRetry() == 0) {
                 notificationIdMap.put(videoChunkUploadStartedEvent.getVideoId(),VIDEO_UPLOAD_NOTIFICATION_ID);
-                showProgressNotification(baseActivity, VIDEO_UPLOAD_NOTIFICATION_ID, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.notification_media_upload_text_inprogress), 0, 0, ServiceCallCancelReceiver.createVideoCancelPendingIntent(baseActivity, VIDEO_UPLOAD_NOTIFICATION_ID, videoChunkUploadStartedEvent.getVideoId()));
+                showProgressNotification(baseActivity, VIDEO_UPLOAD_NOTIFICATION_ID, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.notification_media_upload_text_inprogress, 0, videoChunkUploadStartedEvent.getVideoSize()), 0, 0, ServiceCallCancelReceiver.createVideoCancelPendingIntent(baseActivity, VIDEO_UPLOAD_NOTIFICATION_ID, videoChunkUploadStartedEvent.getVideoId()));
                 VIDEO_UPLOAD_NOTIFICATION_ID++;
                 baseActivity.showToast(baseActivity.getString(R.string.message_video_upload_started));
+            } else if (videoChunkUploadStartedEvent.getRetry() == 0){
+                int notificationId = getNotificationIdFromMediaId(videoChunkUploadStartedEvent.getVideoId());
+                PendingIntent cancelIntent = videoChunkUploadStartedEvent.getChunk() * FetLifeApiIntentService.VIDEO_UPLOAD_CHUNK_SIZE_MBYTES >= videoChunkUploadStartedEvent.getVideoSize() ? null : ServiceCallCancelReceiver.createVideoCancelPendingIntent(baseActivity, notificationId, videoChunkUploadStartedEvent.getVideoId());
+                showProgressNotification(baseActivity, notificationId, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.notification_media_upload_text_inprogress, (videoChunkUploadStartedEvent.getChunk()-1) * FetLifeApiIntentService.VIDEO_UPLOAD_CHUNK_SIZE_MBYTES, videoChunkUploadStartedEvent.getVideoSize()), 0, 0, cancelIntent);
             }
         }
     }
@@ -97,7 +114,9 @@ public class EventDisplayHandler {
         if (serviceCallCancelEvent instanceof VideoChunkUploadCancelEvent) {
             VideoChunkUploadCancelEvent videoChunkUploadCancelEvent = (VideoChunkUploadCancelEvent) serviceCallCancelEvent;
             if (videoChunkUploadCancelEvent.isCancelSucceed()) {
-                dismissNotification(baseActivity, getNotificationIdFromMediaId(((VideoChunkUploadCancelEvent)serviceCallCancelEvent).getVideoId()));
+                int notificationId = getNotificationIdFromMediaId(((VideoChunkUploadCancelEvent)serviceCallCancelEvent).getVideoId());
+                dismissNotification(baseActivity, notificationId);
+                showMessageNotification(baseActivity, notificationId, baseActivity.getString(R.string.notification_video_upload_title), baseActivity.getString(R.string.message_video_upload_cancelled));
                 baseActivity.showToast(baseActivity.getString(R.string.message_video_upload_cancelled));
             } else {
                 baseActivity.showToast(baseActivity.getString(R.string.message_video_upload_cancel_failed));
@@ -110,13 +129,20 @@ public class EventDisplayHandler {
         return notificationId;
     }
 
+    private void showMessageNotification(BaseActivity baseActivity, int notificationId, String title, String text) {
+        NotificationManager notifyManager = (NotificationManager) baseActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(baseActivity);
+        builder.setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_stat_onesignal_default);
+        notifyManager.notify(notificationId, builder.build());
+    }
+
     private void showProgressNotification(BaseActivity baseActivity, int notificationId, String title, String text, int progress, int maxProgress, PendingIntent cancelIntent) {
         NotificationManager notifyManager = (NotificationManager) baseActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(baseActivity);
-        //TODO(VID): set not cancelable
         builder.setContentTitle(title)
                 .setContentText(text)
-                .setOngoing(true)
                 .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_stat_onesignal_default);
 
