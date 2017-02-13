@@ -497,18 +497,22 @@ public class FetLifeApiIntentService extends IntentService {
         //Workaround for server issue as it does not handle millis
         while (System.currentTimeMillis()/1000 == lastSentMessageTime/1000) {}
 
-        String dateString = DateUtil.toServerString(System.currentTimeMillis());
-        Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody(), dateString);
-        Response<Message> postMessageResponse = postMessagesCall.execute();
+        Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody());
+
+        Response<Message> postMessageResponse;
+        try {
+            postMessageResponse = postMessagesCall.execute();
+        } catch (IOException ioe) {
+            Crashlytics.logException(new Exception("Message send failed", ioe));
+            throw ioe;
+        }
 
         String conversationId = pendingMessage.getConversationId();
         if (postMessageResponse.isSuccess()) {
+            lastSentMessageTime = System.currentTimeMillis();
             //Update the message state of the returned message object
             final Message message = postMessageResponse.body();
-
-            lastSentMessageTime = message.getDate();
-
-            //Messages are identifi
+            //Messages are identify
             // ed in the db by client id so original pending message will be overridden here with the correct state
             message.setClientId(pendingMessage.getClientId());
             message.setPending(false);
@@ -519,7 +523,7 @@ public class FetLifeApiIntentService extends IntentService {
         } else {
             //If the call failed make the pending message to a failed message
             //Note if the post is failed due to connection issue an exception will be thrown, so here we make the assumption the failure is permanent.
-            //TODO check the result code and based on that send the message permamntly failed or keep it still pending
+            //TODO check the result code and based on that send the message permanently failed or keep it still pending
             //TODO add functionality for the user to be able to retry sending failed messages
             pendingMessage.setPending(false);
             pendingMessage.setFailed(true);

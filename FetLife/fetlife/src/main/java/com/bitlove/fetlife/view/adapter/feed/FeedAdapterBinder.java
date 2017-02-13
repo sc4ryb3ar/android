@@ -118,7 +118,6 @@ public class FeedAdapterBinder {
 
             LinearLayout linearLayout = feedViewHolder.listExpandArea;
 
-
             boolean expandByPreference = feedItemResourceHelper.getExpandPreference();
             boolean expanded = expandHistory.get(position,expandByPreference);
             feedViewHolder.gridExpandArea.setVisibility(View.GONE);

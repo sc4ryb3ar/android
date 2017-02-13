@@ -58,7 +58,7 @@ public interface FetLifeApi {
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")
-    Call<Message> postMessage(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId, @Field("body") String body, @Field("created_at") String dateStrings);
+    Call<Message> postMessage(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId, @Field("body") String body);
 
     @FormUrlEncoded
     @PUT("/api/v2/me/conversations/{conversationId}/messages/read")

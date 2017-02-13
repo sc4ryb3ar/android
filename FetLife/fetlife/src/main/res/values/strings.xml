@@ -24,9 +24,12 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v2.5.0<br/>
+            <p/>v2.5.3<br/>
                     <ul>
                         <li>Video Upload</li>
+                        <li>Feed Image Scaling improvement</li>
+                        <li>Improved logging</li>
+                        <li>Improved message ordering</li>
                     </ul>
 
             <p/>v2.4.0<br/>
