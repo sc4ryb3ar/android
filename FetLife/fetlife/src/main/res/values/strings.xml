@@ -24,12 +24,16 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v2.5.3<br/>
+            <p/>v2.5.6<br/>
                     <ul>
                         <li>Video Upload</li>
                         <li>Feed Image Scaling improvement</li>
                         <li>Improved logging</li>
                         <li>Improved message ordering</li>
+                        <li>Auto check for updates</li>
+                        <li>Fix for incorrect badge counter (one time clean up needed)</li>
+                        <li>Improved message ordering</li>
+                        <li>Usage of default privacy settings for notifications</li>
                     </ul>
 
             <p/>v2.4.0<br/>
