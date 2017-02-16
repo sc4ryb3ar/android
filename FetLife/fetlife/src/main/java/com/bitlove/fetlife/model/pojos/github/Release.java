@@ -9,6 +9,9 @@ public class Release {
     @JsonProperty("name")
     private String name;
 
+    @JsonProperty("tag_name")
+    private String tag;
+
     @JsonProperty("assets")
     private List<Asset> assets;
 
@@ -26,5 +29,20 @@ public class Release {
 
     public void setAssets(List<Asset> assets) {
         this.assets = assets;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getReleaseUrl() {
+        if (assets == null || assets.isEmpty()) {
+            return null;
+        }
+        return assets.get(0).getBrowserDownloadUrl();
     }
 }

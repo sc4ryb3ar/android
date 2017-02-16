@@ -17,6 +17,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestSendSucceededEvent;
+import com.bitlove.fetlife.event.LatestReleaseEvent;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
 import com.bitlove.fetlife.event.LoginStartedEvent;
@@ -55,6 +56,7 @@ import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.pojos.VideoUploadResult;
+import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.FileUtil;
@@ -106,7 +108,10 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
     public static final String ACTION_APICALL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.apicall.upload_video_chunk";
+
     public static final String ACTION_CANCEL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.cancel.upload_video_chunk";
+
+    public static final String ACTION_EXTERNAL_CALL_CHECK_4_UPDATES = "com.bitlove.fetlife.action.external.check_for_updates";
 
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
@@ -159,6 +164,9 @@ public class FetLifeApiIntentService extends IntentService {
         }
         if (!isActionInProgress(ACTION_APICALL_SEND_FRIENDREQUESTS)) {
             startApiCall(context, ACTION_APICALL_SEND_FRIENDREQUESTS);
+        }
+        if (!isActionInProgress(ACTION_EXTERNAL_CALL_CHECK_4_UPDATES)) {
+            startApiCall(context, ACTION_EXTERNAL_CALL_CHECK_4_UPDATES);
         }
     }
 
@@ -297,6 +305,9 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MEMBER:
                     result = getMember(params);
                     break;
+                case ACTION_EXTERNAL_CALL_CHECK_4_UPDATES:
+                    result = checkForUpdates(params);
+                    break;
             }
 
             int lastResponseCode = getFetLifeApplication().getFetLifeService().getLastResponseCode();
@@ -332,6 +343,18 @@ public class FetLifeApiIntentService extends IntentService {
         } finally {
             //make sure we set the action in progress indicator correctly
             setActionInProgress(null);
+        }
+    }
+
+    private int checkForUpdates(String... params) throws IOException {
+        Call<Release> releaseCall = getFetLifeApplication().getGitHubService().getGitHubApi().getLatestRelease();
+        Response<Release> releaseCallResponse = releaseCall.execute();
+        if (releaseCallResponse.isSuccess()) {
+            Release latestRelease = releaseCallResponse.body();
+            getFetLifeApplication().getEventBus().post(new LatestReleaseEvent(latestRelease));
+            return Integer.MAX_VALUE;
+        } else {
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -432,13 +455,13 @@ public class FetLifeApiIntentService extends IntentService {
                     //db changed, reload remaining pending messages with starting this method recursively
                     return sendPendingMessages(user, ++sentMessageCount);
                 } else {
-                    return Integer.MIN_VALUE;
+                    continue;
                 }
             } else if (sendPendingMessage(pendingMessage)) {
                 MessageDuplicationDebugUtil.checkSentMessage(pendingMessage);
                 sentMessageCount++;
             } else {
-                return Integer.MIN_VALUE;
+                continue;
             }
         }
         //Return success result if at least one pending message could have been sent so there was a change in the current state
@@ -473,7 +496,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             //Update all other messages the user initiated in the meanwhile so they are not mapped to the new conversation
             //They will be now pending messages ready to be sent so a next scan (will be forced after returning from this method) will find them and send them
-            List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.conversationId.is(localConversationId)).queryList();
+            List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.conversationId.is(localConversationId)).orderBy(Message_Table.date,true).queryList();
             for (Message pendingMessage : pendingMessages) {
                 pendingMessage.setConversationId(serverConversationId);
                 pendingMessage.save();
@@ -536,7 +559,7 @@ public class FetLifeApiIntentService extends IntentService {
     private int sendPendingFriendRequests() throws IOException {
 
         int sentCount = 0;
-        List<FriendRequest> pendingFriendRequests = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(true)).queryList();
+        List<FriendRequest> pendingFriendRequests = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(true)).orderBy(FriendRequest_Table.id,true).queryList();
         for (FriendRequest pendingFriendRequest : pendingFriendRequests) {
             if (!sendPendingFriendRequest(pendingFriendRequest)) {
                 pendingFriendRequest.delete();
@@ -544,7 +567,7 @@ public class FetLifeApiIntentService extends IntentService {
                 sentCount++;
             }
         }
-        List<SharedProfile> pendingSharedProfiles = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(true)).queryList();
+        List<SharedProfile> pendingSharedProfiles = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(true)).orderBy(SharedProfile_Table.id,true).queryList();
         for (SharedProfile pendingSharedProfile : pendingSharedProfiles) {
             if (!sendPendingSharedProfile(pendingSharedProfile)) {
                 pendingSharedProfile.delete();

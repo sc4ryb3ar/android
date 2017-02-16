@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.notification;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -26,13 +27,14 @@ public class AnonymNotification {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(fetLifeApplication)
-                        .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_kinky))
+                        .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_vanilla))
                         .setSmallIcon(R.drawable.ic_anonym_notif_small)
                         .setContentTitle(fetLifeApplication.getString(R.string.noification_title_new_one_or_more_notification))
                         .setContentText(fetLifeApplication.getString(R.string.noification_text_new_one_or_more_notification))
                         .setAutoCancel(true)
                         .setVibrate(new long[] {1000, 1000})
                         .setGroup(getClass().getSimpleName())
+                        .setVisibility(Notification.VISIBILITY_SECRET)
                         .setContentIntent(contentPendingIntent);
 
         // Sets an ID for the notification
