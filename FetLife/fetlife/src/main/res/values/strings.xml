@@ -33,6 +33,7 @@
                         <li>Auto check for updates</li>
                         <li>Fix for incorrect badge counter (one time clean up needed)</li>
                         <li>Improved message ordering</li>
+                        <li>Code improved to avoid the same message sent twice</li>
                         <li>Usage of default privacy settings for notifications</li>
                     </ul>
 

@@ -12,32 +12,37 @@ public class MessageDuplicationDebugUtil {
 
     private static String lastTypedHash, lastSentHash;
 
-    public static void checkTypedMessage(Message message) {
-        String body = message.getBody();
+    public static boolean checkTypedMessage(String senderId, String body) {
         if (body == null || body.trim().length() <= BODY_TRASHOLD) {
             lastTypedHash = null;
-            return;
+            return false;
         }
-        String hashBase = message.getSenderId() + message.getBody();
+        String hashBase = senderId + body;
         String hash = calculateHash(hashBase);
-        if (hash.equals(lastTypedHash)) {
-            Crashlytics.logException(new Exception("Typed Message match; body length: " + body.length()));
-        }
+
+        boolean sameAsBefore = hash.equals(lastTypedHash);
         lastTypedHash = hash;
+
+        return sameAsBefore;
     }
 
-    public static void checkSentMessage(Message message) {
+    public static boolean checkSentMessage(Message message) {
         String body = message.getBody();
         if (body == null || body.trim().length() <= BODY_TRASHOLD) {
             lastSentHash = null;
-            return;
+            return false;
         }
         String hashBase = message.getSenderId() + message.getBody();
         String hash = calculateHash(hashBase);
-        if (hash.equals(lastSentHash)) {
+
+        boolean sameAsBefore = hash.equals(lastSentHash);
+        lastSentHash = hash;
+
+        if (sameAsBefore) {
             Crashlytics.logException(new Exception("Sent Message match; body length: " + body.length()));
         }
-        lastSentHash = hash;
+
+        return sameAsBefore;
     }
 
     private static String calculateHash(String hashBase) {
