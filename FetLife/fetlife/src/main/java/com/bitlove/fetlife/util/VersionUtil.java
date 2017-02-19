@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.view.activity.BaseActivity;
 import com.crashlytics.android.Crashlytics;
@@ -14,6 +15,7 @@ import com.crashlytics.android.Crashlytics;
 public class VersionUtil {
 
     private static final String PREF_NOTIFIED_LATEST_RELEASE = "PREF_NOTIFIED_LATEST_RELEASE";
+    private static final String PREF_NOTIFIED_LATEST_PRERELEASE = "PREF_NOTIFIED_LATEST_PRERELEASE";
 
     public static boolean toBeNotified(BaseActivity baseActivity, Release release) {
 
@@ -25,15 +27,24 @@ public class VersionUtil {
             return false;
         }
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(baseActivity.getApplication());
-
-        if (releaseVersion.equals(sharedPreferences.getString(PREF_NOTIFIED_LATEST_RELEASE, null))) {
+        if (release.isPrerelease() && !notifyAboutPrereleases(baseActivity)) {
             return false;
         }
-        sharedPreferences.edit().putString(PREF_NOTIFIED_LATEST_RELEASE, releaseVersion).apply();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(baseActivity.getApplication());
+
+        if (releaseVersion.equals(sharedPreferences.getString(release.isPrerelease() ? PREF_NOTIFIED_LATEST_PRERELEASE : PREF_NOTIFIED_LATEST_RELEASE, null))) {
+            return false;
+        }
+        sharedPreferences.edit().putString(release.isPrerelease() ? PREF_NOTIFIED_LATEST_PRERELEASE : PREF_NOTIFIED_LATEST_RELEASE, releaseVersion).apply();
 
         return true;
 
+    }
+
+    private static boolean notifyAboutPrereleases(BaseActivity baseActivity) {
+        SharedPreferences sharedPreferences = baseActivity.getFetLifeApplication().getUserSessionManager().getActiveUserPreferences();
+        return sharedPreferences.getBoolean(baseActivity.getString(R.string.settings_key_notification_prerelease_enabled), Boolean.valueOf(baseActivity.getString(R.string.settings_default_notification_prerelease_enabled)));
     }
 
     public static int getVersionInt(String versionText) {

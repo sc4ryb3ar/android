@@ -138,25 +138,32 @@ public class EventDisplayHandler {
 
     public void onLatestReleaseChecked(BaseActivity baseActivity, LatestReleaseEvent latestReleaseEvent) {
         Release latestRelease = latestReleaseEvent.getLatestRelease();
+        Release latestPreRelease = latestReleaseEvent.getLatestPreRelease();
         if (VersionUtil.toBeNotified(baseActivity, latestRelease)) {
-            //TODO(version): add link
-            String header = baseActivity.getString(R.string.notification_title_new_release);
-            String message = baseActivity.getString(R.string.notification_text_new_release,latestRelease.getTag());
-            String url = latestRelease.getReleaseUrl();
-
-            NotificationHistoryItem notificationHistoryItem = new NotificationHistoryItem();
-            notificationHistoryItem.setTimeStamp(System.currentTimeMillis());
-            notificationHistoryItem.setDisplayHeader(header);
-            notificationHistoryItem.setDisplayMessage(message);
-            notificationHistoryItem.setLaunchUrl(url);
-            notificationHistoryItem.save();
-
-            Intent notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            PendingIntent pendingIntent = PendingIntent.getActivity(baseActivity, 0, notificationIntent, 0);
-            showMessageNotification(baseActivity,RELEASE_NOTIFICATION_ID,header,message,pendingIntent);
-
-            baseActivity.showToast(baseActivity.getString(R.string.notification_toast_new_release));
+            notifyAboutNewRelease(baseActivity, latestRelease);
         }
+        if (VersionUtil.toBeNotified(baseActivity, latestPreRelease)) {
+            notifyAboutNewRelease(baseActivity, latestPreRelease);
+        }
+    }
+
+    private void notifyAboutNewRelease(BaseActivity baseActivity, Release release) {
+        String header = baseActivity.getString(release.isPrerelease() ? R.string.notification_title_new_prerelease : R.string.notification_title_new_release);
+        String message = baseActivity.getString(release.isPrerelease() ? R.string.notification_text_new_prerelease : R.string.notification_text_new_release,release.getTag());
+        String url = release.getReleaseUrl();
+
+        NotificationHistoryItem notificationHistoryItem = new NotificationHistoryItem();
+        notificationHistoryItem.setTimeStamp(System.currentTimeMillis());
+        notificationHistoryItem.setDisplayHeader(header);
+        notificationHistoryItem.setDisplayMessage(message);
+        notificationHistoryItem.setLaunchUrl(url);
+        notificationHistoryItem.save();
+
+        Intent notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        PendingIntent pendingIntent = PendingIntent.getActivity(baseActivity, 0, notificationIntent, 0);
+        showMessageNotification(baseActivity,RELEASE_NOTIFICATION_ID,header,message,pendingIntent);
+
+        baseActivity.showToast(baseActivity.getString(release.isPrerelease() ? R.string.notification_toast_new_prerelease : R.string.notification_toast_new_release));
     }
 
     private int getNotificationIdFromMediaId(String mediaId) {

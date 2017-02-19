@@ -23,6 +23,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
+import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -343,7 +344,7 @@ public class FetLifeApplication extends MultiDexApplication {
 
         @Override
         public void onActivityResumed(Activity activity) {
-            if (!isAppInForeground()) {
+            if (!isAppInForeground() || foregroundActivity instanceof LoginActivity) {
                 FetLifeApiIntentService.startPendingCalls(FetLifeApplication.this);
             }
             setForegroundActivity(activity);

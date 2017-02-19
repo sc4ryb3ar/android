@@ -58,7 +58,6 @@ import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.pojos.VideoUploadResult;
 import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.util.BytesUtil;
-import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
@@ -347,11 +346,22 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private int checkForUpdates(String... params) throws IOException {
-        Call<Release> releaseCall = getFetLifeApplication().getGitHubService().getGitHubApi().getLatestRelease();
-        Response<Release> releaseCallResponse = releaseCall.execute();
-        if (releaseCallResponse.isSuccess()) {
-            Release latestRelease = releaseCallResponse.body();
-            getFetLifeApplication().getEventBus().post(new LatestReleaseEvent(latestRelease));
+        Call<List<Release>> releasesCall = getFetLifeApplication().getGitHubService().getGitHubApi().getReleases();
+        Response<List<Release>> releasesCallResponse = releasesCall.execute();
+        if (releasesCallResponse.isSuccess()) {
+            Release latestRelease = null;
+            Release latestPreRelease = null;
+            for (Release release : releasesCallResponse.body()) {
+                if (release.isPrerelease()) {
+                    latestPreRelease = release;
+                } else {
+                    latestRelease = release;
+                }
+                if (latestRelease != null && latestPreRelease != null) {
+                    break;
+                }
+            }
+            getFetLifeApplication().getEventBus().post(new LatestReleaseEvent(latestRelease, latestPreRelease));
             return Integer.MAX_VALUE;
         } else {
             return Integer.MIN_VALUE;

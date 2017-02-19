@@ -15,6 +15,9 @@ public class Release {
     @JsonProperty("assets")
     private List<Asset> assets;
 
+    @JsonProperty("prerelease")
+    private boolean prerelease;
+
     public String getName() {
         return name;
     }
@@ -37,6 +40,14 @@ public class Release {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public boolean isPrerelease() {
+        return prerelease;
+    }
+
+    public void setPrerelease(boolean prerelease) {
+        this.prerelease = prerelease;
     }
 
     public String getReleaseUrl() {

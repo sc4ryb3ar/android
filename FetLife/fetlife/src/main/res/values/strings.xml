@@ -198,6 +198,8 @@
     <string name="settings_summary_notification_messages_enabled">Enable Notifications for incoming Messages</string>
     <string name="settings_title_notification_friendrequests_enabled">Friend Request Notifications</string>
     <string name="settings_summary_notification_friendrequests_enabled">Enable Notifications for incoming Friend Requests</string>
+    <string name="settings_title_notification_prerelease_enabled">Pre-Release Notifications</string>
+    <string name="settings_summary_notification_prerelease_enabled">Enable Notifications about new preview releases</string>
     <string name="settings_title_notification_others_enabled">Other Notifications</string>
     <string name="settings_summary_notification_others_enabled">Enable Notifications for any other event</string>
 
@@ -393,5 +395,8 @@
     <string name="notification_title_new_release">New FetLife App release</string>
     <string name="notification_toast_new_release">New FetLife App version is available</string>
     <string name="notification_text_new_release">Download FetLife App version %1$s\nfor tha latest features and bug fixes.</string>
+    <string name="notification_title_new_prerelease">New FetLife App pre-release</string>
+    <string name="notification_toast_new_prerelease">New FetLife App Preview version is available</string>
+    <string name="notification_text_new_prerelease">Download FetLife App Preview version %1$s\nto test upcoming features.</string>
 
 </resources>

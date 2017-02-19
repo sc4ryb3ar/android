@@ -34,10 +34,10 @@
             android:summary="@string/settings_summary_notification_friendrequests_enabled"/>
 
         <CheckBoxPreference
-            android:key="@string/settings_key_notification_others_enabled"
-            android:defaultValue="@string/settings_default_notification_others_enabled"
-            android:title="@string/settings_title_notification_others_enabled"
-            android:summary="@string/settings_summary_notification_others_enabled"/>
+            android:key="@string/settings_key_notification_prerelease_enabled"
+            android:defaultValue="@string/settings_default_notification_prerelease_enabled"
+            android:title="@string/settings_title_notification_prerelease_enabled"
+            android:summary="@string/settings_summary_notification_prerelease_enabled"/>
 
     </com.bitlove.fetlife.view.widget.BoldPreferenceCategory>
 
