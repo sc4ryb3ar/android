@@ -8,9 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Friend;
-import com.bitlove.fetlife.model.pojos.Friend_Table;
+import com.bitlove.fetlife.model.pojos.FriendReference;
+import com.bitlove.fetlife.model.pojos.FriendReference_Table;
+import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.Member_Table;
+import com.bitlove.fetlife.model.pojos.User;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -19,11 +23,12 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, FriendViewHolder> {
+public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, FriendViewHolder> {
 
-    private List<Friend> itemList;
+    private List<Member> itemList;
 
-    public FriendsRecyclerAdapter() {
+    public FriendsRecyclerAdapter(FetLifeApplication fetLifeApplication) {
+        super(fetLifeApplication);
         loadItems();
     }
 
@@ -41,7 +46,13 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            itemList = new Select().from(Friend.class).orderBy(OrderBy.fromProperty(Friend_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            User user = fetLifeApplication.getUserSessionManager().getCurrentUser();
+            List<FriendReference> friendReferences = new Select().from(FriendReference.class).where(FriendReference_Table.friendId.is(user.getId())).orderBy(OrderBy.fromProperty(FriendReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            List<String> friendIds = new ArrayList<>();
+            for (FriendReference friendReference : friendReferences) {
+                friendIds.add(friendReference.getId());
+            }
+            itemList = new Select().from(Member.class).where(Member_Table.id.in(friendIds)).orderBy(OrderBy.fromProperty(Member_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }
@@ -52,7 +63,7 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
         return itemList.size();
     }
 
-    public Friend getItem(int position) {
+    public Member getItem(int position) {
         return itemList.get(position);
     }
 
@@ -65,7 +76,7 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Friend, 
     @Override
     public void onBindViewHolder(FriendViewHolder friendViewHolder, int position) {
 
-        final Friend friend = itemList.get(position);
+        final Member friend = itemList.get(position);
 
         friendViewHolder.headerText.setText(friend.getNickname());
         friendViewHolder.upperText.setText(friend.getMetaInfo());

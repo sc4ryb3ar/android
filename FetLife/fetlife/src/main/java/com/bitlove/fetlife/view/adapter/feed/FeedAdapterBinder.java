@@ -5,7 +5,6 @@ package com.bitlove.fetlife.view.adapter.feed;
 import android.content.Context;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.text.Html;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
@@ -267,19 +266,19 @@ public class FeedAdapterBinder {
         final IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
         increaseTouchArea(imageLove);
 
-        boolean isLoved = picture.isIsLovedByMe();
+        boolean isLoved = picture.isLovedByMe();
         imageLove.setText(isLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
         imageLove.setTextColor(overlay.getContext().getResources().getColor(isLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
         imageLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 IconTextView imageLove = (IconTextView) v;
-                boolean isLoved = picture.isIsLovedByMe();
+                boolean isLoved = picture.isLovedByMe();
                 boolean newIsLoved = !isLoved;
                 imageLove.setText(newIsLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
                 imageLove.setTextColor(v.getContext().getResources().getColor(newIsLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
                 startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
-                picture.setIsLovedByMe(newIsLoved);
+                picture.setLovedByMe(newIsLoved);
             }
         });
 
@@ -347,7 +346,7 @@ public class FeedAdapterBinder {
         @Subscribe(threadMode = ThreadMode.MAIN)
         public void onResourceListCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
             if (serviceCallFailedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFailedEvent.getParams())) {
-                picture.setIsLovedByMe(!loved);
+                picture.setLovedByMe(!loved);
                 fetLifeApplication.getEventBus().unregister(this);
             }
         }

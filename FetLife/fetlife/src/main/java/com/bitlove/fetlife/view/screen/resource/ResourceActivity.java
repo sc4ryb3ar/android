@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.resource;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -18,9 +18,9 @@ import com.bitlove.fetlife.event.ServiceCallCancelRequestEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.view.activity.BaseActivity;
-import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
-import com.bitlove.fetlife.view.activity.component.EventDisplayHandler;
+import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.component.EventDisplayHandler;
+import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -42,10 +42,10 @@ public abstract class ResourceActivity extends BaseActivity {
             showVersionSnackBarIfNeeded();
         }
 
-        TextView text = (TextView)findViewById(R.id.text_preview);
-
-        RotateAnimation rotate= (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.preview_rotation);
-        text.setAnimation(rotate);
+//        TextView text = (TextView)findViewById(R.id.text_preview);
+//
+//        RotateAnimation rotate= (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.preview_rotation);
+//        text.setAnimation(rotate);
     }
 
     @Override

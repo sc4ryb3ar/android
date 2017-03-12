@@ -1,6 +1,8 @@
-package com.bitlove.fetlife.view.activity;
+package com.bitlove.fetlife.view.screen;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -11,14 +13,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.view.activity.component.ActivityComponent;
+import com.bitlove.fetlife.view.screen.component.ActivityComponent;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
@@ -68,13 +69,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     @Override
     public void setTitle(CharSequence title) {
         super.setTitle("");
-        toolBarTitle.setText(title);
+        if (toolBarTitle != null) {
+            toolBarTitle.setText(title);
+        }
     }
 
     @Override
     public void setTitle(int titleId) {
         super.setTitle("");
-        toolBarTitle.setText(titleId);
+        if (toolBarTitle != null) {
+            toolBarTitle.setText(titleId);
+        }
     }
 
     @Override
@@ -245,6 +250,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
         super.startActivityForResult(intent, requestCode, options);

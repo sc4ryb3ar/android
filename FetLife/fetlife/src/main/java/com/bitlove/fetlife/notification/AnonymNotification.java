@@ -9,7 +9,7 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 
 public class AnonymNotification {
 

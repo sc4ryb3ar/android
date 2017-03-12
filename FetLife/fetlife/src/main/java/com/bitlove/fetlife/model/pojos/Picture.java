@@ -1,30 +1,54 @@
 
 package com.bitlove.fetlife.model.pojos;
 
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-public class Picture {
+@Table(database = FetLifeDatabase.class)
+public class Picture extends BaseModel {
 
     @JsonProperty("variants")
     private PictureVariants variants;
+
+    @Column
     @JsonProperty("url")
     private String url;
+
     @JsonProperty("member")
     private Member member;
+
+    @Column
     @JsonProperty("love_count")
     private int loveCount;
+
+    @Column
     @JsonProperty("is_loved_by_me")
     private boolean isLovedByMe;
+
+    @Column
+    @PrimaryKey(autoincrement = false)
     @JsonProperty("id")
     private String id;
+
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("content_type")
     private String contentType;
+
+    @Column
     @JsonProperty("comment_count")
     private int commentCount;
+
+    @Column
     @JsonProperty("body")
     private String body;
+
+    @Column
+    private String thumbUrl;
 
     /**
      *
@@ -44,6 +68,17 @@ public class Picture {
     @JsonProperty("variants")
     public void setVariants(PictureVariants variants) {
         this.variants = variants;
+        if (variants != null) {
+            setThumbUrl(variants.getLargeUrl());
+        }
+    }
+
+    public String getThumbUrl() {
+        return thumbUrl;
+    }
+
+    public void setThumbUrl(String thumbUrl) {
+        this.thumbUrl = thumbUrl;
     }
 
     /**
@@ -106,24 +141,14 @@ public class Picture {
         this.loveCount = loveCount;
     }
 
-    /**
-     *
-     * @return
-     *     The isLovedByMe
-     */
     @JsonProperty("is_loved_by_me")
-    public boolean isIsLovedByMe() {
+    public boolean isLovedByMe() {
         return isLovedByMe;
     }
 
-    /**
-     *
-     * @param isLovedByMe
-     *     The is_loved_by_me
-     */
     @JsonProperty("is_loved_by_me")
-    public void setIsLovedByMe(boolean isLovedByMe) {
-        this.isLovedByMe = isLovedByMe;
+    public void setLovedByMe(boolean lovedByMe) {
+        isLovedByMe = lovedByMe;
     }
 
     /**

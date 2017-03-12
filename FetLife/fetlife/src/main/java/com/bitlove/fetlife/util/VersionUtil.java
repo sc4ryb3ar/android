@@ -4,12 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.github.Release;
-import com.bitlove.fetlife.view.activity.BaseActivity;
+import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.crashlytics.android.Crashlytics;
 
 public class VersionUtil {

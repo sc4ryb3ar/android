@@ -1,26 +1,21 @@
-package com.bitlove.fetlife.view.activity.resource;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.Friend;
+import com.bitlove.fetlife.model.pojos.FriendReference;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.FriendsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
-import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-public class FriendsActivity extends ResourceListActivity<Friend> implements NavigationView.OnNavigationItemSelectedListener {
+public class FriendsActivity extends ResourceListActivity<Member> implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String EXTRA_FRIEND_LIST_MODE = "com.bitlove.fetlife.extra.friend_list_mode";
 
@@ -80,11 +75,11 @@ public class FriendsActivity extends ResourceListActivity<Friend> implements Nav
 
     @Override
     protected ResourceListRecyclerAdapter createRecyclerAdapter(Bundle savedInstanceState) {
-        return new FriendsRecyclerAdapter();
+        return new FriendsRecyclerAdapter(getFetLifeApplication());
     }
 
     @Override
-    public void onItemClick(Friend friend) {
+    public void onItemClick(Member friend) {
         switch (getFriendListMode()) {
             case NEW_CONVERSATION:
                 MessagesActivity.startActivity(FriendsActivity.this, Conversation.createLocalConversation(friend), friend.getNickname(), friend.getAvatarLink(), false);
@@ -97,7 +92,7 @@ public class FriendsActivity extends ResourceListActivity<Friend> implements Nav
     }
 
     @Override
-    public void onAvatarClick(Friend friend) {
+    public void onAvatarClick(Member friend) {
         String url = friend.getLink();
         if (url != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW);

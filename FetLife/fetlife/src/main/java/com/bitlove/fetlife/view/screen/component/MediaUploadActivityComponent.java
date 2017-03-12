@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.component;
+package com.bitlove.fetlife.view.screen.component;
 
 public class MediaUploadActivityComponent extends ActivityComponent {
 

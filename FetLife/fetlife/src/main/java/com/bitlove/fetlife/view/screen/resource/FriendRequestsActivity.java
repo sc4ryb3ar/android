@@ -1,10 +1,9 @@
-package com.bitlove.fetlife.view.activity.resource;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.FriendRequestSendFailedEvent;
@@ -13,7 +12,7 @@ import com.bitlove.fetlife.event.FriendSuggestionAddedEvent;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.FriendRequestsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.raizlabs.android.dbflow.structure.BaseModel;

@@ -1,12 +1,10 @@
-package com.bitlove.fetlife.view.activity.component;
+package com.bitlove.fetlife.view.screen.component;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v7.app.NotificationCompat;
 
 import com.bitlove.fetlife.R;
@@ -32,8 +30,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.model.service.ServiceCallCancelReceiver;
 import com.bitlove.fetlife.util.AppUtil;
 import com.bitlove.fetlife.util.VersionUtil;
-import com.bitlove.fetlife.view.activity.BaseActivity;
-import com.bitlove.fetlife.view.activity.resource.ResourceActivity;
+import com.bitlove.fetlife.view.screen.BaseActivity;
 
 import java.util.HashMap;
 import java.util.Map;

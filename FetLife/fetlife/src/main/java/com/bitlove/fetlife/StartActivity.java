@@ -3,8 +3,8 @@ package com.bitlove.fetlife;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.activity.resource.FeedActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 
 /**
  * Default Start Activity to make Activity title and App name independent

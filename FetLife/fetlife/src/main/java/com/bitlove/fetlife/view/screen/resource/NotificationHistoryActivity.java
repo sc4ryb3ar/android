@@ -1,19 +1,17 @@
-package com.bitlove.fetlife.view.activity.resource;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NotificationReceivedEvent;
 import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
-import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.NotificationHistoryRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.raizlabs.android.dbflow.sql.language.Delete;

@@ -1,15 +1,12 @@
-package com.bitlove.fetlife.view.activity.component;
+package com.bitlove.fetlife.view.screen.component;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.bitlove.fetlife.view.activity.BaseActivity;
+import com.bitlove.fetlife.view.screen.BaseActivity;
 
 public abstract class ActivityComponent {
 

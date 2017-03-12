@@ -1,8 +1,17 @@
 package com.bitlove.fetlife.model.pojos;
 
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.fasterxml.jackson.annotation.JsonProperty;
-public class Status {
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
+@Table(database = FetLifeDatabase.class)
+public class Status extends BaseModel {
+
+    @Column
+    @PrimaryKey(autoincrement = false)
     @JsonProperty("id")
     private String id;
     @JsonProperty("created_at")
@@ -11,14 +20,19 @@ public class Status {
     private Member member;
     @JsonProperty("content_type")
     private String contentType;
+    @Column
     @JsonProperty("love_count")
     private Integer loveCount;
+    @Column
     @JsonProperty("is_loved_by_me")
-    private Boolean isLovedByMe;
+    private boolean isLovedByMe;
+    @Column
     @JsonProperty("comment_count")
     private Integer commentCount;
+    @Column
     @JsonProperty("body")
     private String body;
+    @Column
     @JsonProperty("url")
     private String url;
 
@@ -122,24 +136,14 @@ public class Status {
         this.loveCount = loveCount;
     }
 
-    /**
-     *
-     * @return
-     * The isLovedByMe
-     */
     @JsonProperty("is_loved_by_me")
-    public Boolean getIsLovedByMe() {
+    public boolean isLovedByMe() {
         return isLovedByMe;
     }
 
-    /**
-     *
-     * @param isLovedByMe
-     * The is_loved_by_me
-     */
     @JsonProperty("is_loved_by_me")
-    public void setIsLovedByMe(Boolean isLovedByMe) {
-        this.isLovedByMe = isLovedByMe;
+    public void setLovedByMe(boolean lovedByMe) {
+        isLovedByMe = lovedByMe;
     }
 
     /**

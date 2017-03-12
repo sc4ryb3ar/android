@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.standalone;
+package com.bitlove.fetlife.view.screen.standalone;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,14 +17,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
 import com.bitlove.fetlife.event.LoginStartedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 //TODO: clean up the POJOs and define relations
@@ -27,6 +28,10 @@ public class Member extends BaseModel {
     @JsonProperty("nickname")
     @Column
     private String nickname;
+
+    @JsonProperty("about")
+    @Column
+    private String about;
 
     @JsonProperty("notification_token")
     @Column
@@ -116,6 +121,14 @@ public class Member extends BaseModel {
         this.link = link;
     }
 
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
     public String toJsonString() throws JsonProcessingException {
         return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
             @Override
@@ -123,5 +136,13 @@ public class Member extends BaseModel {
                 return m.getDeclaringClass() == BaseModel.class || super.hasIgnoreMarker(m);
             }
         }).writeValueAsString(this);
+    }
+
+    public static Member loadMember(String memberId) {
+        Member member = new Select().from(Member.class).where(Member_Table.id.is(memberId)).querySingle();
+        if (member == null) {
+            return null;
+        }
+        return member;
     }
 }

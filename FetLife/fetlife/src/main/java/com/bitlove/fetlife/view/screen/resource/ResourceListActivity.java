@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.resource;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -14,7 +14,7 @@ import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -108,7 +108,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
 
     @Override
     protected void onSetContentView() {
-        setContentView(R.layout.activity_resource_list);
+        setContentView(R.layout.activity_resource_recycler_menu);
     }
 
     @Override

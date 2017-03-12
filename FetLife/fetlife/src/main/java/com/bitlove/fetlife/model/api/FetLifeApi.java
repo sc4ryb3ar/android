@@ -3,14 +3,15 @@ package com.bitlove.fetlife.model.api;
 import com.bitlove.fetlife.model.pojos.AuthBody;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.Feed;
-import com.bitlove.fetlife.model.pojos.Friend;
+import com.bitlove.fetlife.model.pojos.FriendReference;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
+import com.bitlove.fetlife.model.pojos.Picture;
+import com.bitlove.fetlife.model.pojos.Status;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.pojos.VideoUploadResult;
-import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
@@ -22,10 +23,8 @@ import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Header;
-import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.PUT;
-import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
@@ -48,13 +47,22 @@ public interface FetLifeApi {
     Call<Conversation> getConversation(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId);
 
     @GET("/api/v2/me/friends")
-    Call<List<Friend>> getFriends(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
+    Call<List<Member>> getFriends(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 
     @GET("/api/v2/me/conversations/{conversationId}/messages")
     Call<List<Message>> getMessages(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId, @Query("since_id") String sinceMessageId, @Query("until_id") String untilMessageId, @Query("limit") int limit);
 
     @GET("/api/v2/members/{memberId}")
-    Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String conversationId);
+    Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
+
+    @GET("/api/v2/members/{memberId}/pictures")
+    Call<List<Picture>> getMemberPictures(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/members/{memberId}/friends")
+    Call<List<Member>> getMemberFriends(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/members/{memberId}/statuses")
+    Call<List<Status>> getMemberStatuses(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")

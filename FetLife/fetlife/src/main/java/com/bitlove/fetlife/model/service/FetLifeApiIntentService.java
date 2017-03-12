@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
+import android.provider.Settings;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
@@ -43,15 +44,22 @@ import com.bitlove.fetlife.model.pojos.AuthBody;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Feed;
-import com.bitlove.fetlife.model.pojos.Friend;
+import com.bitlove.fetlife.model.pojos.FriendReference;
+import com.bitlove.fetlife.model.pojos.FriendReference_Table;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
-import com.bitlove.fetlife.model.pojos.Friend_Table;
 import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.Member_Table;
+import com.bitlove.fetlife.model.pojos.Picture;
+import com.bitlove.fetlife.model.pojos.PictureReference;
+import com.bitlove.fetlife.model.pojos.PictureReference_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Message_Table;
 import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
+import com.bitlove.fetlife.model.pojos.Status;
+import com.bitlove.fetlife.model.pojos.StatusReference;
+import com.bitlove.fetlife.model.pojos.StatusReference_Table;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
@@ -93,7 +101,10 @@ public class FetLifeApiIntentService extends IntentService {
     //***
 
     public static final String ACTION_APICALL_MEMBER = "com.bitlove.fetlife.action.apicall.member";
-    public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.cpnversations";
+    public static final String ACTION_APICALL_MEMBER_FRIENDS = "com.bitlove.fetlife.action.apicall.member_friends";
+    public static final String ACTION_APICALL_MEMBER_STATUSES = "com.bitlove.fetlife.action.apicall.member_statuses";
+    public static final String ACTION_APICALL_MEMBER_PICTURES = "com.bitlove.fetlife.action.apicall.member_pictures";
+    public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.conversations";
     public static final String ACTION_APICALL_FEED = "com.bitlove.fetlife.action.apicall.feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
@@ -255,7 +266,16 @@ public class FetLifeApiIntentService extends IntentService {
                     result = retrieveConversations(params);
                     break;
                 case ACTION_APICALL_FRIENDS:
-                    result = retrieveFriends(params);
+                    result = retrieveMyFriends(params);
+                    break;
+                case ACTION_APICALL_MEMBER_FRIENDS:
+                    result = retrieveMemberFriends(params);
+                    break;
+                case ACTION_APICALL_MEMBER_PICTURES:
+                    result = retrieveMemberPictures(params);
+                    break;
+                case ACTION_APICALL_MEMBER_STATUSES:
+                    result = retrieveMemberStatuses(params);
                     break;
                 case ACTION_APICALL_FRIENDREQUESTS:
                     result = retrieveFriendRequests(params);
@@ -1059,11 +1079,15 @@ public class FetLifeApiIntentService extends IntentService {
             if (page == 1) {
                 lastConfirmedConversationPosition = -1;
             } else {
-                lastConfirmedConversationPosition = loadLastSyncedPosition(SyncedPositionType.CONVERSATION);
+                lastConfirmedConversationPosition = loadLastSyncedPosition(SyncedPositionType.CONVERSATION,"");
             }
             int newItemCount = 0, deletedItemCount = 0;
 
             for (Conversation conversation : conversations) {
+
+                //TODO(profile): use merge not to have less values
+                conversation.getMember().save();
+
                 int foundPos;
                 for (foundPos = lastConfirmedConversationPosition+1; foundPos < currentConversations.size(); foundPos++) {
                     Conversation checkConversation = currentConversations.get(foundPos);
@@ -1089,7 +1113,7 @@ public class FetLifeApiIntentService extends IntentService {
                 conversation.save();
             }
 
-            saveLastSyncedPosition(SyncedPositionType.CONVERSATION,lastConfirmedConversationPosition+newItemCount);
+            saveLastSyncedPosition(SyncedPositionType.CONVERSATION,"",lastConfirmedConversationPosition+newItemCount);
 
             return conversations.size() - deletedItemCount;
         } else {
@@ -1116,35 +1140,64 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private int retrieveFriends(String[] params) throws IOException {
-        final int limit = getIntFromParams(params, 0, 10);
-        final int page = getIntFromParams(params, 1, 1);
+    private int retrieveMyFriends(String[] params) throws IOException {
+        String currentUserId = getFetLifeApplication().getUserSessionManager().getCurrentUser().getId();
+        return retrieveFriends(true, currentUserId, params);
+    }
 
-        Call<List<Friend>> getFriendsCall = getFetLifeApi().getFriends(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
-        Response<List<Friend>> friendsResponse = getFriendsCall.execute();
+    private int retrieveMemberFriends(String[] params) throws IOException {
+        String userId = params[0];
+        String newParams[] = new String[params.length-1];
+
+        System.arraycopy(params, 1, newParams, 0, params.length-1);
+
+        return retrieveFriends(true, userId, newParams);
+    }
+
+    private int retrieveFriends(boolean myFriends, String userId, String[] params) throws IOException {
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Member>> getFriendsCall;
+        if (myFriends) {
+            getFriendsCall = getFetLifeApi().getFriends(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
+        } else {
+            getFriendsCall = getFetLifeApi().getMemberFriends(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
+        }
+
+        Response<List<Member>> friendsResponse = getFriendsCall.execute();
         if (friendsResponse.isSuccess()) {
 
-            final List<Friend> friends = friendsResponse.body();
-            List<Friend> currentFriends = new Select().from(Friend.class).orderBy(OrderBy.fromProperty(Friend_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            final List<Member> friendMembers = friendsResponse.body();
+            List<FriendReference> currentFriends = new Select().from(FriendReference.class).where(FriendReference_Table.friendId.is(userId)).orderBy(OrderBy.fromProperty(FriendReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
 
             int lastConfirmedFriendPosition;
             if (page == 1) {
                 lastConfirmedFriendPosition = -1;
             } else {
-                lastConfirmedFriendPosition = loadLastSyncedPosition(SyncedPositionType.FRIEND);
+                lastConfirmedFriendPosition = loadLastSyncedPosition(SyncedPositionType.FRIEND,userId);
             }
             int newItemCount = 0, deletedItemCount = 0;
 
-            for (Friend friend : friends) {
+            for (Member friendMember : friendMembers) {
+
+                //TODO(profile) : merge save
+                friendMember.save();
+
                 int foundPos;
                 for (foundPos = lastConfirmedFriendPosition+1; foundPos < currentFriends.size(); foundPos++) {
-                    Friend checkFriend = currentFriends.get(foundPos);
-                    if (friend.getId().equals(checkFriend.getId())) {
+                    FriendReference checkFriend = currentFriends.get(foundPos);
+                    if (friendMember.getId().equals(checkFriend.getId())) {
                         break;
                     }
                 }
                 if (foundPos >= currentFriends.size()) {
                     newItemCount++;
+                    FriendReference friendReference = new FriendReference();
+                    friendReference.setId(friendMember.getId());
+                    friendReference.setNickname(friendMember.getNickname());
+                    friendReference.setFriendId(userId);
+                    friendReference.save();
                 } else {
                     for (int i = lastConfirmedFriendPosition+1; i < foundPos; i++) {
                         currentFriends.get(i).delete();
@@ -1152,12 +1205,159 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                     lastConfirmedFriendPosition = foundPos;
                 }
-                friend.save();
             }
 
-            saveLastSyncedPosition(SyncedPositionType.FRIEND,lastConfirmedFriendPosition+newItemCount);
+            saveLastSyncedPosition(SyncedPositionType.FRIEND,userId,lastConfirmedFriendPosition+newItemCount);
 
-            return friends.size() - deletedItemCount;
+            return friendMembers.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveMyPictures(String[] params) throws IOException {
+        String currentUserId = getFetLifeApplication().getUserSessionManager().getCurrentUser().getId();
+        return retrievePictures(true, currentUserId, params);
+    }
+
+    private int retrieveMemberPictures(String[] params) throws IOException {
+        String userId = params[0];
+        String newParams[] = new String[params.length-1];
+
+        System.arraycopy(params, 1, newParams, 0, params.length-1);
+
+        return retrievePictures(true, userId, newParams);
+    }
+
+    private int retrievePictures(boolean myPictures, String userId, String[] params) throws IOException {
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Picture>> getPicturesCall;
+        if (myPictures) {
+            throw new NoSuchMethodError("Not Yet implemented");
+        } else {
+            getPicturesCall = getFetLifeApi().getMemberPictures(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
+        }
+
+        Response<List<Picture>> picturesResponse = getPicturesCall.execute();
+        if (picturesResponse.isSuccess()) {
+
+            final List<Picture> retrievedPictures = picturesResponse.body();
+            //TODO(profile) : use same ordering
+            List<PictureReference> currentPictures = new Select().from(PictureReference.class).where(PictureReference_Table.userId.is(userId)).queryList();
+
+            int lastConfirmedPicturePosition;
+            if (page == 1) {
+                lastConfirmedPicturePosition = -1;
+            } else {
+                lastConfirmedPicturePosition = loadLastSyncedPosition(SyncedPositionType.PICTURE,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Picture retrievedPicture : retrievedPictures) {
+                int foundPos;
+                for (foundPos = lastConfirmedPicturePosition+1; foundPos < currentPictures.size(); foundPos++) {
+                    PictureReference checkPicture = currentPictures.get(foundPos);
+                    if (retrievedPicture.getId().equals(checkPicture.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentPictures.size()) {
+                    newItemCount++;
+                    PictureReference pictureReference = new PictureReference();
+                    pictureReference.setId(retrievedPicture.getId());
+                    //TODO(profile) save here the ordering param
+                    pictureReference.setUserId(userId);
+                    pictureReference.save();
+                } else {
+                    for (int i = lastConfirmedPicturePosition+1; i < foundPos; i++) {
+                        currentPictures.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedPicturePosition = foundPos;
+                }
+                //TODO(profile) : merge save
+                retrievedPicture.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.PICTURE,userId,lastConfirmedPicturePosition+newItemCount);
+
+            return retrievedPictures.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveMyStatuses(String[] params) throws IOException {
+        String currentUserId = getFetLifeApplication().getUserSessionManager().getCurrentUser().getId();
+        return retrieveStatuses(true, currentUserId, params);
+    }
+
+    private int retrieveMemberStatuses(String[] params) throws IOException {
+        String userId = params[0];
+        String newParams[] = new String[params.length-1];
+
+        System.arraycopy(params, 1, newParams, 0, params.length-1);
+
+        return retrieveStatuses(true, userId, newParams);
+    }
+
+    private int retrieveStatuses(boolean myStatus, String userId, String[] params) throws IOException {
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Status>> getStatusCall;
+        if (myStatus) {
+            throw new NoSuchMethodError("Not Yet implemented");
+        } else {
+            getStatusCall = getFetLifeApi().getMemberStatuses(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
+        }
+
+        Response<List<Status>> statussResponse = getStatusCall.execute();
+        if (statussResponse.isSuccess()) {
+
+            final List<Status> retrievedStatuses = statussResponse.body();
+            //TODO(profile) : use same ordering
+            List<StatusReference> currentStatus = new Select().from(StatusReference.class).where(StatusReference_Table.userId.is(userId)).queryList();
+
+            int lastConfirmedStatusPosition;
+            if (page == 1) {
+                lastConfirmedStatusPosition = -1;
+            } else {
+                lastConfirmedStatusPosition = loadLastSyncedPosition(SyncedPositionType.STATUS,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Status retrievedStatus : retrievedStatuses) {
+                int foundPos;
+                for (foundPos = lastConfirmedStatusPosition+1; foundPos < currentStatus.size(); foundPos++) {
+                    StatusReference checkStatus = currentStatus.get(foundPos);
+                    if (retrievedStatus.getId().equals(checkStatus.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentStatus.size()) {
+                    newItemCount++;
+                    StatusReference statusReference = new StatusReference();
+                    statusReference.setId(retrievedStatus.getId());
+                    //TODO(profile) save here the ordering param
+                    statusReference.setUserId(userId);
+                    statusReference.save();
+                } else {
+                    for (int i = lastConfirmedStatusPosition+1; i < foundPos; i++) {
+                        currentStatus.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedStatusPosition = foundPos;
+                }
+                //TODO(profile) : merge save
+                retrievedStatus.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.STATUS,userId,lastConfirmedStatusPosition+newItemCount);
+
+            return retrievedStatuses.size() - deletedItemCount;
         } else {
             return Integer.MIN_VALUE;
         }
@@ -1302,6 +1502,8 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private enum SyncedPositionType {
+        PICTURE,
+        STATUS,
         FRIEND,
         CONVERSATION;
 
@@ -1311,14 +1513,14 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private void saveLastSyncedPosition(SyncedPositionType syncedPositionType, int position) {
+    private void saveLastSyncedPosition(SyncedPositionType syncedPositionType, String modifier, int position) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        preferences.edit().putInt(syncedPositionType.toString(), position).apply();
+        preferences.edit().putInt(syncedPositionType.toString() + modifier, position).apply();
     }
 
-    private int loadLastSyncedPosition(SyncedPositionType syncedPositionType) {
+    private int loadLastSyncedPosition(SyncedPositionType syncedPositionType, String modifier) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
-        return preferences.getInt(syncedPositionType.toString(), -1);
+        return preferences.getInt(syncedPositionType.toString() + modifier, -1);
     }
 
 }

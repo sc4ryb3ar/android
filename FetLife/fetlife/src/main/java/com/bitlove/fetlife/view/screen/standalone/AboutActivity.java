@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.standalone;
+package com.bitlove.fetlife.view.screen.standalone;
 
 import android.content.Context;
 import android.content.Intent;

@@ -9,8 +9,8 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.activity.resource.MessagesActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 
 import org.json.JSONObject;
 

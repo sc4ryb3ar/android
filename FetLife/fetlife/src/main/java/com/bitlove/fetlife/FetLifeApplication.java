@@ -1,7 +1,6 @@
 package com.bitlove.fetlife;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -22,8 +21,8 @@ import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
-import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
-import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
+import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
+import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;

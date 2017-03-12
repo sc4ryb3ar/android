@@ -1,6 +1,18 @@
 package com.bitlove.fetlife.view.adapter;
 
+import com.bitlove.fetlife.FetLifeApplication;
+
 public abstract class ResourceListRecyclerAdapter<Resource, ResourceViewHolder extends SwipeableViewHolder> extends SwipeableRecyclerAdapter<ResourceViewHolder> {
+
+    protected FetLifeApplication fetLifeApplication;
+
+    public ResourceListRecyclerAdapter() {
+
+    }
+
+    public ResourceListRecyclerAdapter(FetLifeApplication fetLifeApplication) {
+        this.fetLifeApplication = fetLifeApplication;
+    }
 
     public abstract void refresh();
 

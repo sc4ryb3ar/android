@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.resource;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +29,7 @@ import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
-import com.bitlove.fetlife.view.activity.component.MenuActivityComponent;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
@@ -86,7 +86,7 @@ public class MessagesActivity extends ResourceActivity
 
     @Override
     protected void onSetContentView() {
-        setContentView(R.layout.activity_resource_list);
+        setContentView(R.layout.activity_resource_recycler_menu);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.activity.component;
+package com.bitlove.fetlife.view.screen.component;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,16 +18,16 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.User;
-import com.bitlove.fetlife.view.activity.resource.FeedActivity;
-import com.bitlove.fetlife.view.activity.standalone.AboutActivity;
-import com.bitlove.fetlife.view.activity.standalone.AddNfcFriendActivity;
-import com.bitlove.fetlife.view.activity.BaseActivity;
-import com.bitlove.fetlife.view.activity.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.activity.resource.FriendRequestsActivity;
-import com.bitlove.fetlife.view.activity.resource.FriendsActivity;
-import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
-import com.bitlove.fetlife.view.activity.resource.NotificationHistoryActivity;
-import com.bitlove.fetlife.view.activity.standalone.SettingsActivity;
+import com.bitlove.fetlife.view.screen.resource.FeedActivity;
+import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
+import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
+import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.FriendsActivity;
+import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
+import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
 import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
 import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
