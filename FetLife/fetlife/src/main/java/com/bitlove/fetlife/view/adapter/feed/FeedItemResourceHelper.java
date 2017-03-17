@@ -148,7 +148,10 @@ public class FeedItemResourceHelper {
         if (events == null || events.isEmpty()) {
             return null;
         }
-        FeedEvent event = events.get(0);
+        return getMember(events.get(0));
+    }
+
+    public Member getMember(FeedEvent event) {
         try {
             switch (feedStoryType) {
                 case PEOPLE_INTO_CREATED:
@@ -179,6 +182,20 @@ public class FeedItemResourceHelper {
                     return event.getTarget().getRsvp().getMember();
                 case COMMENT_CREATED:
                     return event.getTarget().getComment().getMember();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Member getTargetMember(FeedEvent event) {
+        try {
+            switch (feedStoryType) {
+                case FRIEND_CREATED:
+                case FOLLOW_CREATED:
+                    return event.getTarget().getRelation().getTargetMember();
                 default:
                     return null;
             }

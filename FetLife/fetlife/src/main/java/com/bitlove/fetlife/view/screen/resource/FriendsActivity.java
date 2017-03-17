@@ -8,12 +8,13 @@ import android.support.design.widget.NavigationView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.FriendReference;
 import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.RelationReference;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.adapter.FriendsRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
 public class FriendsActivity extends ResourceListActivity<Member> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -26,7 +27,7 @@ public class FriendsActivity extends ResourceListActivity<Member> implements Nav
 
     private static final int FRIENDS_PAGE_COUNT = 10;
 
-    private FriendsRecyclerAdapter friendsAdapter;
+    private RelationsRecyclerAdapter friendsAdapter;
 
     private int requestedPage = 1;
 
@@ -74,8 +75,21 @@ public class FriendsActivity extends ResourceListActivity<Member> implements Nav
     }
 
     @Override
+    protected void startResourceCall(int pageCount, int requestedPage) {
+        String apiCallAction = getApiCallAction();
+        if (apiCallAction == null) {
+            return;
+        }
+        if (requestedPage != DEFAULT_REQUESTED_PAGE) {
+            FetLifeApiIntentService.startApiCall(FriendsActivity.this, apiCallAction, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(pageCount), Integer.toString(requestedPage));
+        } else {
+            FetLifeApiIntentService.startApiCall(FriendsActivity.this, apiCallAction, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(pageCount));
+        }
+    }
+
+    @Override
     protected ResourceListRecyclerAdapter createRecyclerAdapter(Bundle savedInstanceState) {
-        return new FriendsRecyclerAdapter(getFetLifeApplication());
+        return new RelationsRecyclerAdapter(getFetLifeApplication().getUserSessionManager().getCurrentUser().getId(), RelationReference.VALUE_RELATIONTYPE_FRIEND,getFetLifeApplication());
     }
 
     @Override
@@ -93,11 +107,6 @@ public class FriendsActivity extends ResourceListActivity<Member> implements Nav
 
     @Override
     public void onAvatarClick(Member friend) {
-        String url = friend.getLink();
-        if (url != null) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            startActivity(intent);
-        }
+        ProfileActivity.startActivity(this,friend.getId());
     }
 }

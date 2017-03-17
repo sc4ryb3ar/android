@@ -7,8 +7,13 @@ import android.view.View;
 
 public abstract class SwipeableRecyclerAdapter<T extends SwipeableViewHolder> extends RecyclerView.Adapter<T> {
 
+    private boolean useSwipe = true;
+
     @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
+        if (!useSwipe()) {
+            return;
+        }
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, getSwipeDirections()) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -98,6 +103,14 @@ public abstract class SwipeableRecyclerAdapter<T extends SwipeableViewHolder> ex
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    protected boolean useSwipe() {
+        return useSwipe;
+    }
+
+    public void setUseSwipe(boolean useSwipe) {
+        this.useSwipe = useSwipe;
     }
 
     protected int getSwipeDirections() {

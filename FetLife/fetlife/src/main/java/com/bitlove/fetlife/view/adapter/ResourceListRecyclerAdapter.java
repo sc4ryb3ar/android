@@ -23,8 +23,8 @@ public abstract class ResourceListRecyclerAdapter<Resource, ResourceViewHolder e
 
     protected OnResourceClickListener<Resource> onResourceClickListener;
 
-    public void setOnItemClickListener(OnResourceClickListener<Resource> onConversationClickListener) {
-        this.onResourceClickListener = onConversationClickListener;
+    public void setOnItemClickListener(OnResourceClickListener<Resource> onResourceClickListener) {
+        this.onResourceClickListener = onResourceClickListener;
     }
 
     public OnResourceClickListener<Resource> getOnItemClickListener() {

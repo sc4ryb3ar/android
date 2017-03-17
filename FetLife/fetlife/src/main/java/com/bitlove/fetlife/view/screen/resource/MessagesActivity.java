@@ -31,6 +31,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
@@ -53,7 +54,7 @@ public class MessagesActivity extends ResourceActivity
 
     private String conversationId;
     private String avatarUrl;
-    private String memberLink;
+    private String memberId;
     private boolean oldMessageLoadingInProgress;
 
     protected RecyclerView recyclerView;
@@ -131,7 +132,7 @@ public class MessagesActivity extends ResourceActivity
         conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
         String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
         avatarUrl = intent.getStringExtra(EXTRA_AVATAR_RESOURCE_URL);
-        memberLink = null;
+        memberId = null;
 
         messagesAdapter = new MessagesRecyclerAdapter(conversationId);
         conversation = messagesAdapter.getConversation();
@@ -143,7 +144,7 @@ public class MessagesActivity extends ResourceActivity
             if (avatarUrl == null) {
                 avatarUrl = conversation.getAvatarLink();
             }
-            memberLink = conversation.getMemberLink();
+            memberId = conversation.getMemberId();
         }
 
         if (avatarUrl != null) {
@@ -153,13 +154,11 @@ public class MessagesActivity extends ResourceActivity
             toolBarImage.setVisibility(View.GONE);
         }
         View.OnClickListener toolBarItemClickListener;
-        if (memberLink != null) {
+        if (memberId != null) {
             toolBarItemClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(memberLink));
-                    startActivity(intent);
+                    ProfileActivity.startActivity(MessagesActivity.this,memberId);
                 }
             };
         } else {

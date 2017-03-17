@@ -1,6 +1,8 @@
 package com.bitlove.fetlife.model.pojos;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
@@ -14,6 +16,9 @@ public class Status extends BaseModel {
     @PrimaryKey(autoincrement = false)
     @JsonProperty("id")
     private String id;
+    @Column
+    @JsonIgnore
+    private long date;
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("member")
@@ -74,6 +79,20 @@ public class Status extends BaseModel {
     @JsonProperty("created_at")
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+        if (createdAt != null) {
+            try {
+                setDate(DateUtil.parseDate(createdAt));
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 
     /**

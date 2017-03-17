@@ -10,11 +10,10 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.FriendReference;
-import com.bitlove.fetlife.model.pojos.FriendReference_Table;
+import com.bitlove.fetlife.model.pojos.RelationReference;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Member_Table;
-import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.model.pojos.RelationReference_Table;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -23,12 +22,16 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, FriendViewHolder> {
+public class RelationsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, RelationViewHolder> {
 
+    private final String memberId;
+    private final int relationType;
     private List<Member> itemList;
 
-    public FriendsRecyclerAdapter(FetLifeApplication fetLifeApplication) {
+    public RelationsRecyclerAdapter(String memberId, int relationType, FetLifeApplication fetLifeApplication) {
         super(fetLifeApplication);
+        this.memberId = memberId;
+        this.relationType = relationType;
         loadItems();
     }
 
@@ -46,13 +49,12 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, 
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            User user = fetLifeApplication.getUserSessionManager().getCurrentUser();
-            List<FriendReference> friendReferences = new Select().from(FriendReference.class).where(FriendReference_Table.friendId.is(user.getId())).orderBy(OrderBy.fromProperty(FriendReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
-            List<String> friendIds = new ArrayList<>();
-            for (FriendReference friendReference : friendReferences) {
-                friendIds.add(friendReference.getId());
+            List<RelationReference> relationReferences = new Select().from(RelationReference.class).where(RelationReference_Table.userId.is(memberId)).and(RelationReference_Table.relationType.is(relationType)).orderBy(OrderBy.fromProperty(RelationReference_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
+            List<String> relationIds = new ArrayList<>();
+            for (RelationReference relationReference : relationReferences) {
+                relationIds.add(relationReference.getId());
             }
-            itemList = new Select().from(Member.class).where(Member_Table.id.in(friendIds)).orderBy(OrderBy.fromProperty(Member_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            itemList = new Select().from(Member.class).where(Member_Table.id.in(relationIds)).orderBy(OrderBy.fromProperty(Member_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }
@@ -68,22 +70,22 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, 
     }
 
     @Override
-    public FriendViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RelationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem_friend, parent, false);
-        return new FriendViewHolder(itemView);
+        return new RelationViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(FriendViewHolder friendViewHolder, int position) {
+    public void onBindViewHolder(RelationViewHolder relationViewHolder, int position) {
 
         final Member friend = itemList.get(position);
 
-        friendViewHolder.headerText.setText(friend.getNickname());
-        friendViewHolder.upperText.setText(friend.getMetaInfo());
+        relationViewHolder.headerText.setText(friend.getNickname());
+        relationViewHolder.upperText.setText(friend.getMetaInfo());
 
-//        friendViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(friend.getDate())));
+//        relationViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(friend.getDate())));
 
-        friendViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        relationViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onResourceClickListener != null) {
@@ -92,7 +94,7 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, 
             }
         });
 
-        friendViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
+        relationViewHolder.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onResourceClickListener != null) {
@@ -101,24 +103,24 @@ public class FriendsRecyclerAdapter extends ResourceListRecyclerAdapter<Member, 
             }
         });
 
-        friendViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
+        relationViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
         String avatarUrl = friend.getAvatarLink();
-        friendViewHolder.avatarImage.setImageURI(avatarUrl);
-//        imageLoader.loadImage(friendViewHolder.itemView.getContext(), avatarUrl, friendViewHolder.avatarImage, R.drawable.dummy_avatar);
+        relationViewHolder.avatarImage.setImageURI(avatarUrl);
+//        imageLoader.loadImage(relationViewHolder.itemView.getContext(), avatarUrl, relationViewHolder.avatarImage, R.drawable.dummy_avatar);
     }
 
     @Override
-    protected void onItemRemove(FriendViewHolder viewHolder, RecyclerView recyclerView, boolean swipedRight) {
+    protected void onItemRemove(RelationViewHolder viewHolder, RecyclerView recyclerView, boolean swipedRight) {
 
     }
 }
 
-class FriendViewHolder extends SwipeableViewHolder {
+class RelationViewHolder extends SwipeableViewHolder {
 
     SimpleDraweeView avatarImage;
     TextView headerText, upperText, dateText;
 
-    public FriendViewHolder(View itemView) {
+    public RelationViewHolder(View itemView) {
         super(itemView);
 
         headerText = (TextView) itemView.findViewById(R.id.friend_header);

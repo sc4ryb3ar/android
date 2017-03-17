@@ -10,9 +10,11 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
 public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack, FeedRecyclerAdapter.OnFeedItemClickListener {
 
@@ -60,37 +62,34 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     public void onMemberClick(Member member) {
-        openUrl(member.getLink());
-        String url = member.getLink();
-        if (url != null) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            startActivity(intent);
-        }
+        //TODO(feed): Remove this save after Feed is stored in local db
+        member.save();
+        ProfileActivity.startActivity(this, member.getId());
     }
 
     @Override
     public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url) {
-        openUrl(url);
+        UrlUtil.openUrl(this,url);
     }
 
     @Override
-    public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url) {
-        openUrl(url);
+    public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, Member targetMember) {
+        if (targetMember != null) {
+            if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
+                //TODO(feed): Remove this save after Feed is stored in local db
+                targetMember.save();
+                ProfileActivity.startActivity(this, targetMember.getId());
+                return;
+            }
+        }
+        UrlUtil.openUrl(this,url);
     }
 
     @Override
     public void onVisitItem(Object object, String url) {
-        openUrl(url);
+        UrlUtil.openUrl(this,url);
     }
 
-    private void openUrl(String link) {
-        if (link != null) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(link));
-            startActivity(intent);
-        }
-    }
 
     @Override
     public boolean finishAtMenuNavigation() {

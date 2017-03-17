@@ -200,7 +200,7 @@
   <string name="forgot_login">Logindaten vergessen?</string>
 
 
-  <!-- *** Strings for FriendReference Requests screen *** -->
+  <!-- *** Strings for RelationReference Requests screen *** -->
 
   <string name="text_friendrequests_rejected">Abgelehnt</string>
   <string name="text_friendrequests_accepted">Akzeptiert</string>

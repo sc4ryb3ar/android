@@ -75,6 +75,4 @@ public class AboutFragment extends BaseFragment implements ProfileFragment {
             refresh();
         }
     }
-
-
 }

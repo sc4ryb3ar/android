@@ -13,6 +13,7 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
+import com.bitlove.fetlife.model.pojos.Relation;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
@@ -81,7 +82,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
                 requestedPage = 1;
                 String apiAction = getApiCallAction();
                 if (apiAction != null) {
-                    FetLifeApiIntentService.startApiCall(ResourceListActivity.this, getApiCallAction(), Integer.toString(PAGE_COUNT));
+                    startResourceCall(PAGE_COUNT);
                 }
             }
         });
@@ -127,7 +128,7 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         }
     }
 
-    private static final int DEFAULT_REQUESTED_PAGE = Integer.MIN_VALUE;
+    protected static final int DEFAULT_REQUESTED_PAGE = Integer.MIN_VALUE;
 
     protected void startResourceCall(int pageCount) {
         startResourceCall(pageCount, DEFAULT_REQUESTED_PAGE);

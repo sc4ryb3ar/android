@@ -15,15 +15,55 @@ import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 //TODO: clean up the POJOs and define relations
 @Table(database = FetLifeDatabase.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Member extends BaseModel {
 
+    private static final String SEPARATOR_LOOKING_FOR = ";";
+
     @JsonProperty("id")
     @Column
     @PrimaryKey(autoincrement = false)
     private String id;
+
+    @JsonProperty("is_followable")
+    @Column
+    private boolean followable;
+
+    @JsonProperty("is_followed_by_me")
+    @Column
+    private boolean followedByMe;
+
+    @JsonProperty("is_friend_with_me")
+    @Column
+    private boolean friendWithMe;
+
+    @JsonProperty("sexual_orientation")
+    @Column
+    private String sexualOrientation;
+
+    @JsonProperty("looking_for")
+    private List<String> lookingFor;
+
+    @Column
+    private String lookingForText;
+
+    @JsonProperty("country")
+    @Column
+    private String country;
+
+    @JsonProperty("city")
+    @Column
+    private String city;
+
+    @JsonProperty("administrative_area")
+    @Column
+    private String administrativeArea;
 
     @JsonProperty("nickname")
     @Column
@@ -51,6 +91,96 @@ public class Member extends BaseModel {
     @JsonIgnore
     @Column
     private String avatarLink;
+
+    public static Member loadMember(String memberId) {
+        Member member = new Select().from(Member.class).where(Member_Table.id.is(memberId)).querySingle();
+        if (member == null) {
+            return null;
+        }
+        return member;
+    }
+
+    public boolean isFollowable() {
+        return followable;
+    }
+
+    public void setFollowable(boolean followable) {
+        this.followable = followable;
+    }
+
+    public boolean isFollowedByMe() {
+        return followedByMe;
+    }
+
+    public void setFollowedByMe(boolean followedByMe) {
+        this.followedByMe = followedByMe;
+    }
+
+    public boolean isFriendWithMe() {
+        return friendWithMe;
+    }
+
+    public void setFriendWithMe(boolean friendWithMe) {
+        this.friendWithMe = friendWithMe;
+    }
+
+    public String getSexualOrientation() {
+        return sexualOrientation;
+    }
+
+    public void setSexualOrientation(String sexualOrientation) {
+        this.sexualOrientation = sexualOrientation;
+    }
+
+    public List<String> getLookingFor() {
+        if (lookingFor == null && lookingForText != null) {
+            lookingFor = Arrays.asList(lookingForText.split(SEPARATOR_LOOKING_FOR));
+        }
+        return lookingFor;
+    }
+
+    public void setLookingFor(List<String> lookingFor) {
+        this.lookingFor = lookingFor;
+        if (lookingFor != null) {
+            String lookingForText = "";
+            for (String lookingForElement : lookingFor) {
+                lookingForText += SEPARATOR_LOOKING_FOR + lookingForElement;
+            }
+            setLookingForText(lookingForText);
+        }
+    }
+
+    public String getLookingForText() {
+        return lookingForText;
+    }
+
+    public void setLookingForText(String lookingForText) {
+        this.lookingForText = lookingForText;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getAdministrativeArea() {
+        return administrativeArea;
+    }
+
+    public void setAdministrativeArea(String administrativeArea) {
+        this.administrativeArea = administrativeArea;
+    }
 
     public String getNickname() {
         return nickname;
@@ -136,13 +266,5 @@ public class Member extends BaseModel {
                 return m.getDeclaringClass() == BaseModel.class || super.hasIgnoreMarker(m);
             }
         }).writeValueAsString(this);
-    }
-
-    public static Member loadMember(String memberId) {
-        Member member = new Select().from(Member.class).where(Member_Table.id.is(memberId)).querySingle();
-        if (member == null) {
-            return null;
-        }
-        return member;
     }
 }

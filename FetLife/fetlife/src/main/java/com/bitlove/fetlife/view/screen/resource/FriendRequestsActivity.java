@@ -15,6 +15,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.FriendRequestsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -63,11 +64,11 @@ public class FriendRequestsActivity extends ResourceListActivity<BaseModel> impl
 
     @Override
     public void onAvatarClick(BaseModel friendRequestScreenItem) {
-        String url = friendRequestScreenItem instanceof FriendRequest ? ((FriendRequest)friendRequestScreenItem).getMemberLink() : ((SharedProfile)friendRequestScreenItem).getLink();
-        if (url != null) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            startActivity(intent);
+        if (friendRequestScreenItem instanceof FriendRequest) {
+            ProfileActivity.startActivity(this,((FriendRequest)friendRequestScreenItem).getMemberId());
+        } else {
+            //TODO(profile) Save SharedProfile As Member instead
+            ProfileActivity.startActivity(this,((SharedProfile)friendRequestScreenItem).getId());
         }
     }
 

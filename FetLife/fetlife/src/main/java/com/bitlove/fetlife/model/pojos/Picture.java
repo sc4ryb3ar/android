@@ -1,12 +1,23 @@
 
 package com.bitlove.fetlife.model.pojos;
 
+import android.text.Html;
+
+import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.event.ServiceCallFailedEvent;
+import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 @Table(database = FetLifeDatabase.class)
 public class Picture extends BaseModel {
@@ -22,6 +33,10 @@ public class Picture extends BaseModel {
     private Member member;
 
     @Column
+    @JsonIgnore
+    private String memberId;
+
+    @Column
     @JsonProperty("love_count")
     private int loveCount;
 
@@ -34,8 +49,15 @@ public class Picture extends BaseModel {
     @JsonProperty("id")
     private String id;
 
+    @Column
     @JsonProperty("created_at")
     private String createdAt;
+
+    @Column
+    @JsonIgnore
+    private long date;
+
+    @Column
     @JsonProperty("content_type")
     private String contentType;
 
@@ -49,6 +71,9 @@ public class Picture extends BaseModel {
 
     @Column
     private String thumbUrl;
+
+    @Column
+    private String displayUrl;
 
     /**
      *
@@ -70,6 +95,7 @@ public class Picture extends BaseModel {
         this.variants = variants;
         if (variants != null) {
             setThumbUrl(variants.getLargeUrl());
+            setDisplayUrl(variants.getHugeUrl());
         }
     }
 
@@ -79,6 +105,22 @@ public class Picture extends BaseModel {
 
     public void setThumbUrl(String thumbUrl) {
         this.thumbUrl = thumbUrl;
+    }
+
+    public String getDisplayUrl() {
+        return displayUrl;
+    }
+
+    public void setDisplayUrl(String displayUrl) {
+        this.displayUrl = displayUrl;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
     }
 
     /**
@@ -108,6 +150,9 @@ public class Picture extends BaseModel {
      */
     @JsonProperty("member")
     public Member getMember() {
+        if (member == null) {
+            member = Member.loadMember(memberId);
+        }
         return member;
     }
 
@@ -119,6 +164,10 @@ public class Picture extends BaseModel {
     @JsonProperty("member")
     public void setMember(Member member) {
         this.member = member;
+        if (member != null) {
+            member.save();
+            setMemberId(member.getId());
+        }
     }
 
     /**
@@ -189,8 +238,21 @@ public class Picture extends BaseModel {
     @JsonProperty("created_at")
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+        if (createdAt != null) {
+            try {
+                setDate(DateUtil.parseDate(createdAt));
+            } catch (Exception e) {
+            }
+        }
     }
 
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
     /**
      *
      * @return
@@ -249,6 +311,56 @@ public class Picture extends BaseModel {
     @JsonProperty("body")
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public static String getFormattedBody(String body) {
+        try {
+            return Html.fromHtml(body).toString();
+        } catch (Throwable t) {
+            return body;
+        }
+    }
+
+    public static void startLoveCallWithObserver(final FetLifeApplication fetLifeApplication, final Picture picture, final boolean loved) {
+        final String action = loved ? FetLifeApiIntentService.ACTION_APICALL_ADD_LOVE : FetLifeApiIntentService.ACTION_APICALL_REMOVE_LOVE;
+        fetLifeApplication.getEventBus().register(new LoveImageCallObserver(fetLifeApplication, action, picture, loved));
+        FetLifeApiIntentService.startApiCall(fetLifeApplication, action, picture.getId(), picture.getContentType());
+    }
+
+    private static class LoveImageCallObserver {
+
+        private final FetLifeApplication fetLifeApplication;
+        String action;
+        Picture picture;
+        boolean loved;
+
+        LoveImageCallObserver(FetLifeApplication fetLifeApplication,String action, Picture picture, boolean loved) {
+            this.action = action;
+            this.picture = picture;
+            this.loved = loved;
+            this.fetLifeApplication = fetLifeApplication;
+        }
+
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
+            if (serviceCallFinishedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFinishedEvent.getParams())) {
+                fetLifeApplication.getEventBus().unregister(this);
+            }
+        }
+
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onResourceListCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
+            if (serviceCallFailedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFailedEvent.getParams())) {
+                picture.setLovedByMe(!loved);
+                fetLifeApplication.getEventBus().unregister(this);
+            }
+        }
+        private boolean checkParams(String... params) {
+            if (params == null || params.length != 2) {
+                return false;
+            }
+            return picture.getId().equals(params[0]) && picture.getContentType().equals(params[1]);
+        }
     }
 
 }

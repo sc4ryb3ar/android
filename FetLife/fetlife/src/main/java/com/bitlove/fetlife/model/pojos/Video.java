@@ -1,31 +1,51 @@
 package com.bitlove.fetlife.model.pojos;
 
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-public class Video {
+@Table(database = FetLifeDatabase.class)
+public class Video extends BaseModel {
 
+    @Column
+    @PrimaryKey(autoincrement = false)
     @JsonProperty("id")
     private String id;
+    @Column
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("member")
     private Member member;
+    @Column
     @JsonProperty("content_type")
     private String contentType;
+    @Column
     @JsonProperty("love_count")
     private Integer loveCount;
+    @Column
     @JsonProperty("is_loved_by_me")
     private Boolean isLovedByMe;
+    @Column
     @JsonProperty("comment_count")
     private Integer commentCount;
+    @Column
     @JsonProperty("video_url")
     private String videoUrl;
     @JsonProperty("thumbnail")
     private Thumbnail thumbnail;
+    @Column
     @JsonProperty("body")
     private String body;
+    @Column
     @JsonProperty("url")
     private String url;
+    @Column
+    @JsonIgnore
+    private String thumbUrl;
 
     /**
      *
@@ -133,7 +153,7 @@ public class Video {
      * The isLovedByMe
      */
     @JsonProperty("is_loved_by_me")
-    public Boolean getIsLovedByMe() {
+    public Boolean isLovedByMe() {
         return isLovedByMe;
     }
 
@@ -143,7 +163,7 @@ public class Video {
      * The is_loved_by_me
      */
     @JsonProperty("is_loved_by_me")
-    public void setIsLovedByMe(Boolean isLovedByMe) {
+    public void setLovedByMe(Boolean isLovedByMe) {
         this.isLovedByMe = isLovedByMe;
     }
 
@@ -187,6 +207,14 @@ public class Video {
         this.videoUrl = videoUrl;
     }
 
+    public String getThumbUrl() {
+        return thumbUrl;
+    }
+
+    public void setThumbUrl(String thumbUrl) {
+        this.thumbUrl = thumbUrl;
+    }
+
     /**
      *
      * @return
@@ -205,6 +233,9 @@ public class Video {
     @JsonProperty("thumbnail")
     public void setThumbnail(Thumbnail thumbnail) {
         this.thumbnail = thumbnail;
+        if (thumbnail != null) {
+            setThumbUrl(thumbnail.getVariants().get150().getUrl());
+        }
     }
 
     /**
