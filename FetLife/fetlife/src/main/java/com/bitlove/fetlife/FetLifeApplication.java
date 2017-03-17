@@ -16,12 +16,14 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
+import com.bitlove.fetlife.model.api.GitHubService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
 import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
+import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -86,6 +88,8 @@ public class FetLifeApplication extends MultiDexApplication {
     private UserSessionManager userSessionManager;
     private InMemoryStorage inMemoryStorage;
 
+    private GitHubService gitHubService;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -128,6 +132,12 @@ public class FetLifeApplication extends MultiDexApplication {
             fetLifeService = new FetLifeService(this);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        try {
+            gitHubService = new GitHubService(this);
+        } catch (Exception e) {
+            gitHubService = null;
         }
 
         notificationParser = new NotificationParser();
@@ -282,6 +292,9 @@ public class FetLifeApplication extends MultiDexApplication {
         return eventBus;
     }
 
+    public GitHubService getGitHubService() {
+        return gitHubService;
+    }
 
     //****
     //Getters for App version info
@@ -331,7 +344,7 @@ public class FetLifeApplication extends MultiDexApplication {
 
         @Override
         public void onActivityResumed(Activity activity) {
-            if (!isAppInForeground()) {
+            if (!isAppInForeground() || foregroundActivity instanceof LoginActivity) {
                 FetLifeApiIntentService.startPendingCalls(FetLifeApplication.this);
             }
             setForegroundActivity(activity);

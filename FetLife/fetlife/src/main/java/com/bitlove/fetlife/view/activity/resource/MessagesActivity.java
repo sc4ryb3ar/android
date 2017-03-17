@@ -336,6 +336,9 @@ public class MessagesActivity extends ResourceActivity
         }
     }
 
+    private long lastSendButtonClickTime = 0l;
+    private static final long SEND_BUTTON_CLICK_THRESHOLD = 700l;
+
     public void onSend(View v) {
         final String text = textInput.getText().toString();
 
@@ -343,13 +346,18 @@ public class MessagesActivity extends ResourceActivity
             return;
         }
 
-        textInput.setText("");
-
         User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
-
         if (currentUser == null) {
             return;
         }
+
+        long messageDate = System.currentTimeMillis();
+        if (MessageDuplicationDebugUtil.checkTypedMessage(currentUser.getId(),text) && messageDate - lastSendButtonClickTime < SEND_BUTTON_CLICK_THRESHOLD) {
+            return;
+        }
+        lastSendButtonClickTime = System.currentTimeMillis();
+
+        textInput.setText("");
 
         Message message = new Message();
         message.setPending(true);
@@ -359,7 +367,6 @@ public class MessagesActivity extends ResourceActivity
         message.setBody(text.trim());
         message.setSenderId(currentUser.getId());
         message.setSenderNickname(currentUser.getNickname());
-        MessageDuplicationDebugUtil.checkTypedMessage(message);
         message.save();
 
         FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);

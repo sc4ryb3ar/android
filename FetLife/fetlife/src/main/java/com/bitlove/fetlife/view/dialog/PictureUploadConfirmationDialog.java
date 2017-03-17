@@ -19,22 +19,24 @@ import android.widget.TextView;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 
-public class MediaUploadConfirmationDialog extends DialogFragment {
+public class PictureUploadConfirmationDialog extends DialogFragment {
 
     private static final String ARGUMENT_MEDIA_URI = "ARGUMENT_MEDIA_URI";
     private static final String ARGUMENT_DELETE_AFTER_UPLOAD = "ARGUMENT_DELETE_AFTER_UPLOAD";
-    private static final String FRAGMENT_TAG = MediaUploadConfirmationDialog.class.getSimpleName();
+    private static final String ARGUMENT_IS_VIDEO = "ARGUMENT_IS_VIDEO";
+    private static final String FRAGMENT_TAG = PictureUploadConfirmationDialog.class.getSimpleName();
 
-    public static MediaUploadConfirmationDialog newInstance(String mediaUri, boolean deleteAfterUpload) {
-        MediaUploadConfirmationDialog mediaUploadConfirmationDialog = new MediaUploadConfirmationDialog();
+    public static PictureUploadConfirmationDialog newInstance(String mediaUri, boolean isVideo, boolean deleteAfterUpload) {
+        PictureUploadConfirmationDialog pictureUploadConfirmationDialog = new PictureUploadConfirmationDialog();
         Bundle args = new Bundle();
         args.putString(ARGUMENT_MEDIA_URI, mediaUri);
+        args.putBoolean(ARGUMENT_IS_VIDEO, isVideo);
         args.putBoolean(ARGUMENT_DELETE_AFTER_UPLOAD, deleteAfterUpload);
-        mediaUploadConfirmationDialog.setArguments(args);
-        return mediaUploadConfirmationDialog;
+        pictureUploadConfirmationDialog.setArguments(args);
+        return pictureUploadConfirmationDialog;
     }
 
-    public static void show(Activity activity, String mediaUri, boolean deleteAfterUpload) {
+    public static void show(Activity activity, String mediaUri, boolean isVideo, boolean deleteAfterUpload) {
         FragmentTransaction ft = activity.getFragmentManager().beginTransaction();
         Fragment prev = activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (prev != null) {
@@ -43,7 +45,7 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        DialogFragment newFragment = newInstance(mediaUri, deleteAfterUpload);
+        DialogFragment newFragment = newInstance(mediaUri, isVideo, deleteAfterUpload);
         newFragment.show(ft, FRAGMENT_TAG);
     }
 
@@ -66,10 +68,10 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
 
         final AppCompatCheckBox checkBox = (AppCompatCheckBox) view.findViewById(R.id.dialogCheckBox);
         checkBox.setVisibility(View.VISIBLE);
-        checkBox.setText(R.string.button_media_picture_upload_check_friends_only);
+        checkBox.setText(R.string.button_media_upload_check_friends_only);
 
         Button leftButton = (Button) view.findViewById(R.id.dialogNegativeButton);
-        leftButton.setText(R.string.button_media_picture_upload_cancel);
+        leftButton.setText(R.string.button_media_upload_cancel);
         leftButton.setVisibility(View.VISIBLE);
         leftButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,12 +81,16 @@ public class MediaUploadConfirmationDialog extends DialogFragment {
         });
 
         Button rightButton = (Button) view.findViewById(R.id.dialogPositiveButton);
-        rightButton.setText(R.string.button_media_picture_upload_confirmation);
+        rightButton.setText(R.string.button_media_upload_confirmation);
         rightButton.setVisibility(View.VISIBLE);
         rightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
+                if (getArguments().getBoolean(ARGUMENT_IS_VIDEO, false)) {
+                    FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_VIDEO, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
+                } else {
+                    FetLifeApiIntentService.startApiCall(getActivity(), FetLifeApiIntentService.ACTION_APICALL_UPLOAD_PICTURE, getArguments().getString(ARGUMENT_MEDIA_URI), Boolean.toString(getArguments().getBoolean(ARGUMENT_DELETE_AFTER_UPLOAD)), editText.getText().toString(), Boolean.toString(checkBox.isChecked()));
+                }
                 dismissAllowingStateLoss();
             }
         });

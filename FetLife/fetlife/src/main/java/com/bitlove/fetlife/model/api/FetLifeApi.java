@@ -9,7 +9,7 @@ import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
-import com.bitlove.fetlife.model.pojos.VideoUploadIdResult;
+import com.bitlove.fetlife.model.pojos.VideoUploadResult;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
@@ -58,7 +58,7 @@ public interface FetLifeApi {
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")
-    Call<Message> postMessage(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId, @Field("body") String body, @Field("created_at") String dateStrings);
+    Call<Message> postMessage(@Header("Authorization") String authHeader, @Path("conversationId") String conversationId, @Field("body") String body);
 
     @FormUrlEncoded
     @PUT("/api/v2/me/conversations/{conversationId}/messages/read")
@@ -81,26 +81,6 @@ public interface FetLifeApi {
     @POST("/api/v2/me/friendrequests")
     Call<FriendRequest> createFriendRequest(@Header("Authorization") String authHeader, @Field("member_id") String friendId);
 
-    @Multipart
-    @POST("/api/v2/me/pictures")
-    Call<ResponseBody> uploadPicture(@Header("Authorization") String authHeader, @Part("picture\"; filename=\"android_app.png\" ") RequestBody picture,  @Part("is_avatar") RequestBody isAvatar, @Part("only_friends") RequestBody friendsOnly, @Part("caption") RequestBody caption, @Part("is_of_or_by_user") RequestBody isFromUser);
-    //TODO: solve dynamic file name
-    //https://github.com/square/retrofit/issues/1063
-
-    @FormUrlEncoded
-    @POST("/api/v2/me/videos")
-    Call<VideoUploadIdResult> uploadVideoStart(@Header("Authorization") String authHeader, @Field("title") String title, @Field("description") String description, @Field("video_file_name") String videoFileName, @Field("only_friends") boolean friendsOnly, @Field("is_of_or_by_user") boolean isFromUser);
-
-    @Multipart
-    @PUT("/api/v2/me/videos/uploads/{video_upload_id}")
-    Call<ResponseBody> uploadVideoPart(@Header("Authorization") String authHeader, @Path("video_upload_id") String videoUploadId, @Part("file\"; filename=\"android_app.part\" ") RequestBody video, @Part("number") RequestBody number);
-    //TODO: solve dynamic file name
-    //https://github.com/square/retrofit/issues/1063
-
-    @FormUrlEncoded
-    @POST("/api/v2/me/videos/uploads/{video_upload_id}/finish")
-    Call<ResponseBody> uploadVideoFinish(@Header("Authorization") String authHeader, @Path("video_upload_id") String videoUploadId);
-
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 
@@ -110,5 +90,11 @@ public interface FetLifeApi {
     @DELETE("/api/v2/me/loves/{content_type}/{content_id}")
     Call<ResponseBody> deleteLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);
 
+    @FormUrlEncoded
+    @POST("/api/v2/me/videos/uploads")
+    Call<VideoUploadResult> uploadVideoStart(@Header("Authorization") String authHeader, @Field("title") String title, @Field("description") String description, @Field("video_file_name") String videoFileName, @Field("only_friends") boolean friendsOnly, @Field("is_of_or_by_user") boolean isFromUser);
+
+    @POST("/api/v2/me/videos/uploads/{video_upload_id}/finish")
+    Call<ResponseBody> uploadVideoFinish(@Header("Authorization") String authHeader, @Path("video_upload_id") String videoUploadId);
 
 }

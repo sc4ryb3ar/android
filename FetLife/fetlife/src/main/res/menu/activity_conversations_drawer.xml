@@ -28,7 +28,12 @@
         <item
             android:id="@+id/nav_upload_pic"
             android:icon="@android:drawable/ic_menu_gallery"
-            android:title="@string/menu_upload_media" />
+            android:title="@string/menu_upload_photo" />
+
+        <item
+            android:id="@+id/nav_upload_video"
+            android:icon="@android:drawable/ic_menu_gallery"
+            android:title="@string/menu_upload_video" />
 
         <item
             android:id="@+id/nav_introduce"

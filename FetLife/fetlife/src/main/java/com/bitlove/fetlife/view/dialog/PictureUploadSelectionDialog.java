@@ -27,14 +27,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MediaUploadSelectionDialog extends DialogFragment {
+public class PictureUploadSelectionDialog extends DialogFragment {
 
     private static final int REQUEST_CODE_GALLERY_IMAGE = 2315;
     private static final int REQUEST_CODE_CAMERA_IMAGE = 3455;
-    private static final int REQUEST_CODE_CROP_GALLERY_IMAGE = 4315;
-    private static final int REQUEST_CODE_CROP_CAMERA_IMAGE = 5455;
 
-    private static final String FRAGMENT_TAG = MediaUploadSelectionDialog.class.getSimpleName();
+    private static final String FRAGMENT_TAG = PictureUploadSelectionDialog.class.getSimpleName();
 
     private static final String STATE_PARCELABLE_PHOTOURI = "STATE_PARCELABLE_PHOTOURI";
 
@@ -82,6 +80,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     private void onGalleryUpload() {
         Intent intent = new Intent();
         intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,
                 getResources().getString(R.string.title_intent_choose_media_upload)), REQUEST_CODE_GALLERY_IMAGE);
@@ -113,7 +112,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
                 dismissAllowingStateLoss();
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
-                MediaUploadConfirmationDialog.show(getActivity(), resultUri.toString(), true);
+                PictureUploadConfirmationDialog.show(getActivity(), resultUri.toString(), false, true);
                 cleanUpCameraPicture();
             }
         } else if (resultCode == Activity.RESULT_CANCELED){
@@ -205,7 +204,7 @@ public class MediaUploadSelectionDialog extends DialogFragment {
     }
 
     private static DialogFragment newInstance() {
-        return new MediaUploadSelectionDialog();
+        return new PictureUploadSelectionDialog();
     }
 
     private ResourceListActivity getResourceActivity() {

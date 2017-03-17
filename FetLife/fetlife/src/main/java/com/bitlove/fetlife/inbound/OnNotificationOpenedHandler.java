@@ -23,7 +23,8 @@ public class OnNotificationOpenedHandler implements OneSignal.NotificationOpened
         if (!isValidNotification(osNotificationOpenResult)) {
             //Investigating further some strange exceptions at this point
             try {
-                Crashlytics.logException(new Exception("Invalid notification from one signal; json: " + osNotificationOpenResult.toJSONObject().toString()));
+                OneSignal.cancelNotification(osNotificationOpenResult.notification.androidNotificationId);
+                Crashlytics.logException(new Exception("Invalid notification from one signal; Cancel invoked. json: " + osNotificationOpenResult.toJSONObject().toString()));
             } catch (Throwable t) {
                 Crashlytics.logException(new Exception("Invalid notification from one signal; JSON not available; displayType: " + osNotificationOpenResult.notification.displayType));
             }

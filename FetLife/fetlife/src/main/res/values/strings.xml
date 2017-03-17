@@ -24,6 +24,19 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.5.6<br/>
+                    <ul>
+                        <li>Video Upload</li>
+                        <li>Feed Image Scaling improvement</li>
+                        <li>Improved logging</li>
+                        <li>Improved message ordering</li>
+                        <li>Auto check for updates</li>
+                        <li>Fix for incorrect badge counter (one time clean up needed)</li>
+                        <li>Improved message ordering</li>
+                        <li>Code improved to avoid the same message sent twice</li>
+                        <li>Usage of default privacy settings for notifications</li>
+                    </ul>
+
             <p/>v2.4.0<br/>
                     <ul>
                         <li>Improved Conversation Layout (User Avatar, Direct link to user profile)</li>
@@ -139,7 +152,8 @@
     <string name="menu_friendrequests">Friend Requests</string>
     <string name="menu_introduce">Share My Profile</string>
     <string name="menu_notifications">Notifications</string>
-    <string name="menu_upload_media">Upload Photo</string>
+    <string name="menu_upload_photo">Upload Photo</string>
+    <string name="menu_upload_video">Upload Video</string>
     <string name="menu_conversations">Conversations</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_logout">Logout</string>
@@ -157,6 +171,7 @@
     <string name="title_activity_notificationhistory">Notifications</string>
     <string name="title_intent_choose_media_upload">Select Media App</string>
     <string name="title_media_picture_upload_confirmation">Add your picture</string>
+    <string name="title_media_video_upload_confirmation">Add your video</string>
 
     <!-- *** Settings texts *** -->
 
@@ -183,6 +198,8 @@
     <string name="settings_summary_notification_messages_enabled">Enable Notifications for incoming Messages</string>
     <string name="settings_title_notification_friendrequests_enabled">Friend Request Notifications</string>
     <string name="settings_summary_notification_friendrequests_enabled">Enable Notifications for incoming Friend Requests</string>
+    <string name="settings_title_notification_prerelease_enabled">Pre-Release Notifications</string>
+    <string name="settings_summary_notification_prerelease_enabled">Enable Notifications about new preview releases</string>
     <string name="settings_title_notification_others_enabled">Other Notifications</string>
     <string name="settings_summary_notification_others_enabled">Enable Notifications for any other event</string>
 
@@ -205,7 +222,9 @@
     <string name="button_delete_user_data_confirmation">Yes</string>
     <string name="button_delete_user_data_cancel">Cancel</string>
     <string name="button_media_picture_upload_hint_caption">Caption</string>
-    <string name="button_media_picture_upload_check_friends_only">Only visible to friends</string>
+    <string name="button_media_video_upload_hint_title">Title</string>
+    <string name="button_media_video_upload_hint_text">Text</string>
+    <string name="button_media_upload_check_friends_only">Only visible to friends</string>
     <string name="message_friend_decision_failed">FetLife App: Your decision about friendship could not be sent as you had logged out before it could have been processed</string>
 
     <!-- *** Feed texts *** -->
@@ -340,8 +359,22 @@
     <string name="message_image_upload_failed">Photo upload has failed. Try again later</string>
 
     <string name="message_media_picture_upload_confirmation">I certify this picture is of me, or that I have explicit permission to post it on FetLife.\nI tell no lie</string>
-    <string name="button_media_picture_upload_confirmation">Certify</string>
-    <string name="button_media_picture_upload_cancel">Cancel</string>
+    <string name="message_media_video_upload_confirmation">I certify this video is of me, or that I have explicit permission to post it on FetLife.\nI tell no lie</string>
+    <string name="button_media_upload_confirmation">Certify</string>
+    <string name="button_media_upload_cancel">Cancel</string>
+
+    <string name="notification_video_upload_title">Video upload</string>
+    <string name="notification_picture_upload_title">Picture upload</string>
+    <string name="notification_media_upload_text_inprogress">uploading %1$d / %2$d MBytes</string>
+    <string name="notification_media_upload_text_being_cancelled">being cancelled</string>
+
+    <string name="message_video_upload_started">Beaming up your video ...</string>
+    <string name="message_video_upload_finished">Your Video has been uploaded</string>
+    <string name="message_video_upload_failed">Video upload has failed. Try again later</string>
+    <string name="message_video_upload_failed_file_size">Video upload has failed. Video size should be maximum %1$d MBytes</string>
+    <string name="message_video_upload_cancelled">Video upload has been cancelled.</string>
+    <string name="message_video_upload_being_cancelled">Video upload is being cancelled.</string>
+    <string name="message_video_upload_cancel_failed">Video upload could not be cancelled.</string>
 
     <!-- *** Other Strings *** -->
 
@@ -359,5 +392,11 @@
     <string name="action_settings">Settings</string>
     <string name="settings_title_general">General Settings</string>
     <string name="settings_summary_general">Manage general App settings</string>
+    <string name="notification_title_new_release">New FetLife App release</string>
+    <string name="notification_toast_new_release">New FetLife App version is available</string>
+    <string name="notification_text_new_release">Download FetLife App version %1$s\nfor tha latest features and bug fixes.</string>
+    <string name="notification_title_new_prerelease">New FetLife App pre-release</string>
+    <string name="notification_toast_new_prerelease">New FetLife App Preview version is available</string>
+    <string name="notification_text_new_prerelease">Download FetLife App Preview version %1$s\nto test upcoming features.</string>
 
 </resources>

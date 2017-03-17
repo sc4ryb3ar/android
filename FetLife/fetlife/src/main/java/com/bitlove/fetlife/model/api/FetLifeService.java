@@ -6,6 +6,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -15,18 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
-import retrofit.Converter;
 import retrofit.JacksonConverterFactory;
 import retrofit.Retrofit;
 
@@ -39,6 +36,7 @@ public class FetLifeService {
     public static final String AUTH_HEADER_PREFIX = "Bearer ";
 
     private final FetLifeApi fetLifeApi;
+    private final FetLifeMultipartUploadApi fetLifeMultipartUploadApi;
 
     private int lastResponseCode = -1;
 
@@ -74,6 +72,9 @@ public class FetLifeService {
                 return response;
             }
         });
+        client.setConnectTimeout(15, TimeUnit.SECONDS);
+        client.setReadTimeout(15, TimeUnit.SECONDS);
+        client.setWriteTimeout(15, TimeUnit.SECONDS);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
@@ -83,10 +84,43 @@ public class FetLifeService {
                 .client(client)
                 .addConverterFactory(JacksonConverterFactory.create(mapper)).build()
                 .create(FetLifeApi.class);
+
+        OkHttpClient uploadClient = new OkHttpClient();
+        uploadClient.setConnectTimeout(5, TimeUnit.MINUTES);
+        uploadClient.setReadTimeout(5, TimeUnit.MINUTES);
+        uploadClient.setWriteTimeout(5, TimeUnit.MINUTES);
+        uploadClient.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return hostname.endsWith(HOST_NAME);
+            }
+        });
+        uploadClient.setSslSocketFactory(context.getSocketFactory());
+        uploadClient.interceptors().add(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request request = chain.request();
+                Response response = chain.proceed(request);
+                //response.body().string();
+                lastResponseCode = response.code();
+                return response;
+            }
+        });
+
+        fetLifeMultipartUploadApi = new Retrofit.Builder()
+                .baseUrl(LOGON_BASE_URL)
+                .client(uploadClient)
+                .addConverterFactory(JacksonConverterFactory.create(mapper)).build()
+                .create(FetLifeMultipartUploadApi.class);
+
     }
 
     public FetLifeApi getFetLifeApi() {
         return fetLifeApi;
+    }
+
+    public FetLifeMultipartUploadApi getFetLifeMultipartUploadApi() {
+        return fetLifeMultipartUploadApi;
     }
 
     public int getLastResponseCode() {

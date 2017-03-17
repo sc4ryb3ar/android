@@ -240,6 +240,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        for (ActivityComponent activityComponent : activityComponentList) {
+            activityComponent.onActivityResult(this, resultCode, data);
+        }
     }
 
     @Override

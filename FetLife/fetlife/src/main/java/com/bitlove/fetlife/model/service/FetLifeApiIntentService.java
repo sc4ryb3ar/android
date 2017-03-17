@@ -5,10 +5,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
@@ -16,17 +17,27 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestSendSucceededEvent;
+import com.bitlove.fetlife.event.LatestReleaseEvent;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
 import com.bitlove.fetlife.event.LoginStartedEvent;
 import com.bitlove.fetlife.event.MessageSendFailedEvent;
 import com.bitlove.fetlife.event.MessageSendSucceededEvent;
 import com.bitlove.fetlife.event.NewConversationEvent;
+import com.bitlove.fetlife.event.PictureUploadFailedEvent;
+import com.bitlove.fetlife.event.PictureUploadFinishedEvent;
+import com.bitlove.fetlife.event.PictureUploadStartedEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
+import com.bitlove.fetlife.event.VideoChunkUploadCancelEvent;
+import com.bitlove.fetlife.event.VideoChunkUploadFailedEvent;
+import com.bitlove.fetlife.event.VideoChunkUploadFinishedEvent;
+import com.bitlove.fetlife.event.VideoChunkUploadStartedEvent;
+import com.bitlove.fetlife.event.VideoUploadFailedEvent;
 import com.bitlove.fetlife.model.api.FetLifeApi;
 import com.bitlove.fetlife.model.api.FetLifeService;
+import com.bitlove.fetlife.model.api.FetLifeMultipartUploadApi;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.AuthBody;
 import com.bitlove.fetlife.model.pojos.Conversation;
@@ -44,9 +55,10 @@ import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
 import com.bitlove.fetlife.model.pojos.Story;
 import com.bitlove.fetlife.model.pojos.Token;
 import com.bitlove.fetlife.model.pojos.User;
-import com.bitlove.fetlife.model.pojos.VideoUploadIdResult;
+import com.bitlove.fetlife.model.pojos.VideoUploadResult;
+import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.util.BytesUtil;
-import com.bitlove.fetlife.util.DateUtil;
+import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.crashlytics.android.Crashlytics;
@@ -65,7 +77,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import retrofit.Call;
@@ -91,6 +106,11 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEND_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.send_friendrequests";
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
+    public static final String ACTION_APICALL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.apicall.upload_video_chunk";
+
+    public static final String ACTION_CANCEL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.cancel.upload_video_chunk";
+
+    public static final String ACTION_EXTERNAL_CALL_CHECK_4_UPDATES = "com.bitlove.fetlife.action.external.check_for_updates";
 
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
@@ -114,6 +134,8 @@ public class FetLifeApiIntentService extends IntentService {
 
     private static String actionInProgress = null;
 
+    private static int callCount;
+
     /**
      * Main interaction method with this class to initiate a new Api call with the given parameters
      *
@@ -128,12 +150,22 @@ public class FetLifeApiIntentService extends IntentService {
         context.startService(intent);
     }
 
+    public static synchronized Intent getActionIntent(Context context, String action, String... params) {
+        Intent intent = new Intent(context, FetLifeApiIntentService.class);
+        intent.setAction(action);
+        intent.putExtra(EXTRA_PARAMS, params);
+        return intent;
+    }
+
     public static synchronized void startPendingCalls(Context context) {
         if (!isActionInProgress(ACTION_APICALL_SEND_MESSAGES)) {
             startApiCall(context, ACTION_APICALL_SEND_MESSAGES);
         }
         if (!isActionInProgress(ACTION_APICALL_SEND_FRIENDREQUESTS)) {
             startApiCall(context, ACTION_APICALL_SEND_FRIENDREQUESTS);
+        }
+        if (!isActionInProgress(ACTION_EXTERNAL_CALL_CHECK_4_UPDATES)) {
+            startApiCall(context, ACTION_EXTERNAL_CALL_CHECK_4_UPDATES);
         }
     }
 
@@ -165,6 +197,8 @@ public class FetLifeApiIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+        callCount++;
 
         if (intent == null) {
             return;
@@ -260,8 +294,18 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_UPLOAD_VIDEO:
                     result = uploadVideo(params);
                     break;
+                case ACTION_APICALL_UPLOAD_VIDEO_CHUNK:
+                    result = uploadVideoChunk(params);
+                    break;
+                case ACTION_CANCEL_UPLOAD_VIDEO_CHUNK:
+                    cancelUploadVideoChunk(params);
+                    result = 1;
+                    break;
                 case ACTION_APICALL_MEMBER:
                     result = getMember(params);
+                    break;
+                case ACTION_EXTERNAL_CALL_CHECK_4_UPDATES:
+                    result = checkForUpdates(params);
                     break;
             }
 
@@ -281,7 +325,7 @@ public class FetLifeApiIntentService extends IntentService {
                     sendAuthenticationFailedNotification();
                 }
                 //TODO: error handling for endless loop
-            } else {
+            } else if (result != Integer.MAX_VALUE) {
                 //If the call failed notify all subscribers about
                 sendLoadFailedNotification(action, params);
             }
@@ -298,6 +342,29 @@ public class FetLifeApiIntentService extends IntentService {
         } finally {
             //make sure we set the action in progress indicator correctly
             setActionInProgress(null);
+        }
+    }
+
+    private int checkForUpdates(String... params) throws IOException {
+        Call<List<Release>> releasesCall = getFetLifeApplication().getGitHubService().getGitHubApi().getReleases();
+        Response<List<Release>> releasesCallResponse = releasesCall.execute();
+        if (releasesCallResponse.isSuccess()) {
+            Release latestRelease = null;
+            Release latestPreRelease = null;
+            for (Release release : releasesCallResponse.body()) {
+                if (release.isPrerelease()) {
+                    latestPreRelease = release;
+                } else {
+                    latestRelease = release;
+                }
+                if (latestRelease != null && latestPreRelease != null) {
+                    break;
+                }
+            }
+            getFetLifeApplication().getEventBus().post(new LatestReleaseEvent(latestRelease, latestPreRelease));
+            return Integer.MAX_VALUE;
+        } else {
+            return Integer.MIN_VALUE;
         }
     }
 
@@ -398,13 +465,13 @@ public class FetLifeApiIntentService extends IntentService {
                     //db changed, reload remaining pending messages with starting this method recursively
                     return sendPendingMessages(user, ++sentMessageCount);
                 } else {
-                    return Integer.MIN_VALUE;
+                    continue;
                 }
             } else if (sendPendingMessage(pendingMessage)) {
                 MessageDuplicationDebugUtil.checkSentMessage(pendingMessage);
                 sentMessageCount++;
             } else {
-                return Integer.MIN_VALUE;
+                continue;
             }
         }
         //Return success result if at least one pending message could have been sent so there was a change in the current state
@@ -439,7 +506,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             //Update all other messages the user initiated in the meanwhile so they are not mapped to the new conversation
             //They will be now pending messages ready to be sent so a next scan (will be forced after returning from this method) will find them and send them
-            List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.conversationId.is(localConversationId)).queryList();
+            List<Message> pendingMessages = new Select().from(Message.class).where(Message_Table.conversationId.is(localConversationId)).orderBy(Message_Table.date,true).queryList();
             for (Message pendingMessage : pendingMessages) {
                 pendingMessage.setConversationId(serverConversationId);
                 pendingMessage.save();
@@ -463,18 +530,23 @@ public class FetLifeApiIntentService extends IntentService {
         //Workaround for server issue as it does not handle millis
         while (System.currentTimeMillis()/1000 == lastSentMessageTime/1000) {}
 
-        String dateString = DateUtil.toServerString(System.currentTimeMillis());
-        Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody(), dateString);
-        Response<Message> postMessageResponse = postMessagesCall.execute();
+        Call<Message> postMessagesCall = getFetLifeApi().postMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getConversationId(), pendingMessage.getBody());
+
+        Response<Message> postMessageResponse;
+        try {
+            postMessageResponse = postMessagesCall.execute();
+        } catch (IOException ioe) {
+            Crashlytics.logException(new Exception("Message send failed", ioe));
+            throw ioe;
+        }
 
         String conversationId = pendingMessage.getConversationId();
         if (postMessageResponse.isSuccess()) {
+            lastSentMessageTime = System.currentTimeMillis();
             //Update the message state of the returned message object
             final Message message = postMessageResponse.body();
-
-            lastSentMessageTime = message.getDate();
-
-            //Messages are identified in the db by client id so original pending message will be overridden here with the correct state
+            //Messages are identify
+            // ed in the db by client id so original pending message will be overridden here with the correct state
             message.setClientId(pendingMessage.getClientId());
             message.setPending(false);
             message.setConversationId(conversationId);
@@ -484,7 +556,7 @@ public class FetLifeApiIntentService extends IntentService {
         } else {
             //If the call failed make the pending message to a failed message
             //Note if the post is failed due to connection issue an exception will be thrown, so here we make the assumption the failure is permanent.
-            //TODO check the result code and based on that send the message permamntly failed or keep it still pending
+            //TODO check the result code and based on that send the message permanently failed or keep it still pending
             //TODO add functionality for the user to be able to retry sending failed messages
             pendingMessage.setPending(false);
             pendingMessage.setFailed(true);
@@ -497,7 +569,7 @@ public class FetLifeApiIntentService extends IntentService {
     private int sendPendingFriendRequests() throws IOException {
 
         int sentCount = 0;
-        List<FriendRequest> pendingFriendRequests = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(true)).queryList();
+        List<FriendRequest> pendingFriendRequests = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(true)).orderBy(FriendRequest_Table.id,true).queryList();
         for (FriendRequest pendingFriendRequest : pendingFriendRequests) {
             if (!sendPendingFriendRequest(pendingFriendRequest)) {
                 pendingFriendRequest.delete();
@@ -505,7 +577,7 @@ public class FetLifeApiIntentService extends IntentService {
                 sentCount++;
             }
         }
-        List<SharedProfile> pendingSharedProfiles = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(true)).queryList();
+        List<SharedProfile> pendingSharedProfiles = new Select().from(SharedProfile.class).where(SharedProfile_Table.pending.is(true)).orderBy(SharedProfile_Table.id,true).queryList();
         for (SharedProfile pendingSharedProfile : pendingSharedProfiles) {
             if (!sendPendingSharedProfile(pendingSharedProfile)) {
                 pendingSharedProfile.delete();
@@ -589,7 +661,18 @@ public class FetLifeApiIntentService extends IntentService {
     //Multimedia (POST) related methods / Api calls
     //****
 
-    private int uploadPicture(String[] params) throws IOException {
+    private int uploadPicture(final String[] params) throws IOException {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                uploadPictureBackground(params);
+            }
+        }).start();
+        return 0;
+    }
+
+    private int uploadPictureBackground(String[] params) {
 
         Uri uri = Uri.parse(params[0]);
         ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
@@ -603,6 +686,11 @@ public class FetLifeApiIntentService extends IntentService {
 
         if (mimeType == null) {
             Crashlytics.logException(new Exception("Media type for file to upload not found"));
+            if (deleteAfterUpload) {
+                deleteUri(uri);
+            }
+
+            getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(ACTION_APICALL_UPLOAD_PICTURE, false, params));
             return Integer.MIN_VALUE;
         }
 
@@ -610,42 +698,62 @@ public class FetLifeApiIntentService extends IntentService {
             inputStream = contentResolver.openInputStream(uri);
         } catch (Exception e) {
             Crashlytics.logException(new Exception("Media file to upload not found", e));
+            if (deleteAfterUpload) {
+                deleteUri(uri);
+            }
+            getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(ACTION_APICALL_UPLOAD_PICTURE, false, params));
             return Integer.MIN_VALUE;
         }
 
-        RequestBody mediaBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
-        RequestBody isAvatarPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(false));
-        RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(friendsOnly));
-        RequestBody captionPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), caption);
-        RequestBody isFromUserPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(true));
+        try {
 
-        Call<ResponseBody> uploadPictureCall = getFetLifeApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), mediaBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
-        Response<ResponseBody> response = uploadPictureCall.execute();
+            RequestBody mediaBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
+            RequestBody isAvatarPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(false));
+            RequestBody friendsOnlyPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(friendsOnly));
+            RequestBody captionPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), caption);
+            RequestBody isFromUserPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Boolean.toString(true));
 
-        if (deleteAfterUpload) {
-            try {
-                getContentResolver().delete(uri, null, null);
-            } catch (IllegalArgumentException iae) {
-                File contentFile = new File(uri.toString());
-                if (contentFile.exists()) {
-                    contentFile.delete();
-                }
+            Call<ResponseBody> uploadPictureCall = getFetLifeUploadApi().uploadPicture(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), mediaBody, isAvatarPart, friendsOnlyPart, captionPart, isFromUserPart);
+            Response<ResponseBody> response = uploadPictureCall.execute();
+
+            if (deleteAfterUpload) {
+                deleteUri(uri);
             }
-        }
 
-        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
+            if (response.isSuccess()) {
+                getFetLifeApplication().getEventBus().post(new ServiceCallFinishedEvent(ACTION_APICALL_UPLOAD_PICTURE, 1, params));
+                return 1;
+            } else {
+                getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(ACTION_APICALL_UPLOAD_PICTURE, false, params));
+                return Integer.MIN_VALUE;
+            }
+        } catch (IOException ioe) {
+            if (deleteAfterUpload) {
+                deleteUri(uri);
+            }
+            getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(ACTION_APICALL_UPLOAD_PICTURE, false, params));
+            return Integer.MIN_VALUE;
+        }
     }
 
+    private static final Map<String, Object> videoChunkCancelRequestHolder = Collections.synchronizedMap(new HashMap<String, Object>());
+    private static final int MAX_VIDEO_CHUNK_UPLOAD_RETRY = 3;
+    public static final int VIDEO_UPLOAD_CHUNK_SIZE_MBYTES = 5;
+    public static final int MAX_VIDEO_FILE_SIZE = 100;
+    private static final int MBYTE_MULTIPLYER = 1024 * 1025;
+
     private int uploadVideo(String[] params) throws IOException {
+
+        //TODO(VID): check http://www.androidhive.info/2014/12/android-uploading-camera-image-video-to-server-with-progress-bar/
 
         Uri uri = Uri.parse(params[0]);
         ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
 
         boolean deleteAfterUpload = getBoolFromParams(params, 1, false);
-        String caption = params[2];
-        boolean friendsOnly = getBoolFromParams(params, 3, false);
+        String title = params[2];
+        String text = params[3];
+        boolean friendsOnly = getBoolFromParams(params, 4, false);
 
-        InputStream inputStream;
         String mimeType = getMimeType(uri, true, contentResolver);
 
         if (mimeType == null) {
@@ -653,50 +761,179 @@ public class FetLifeApiIntentService extends IntentService {
             return Integer.MIN_VALUE;
         }
 
-        Call<VideoUploadIdResult> uploadVideoStartCall = getFetLifeApi().uploadVideoStart(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), caption, caption, "video.jpeg", true, true);
-        Response<VideoUploadIdResult> uploadVideoStartResponse = uploadVideoStartCall.execute();
+        Cursor cursor = contentResolver.query(uri,
+                null, null, null, null);
+        cursor.moveToFirst();
+        long size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE));
+        cursor.close();
+        if (size > MAX_VIDEO_FILE_SIZE * MBYTE_MULTIPLYER) {
+            getFetLifeApplication().getEventBus().post(new VideoUploadFailedEvent(true));
+            if (deleteAfterUpload) {
+                deleteUri(uri);
+            }
+            return Integer.MAX_VALUE;
+        }
+
+        Call<VideoUploadResult> uploadVideoStartCall = getFetLifeApi().uploadVideoStart(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), title, text, "video_android.mp4", friendsOnly, true);
+        Response<VideoUploadResult> uploadVideoStartResponse = uploadVideoStartCall.execute();
 
         if (!uploadVideoStartResponse.isSuccess()) {
+            if (deleteAfterUpload) {
+                deleteUri(uri);
+            }
             return Integer.MIN_VALUE;
         }
 
-        String videoUploadId = uploadVideoStartResponse.body().getVideoUploadId();
-
-        try {
-            inputStream = contentResolver.openInputStream(uri);
-        } catch (Exception e) {
-            Crashlytics.logException(new Exception("Media file to upload not found", e));
+        String videoUploadId = uploadVideoStartResponse.body().getId();
+        if (videoUploadId == null) {
+            if (deleteAfterUpload) {
+                deleteUri(uri);
+            }
             return Integer.MIN_VALUE;
         }
 
-        RequestBody mediaBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
-        RequestBody numberPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Integer.toString(1));
-
-        Call<ResponseBody> uploadVideoPartCall = getFetLifeApi().uploadVideoPart(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), videoUploadId, mediaBody, numberPart);
-        Response<ResponseBody> uploadVideoPartResponse = uploadVideoPartCall.execute();
+        String[] chunkUris = FileUtil.splitFile(getFetLifeApplication(), uri, videoUploadId, VIDEO_UPLOAD_CHUNK_SIZE_MBYTES * MBYTE_MULTIPLYER);
 
         if (deleteAfterUpload) {
-            try {
-                getContentResolver().delete(uri, null, null);
-            } catch (IllegalArgumentException iae) {
-                File contentFile = new File(uri.toString());
-                if (contentFile.exists()) {
-                    contentFile.delete();
-                }
-            }
+            deleteUri(uri);
         }
 
-        if (!uploadVideoPartResponse.isSuccess()) {
-            return Integer.MIN_VALUE;
-        }
+        final String chunkCallParams[] = new String[chunkUris.length+5];
+        chunkCallParams[0] = videoUploadId;
+        chunkCallParams[1] = mimeType;
+        chunkCallParams[2] = "" + 0;
+        chunkCallParams[3] = "" + 0;
+        chunkCallParams[4] = "" + size / 1024 / 1024;
+        System.arraycopy(chunkUris, 0, chunkCallParams, 5, chunkUris.length);
 
-        Call<ResponseBody> uploadVideoFinishCall = getFetLifeApi().uploadVideoFinish(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), videoUploadId);
-        Response<ResponseBody> uploadVideoFinishResponse = uploadVideoFinishCall.execute();
+        FetLifeApiIntentService.startApiCall(getFetLifeApplication(), ACTION_APICALL_UPLOAD_VIDEO_CHUNK, chunkCallParams);
 
-        return uploadVideoFinishResponse.isSuccess() ? 1 : Integer.MIN_VALUE;
+        return 1;
     }
 
-    public static String getMimeType(Uri uri, boolean isVideo, ContentResolver contentResolver) {
+    private void deleteUri(Uri uri) {
+        try {
+            getContentResolver().delete(uri, null, null);
+        } catch (IllegalArgumentException iae) {
+            File contentFile = new File(uri.toString());
+            if (contentFile.exists()) {
+                contentFile.delete();
+            }
+        }
+    }
+
+    private int uploadVideoChunk(final String[] params) throws IOException {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                uploadVideoChunkBackground(params);
+            }
+        }).start();
+        return 0;
+    }
+
+    private int uploadVideoChunkBackground(final String[] params) {
+        ContentResolver contentResolver = getFetLifeApplication().getContentResolver();
+
+        String videoUploadId = params[0];
+
+        String mimeType = params[1];
+        int chunkToProcess = getIntFromParams(params, 2, 0);
+        int timeoutFailCounter = getIntFromParams(params, 3, 0);
+        int totalSizeIMBytes = getIntFromParams(params, 4, 0);
+
+        String[] uris = new String[params.length -5];
+        System.arraycopy(params, 5, uris, 0, uris.length);
+
+        if (videoChunkCancelRequestHolder.remove(videoUploadId) != null) {
+            getFetLifeApplication().getEventBus().post(new VideoChunkUploadCancelEvent(videoUploadId, true));
+            return Integer.MAX_VALUE;
+        }
+
+        try {
+
+            getFetLifeApplication().getEventBus().post(new VideoChunkUploadStartedEvent(videoUploadId, chunkToProcess+1, uris.length, totalSizeIMBytes, timeoutFailCounter));
+
+            Uri uri = Uri.parse(uris[chunkToProcess]);
+
+            InputStream inputStream;
+            try {
+                inputStream = contentResolver.openInputStream(uri);
+            } catch (Exception e) {
+                Crashlytics.logException(new Exception("Media file to upload not found", e));
+                getFetLifeApplication().getEventBus().post(new VideoChunkUploadFailedEvent(videoUploadId, chunkToProcess+1, uris.length, false));
+                return Integer.MAX_VALUE;
+            }
+
+            if (inputStream == null) {
+                getFetLifeApplication().getEventBus().post(new VideoChunkUploadFailedEvent(videoUploadId, chunkToProcess+1, uris.length, false));
+                return Integer.MAX_VALUE;
+            }
+
+            RequestBody mediaBody = RequestBody.create(MediaType.parse(mimeType), BytesUtil.getBytes(inputStream));
+            RequestBody numberPart = RequestBody.create(MediaType.parse(TEXT_PLAIN), Integer.toString(chunkToProcess+1));
+
+            Call<ResponseBody> uploadVideoPartCall = getFetLifeUploadApi().uploadVideoPart(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), videoUploadId, mediaBody, numberPart);
+            Response<ResponseBody> uploadVideoPartResponse = uploadVideoPartCall.execute();
+
+            if (!uploadVideoPartResponse.isSuccess()) {
+                for (int i = chunkToProcess; i < uris.length; i++) {
+                    Uri chunkUri = Uri.parse(uris[i]);
+                    deleteUri(chunkUri);
+                }
+                getFetLifeApplication().getEventBus().post(new VideoChunkUploadFailedEvent(videoUploadId, chunkToProcess+1, uris.length, false));
+                return Integer.MAX_VALUE;
+            } else {
+                deleteUri(uri);
+            }
+
+            if (chunkToProcess == uris.length-1) {
+                if (videoChunkCancelRequestHolder.remove(videoUploadId) != null) {
+                    getFetLifeApplication().getEventBus().post(new VideoChunkUploadCancelEvent(videoUploadId, false));
+                    return Integer.MAX_VALUE;
+                }
+
+                Call<ResponseBody> uploadVideoFinishCall = getFetLifeApi().uploadVideoFinish(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), videoUploadId);
+                Response<ResponseBody> uploadVideoFinishResponse = uploadVideoFinishCall.execute();
+
+                if (uploadVideoFinishResponse.isSuccess()) {
+                    getFetLifeApplication().getEventBus().post(new VideoChunkUploadFinishedEvent(videoUploadId, chunkToProcess+1, uris.length));
+                    return chunkToProcess;
+                } else {
+                    getFetLifeApplication().getEventBus().post(new VideoChunkUploadFailedEvent(videoUploadId, chunkToProcess+1, uris.length, false));
+                    return Integer.MAX_VALUE;
+                }
+            } else {
+
+                params[2] = Integer.toString(chunkToProcess+1);
+                params[3] = Integer.toString(0);
+                FetLifeApiIntentService.startApiCall(getFetLifeApplication(), ACTION_APICALL_UPLOAD_VIDEO_CHUNK, params);
+                getFetLifeApplication().getEventBus().post(new VideoChunkUploadFinishedEvent(videoUploadId, chunkToProcess+1, uris.length));
+                return chunkToProcess;
+            }
+        } catch (IOException ioException) {
+            if (timeoutFailCounter < MAX_VIDEO_CHUNK_UPLOAD_RETRY) {
+                params[3] = Integer.toString(timeoutFailCounter+1);
+                FetLifeApiIntentService.startApiCall(getFetLifeApplication(), ACTION_APICALL_UPLOAD_VIDEO_CHUNK, params);
+                return 0;
+            } else {
+                Crashlytics.logException(new Exception("Video chunk upload failed after retries",ioException));
+                getFetLifeApplication().getEventBus().post(new VideoChunkUploadFailedEvent(videoUploadId, chunkToProcess+1, uris.length, false));
+                for (int i = chunkToProcess; i < uris.length; i++) {
+                    Uri chunkUri = Uri.parse(uris[i]);
+                    deleteUri(chunkUri);
+                }
+                //throw ioException;
+                return Integer.MAX_VALUE;
+            }
+        }
+    }
+
+    private static void cancelUploadVideoChunk(String... params) {
+        videoChunkCancelRequestHolder.put(params[0],new Object());
+    }
+
+    private static String getMimeType(Uri uri, boolean isVideo, ContentResolver contentResolver) {
         String mimeType;
 
         //Check uri format to avoid null
@@ -968,6 +1205,13 @@ public class FetLifeApiIntentService extends IntentService {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginStartedEvent());
                 break;
+            case ACTION_APICALL_UPLOAD_PICTURE:
+                getFetLifeApplication().getEventBus().post(new PictureUploadStartedEvent(Integer.toString(callCount)));
+                break;
+            case ACTION_APICALL_UPLOAD_VIDEO:
+            case ACTION_APICALL_UPLOAD_VIDEO_CHUNK:
+                //Invoked directly from the methods
+                break;
             default:
                 getFetLifeApplication().getEventBus().post(new ServiceCallStartedEvent(action));
                 break;
@@ -979,6 +1223,9 @@ public class FetLifeApiIntentService extends IntentService {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginFinishedEvent());
                 break;
+            case ACTION_APICALL_UPLOAD_PICTURE:
+                getFetLifeApplication().getEventBus().post(new PictureUploadFinishedEvent(Integer.toString(callCount)));
+                break;
             default:
                 getFetLifeApplication().getEventBus().post(new ServiceCallFinishedEvent(action, count, params));
                 break;
@@ -989,6 +1236,9 @@ public class FetLifeApiIntentService extends IntentService {
         switch (action) {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginFailedEvent());
+                break;
+            case ACTION_APICALL_UPLOAD_PICTURE:
+                getFetLifeApplication().getEventBus().post(new PictureUploadFailedEvent(Integer.toString(callCount), false));
                 break;
             default:
                 getFetLifeApplication().getEventBus().post(new ServiceCallFailedEvent(action, false, params));
@@ -1018,6 +1268,10 @@ public class FetLifeApiIntentService extends IntentService {
 
     private FetLifeApi getFetLifeApi() {
         return getFetLifeApplication().getFetLifeService().getFetLifeApi();
+    }
+
+    private FetLifeMultipartUploadApi getFetLifeUploadApi() {
+        return getFetLifeApplication().getFetLifeService().getFetLifeMultipartUploadApi();
     }
 
 

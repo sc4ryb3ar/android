@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
+import com.bitlove.fetlife.event.LatestReleaseEvent;
+import com.bitlove.fetlife.event.ServiceCallCancelEvent;
+import com.bitlove.fetlife.event.ServiceCallCancelRequestEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
@@ -101,4 +104,20 @@ public abstract class ResourceActivity extends BaseActivity {
     public void onServiceCallStarted(ServiceCallStartedEvent serviceCallStartedEvent) {
         eventDisplayHandler.onServiceCallStarted(this, serviceCallStartedEvent);
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onServiceCallCancelProcessed(ServiceCallCancelEvent serviceCallCancelEvent) {
+        eventDisplayHandler.onServiceCallCancelProcessed(this, serviceCallCancelEvent);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onServiceCallCancelRequested(ServiceCallCancelRequestEvent serviceCallCancelRequestEvent) {
+        eventDisplayHandler.onServiceCallCancelRequested(this, serviceCallCancelRequestEvent);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLatestReleaseChecked(LatestReleaseEvent latestReleaseEvent) {
+        eventDisplayHandler.onLatestReleaseChecked(this, latestReleaseEvent);
+    }
+
 }
