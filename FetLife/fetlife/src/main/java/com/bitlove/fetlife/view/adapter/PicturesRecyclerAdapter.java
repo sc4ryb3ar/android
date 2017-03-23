@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
@@ -18,10 +19,7 @@ import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.Picture_Table;
 import com.bitlove.fetlife.util.MaterialIcons;
 import com.bitlove.fetlife.util.ViewUtil;
-import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
-import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.malinskiy.materialicons.widget.IconTextView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -115,20 +113,18 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
         TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
 
-        final IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
+        final ImageView imageLove = (ImageView) overlay.findViewById(R.id.feedImageLove);
         ViewUtil.increaseTouchArea(imageLove,OVERLAY_HITREC_PADDING);
 
         boolean isLoved = picture.isLovedByMe();
-        imageLove.setText(isLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-        imageLove.setTextColor(overlay.getContext().getResources().getColor(isLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
+        imageLove.setImageResource(isLoved ? R.drawable.ic_loved : R.drawable.ic_love);
         imageLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IconTextView imageLove = (IconTextView) v;
+                ImageView imageLove = (ImageView) v;
                 boolean isLoved = picture.isLovedByMe();
                 boolean newIsLoved = !isLoved;
-                imageLove.setText(newIsLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-                imageLove.setTextColor(v.getContext().getResources().getColor(newIsLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
+                imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
                 Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
                 picture.setLovedByMe(newIsLoved);
             }

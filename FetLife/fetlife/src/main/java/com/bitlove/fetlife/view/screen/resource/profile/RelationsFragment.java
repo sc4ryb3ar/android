@@ -28,7 +28,7 @@ public class RelationsFragment extends BaseFragment implements ResourceListRecyc
     private RecyclerView recyclerView;
 
     public static RelationsFragment newInstance(String memberId, int relationType) {
-        //TODO(profile): make it work with current user too (save user as member and keep only id in other table)
+        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         RelationsFragment friendsFragment = new RelationsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);

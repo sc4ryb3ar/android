@@ -30,7 +30,7 @@ public class PicturesFragment extends BaseFragment implements PicturesRecyclerAd
     private RecyclerView recyclerView;
 
     public static PicturesFragment newInstance(String memberId) {
-        //TODO(profile): make it work with current user too (save user as member and keep only id in other table)
+        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         PicturesFragment picturesFragment = new PicturesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);

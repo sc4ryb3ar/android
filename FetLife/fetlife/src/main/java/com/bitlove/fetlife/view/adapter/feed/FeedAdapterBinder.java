@@ -3,34 +3,25 @@
 package com.bitlove.fetlife.view.adapter.feed;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFailedEvent;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.pojos.FeedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.Story;
-import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.util.MaterialIcons;
 import com.bitlove.fetlife.util.ViewUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.malinskiy.materialicons.widget.IconTextView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,7 +163,7 @@ public class FeedAdapterBinder {
                             setOverlayContent(overlay, picture, onItemClickListener);
                             new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                         } else {
-                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
+                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
                         }
                     }
                 });
@@ -211,7 +202,7 @@ public class FeedAdapterBinder {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
+                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
                 }
             });
 
@@ -264,20 +255,18 @@ public class FeedAdapterBinder {
         TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
 
-        final IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
+        final ImageView imageLove = (ImageView) overlay.findViewById(R.id.feedImageLove);
         ViewUtil.increaseTouchArea(imageLove,OVERLAY_HITREC_PADDING);
 
         boolean isLoved = picture.isLovedByMe();
-        imageLove.setText(isLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-        imageLove.setTextColor(overlay.getContext().getResources().getColor(isLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
+        imageLove.setImageResource(isLoved ? R.drawable.ic_loved : R.drawable.ic_loved);
         imageLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IconTextView imageLove = (IconTextView) v;
+                ImageView imageLove = (ImageView) v;
                 boolean isLoved = picture.isLovedByMe();
                 boolean newIsLoved = !isLoved;
-                imageLove.setText(newIsLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-                imageLove.setTextColor(v.getContext().getResources().getColor(newIsLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
+                imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_loved);
                 Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
                 picture.setLovedByMe(newIsLoved);
             }

@@ -20,8 +20,8 @@ android {
         targetSdkVersion 25
         multiDexEnabled true
 
-        versionCode 20508
-        versionName "2.5.8"
+        versionCode 20603
+        versionName "2.6.3"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -126,8 +126,6 @@ dependencies {
     compile 'joda-time:joda-time:2.9.1'
 
     compile 'com.github.jd-alexander:LikeButton:0.2.0'
-
-    compile 'com.malinskiy:materialicons:1.0.2'
 
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
 

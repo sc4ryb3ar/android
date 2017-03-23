@@ -7,7 +7,8 @@ import android.preference.PreferenceManager;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.Member_Table;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
@@ -32,12 +33,13 @@ public class UserSessionManager {
     private static final String CONSTANT_ONESIGNAL_TAG_MEMBER_TOKEN = "member_token";
 
     private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED";
+    private static final String APP_PREF_KEY_INT_VERSION_UPGRADE_USER_EXECUTED = "APP_PREF_KEY_INT_VERSION_UPGRADE_USER_EXECUTED";
     private static final String USER_PREF_KEY_NOTIFPREF_APPLIED = "USER_PREF_KEY_NOTIFPREF_APPLIED";
     private static final String USER_PREF_KEY_FEEDPREF_APPLIED = "USER_PREF_KEY_FEEDPREF_APPLIED";
 
     private final FetLifeApplication fetLifeApplication;
 
-    private User currentUser;
+    private Member currentUser;
     private SharedPreferences activePreferences;
 
     public UserSessionManager(FetLifeApplication fetLifeApplication) {
@@ -61,7 +63,7 @@ public class UserSessionManager {
         }
     }
 
-    public synchronized void onUserLogIn(User loggedInUser, boolean rememberPassword) {
+    public synchronized void onUserLogIn(Member loggedInUser, boolean rememberPassword) {
         if (!isSameUser(loggedInUser, currentUser)) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
@@ -82,11 +84,11 @@ public class UserSessionManager {
         currentUser = null;
     }
 
-    public synchronized User getCurrentUser() {
+    public synchronized Member getCurrentUser() {
         return currentUser;
     }
 
-    private synchronized void logInUser(User user) {
+    private synchronized void logInUser(Member user) {
         String userKey = getUserKey(user);
 
         applyVersionUpgradeIfNeeded(userKey);
@@ -99,7 +101,7 @@ public class UserSessionManager {
         registerToPushMessages(user);
     }
 
-    private synchronized void logOutUser(User user) {
+    private synchronized void logOutUser(Member user) {
         closeDb();
         String userKey = user == null ? loadLastLoggedUserKey() : getUserKey(user);
         if (userKey != null) {
@@ -109,7 +111,7 @@ public class UserSessionManager {
         }
     }
 
-    private synchronized void resetUser(User user) {
+    private synchronized void resetUser(Member user) {
         String userKey = getUserKey(user);
         if (userKey == null) {
             return;
@@ -122,11 +124,11 @@ public class UserSessionManager {
         unregisterFromPushMessages(user);
     }
 
-    private static String getUserKey(User user) {
+    private static String getUserKey(Member user) {
         return user != null && user.getNickname() != null ? SecurityUtil.hash_sha256(user.getNickname()) : null;
     }
 
-    private void registerToPushMessages(User user) {
+    private void registerToPushMessages(Member user) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(CONSTANT_ONESIGNAL_TAG_VERSION,1);
@@ -139,7 +141,7 @@ public class UserSessionManager {
         }
     }
 
-    private void unregisterFromPushMessages(User user) {
+    private void unregisterFromPushMessages(Member user) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(CONSTANT_ONESIGNAL_TAG_VERSION, 1);
@@ -216,14 +218,22 @@ public class UserSessionManager {
         preferences.edit().putString(PreferenceKeys.PREF_KEY_USER_HISTORY, stringBuilder.toString()).apply();
     }
 
-    private void updateUserRecord(User user) {
+    private void updateUserRecord(Member user) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        preferences.edit().putString(PreferenceKeys.PREF_KEY_USER_CURRENT, user.getId()).apply();
         if (user != null) {
-            user.save();
+            user.mergeSave();
         }
     }
 
-    private User readUserRecord() {
-        return new Select().from(User.class).querySingle();
+    private Member readUserRecord() {
+        //TODO(userswitch): check if needed to mergeSave more users
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        String userId = preferences.getString(PreferenceKeys.PREF_KEY_USER_CURRENT,null);
+        if (userId == null) {
+            return null;
+        }
+        return new Select().from(Member.class).where(Member_Table.id.is(userId)).querySingle();
     }
 
     private void saveUserDb(String userKey) {
@@ -308,7 +318,7 @@ public class UserSessionManager {
         return "fetlife" + "_" + userKey + ".pref";
     }
 
-    private static boolean isSameUser(User user1, User user2) {
+    private static boolean isSameUser(Member user1, Member user2) {
         if (user1 == null || user2 == null || user1.getNickname() == null) {
             return false;
         }
@@ -316,6 +326,25 @@ public class UserSessionManager {
     }
 
     private void applyVersionUpgradeIfNeeded(String userKey) {
+        applyDbVersionUpgradeIfNeeded();
+        applyUserVersionUpgradeIfNeeded(userKey);
+    }
+
+    private void applyDbVersionUpgradeIfNeeded() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        if (lastVersionUpgrade < 20603) {
+            sharedPreferences.edit().clear().apply();
+
+            FlowManager.destroy();
+            fetLifeApplication.deleteDatabase(FetLifeDatabase.NAME + ".db");
+            fetLifeApplication.openOrCreateDatabase(FetLifeDatabase.NAME + ".db", Context.MODE_PRIVATE, null);
+
+            sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
+        }
+    }
+
+    private void applyUserVersionUpgradeIfNeeded(String userKey) {
         SharedPreferences sharedPreferences = getUserPreferences(userKey);
         int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
         if (lastVersionUpgrade < 10603) {

@@ -165,7 +165,7 @@ public class Picture extends BaseModel {
     public void setMember(Member member) {
         this.member = member;
         if (member != null) {
-            member.save();
+            member.mergeSave();
             setMemberId(member.getId());
         }
     }

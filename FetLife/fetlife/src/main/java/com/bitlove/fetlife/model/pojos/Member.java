@@ -24,6 +24,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Member extends BaseModel {
 
+    public static final String VALUE_FRIEND = "friend";
+    public static final String VALUE_FRIEND_WITHOUT_FOLLOWING = "friend_without_following";
+    public static final String VALUE_FOLLOWING = "following";
+    public static final String VALUE_FRIEND_REQUEST_PENDING = "friend_request_pending";
+    public static final String VALUE_FRIEND_REQUEST_SENT = "friend_request_sent";
+    public static final String VALUE_FOLLOWING_FRIEND_REQUEST_SENT = "following_friend_request_sent";
+    public static final String VALUE_FOLLOWING_FRIEND_REQUEST_PENDING = "following_friend_request_pending";
+
     private static final String SEPARATOR_LOOKING_FOR = ";";
 
     @JsonProperty("id")
@@ -35,13 +43,9 @@ public class Member extends BaseModel {
     @Column
     private boolean followable;
 
-    @JsonProperty("is_followed_by_me")
+    @JsonProperty("relation_with_me")
     @Column
-    private boolean followedByMe;
-
-    @JsonProperty("is_friend_with_me")
-    @Column
-    private boolean friendWithMe;
+    private String relationWithMe;
 
     @JsonProperty("sexual_orientation")
     @Column
@@ -92,6 +96,30 @@ public class Member extends BaseModel {
     @Column
     private String avatarLink;
 
+    @JsonIgnore
+    @Column
+    private String refreshToken;
+
+    @JsonIgnore
+    @Column
+    private String accessToken;
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     public static Member loadMember(String memberId) {
         Member member = new Select().from(Member.class).where(Member_Table.id.is(memberId)).querySingle();
         if (member == null) {
@@ -108,20 +136,12 @@ public class Member extends BaseModel {
         this.followable = followable;
     }
 
-    public boolean isFollowedByMe() {
-        return followedByMe;
+    public String getRelationWithMe() {
+        return relationWithMe;
     }
 
-    public void setFollowedByMe(boolean followedByMe) {
-        this.followedByMe = followedByMe;
-    }
-
-    public boolean isFriendWithMe() {
-        return friendWithMe;
-    }
-
-    public void setFriendWithMe(boolean friendWithMe) {
-        this.friendWithMe = friendWithMe;
+    public void setRelationWithMe(String relationWithMe) {
+        this.relationWithMe = relationWithMe;
     }
 
     public String getSexualOrientation() {
@@ -266,5 +286,27 @@ public class Member extends BaseModel {
                 return m.getDeclaringClass() == BaseModel.class || super.hasIgnoreMarker(m);
             }
         }).writeValueAsString(this);
+    }
+
+    public void mergeSave() {
+        Member savedMember = Member.loadMember(id);
+        if (savedMember != null) {
+            savedMember.setAvatar(getAvatar());
+            savedMember.setMetaInfo(getMetaInfo());
+            savedMember.setNickname(getNickname());
+            savedMember.save();
+        } else {
+            save();
+        }
+    }
+
+    @Override
+    public void save() {
+        Member savedMember = Member.loadMember(id);
+        if (savedMember != null) {
+            setAccessToken(savedMember.getAccessToken());
+            setRefreshToken(savedMember.getRefreshToken());
+        }
+        super.save();
     }
 }

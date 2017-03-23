@@ -12,19 +12,28 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.event.ServiceCallFailedEvent;
+import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.pojos.Conversation;
+import com.bitlove.fetlife.model.pojos.FollowRequest;
+import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.RelationReference;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.ColorUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.FriendsActivity;
 import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
 import com.bitlove.fetlife.view.widget.FlingBehavior;
 import com.facebook.drawee.view.SimpleDraweeView;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class ProfileActivity extends ResourceActivity implements AppBarLayout.OnOffsetChangedListener {
 
@@ -54,23 +63,17 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
         final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
         Member member = Member.loadMember(memberId);
+
+        showProgress();
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, STATUSES_CALL_LIMIT, "1");
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, PICTURES_CALL_LIMIT, "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, PICTURES_CALL_LIMIT, "1");
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), FRIENDS_CALL_LIMIT, "1");
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), FRIENDS_CALL_LIMIT, "1");
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), FRIENDS_CALL_LIMIT, "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, PICTURES_CALL_LIMIT, "1");
 
-        setTitle(member.getNickname());
-        TextView nickNameView = (TextView) findViewById(R.id.profile_nickname);
-        nickNameView.setText(member.getNickname());
-        TextView metaView = (TextView) findViewById(R.id.profile_meta);
-        metaView.setText(member.getMetaInfo());
-        SimpleDraweeView avatarView = (SimpleDraweeView) findViewById(R.id.profile_avatar);
-        avatarView.setImageURI(member.getAvatarLink());
-        SimpleDraweeView imageHeaderView = (SimpleDraweeView) findViewById(R.id.profile_image_header);
-        imageHeaderView.setImageURI(member.getAvatarLink());
+        setMemberDetails(member);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
@@ -131,20 +134,170 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         appBarLayout.addOnOffsetChangedListener(this);
     }
 
-    public void onMenuIconMessage(View v) {
+    private void setMemberDetails(Member member) {
+        setTitle(member.getNickname());
+        TextView nickNameView = (TextView) findViewById(R.id.profile_nickname);
+        nickNameView.setText(member.getNickname());
+        TextView metaView = (TextView) findViewById(R.id.profile_meta);
+        metaView.setText(member.getMetaInfo());
+        SimpleDraweeView avatarView = (SimpleDraweeView) findViewById(R.id.profile_avatar);
+        avatarView.setImageURI(member.getAvatarLink());
+        SimpleDraweeView imageHeaderView = (SimpleDraweeView) findViewById(R.id.profile_image_header);
+        imageHeaderView.setImageURI(member.getAvatarLink());
+        SimpleDraweeView toolbarHeaderView = (SimpleDraweeView) findViewById(R.id.toolbar_image);
+        toolbarHeaderView.setImageURI(member.getAvatarLink());
+        toolbarHeaderView.setTag(member.getAvatarLink());
+
+        ImageView friendTextView = (ImageView) findViewById(R.id.profile_menu_icon_friend);
+        String relationWithMe = member.getRelationWithMe();
+        if (relationWithMe == null) {
+            relationWithMe = "";
+        }
+        switch (relationWithMe) {
+            case Member.VALUE_FRIEND:
+                friendTextView.setImageResource(R.drawable.ic_friend);
+                break;
+            case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
+            case Member.VALUE_FRIEND_REQUEST_SENT:
+                friendTextView.setImageResource(R.drawable.ic_friend_sent);
+                break;
+            case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
+            case Member.VALUE_FRIEND_REQUEST_PENDING:
+                friendTextView.setImageResource(R.drawable.ic_friend_pending);
+                break;
+            default:
+                friendTextView.setImageResource(R.drawable.ic_friend_add);
+                break;
+        }
+        friendTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onMenuIconFriend();
+            }
+        });
+        ImageView followTextView = (ImageView) findViewById(R.id.profile_menu_icon_follow);
+        followTextView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
+        followTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onMenuIconFollow();
+            }
+        });
+        findViewById(R.id.profile_menu_icon_message).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onMenuIconMessage();
+            }
+        });
+        findViewById(R.id.profile_menu_icon_view).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onMenuIconView();
+            }
+        });
+    }
+
+    private boolean isFriendWithMe(Member member) {
+        String relationWithMe = member.getRelationWithMe();
+        if (relationWithMe == null) {
+            return false;
+        }
+        return relationWithMe.equals(Member.VALUE_FRIEND) || relationWithMe.equals(Member.VALUE_FRIEND_WITHOUT_FOLLOWING);
+    }
+
+    private boolean isFollowedByMe(Member member) {
+        String relationWithMe = member.getRelationWithMe();
+        if (relationWithMe == null) {
+            return false;
+        }
+        return relationWithMe.equals(Member.VALUE_FRIEND) || relationWithMe.equals(Member.VALUE_FOLLOWING) ||  relationWithMe.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT) ||  relationWithMe.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING) ;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void callFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
+        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER)) {
+            final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
+            Member member = Member.loadMember(memberId);
+            setMemberDetails(member);
+        } else if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS)) {
+            dismissProgress();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void callFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
+        if (serviceCallFailedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS)) {
+            dismissProgress();
+        }
+    }
+
+    private void onMenuIconMessage() {
         Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
         if (member != null) {
             MessagesActivity.startActivity(this, Conversation.createLocalConversation(member), member.getNickname(), member.getAvatarLink(), false);
         }
     }
 
-    public void onMenuIconView(View v) {
+    private void onMenuIconView() {
         Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
         if (member != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(member.getLink()));
             startActivity(intent);
+        }
+    }
 
+    private void onMenuIconFriend() {
+        Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        String currentRelation = member.getRelationWithMe();
+        if (currentRelation == null) {
+            currentRelation = "";
+        }
+        if (member != null && !isFriendWithMe(member)) {
+            FriendRequest friendRequest = new FriendRequest();
+            friendRequest.setMemberId(member.getId());
+            friendRequest.setPendingState(FriendRequest.PendingState.OUTGOING);
+            friendRequest.setPending(true);
+            friendRequest.save();
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
+            member.setRelationWithMe(isFollowedByMe(member) ? Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT : Member.VALUE_FRIEND_REQUEST_SENT);
+            member.save();
+            setMemberDetails(member);
+        }
+        switch (currentRelation) {
+            //TODO(profile) add resource texts
+            case Member.VALUE_FRIEND:
+                //showToast();
+                break;
+            case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
+            case Member.VALUE_FRIEND_REQUEST_SENT:
+                showToast("Friend request has been already sent");
+                break;
+            case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
+            case Member.VALUE_FRIEND_REQUEST_PENDING:
+                showToast("Friend request is waiting from your approval; Check Friend Requests Screen");
+                break;
+            default:
+                showToast(getString(R.string.message_friend_request_sent,member.getNickname()));
+                break;
+        }
+
+    }
+
+    private void onMenuIconFollow() {
+        Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        if (member != null && !isFollowedByMe(member) && member.isFollowable()) {
+            FollowRequest followRequest = new FollowRequest();
+            followRequest.setMemberId(member.getId());
+            followRequest.save();
+            member.setRelationWithMe(Member.VALUE_FOLLOWING);
+            member.mergeSave();
+            setMemberDetails(member);
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
+            showToast(getString(R.string.message_follow_set,member.getNickname()));
+        } else if (isFollowedByMe(member)){
+            //TODO(profile) add resource texts
+            showToast("You are already following" + member.getNickname());
         }
     }
 
@@ -180,26 +333,29 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         int maxScroll = appBarLayout.getTotalScrollRange();
         float percentage = (float) Math.abs(offset) / (float) maxScroll;
 
-        setToolbarVisibility(appBarLayout, findViewById(R.id.toolbar_title), percentage);
+        setToolbarVisibility(appBarLayout, findViewById(R.id.toolbar_title), findViewById(R.id.toolbar_image), percentage);
     }
 
     private boolean isTitleVisible = false;
 
-    private void setToolbarVisibility(AppBarLayout appBarLayout, View title, float percentage) {
+    private void setToolbarVisibility(AppBarLayout appBarLayout, View title, View image, float percentage) {
         if (percentage >= PERCENTAGE_TO_SHOW_TITLE_DETAILS) {
             if(!isTitleVisible) {
                 startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
+                startAlphaAnimation(image, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
+                ((SimpleDraweeView)image).setImageURI(image.getTag().toString());
                 isTitleVisible = true;
             }
         } else {
             if (isTitleVisible) {
                 startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.INVISIBLE);
+                startAlphaAnimation(image, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.INVISIBLE);
                 isTitleVisible = false;
             }
         }
     }
 
-    public static void startAlphaAnimation(View v, long duration, long delay, int visibility) {
+    public static void startAlphaAnimation(final View v, long duration, long delay, final int visibility) {
         AlphaAnimation alphaAnimation = (visibility == View.VISIBLE)
                 ? new AlphaAnimation(0f, 1f)
                 : new AlphaAnimation(1f, 0f);

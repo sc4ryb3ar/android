@@ -17,8 +17,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
 import com.bitlove.fetlife.view.screen.BaseActivity;
@@ -31,8 +32,6 @@ import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
 import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
 import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.malinskiy.materialicons.IconDrawable;
-import com.malinskiy.materialicons.Iconify;
 
 public class MenuActivityComponent extends ActivityComponent {
 
@@ -57,14 +56,16 @@ public class MenuActivityComponent extends ActivityComponent {
         Toolbar toolbar = (Toolbar) menuActivity.findViewById(R.id.toolbar);
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) menuActivity.findViewById(R.id.nav_view);
-        navigationView.getMenu().findItem(R.id.nav_feed).setIcon(
-                new IconDrawable(menuActivity, Iconify.IconValue.zmdi_view_list)
-                        .colorRes(R.color.text_color_secondary)
-                        .actionBarSize());
-        navigationView.getMenu().findItem(R.id.nav_upload_video).setIcon(
-                new IconDrawable(menuActivity, Iconify.IconValue.zmdi_videocam)
-                        .colorRes(R.color.text_color_secondary)
-                        .actionBarSize());
+//        navigationView.getMenu().findItem(R.id.nav_feed).setIcon(
+//                MaterialDrawableBuilder.with(menuActivity)
+//                        .setIcon(MaterialDrawableBuilder.IconValue.VIEW_LIST)
+//                        .setColor(R.color.text_color_secondary)
+//                        .setToActionbarSize().build());
+//        navigationView.getMenu().findItem(R.id.nav_upload_video).setIcon(
+//                MaterialDrawableBuilder.with(menuActivity)
+//                        .setIcon(MaterialDrawableBuilder.IconValue.VIDEO)
+//                        .setColor(R.color.text_color_secondary)
+//                        .setToActionbarSize().build());
 
         if (toolbar == null || drawer == null || navigationView == null || (navigationHeaderView = navigationView.getHeaderView(0)) == null) {
             return;
@@ -99,7 +100,7 @@ public class MenuActivityComponent extends ActivityComponent {
 
         navigationView.setNavigationItemSelectedListener(baseActivity);
 
-        User currentUser = menuActivity.getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        final Member currentUser = menuActivity.getFetLifeApplication().getUserSessionManager().getCurrentUser();
         if (currentUser != null) {
             TextView headerTextView = (TextView) navigationHeaderView.findViewById(R.id.nav_header_text);
             headerTextView.setText(currentUser.getNickname());
@@ -107,17 +108,12 @@ public class MenuActivityComponent extends ActivityComponent {
             headerSubTextView.setText(currentUser.getMetaInfo());
             SimpleDraweeView headerAvatar = (SimpleDraweeView) navigationHeaderView.findViewById(R.id.nav_header_image);
             headerAvatar.setImageURI(currentUser.getAvatarLink());
-            final String selfLink = currentUser.getLink();
-            if (selfLink != null) {
-                headerAvatar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(selfLink));
-                        menuActivity.startActivity(intent);
-                    }
-                });
-            }
+            headerAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ProfileActivity.startActivity(menuActivity,currentUser.getId());
+                }
+            });
         }
     }
 

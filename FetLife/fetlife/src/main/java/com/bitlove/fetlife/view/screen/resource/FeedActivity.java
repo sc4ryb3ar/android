@@ -2,7 +2,6 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import com.bitlove.fetlife.FetLifeApplication;
@@ -62,13 +61,21 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     public void onMemberClick(Member member) {
-        //TODO(feed): Remove this save after Feed is stored in local db
-        member.save();
+        //TODO(feed): Remove this mergeSave after Feed is stored in local db
+        member.mergeSave();
         ProfileActivity.startActivity(this, member.getId());
     }
 
     @Override
-    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url) {
+    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, Member targetMember) {
+        if (targetMember != null) {
+            if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
+                //TODO(feed): Remove this mergeSave after Feed is stored in local db
+                targetMember.mergeSave();
+                ProfileActivity.startActivity(this, targetMember.getId());
+                return;
+            }
+        }
         UrlUtil.openUrl(this,url);
     }
 
@@ -76,8 +83,8 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, Member targetMember) {
         if (targetMember != null) {
             if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
-                //TODO(feed): Remove this save after Feed is stored in local db
-                targetMember.save();
+                //TODO(feed): Remove this mergeSave after Feed is stored in local db
+                targetMember.mergeSave();
                 ProfileActivity.startActivity(this, targetMember.getId());
                 return;
             }

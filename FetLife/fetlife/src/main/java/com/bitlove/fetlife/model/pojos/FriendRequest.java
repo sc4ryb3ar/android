@@ -16,7 +16,8 @@ public class FriendRequest extends BaseModel implements FriendRequestScreenModel
     public static enum PendingState {
         NEW,
         ACCEPTED,
-        REJECTED
+        REJECTED,
+        OUTGOING
     }
 
     @Column
@@ -38,7 +39,7 @@ public class FriendRequest extends BaseModel implements FriendRequestScreenModel
     private long date;
 
     @Column
-    private PendingState pendingState;
+    private PendingState pendingState = PendingState.NEW;
 
     @Column
     private boolean pending;

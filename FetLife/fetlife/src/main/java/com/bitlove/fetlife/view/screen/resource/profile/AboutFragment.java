@@ -28,7 +28,7 @@ public class AboutFragment extends BaseFragment implements ProfileFragment {
     private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
 
     public static AboutFragment newInstance(String memberId) {
-        //TODO(profile): make it work with current user too (save user as member and keep only id in other table)
+        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         AboutFragment aboutFragment = new AboutFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);

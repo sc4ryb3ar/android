@@ -398,5 +398,11 @@
     <string name="notification_title_new_prerelease">New FetLife App pre-release</string>
     <string name="notification_toast_new_prerelease">New FetLife App Preview version is available</string>
     <string name="notification_text_new_prerelease">Download FetLife App Preview version %1$s\nto test upcoming features.</string>
+    <string name="message_friend_request_sent">Friend Request has been sent to %1$s</string>
+    <string name="message_follow_set">You are following %1$s</string>
+    <string name="menu_profile_friend">Friend</string>
+    <string name="menu_profile_follow">Follow</string>
+    <string name="menu_profile_message">Message</string>
+    <string name="menu_profile_view">View</string>
 
 </resources>

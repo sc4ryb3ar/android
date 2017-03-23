@@ -29,7 +29,7 @@ public class VideosFragment extends BaseFragment {
     private RecyclerView recyclerView;
 
     public static VideosFragment newInstance(String memberId) {
-        //TODO(profile): make it work with current user too (save user as member and keep only id in other table)
+        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         VideosFragment videosFragment = new VideosFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);

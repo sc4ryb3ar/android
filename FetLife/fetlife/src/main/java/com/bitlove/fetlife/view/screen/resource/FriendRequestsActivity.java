@@ -2,12 +2,11 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.FriendRequestSendFailedEvent;
-import com.bitlove.fetlife.event.FriendRequestSendSucceededEvent;
+import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
+import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
 import com.bitlove.fetlife.event.FriendSuggestionAddedEvent;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
@@ -68,17 +67,17 @@ public class FriendRequestsActivity extends ResourceListActivity<BaseModel> impl
             ProfileActivity.startActivity(this,((FriendRequest)friendRequestScreenItem).getMemberId());
         } else {
             //TODO(profile) Save SharedProfile As Member instead
-            ProfileActivity.startActivity(this,((SharedProfile)friendRequestScreenItem).getId());
+            ProfileActivity.startActivity(this,((SharedProfile)friendRequestScreenItem).getMemberId());
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFriendRequestDecisionSent(FriendRequestSendSucceededEvent friendRequestSendSucceededEvent) {
+    public void onFriendRequestDecisionSent(FriendRequestResponseSendSucceededEvent friendRequestResponseSendSucceededEvent) {
         recyclerAdapter.refresh();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFriendRequestDecisionSendFailed(FriendRequestSendFailedEvent friendRequestSendFailedEvent) {
+    public void onFriendRequestDecisionSendFailed(FriendRequestResponseSendFailedEvent friendRequestSendFailedEvent) {
         recyclerAdapter.refresh();
     }
 

@@ -24,9 +24,9 @@ import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.Conversation;
 
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.Message;
 
-import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
@@ -345,7 +345,7 @@ public class MessagesActivity extends ResourceActivity
             return;
         }
 
-        User currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        Member currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
         if (currentUser == null) {
             return;
         }

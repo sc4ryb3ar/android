@@ -49,22 +49,54 @@
                         android:layout_marginRight="85dp"
                         android:gravity="center">
 
-                        <com.malinskiy.materialicons.widget.IconTextView
-                            android:id="@+id/feedImageLove"
-                            android:text="{zmdi_account}"
-                            android:textColor="@color/text_color_secondary"
-                            android:textSize="24dp"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="40dp"/>
+                            android:orientation="vertical"
+                            android:layout_marginRight="40dp"
+                            android:gravity="center">
 
-                        <com.malinskiy.materialicons.widget.IconTextView
-                            android:id="@+id/feedImageLove2"
-                            android:text="{zmdi_compass}"
-                            android:textColor="@color/text_color_secondary"
-                            android:textSize="24dp"
+                            <ImageView
+                                android:id="@+id/profile_menu_icon_friend"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/ic_friend_add"
+                                android:scaleType="fitXY"/>
+
+                            <TextView
+                                android:id="@+id/profile_menu_text_friend"
+                                android:text="@string/menu_profile_friend"
+                                android:layout_marginTop="2dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="8dp"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:id="@+id/profile_menu_icon_follow"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_follow"
+                                android:layout_gravity="center_horizontal"
+                                android:scaleType="fitXY"/>
+
+                            <TextView
+                                android:id="@+id/profile_menu_text_follow"
+                                android:text="@string/menu_profile_follow"
+                                android:layout_marginTop="2dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="8dp"/>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -75,26 +107,57 @@
                         android:layout_marginLeft="85dp"
                         android:gravity="center">
 
-                        <com.malinskiy.materialicons.widget.IconTextView
-                                android:id="@+id/profile_menu_icon_message"
-                                android:text="{zmdi_comment-text}"
-                                android:textColor="@color/text_color_secondary"
-                                android:textSize="24dp"
-                                android:onClick="onMenuIconMessage"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center">
 
-                            <com.malinskiy.materialicons.widget.IconTextView
-                                android:id="@+id/profile_menu_icon_view"
-                                android:text="{zmdi_eye}"
-                                android:onClick="onMenuIconView"
-                                android:textColor="@color/text_color_secondary"
-                                android:textSize="24dp"
-                                android:layout_marginLeft="40dp"
+                            <ImageView
+                                android:id="@+id/profile_menu_icon_message"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/ic_message"
+                                android:scaleType="fitXY"/>
+
+                            <TextView
+                                android:id="@+id/profile_menu_text_message"
+                                android:text="@string/menu_profile_message"
+                                android:layout_marginTop="2dp"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content"
+                                android:textSize="8dp"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginLeft="40dp"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:id="@+id/profile_menu_icon_view"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/ic_view"
+                                android:scaleType="fitXY"/>
+
+                        <TextView
+                            android:id="@+id/profile_menu_text_view"
+                            android:text="@string/menu_profile_view"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="8dp"/>
 
                     </LinearLayout>
+
+
+                </LinearLayout>
 
                 </LinearLayout>
 
@@ -148,13 +211,33 @@
 
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" >
+
                 <TextView
                     android:id="@+id/toolbar_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/ToolbarTitle"
                     android:gravity="left"
                     android:visibility="invisible"
-                    android:textSize="20sp"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/toolbar_image"
+                    android:padding="@dimen/toolbar_item_padding"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone"
+                    android:layout_gravity="right"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"/>
+
+                <ProgressBar
+                    android:id="@+id/toolbar_progress_indicator"
+                    style="?android:attr/progressBarStyle"
+                    android:visibility="invisible"
+                    android:padding="@dimen/toolbar_item_padding"
+                    android:layout_gravity="right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -175,7 +258,7 @@
             android:layout_gravity="top"
             android:background="@color/color_accent"
             android:textColor="#fff"
-            android:paddingTop="4dp"
+            android:paddingTop="2dp"
             android:paddingBottom="4dp" />
 
     </android.support.v4.view.ViewPager>

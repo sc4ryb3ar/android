@@ -16,15 +16,11 @@ import com.bitlove.fetlife.model.pojos.Video;
 import com.bitlove.fetlife.model.pojos.VideoReference;
 import com.bitlove.fetlife.model.pojos.VideoReference_Table;
 import com.bitlove.fetlife.model.pojos.Video_Table;
-import com.bitlove.fetlife.util.MaterialIcons;
 import com.bitlove.fetlife.util.UrlUtil;
-import com.bitlove.fetlife.util.ViewUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.malinskiy.materialicons.widget.IconTextView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
-import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.util.ArrayList;
 import java.util.List;

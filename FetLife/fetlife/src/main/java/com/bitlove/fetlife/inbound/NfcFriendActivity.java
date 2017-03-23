@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.FriendSuggestionAddedEvent;
+import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.SharedProfile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,7 +35,10 @@ public class NfcFriendActivity extends Activity {
 
         try {
             //Save the received Profile
-            SharedProfile sharedProfile = new ObjectMapper().readValue(new String(msg.getRecords()[0].getPayload()), SharedProfile.class);
+            Member sharedMember = new ObjectMapper().readValue(new String(msg.getRecords()[0].getPayload()), Member.class);
+            sharedMember.mergeSave();
+            SharedProfile sharedProfile = new SharedProfile();
+            sharedProfile.setMemberId(sharedMember.getId());
             sharedProfile.save();
 
             //Notify about new Shared Profile thise who are interested

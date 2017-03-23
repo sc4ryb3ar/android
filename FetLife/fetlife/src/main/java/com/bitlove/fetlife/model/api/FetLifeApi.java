@@ -9,7 +9,6 @@ import com.bitlove.fetlife.model.pojos.Message;
 import com.bitlove.fetlife.model.pojos.Picture;
 import com.bitlove.fetlife.model.pojos.Status;
 import com.bitlove.fetlife.model.pojos.Token;
-import com.bitlove.fetlife.model.pojos.User;
 import com.bitlove.fetlife.model.pojos.Video;
 import com.bitlove.fetlife.model.pojos.VideoUploadResult;
 import com.squareup.okhttp.ResponseBody;
@@ -38,7 +37,7 @@ public interface FetLifeApi {
     Call<Token> refreshToken(@Query("client_id") String clientId, @Field("client_secret") String clientSecret, @Field("redirect_uri") String redirectUrl, @Field("grant_type") String grantType, @Field("refresh_token") String refreshToken);
 
     @GET("/api/v2/me")
-    Call<User> getMe(@Header("Authorization") String authHeader);
+    Call<Member> getMe(@Header("Authorization") String authHeader);
 
     @GET("/api/v2/me/conversations")
     Call<List<Conversation>> getConversations(@Header("Authorization") String authHeader, @Query("order_by") String orderBy, @Query("limit") int limit, @Query("page") int page);
@@ -97,6 +96,9 @@ public interface FetLifeApi {
     @FormUrlEncoded
     @POST("/api/v2/me/friendrequests")
     Call<FriendRequest> createFriendRequest(@Header("Authorization") String authHeader, @Field("member_id") String friendId);
+
+    @PUT("/api/v2/members/{memberId}/follow")
+    Call<ResponseBody> createFollow(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
 
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
