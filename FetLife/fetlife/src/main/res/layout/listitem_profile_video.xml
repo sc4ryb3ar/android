@@ -13,11 +13,9 @@
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/profile_video"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="130dp"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
-        android:maxHeight="130dp"
-        fresco:actualImageScaleType="centerCrop"
-    />
+        fresco:actualImageScaleType="centerCrop" />
 
 </FrameLayout>

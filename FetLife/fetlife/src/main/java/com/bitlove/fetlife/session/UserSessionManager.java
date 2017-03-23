@@ -326,31 +326,16 @@ public class UserSessionManager {
     }
 
     private void applyVersionUpgradeIfNeeded(String userKey) {
-        applyDbVersionUpgradeIfNeeded();
-        applyUserVersionUpgradeIfNeeded(userKey);
-    }
-
-    private void applyDbVersionUpgradeIfNeeded() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < 20603) {
-            sharedPreferences.edit().clear().apply();
-
-            FlowManager.destroy();
-            fetLifeApplication.deleteDatabase(FetLifeDatabase.NAME + ".db");
-            fetLifeApplication.openOrCreateDatabase(FetLifeDatabase.NAME + ".db", Context.MODE_PRIVATE, null);
-
-            sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
-        }
-    }
-
-    private void applyUserVersionUpgradeIfNeeded(String userKey) {
-        SharedPreferences sharedPreferences = getUserPreferences(userKey);
-        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < 10603) {
+        SharedPreferences userPreferences = getUserPreferences(userKey);
+        int lastVersionUpgrade = userPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        if (lastVersionUpgrade < 20605) {
+            closeDb();
+            deleteUserDb(userKey);
+            userPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
+        } else if (lastVersionUpgrade < 10603) {
             SharedPreferences oldPreference = fetLifeApplication.getSharedPreferences(userKey, Context.MODE_PRIVATE);
             boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
-            sharedPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
+            userPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
         }
     }
 

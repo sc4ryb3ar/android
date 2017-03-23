@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,7 +24,6 @@ import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.RelationReference;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.util.ColorUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
@@ -43,6 +41,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private static final String FRIENDS_CALL_LIMIT = "20";
 
     private ViewPager viewPager;
+    private TextView nickNameView,metaView;
+    private SimpleDraweeView avatarView,imageHeaderView,toolbarHeaderView;
+    private ImageView friendIconView,followIconView,messageIconView,viewIconView;
 
     public static void startActivity(BaseActivity baseActivity, String memberId) {
         Intent intent = new Intent(baseActivity, ProfileActivity.class);
@@ -73,6 +74,16 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), FRIENDS_CALL_LIMIT, "1");
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, PICTURES_CALL_LIMIT, "1");
 
+        nickNameView = (TextView) findViewById(R.id.profile_nickname);
+        metaView = (TextView) findViewById(R.id.profile_meta);
+        avatarView = (SimpleDraweeView) findViewById(R.id.profile_avatar);
+        imageHeaderView = (SimpleDraweeView) findViewById(R.id.profile_image_header);
+        toolbarHeaderView = (SimpleDraweeView) findViewById(R.id.toolbar_image);
+        friendIconView = (ImageView) findViewById(R.id.profile_menu_icon_friend);
+        followIconView = (ImageView) findViewById(R.id.profile_menu_icon_follow);
+        messageIconView = (ImageView) findViewById(R.id.profile_menu_icon_message);
+        viewIconView = (ImageView) findViewById(R.id.profile_menu_icon_view);
+
         setMemberDetails(member);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -81,18 +92,20 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             public Fragment getItem(int position) {
                 switch (position) {
                     case 0:
-                        return AboutFragment.newInstance(memberId);
+                        return BasicInfoFragment.newInstance(memberId);
                     case 1:
-                        return StatusesFragment.newInstance(memberId);
+                        return AboutFragment.newInstance(memberId);
                     case 2:
-                        return PicturesFragment.newInstance(memberId);
+                        return StatusesFragment.newInstance(memberId);
                     case 3:
-                        return VideosFragment.newInstance(memberId);
+                        return PicturesFragment.newInstance(memberId);
                     case 4:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
+                        return VideosFragment.newInstance(memberId);
                     case 5:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
                     case 6:
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                    case 7:
                         return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWER);
                     default:
                         return null;
@@ -101,7 +114,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
             @Override
             public int getCount() {
-                return 7;
+                return 8;
             }
 
             @Override
@@ -109,18 +122,20 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 //TODO(profile): move to text file
                 switch (position) {
                     case 0:
-                        return "About";
+                        return "Basic Info";
                     case 1:
-                        return "Statuses";
+                        return "About";
                     case 2:
-                        return "Pictures";
+                        return "Statuses";
                     case 3:
-                        return "Video";
+                        return "Pictures";
                     case 4:
-                        return "Friends";
+                        return "Video";
                     case 5:
-                        return "Following";
+                        return "Friends";
                     case 6:
+                        return "Following";
+                    case 7:
                         return "Followers";
                     default:
                         return null;
@@ -136,60 +151,53 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
     private void setMemberDetails(Member member) {
         setTitle(member.getNickname());
-        TextView nickNameView = (TextView) findViewById(R.id.profile_nickname);
         nickNameView.setText(member.getNickname());
-        TextView metaView = (TextView) findViewById(R.id.profile_meta);
         metaView.setText(member.getMetaInfo());
-        SimpleDraweeView avatarView = (SimpleDraweeView) findViewById(R.id.profile_avatar);
         avatarView.setImageURI(member.getAvatarLink());
-        SimpleDraweeView imageHeaderView = (SimpleDraweeView) findViewById(R.id.profile_image_header);
         imageHeaderView.setImageURI(member.getAvatarLink());
-        SimpleDraweeView toolbarHeaderView = (SimpleDraweeView) findViewById(R.id.toolbar_image);
         toolbarHeaderView.setImageURI(member.getAvatarLink());
         toolbarHeaderView.setTag(member.getAvatarLink());
 
-        ImageView friendTextView = (ImageView) findViewById(R.id.profile_menu_icon_friend);
         String relationWithMe = member.getRelationWithMe();
         if (relationWithMe == null) {
             relationWithMe = "";
         }
         switch (relationWithMe) {
             case Member.VALUE_FRIEND:
-                friendTextView.setImageResource(R.drawable.ic_friend);
+                friendIconView.setImageResource(R.drawable.ic_friend);
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
             case Member.VALUE_FRIEND_REQUEST_SENT:
-                friendTextView.setImageResource(R.drawable.ic_friend_sent);
+                friendIconView.setImageResource(R.drawable.ic_friend_sent);
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
             case Member.VALUE_FRIEND_REQUEST_PENDING:
-                friendTextView.setImageResource(R.drawable.ic_friend_pending);
+                friendIconView.setImageResource(R.drawable.ic_friend_pending);
                 break;
             default:
-                friendTextView.setImageResource(R.drawable.ic_friend_add);
+                friendIconView.setImageResource(R.drawable.ic_friend_add);
                 break;
         }
-        friendTextView.setOnClickListener(new View.OnClickListener() {
+        friendIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onMenuIconFriend();
             }
         });
-        ImageView followTextView = (ImageView) findViewById(R.id.profile_menu_icon_follow);
-        followTextView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
-        followTextView.setOnClickListener(new View.OnClickListener() {
+        followIconView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
+        followIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onMenuIconFollow();
             }
         });
-        findViewById(R.id.profile_menu_icon_message).setOnClickListener(new View.OnClickListener() {
+        messageIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onMenuIconMessage();
             }
         });
-        findViewById(R.id.profile_menu_icon_view).setOnClickListener(new View.OnClickListener() {
+        viewIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onMenuIconView();

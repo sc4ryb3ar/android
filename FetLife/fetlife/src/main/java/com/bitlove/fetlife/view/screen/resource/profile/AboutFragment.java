@@ -2,30 +2,26 @@ package com.bitlove.fetlife.view.screen.resource.profile;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Member_Table;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.util.HtmlListTagHandler;
 import com.bitlove.fetlife.view.screen.BaseFragment;
-import com.raizlabs.android.dbflow.sql.language.BaseModelQueriable;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.List;
+
 public class AboutFragment extends BaseFragment implements ProfileFragment {
 
     private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
+    private TextView aboutTextView;
 
     public static AboutFragment newInstance(String memberId) {
         //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
@@ -36,37 +32,27 @@ public class AboutFragment extends BaseFragment implements ProfileFragment {
         return aboutFragment;
     }
 
-    private String loadAbout(String memberId) {
-        Member member = Member.loadMember(memberId);
+    private void loadAndSetAbout() {
+        Member member = Member.loadMember(getArguments().getString(ARG_MEMBER_ID));
         if (member == null) {
-            return null;
+            return;
         }
-        return member.getAbout();
-    }
-
-    private void loadAndSetAbout(View view) {
-        TextView aboutTextView = (TextView) view.findViewById(R.id.text_about);
-        aboutTextView.setText(loadAbout(getArguments().getString(ARG_MEMBER_ID)));
+        //TODO(profile) use localized values
+        aboutTextView.setText(member.getAbout());
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_about, container, false);
-//        view.findViewById(R.id.text_about).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                int viewId = view.getId();
-//                viewId++;
-//            }
-//        });
-        loadAndSetAbout(view);
+        View view = inflater.inflate(R.layout.fragment_profile_about, container, false);
+        aboutTextView = (TextView) view.findViewById(R.id.text_profile_about);
+        loadAndSetAbout();
         return view;
     }
 
     @Override
     public void refresh() {
-        loadAndSetAbout(getView());
+        loadAndSetAbout();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

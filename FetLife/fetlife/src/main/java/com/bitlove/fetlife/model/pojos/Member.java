@@ -15,7 +15,6 @@ import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class Member extends BaseModel {
     private List<String> lookingFor;
 
     @Column
-    private String lookingForText;
+    private String lookingForRawString;
 
     @JsonProperty("country")
     @Column
@@ -153,8 +152,8 @@ public class Member extends BaseModel {
     }
 
     public List<String> getLookingFor() {
-        if (lookingFor == null && lookingForText != null) {
-            lookingFor = Arrays.asList(lookingForText.split(SEPARATOR_LOOKING_FOR));
+        if (lookingFor == null && lookingForRawString != null) {
+            lookingFor = Arrays.asList(lookingForRawString.split(SEPARATOR_LOOKING_FOR));
         }
         return lookingFor;
     }
@@ -166,16 +165,16 @@ public class Member extends BaseModel {
             for (String lookingForElement : lookingFor) {
                 lookingForText += SEPARATOR_LOOKING_FOR + lookingForElement;
             }
-            setLookingForText(lookingForText);
+            setLookingForRawString(lookingForText);
         }
     }
 
-    public String getLookingForText() {
-        return lookingForText;
+    public String getLookingForRawString() {
+        return lookingForRawString;
     }
 
-    public void setLookingForText(String lookingForText) {
-        this.lookingForText = lookingForText;
+    public void setLookingForRawString(String lookingForRawString) {
+        this.lookingForRawString = lookingForRawString;
     }
 
     public String getCountry() {

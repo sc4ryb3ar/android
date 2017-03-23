@@ -101,8 +101,6 @@ public class FetLifeApiIntentService extends IntentService {
 
     - ??? Progress BAR, + Toolbar Profile Avatar
     - Hitrec for profile icons
-    - DB delete ?
-    - Self profile screen - done
     - FIX FEED LINK ISSUE WITH single new relation - done
 
     - Blocked - Fix friend paging with flickering (disappearing items)
@@ -120,6 +118,8 @@ public class FetLifeApiIntentService extends IntentService {
     ++ Styling cleanup
     ++ Db Refactor
 
+    - DB delete - done
+    - Self profile screen - done
     - Done - Menu: Follow
     - Done - Menu: Send friend requets
     - Status style - Done
