@@ -312,7 +312,21 @@ public class FetLifeApplication extends MultiDexApplication {
     //Version upgrade method to ensure backward compatibility
     //****
 
-    private void applyVersionUpgradeIfNeeded() {}
+    private void applyVersionUpgradeIfNeeded() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        if (lastVersionUpgrade < 20607) {
+            Crashlytics.log("FetLifeApp version upgrade under 20607");
+            FlowManager.destroy();
+            Crashlytics.log("FetLifeApp Flow Manager Destroyed");
+            boolean deleted = deleteDatabase(FetLifeDatabase.NAME + ".db");
+            Crashlytics.log("Db with .db suffix deleted : " + deleted);
+            deleted = deleteDatabase(FetLifeDatabase.NAME);
+            Crashlytics.log("Db without .db suffix deleted : " + deleted);
+            sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, getVersionNumber()).apply();
+            Crashlytics.log("Upgrade version number updated");
+        }
+    }
 
     //****
     //Class to help monitoring Activity State

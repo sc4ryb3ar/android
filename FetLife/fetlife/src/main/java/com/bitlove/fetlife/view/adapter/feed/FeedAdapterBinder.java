@@ -259,14 +259,14 @@ public class FeedAdapterBinder {
         ViewUtil.increaseTouchArea(imageLove,OVERLAY_HITREC_PADDING);
 
         boolean isLoved = picture.isLovedByMe();
-        imageLove.setImageResource(isLoved ? R.drawable.ic_loved : R.drawable.ic_loved);
+        imageLove.setImageResource(isLoved ? R.drawable.ic_loved : R.drawable.ic_love);
         imageLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImageView imageLove = (ImageView) v;
                 boolean isLoved = picture.isLovedByMe();
                 boolean newIsLoved = !isLoved;
-                imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_loved);
+                imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
                 Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
                 picture.setLovedByMe(newIsLoved);
             }

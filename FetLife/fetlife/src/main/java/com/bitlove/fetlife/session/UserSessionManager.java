@@ -12,6 +12,7 @@ import com.bitlove.fetlife.model.pojos.Member_Table;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
+import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -21,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,7 +66,7 @@ public class UserSessionManager {
     }
 
     public synchronized void onUserLogIn(Member loggedInUser, boolean rememberPassword) {
-        if (!isSameUser(loggedInUser, currentUser)) {
+        if (!isSameUser(loggedInUser, currentUser) || versionUpgradeNeeded(getUserPreferences(getUserKey(loggedInUser)))) {
             logOutUser(currentUser);
             logInUser(loggedInUser);
             currentUser = loggedInUser;
@@ -250,8 +252,18 @@ public class UserSessionManager {
         if (databaseFile == null) {
             return;
         }
+        databaseFile.delete();
         File userDatabaseFile = new File(databaseFile.getParentFile(), getUserDatabaseName(userKey));
-        userDatabaseFile.renameTo(databaseFile);
+        if (!userDatabaseFile.exists()) {
+            try {
+                userDatabaseFile.createNewFile();
+            } catch (IOException e) {
+                Crashlytics.logException(e);
+            }
+        }
+        if (!userDatabaseFile.renameTo(databaseFile)) {
+            Crashlytics.logException(new Exception("User database file could not be renamed"));
+        }
     }
 
     private void initUserPreferences(String userKey) {
@@ -283,13 +295,13 @@ public class UserSessionManager {
         getUserPreferences(userKey).edit().clear().apply();
     }
 
-    private void deleteUserDb(String userKey) {
+    private boolean deleteUserDb(String userKey) {
         File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
         if (databaseFile == null) {
-            return;
+            return false;
         }
         File userDatabaseFile = new File(databaseFile.getParentFile(), getUserDatabaseName(userKey));
-        userDatabaseFile.delete();
+        return (!userDatabaseFile.exists() || userDatabaseFile.delete());
     }
 
     private void initDb() {
@@ -328,15 +340,27 @@ public class UserSessionManager {
     private void applyVersionUpgradeIfNeeded(String userKey) {
         SharedPreferences userPreferences = getUserPreferences(userKey);
         int lastVersionUpgrade = userPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < 20605) {
-            closeDb();
-            deleteUserDb(userKey);
-            userPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
-        } else if (lastVersionUpgrade < 10603) {
+        if (lastVersionUpgrade < 10603) {
             SharedPreferences oldPreference = fetLifeApplication.getSharedPreferences(userKey, Context.MODE_PRIVATE);
             boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
             userPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
         }
+        if (lastVersionUpgrade < 20607) {
+            Crashlytics.log("UserSessionManager version upgrade under 20607");
+            closeDb();
+            Crashlytics.log("UserSessionManager db closed");
+            if (deleteUserDb(userKey)) {
+                userPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
+                Crashlytics.log("UserSessionManager db deleted");
+            } else {
+                Crashlytics.logException(new Exception("User database file could not be deleted"));
+            }
+        }
+    }
+
+    private boolean versionUpgradeNeeded(SharedPreferences userPreferences) {
+        int lastVersionUpgrade = userPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
+        return lastVersionUpgrade < 20607;
     }
 
 }

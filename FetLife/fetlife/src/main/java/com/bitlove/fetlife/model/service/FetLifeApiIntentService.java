@@ -85,10 +85,13 @@ import com.squareup.okhttp.ResponseBody;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -1274,6 +1277,17 @@ public class FetLifeApiIntentService extends IntentService {
 
             final List<Member> friendMembers = relationsResponse.body();
             List<RelationReference> currentFriends = new Select().from(RelationReference.class).where(RelationReference_Table.userId.is(userId)).and(RelationReference_Table.relationType.is(relationType)).orderBy(OrderBy.fromProperty(RelationReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            final Collator coll = Collator.getInstance(Locale.US);
+            coll.setStrength(Collator.IDENTICAL);
+            Collections.sort(currentFriends, new Comparator<RelationReference>() {
+                @Override
+                public int compare(RelationReference relationReference, RelationReference relationReference2) {
+                    //Workaround to match with DB sorting
+                    String nickname1 = relationReference.getNickname().replaceAll("_","z");
+                    String nickname2 = relationReference2.getNickname().replaceAll("_","z");
+                    return coll.compare(nickname1,nickname2);
+                }
+            });
 
             int lastConfirmedFriendPosition;
             if (page == 1) {

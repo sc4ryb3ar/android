@@ -351,7 +351,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             if(!isTitleVisible) {
                 startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
                 startAlphaAnimation(image, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
-                ((SimpleDraweeView)image).setImageURI(image.getTag().toString());
+                ((SimpleDraweeView)image).setImageURI((String)image.getTag());
                 isTitleVisible = true;
             }
         } else {
