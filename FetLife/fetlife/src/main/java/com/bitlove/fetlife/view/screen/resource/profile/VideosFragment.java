@@ -22,11 +22,11 @@ import com.bitlove.fetlife.view.screen.BaseFragment;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class VideosFragment extends BaseFragment {
+public class VideosFragment extends ProfileFragment {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
     private static final int VIDEO_GRID_COLUMN_COUNT = 3;
     private RecyclerView recyclerView;
+    public static int PAGE_COUNT = 24;
 
     public static VideosFragment newInstance(String memberId) {
         //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
@@ -49,11 +49,14 @@ public class VideosFragment extends BaseFragment {
         return view;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServiceCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS)) {
-            refresh();
-        }
+    @Override
+    public String getApiCallAction() {
+        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS;
+    }
+
+    @Override
+    protected int getPageCount() {
+        return PAGE_COUNT;
     }
 
     public void refresh() {
@@ -62,7 +65,6 @@ public class VideosFragment extends BaseFragment {
             recyclerViewAdapter.refresh();
         }
     }
-
 
     private FetLifeApplication getFetLifeApplication() {
         return (FetLifeApplication) getActivity().getApplication();

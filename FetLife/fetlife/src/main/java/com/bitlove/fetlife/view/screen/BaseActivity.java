@@ -265,11 +265,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         this.waitingForResult = true;
     }
 
-    protected void showProgress() {
+    public void showProgress() {
         progressIndicator.setVisibility(View.VISIBLE);
     }
 
-    protected void dismissProgress() {
+    public void dismissProgress() {
         progressIndicator.setVisibility(View.INVISIBLE);
     }
 

@@ -252,15 +252,7 @@ public class UserSessionManager {
         if (databaseFile == null) {
             return;
         }
-        databaseFile.delete();
         File userDatabaseFile = new File(databaseFile.getParentFile(), getUserDatabaseName(userKey));
-        if (!userDatabaseFile.exists()) {
-            try {
-                userDatabaseFile.createNewFile();
-            } catch (IOException e) {
-                Crashlytics.logException(e);
-            }
-        }
         if (!userDatabaseFile.renameTo(databaseFile)) {
             Crashlytics.logException(new Exception("User database file could not be renamed"));
         }
@@ -304,6 +296,14 @@ public class UserSessionManager {
         return (!userDatabaseFile.exists() || userDatabaseFile.delete());
     }
 
+    private boolean deleteDefaultDb() {
+        File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
+        if (databaseFile == null) {
+            return false;
+        }
+        return databaseFile.delete();
+    }
+
     private void initDb() {
         FlowManager.init(new FlowConfig.Builder(fetLifeApplication).build());
     }
@@ -345,10 +345,14 @@ public class UserSessionManager {
             boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
             userPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
         }
-        if (lastVersionUpgrade < 20607) {
+        if (lastVersionUpgrade < 20611) {
             Crashlytics.log("UserSessionManager version upgrade under 20607");
             closeDb();
             Crashlytics.log("UserSessionManager db closed");
+            boolean defaultDbDeleted = deleteDefaultDb();
+            if (defaultDbDeleted) {
+                Crashlytics.log("Default Database deleted: " + defaultDbDeleted);
+            }
             if (deleteUserDb(userKey)) {
                 userPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
                 Crashlytics.log("UserSessionManager db deleted");
@@ -360,7 +364,7 @@ public class UserSessionManager {
 
     private boolean versionUpgradeNeeded(SharedPreferences userPreferences) {
         int lastVersionUpgrade = userPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        return lastVersionUpgrade < 20607;
+        return lastVersionUpgrade < 20611;
     }
 
 }

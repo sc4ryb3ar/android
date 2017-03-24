@@ -49,13 +49,13 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideoViewHolder>
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            List<VideoReference> videoReferences = new Select().from(VideoReference.class).where(VideoReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(VideoReference_Table.id).ascending().collate(Collate.NOCASE)).queryList();
+            List<VideoReference> videoReferences = new Select().from(VideoReference.class).where(VideoReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(VideoReference_Table.date).descending()).queryList();
             List<String> videoIds = new ArrayList<>();
             for (VideoReference videoReference : videoReferences) {
                 videoIds.add(videoReference.getId());
             }
             //TODO(profile):add proper ordering
-            itemList = new Select().from(Video.class).where(Video_Table.id.in(videoIds)).orderBy(OrderBy.fromProperty(Video_Table.id).ascending().collate(Collate.NOCASE)).queryList();
+            itemList = new Select().from(Video.class).where(Video_Table.id.in(videoIds)).orderBy(OrderBy.fromProperty(Video_Table.date).descending()).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }

@@ -18,16 +18,19 @@ import android.widget.TextView;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
+import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.FollowRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.Member;
 import com.bitlove.fetlife.model.pojos.RelationReference;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.ViewUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
 import com.bitlove.fetlife.view.widget.FlingBehavior;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -35,10 +38,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class ProfileActivity extends ResourceActivity implements AppBarLayout.OnOffsetChangedListener {
 
+    private static final int PROFILE_MENU_HITREC_PADDING = 200;
+
     private static final String EXTRA_MEMBERID = "EXTRA_MEMBERID";
-    private static final String STATUSES_CALL_LIMIT = "25";
-    private static final String PICTURES_CALL_LIMIT = "24";
-    private static final String FRIENDS_CALL_LIMIT = "20";
 
     private ViewPager viewPager;
     private TextView nickNameView,metaView;
@@ -65,14 +67,13 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
         Member member = Member.loadMember(memberId);
 
-        showProgress();
         FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, STATUSES_CALL_LIMIT, "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, PICTURES_CALL_LIMIT, "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), FRIENDS_CALL_LIMIT, "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), FRIENDS_CALL_LIMIT, "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), FRIENDS_CALL_LIMIT, "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, PICTURES_CALL_LIMIT, "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.PAGE_COUNT), "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.PAGE_COUNT), "1");
 
         nickNameView = (TextView) findViewById(R.id.profile_nickname);
         metaView = (TextView) findViewById(R.id.profile_meta);
@@ -150,15 +151,19 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     }
 
     private void setMemberDetails(Member member) {
-        setTitle(member.getNickname());
-        nickNameView.setText(member.getNickname());
-        metaView.setText(member.getMetaInfo());
-        avatarView.setImageURI(member.getAvatarLink());
-        imageHeaderView.setImageURI(member.getAvatarLink());
-        toolbarHeaderView.setImageURI(member.getAvatarLink());
-        toolbarHeaderView.setTag(member.getAvatarLink());
+        if (member == null) {
+            Crashlytics.logException(new Exception("Member is null"));
+        }
 
-        String relationWithMe = member.getRelationWithMe();
+        setTitle(member != null ? member.getNickname() : "");
+        nickNameView.setText(member != null ? member.getNickname() : "");
+        metaView.setText(member != null ? member.getMetaInfo() : "");
+        avatarView.setImageURI(member != null ? member.getAvatarLink() : "");
+        imageHeaderView.setImageURI(member != null ? member.getAvatarLink() : "");
+        toolbarHeaderView.setImageURI(member != null ? member.getAvatarLink() : "");
+        toolbarHeaderView.setTag(member != null ? member.getAvatarLink() : "");
+
+        String relationWithMe = member != null ? member.getRelationWithMe() : "";
         if (relationWithMe == null) {
             relationWithMe = "";
         }
@@ -184,6 +189,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFriend();
             }
         });
+        ViewUtil.increaseTouchArea(friendIconView,PROFILE_MENU_HITREC_PADDING);
         followIconView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
         followIconView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,18 +197,21 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFollow();
             }
         });
+        ViewUtil.increaseTouchArea(followIconView,PROFILE_MENU_HITREC_PADDING);
         messageIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onMenuIconMessage();
             }
         });
+        ViewUtil.increaseTouchArea(messageIconView,PROFILE_MENU_HITREC_PADDING);
         viewIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onMenuIconView();
             }
         });
+        ViewUtil.increaseTouchArea(viewIconView,PROFILE_MENU_HITREC_PADDING);
     }
 
     private boolean isFriendWithMe(Member member) {
@@ -214,6 +223,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     }
 
     private boolean isFollowedByMe(Member member) {
+        if (member == null) {
+            return false;
+        }
         String relationWithMe = member.getRelationWithMe();
         if (relationWithMe == null) {
             return false;
@@ -222,21 +234,51 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onResourceListCallStarted(ServiceCallStartedEvent serviceCallStartedEvent) {
+        if (isRelatedCall(serviceCallStartedEvent.getServiceCallAction())) {
+            showProgress();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER)) {
             final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
             Member member = Member.loadMember(memberId);
             setMemberDetails(member);
-        } else if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS)) {
+        }
+        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction())) {
             dismissProgress();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
-        if (serviceCallFailedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS)) {
+        if (isRelatedCall(serviceCallFailedEvent.getServiceCallAction())) {
             dismissProgress();
         }
+    }
+
+    private boolean isRelatedCall(String serviceCallAction) {
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS.equals(serviceCallAction)) {
+            return true;
+        }
+        return false;
     }
 
     private void onMenuIconMessage() {
@@ -298,14 +340,49 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             FollowRequest followRequest = new FollowRequest();
             followRequest.setMemberId(member.getId());
             followRequest.save();
-            member.setRelationWithMe(Member.VALUE_FOLLOWING);
+            String relationShipWithMe = member.getRelationWithMe() != null ? member.getRelationWithMe() : "";
+            switch (relationShipWithMe) {
+                case Member.VALUE_FRIEND_WITHOUT_FOLLOWING:
+                    member.setRelationWithMe(Member.VALUE_FRIEND);
+                    break;
+                case Member.VALUE_FRIEND_REQUEST_PENDING:
+                    member.setRelationWithMe(Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING);
+                    break;
+                case Member.VALUE_FRIEND_REQUEST_SENT:
+                    member.setRelationWithMe(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT);
+                    break;
+                default:
+                    member.setRelationWithMe(Member.VALUE_FOLLOWING);
+                    break;
+            }
             member.mergeSave();
             setMemberDetails(member);
             FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
             showToast(getString(R.string.message_follow_set,member.getNickname()));
         } else if (isFollowedByMe(member)){
-            //TODO(profile) add resource texts
-            showToast("You are already following" + member.getNickname());
+            FollowRequest followRequest = new FollowRequest();
+            followRequest.setMemberId(member.getId());
+            followRequest.setFollow(false);
+            followRequest.save();
+            String relationShipWithMe = member.getRelationWithMe() != null ? member.getRelationWithMe() : "";
+            switch (relationShipWithMe) {
+                case Member.VALUE_FOLLOWING:
+                    member.setRelationWithMe(null);
+                    break;
+                case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
+                    member.setRelationWithMe(Member.VALUE_FRIEND_REQUEST_PENDING);
+                    break;
+                case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
+                    member.setRelationWithMe(Member.VALUE_FRIEND_REQUEST_SENT);
+                    break;
+                case Member.VALUE_FRIEND:
+                    member.setRelationWithMe(Member.VALUE_FRIEND_WITHOUT_FOLLOWING);
+                    break;
+            }
+            member.mergeSave();
+            setMemberDetails(member);
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
+            showToast(getString(R.string.message_unfollow_set,member.getNickname()));
         }
     }
 

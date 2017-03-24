@@ -60,13 +60,13 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            List<PictureReference> pictureReferences = new Select().from(PictureReference.class).where(PictureReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(PictureReference_Table.id).ascending().collate(Collate.NOCASE)).queryList();
+            List<PictureReference> pictureReferences = new Select().from(PictureReference.class).where(PictureReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(PictureReference_Table.date).descending()).queryList();
             List<String> pictureIds = new ArrayList<>();
             for (PictureReference pictureReference : pictureReferences) {
                 pictureIds.add(pictureReference.getId());
             }
             //TODO(profile):add proper ordering
-            itemList = new Select().from(Picture.class).where(Picture_Table.id.in(pictureIds)).orderBy(OrderBy.fromProperty(Picture_Table.id).ascending().collate(Collate.NOCASE)).queryList();
+            itemList = new Select().from(Picture.class).where(Picture_Table.id.in(pictureIds)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
             displayLinks = new ArrayList<>();
             for (Picture picture : itemList) {
                 displayLinks.add(picture.getDisplayUrl());

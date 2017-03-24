@@ -315,7 +315,7 @@ public class FetLifeApplication extends MultiDexApplication {
     private void applyVersionUpgradeIfNeeded() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < 20607) {
+        if (lastVersionUpgrade < 20611) {
             Crashlytics.log("FetLifeApp version upgrade under 20607");
             FlowManager.destroy();
             Crashlytics.log("FetLifeApp Flow Manager Destroyed");

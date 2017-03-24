@@ -18,7 +18,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-public class AboutFragment extends BaseFragment implements ProfileFragment {
+public class AboutFragment extends ProfileFragment {
 
     private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
     private TextView aboutTextView;
@@ -51,14 +51,13 @@ public class AboutFragment extends BaseFragment implements ProfileFragment {
     }
 
     @Override
+    public String getApiCallAction() {
+        return FetLifeApiIntentService.ACTION_APICALL_MEMBER;
+    }
+
+    @Override
     public void refresh() {
         loadAndSetAbout();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServiceCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER)) {
-            refresh();
-        }
-    }
 }

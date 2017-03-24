@@ -16,6 +16,9 @@ public class FollowRequest extends BaseModel {
     @PrimaryKey(autoincrement = false)
     private String memberId;
 
+    @Column
+    private boolean follow = true;
+
     public String getMemberId() {
         return memberId;
     }
@@ -24,6 +27,13 @@ public class FollowRequest extends BaseModel {
         this.memberId = memberId;
     }
 
+    public boolean isFollow() {
+        return follow;
+    }
+
+    public void setFollow(boolean follow) {
+        this.follow = follow;
+    }
 }
 
 

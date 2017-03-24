@@ -1,6 +1,7 @@
 package com.bitlove.fetlife.view.screen.resource.profile;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,11 +24,11 @@ import com.bitlove.fetlife.view.screen.BaseFragment;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class PicturesFragment extends BaseFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
+public class PicturesFragment extends ProfileFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
     private static final int PICTURE_GRID_COLUMN_COUNT = 3;
     private RecyclerView recyclerView;
+    public static int PAGE_COUNT = 24;
 
     public static PicturesFragment newInstance(String memberId) {
         //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
@@ -50,11 +51,14 @@ public class PicturesFragment extends BaseFragment implements PicturesRecyclerAd
         return view;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServiceCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES)) {
-            refresh();
-        }
+    @Override
+    public String getApiCallAction() {
+        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES;
+    }
+
+    @Override
+    protected int getPageCount() {
+        return PAGE_COUNT;
     }
 
     public void refresh() {

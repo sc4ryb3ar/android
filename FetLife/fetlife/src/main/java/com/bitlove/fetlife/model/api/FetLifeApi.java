@@ -100,6 +100,9 @@ public interface FetLifeApi {
     @PUT("/api/v2/members/{memberId}/follow")
     Call<ResponseBody> createFollow(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
 
+    @DELETE("/api/v2/members/{memberId}/follow")
+    Call<ResponseBody> removeFollow(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
+
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
 

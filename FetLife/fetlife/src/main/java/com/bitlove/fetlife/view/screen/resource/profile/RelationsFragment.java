@@ -21,10 +21,8 @@ import com.bitlove.fetlife.view.screen.BaseFragment;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class RelationsFragment extends BaseFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class RelationsFragment extends ProfileFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
-    private static final String ARG_RELATION_TYPE = "ARG_RELATION_TYPE";
     private RecyclerView recyclerView;
 
     public static RelationsFragment newInstance(String memberId, int relationType) {
@@ -52,11 +50,9 @@ public class RelationsFragment extends BaseFragment implements ResourceListRecyc
         return view;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServiceCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS)) {
-            refresh();
-        }
+    @Override
+    public String getApiCallAction() {
+        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS;
     }
 
     public void refresh() {
@@ -65,7 +61,6 @@ public class RelationsFragment extends BaseFragment implements ResourceListRecyc
             recyclerViewAdapter.refresh();
         }
     }
-
 
     private FetLifeApplication getFetLifeApplication() {
         return (FetLifeApplication) getActivity().getApplication();

@@ -102,25 +102,25 @@ public class FetLifeApiIntentService extends IntentService {
 
     /*TODO(profile):
 
-    - ??? Progress BAR, + Toolbar Profile Avatar
-    - Hitrec for profile icons
-    - FIX FEED LINK ISSUE WITH single new relation - done
-
-    - Blocked - Fix friend paging with flickering (disappearing items)
-
-    - Pagination (relations, images)
-    - Pagination during image swipe
-
-    - todos
-    - unfollow/delete friends
+    - delete friend
     - alert dialog before friend etc
-    - Follower/Following List (+Clean up Friend Term)
-    - Remove Floating Action Button
+    - todos
 
-    - Basic info screen
+    + Follower/Following List (+Clean up Friend Term)
+    + Pagination during image swipe
+    + Toolbar Profile Avatar
+
     ++ Styling cleanup
     ++ Db Refactor
 
+    - Hitrec for profile icons - done
+    - images order - done
+    - Pagination (relations, images) - done
+    - unfollow - done
+    - FIX FEED LINK ISSUE WITH single new relation - done
+    - Progress BAR - done
+    - Basic info screen - done
+    - Fix friend paging with flickering (disappearing items) - done
     - DB delete - done
     - Self profile screen - done
     - Done - Menu: Follow
@@ -681,9 +681,9 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private boolean sendFollowRequest(FollowRequest followRequest) throws IOException {
-        Call<ResponseBody> createFollowCall = getFetLifeApi().createFollow(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), followRequest.getMemberId());
-        Response<ResponseBody> createFollowResponse = createFollowCall.execute();
-        if (createFollowResponse.isSuccess()) {
+        Call<ResponseBody> followCall = followRequest.isFollow() ? getFetLifeApi().createFollow(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), followRequest.getMemberId()) : getFetLifeApi().removeFollow(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), followRequest.getMemberId());
+        Response<ResponseBody> followResponse = followCall.execute();
+        if (followResponse.isSuccess()) {
             followRequest.delete();
             return true;
         } else {

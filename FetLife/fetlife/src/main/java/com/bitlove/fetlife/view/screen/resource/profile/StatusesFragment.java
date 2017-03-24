@@ -18,9 +18,8 @@ import com.bitlove.fetlife.view.screen.BaseFragment;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class StatusesFragment extends BaseFragment {
+public class StatusesFragment extends ProfileFragment {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
     private RecyclerView recyclerView;
 
     public static StatusesFragment newInstance(String memberId) {
@@ -44,11 +43,9 @@ public class StatusesFragment extends BaseFragment {
         return view;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServiceCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES)) {
-            refresh();
-        }
+    @Override
+    public String getApiCallAction() {
+        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES;
     }
 
     public void refresh() {
@@ -57,7 +54,6 @@ public class StatusesFragment extends BaseFragment {
             recyclerViewAdapter.refresh();
         }
     }
-
 
     private FetLifeApplication getFetLifeApplication() {
         return (FetLifeApplication) getActivity().getApplication();
