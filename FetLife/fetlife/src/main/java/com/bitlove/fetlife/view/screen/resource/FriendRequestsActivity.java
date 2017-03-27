@@ -66,7 +66,6 @@ public class FriendRequestsActivity extends ResourceListActivity<BaseModel> impl
         if (friendRequestScreenItem instanceof FriendRequest) {
             ProfileActivity.startActivity(this,((FriendRequest)friendRequestScreenItem).getMemberId());
         } else {
-            //TODO(profile) Save SharedProfile As Member instead
             ProfileActivity.startActivity(this,((SharedProfile)friendRequestScreenItem).getMemberId());
         }
     }

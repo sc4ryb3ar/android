@@ -25,7 +25,6 @@ public class BasicInfoFragment extends ProfileFragment {
     private TextView locationTextView, relationshipTextView, orientationTextView, lookingForTextView;
 
     public static BasicInfoFragment newInstance(String memberId) {
-        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         BasicInfoFragment aboutFragment = new BasicInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);
@@ -38,8 +37,6 @@ public class BasicInfoFragment extends ProfileFragment {
         if (member == null) {
             return;
         }
-        //TODO(profile) use localized values
-
         String country = member.getCountry();
         String city = member.getCity();
         String administrativeArea = member.getAdministrativeArea();
@@ -61,7 +58,7 @@ public class BasicInfoFragment extends ProfileFragment {
         String orientation = member.getSexualOrientation();
 
         orientationRowView.setVisibility(orientation != null ? View.VISIBLE : View.GONE);
-        orientationTextView.setText(orientation);
+        orientationTextView.setText(getOrientationText(orientation));
 
         List<String> lookingFors = member.getLookingFor();
         if (lookingFors != null && !lookingFors.isEmpty()) {
@@ -73,10 +70,76 @@ public class BasicInfoFragment extends ProfileFragment {
                 }
                 lookingForText += lookingFor + "\n";
             }
-            lookingForTextView.setText(lookingForText);
+            lookingForTextView.setText(getLookingForDisplayString(lookingForText));
         } else {
             lookingForRowView.setVisibility(View.GONE);
             lookingForTextView.setText("");
+        }
+    }
+
+    private String getOrientationText(String orientation) {
+        if (orientation == null) {
+            return null;
+        }
+        switch (orientation) {
+            case "Straight":
+                return getString(R.string.text_profile_orientation_straight);
+            case "Heteroflexible":
+                return getString(R.string.text_profile_orientation_heteroflexible);
+            case "Bisexual":
+                return getString(R.string.text_profile_orientation_bisexual);
+            case "Homoflexible":
+                return getString(R.string.text_profile_orientation_homoflexible);
+            case "Gay":
+                return getString(R.string.text_profile_orientation_gay);
+            case "Lesbian":
+                return getString(R.string.text_profile_orientation_lesbian);
+            case "Queer":
+                return getString(R.string.text_profile_orientation_queer);
+            case "Pansexual":
+                return getString(R.string.text_profile_orientation_pansexual);
+            case "Fluctuating/Evolving":
+                return getString(R.string.text_profile_orientation_evolving);
+            case "Asexual":
+                return getString(R.string.text_profile_orientation_asexual);
+            case "Unsure":
+                return getString(R.string.text_profile_orientation_unsure);
+            case "Not Applicable":
+                return getString(R.string.text_profile_orientation_na);
+            default:
+                return orientation;
+        }
+    }
+
+    private String getLookingForDisplayString(String lookingForText) {
+        if (lookingForText == null) {
+            return null;
+        }
+        switch (lookingForText) {
+            case "lifetime_relationship":
+                return getString(R.string.text_profile_lookingfor_ltr);
+            case "relationship":
+                return getString(R.string.text_profile_lookingfor_relationship);
+            case "teacher":
+                return getString(R.string.text_profile_lookingfor_teacher);
+            case "someone_to_play_with":
+                return getString(R.string.text_profile_lookingfor_playpartner);
+            case "princess_by_day_slut_by_night":
+                return getString(R.string.text_profile_lookingfor_princessslut);
+            case "friendship":
+                return getString(R.string.text_profile_lookingfor_friendship);
+            case "slave":
+                return getString(R.string.text_profile_lookingfor_slave);
+            case "sub":
+                return getString(R.string.text_profile_lookingfor_sub);
+            case "master":
+                return getString(R.string.text_profile_lookingfor_master);
+            case "mistress":
+                return getString(R.string.text_profile_lookingfor_mistress);
+            case "fetnights":
+                return getString(R.string.text_profile_lookingfor_events);
+            default:
+                return lookingForText;
         }
     }
 

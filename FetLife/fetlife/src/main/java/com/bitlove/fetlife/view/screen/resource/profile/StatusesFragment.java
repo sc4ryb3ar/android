@@ -23,7 +23,6 @@ public class StatusesFragment extends ProfileFragment {
     private RecyclerView recyclerView;
 
     public static StatusesFragment newInstance(String memberId) {
-        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         StatusesFragment statusesFragment = new StatusesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);

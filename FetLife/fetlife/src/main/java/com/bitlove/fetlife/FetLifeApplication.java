@@ -44,6 +44,9 @@ public class FetLifeApplication extends MultiDexApplication {
 
     private static final String IMAGE_TOKEN_MIDFIX = "?token=";
 
+    public static final int VERSION_NUMBER_FOR_DB_UPDATE = 20612;
+
+
     /**
      * Preference key for version number for last upgrade was executed.
      * Upgrade for certain version might be executed to ensure backward compatibility
@@ -315,7 +318,7 @@ public class FetLifeApplication extends MultiDexApplication {
     private void applyVersionUpgradeIfNeeded() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < 20611) {
+        if (lastVersionUpgrade < VERSION_NUMBER_FOR_DB_UPDATE) {
             Crashlytics.log("FetLifeApp version upgrade under 20607");
             FlowManager.destroy();
             Crashlytics.log("FetLifeApp Flow Manager Destroyed");

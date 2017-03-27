@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.Picture_Table;
 import com.bitlove.fetlife.model.pojos.Status;
 import com.bitlove.fetlife.model.pojos.StatusReference;
 import com.bitlove.fetlife.model.pojos.StatusReference_Table;
 import com.bitlove.fetlife.model.pojos.Status_Table;
 import com.bitlove.fetlife.util.DateUtil;
+import com.bitlove.fetlife.util.StringUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -53,8 +55,7 @@ public class StatusesRecyclerAdapter extends RecyclerView.Adapter<StatusViewHold
             for (StatusReference statusReference : statusReferences) {
                 statusIds.add(statusReference.getId());
             }
-            //TODO(profile):add proper ordering
-            itemList = new Select().from(Status.class).where(Status_Table.id.in(statusIds)).orderBy(OrderBy.fromProperty(Status_Table.id).ascending().collate(Collate.NOCASE)).queryList();
+            itemList = new Select().from(Status.class).where(Status_Table.id.in(statusIds)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }
@@ -70,7 +71,7 @@ public class StatusesRecyclerAdapter extends RecyclerView.Adapter<StatusViewHold
     @Override
     public void onBindViewHolder(StatusViewHolder holder, int position) {
         Status status = itemList.get(position);
-        holder.statusText.setText(status.getBody());
+        holder.statusText.setText(StringUtil.parseHtml(status.getBody()));
         holder.statusDate.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(status.getDate())));
     }
 

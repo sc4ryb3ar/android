@@ -54,7 +54,6 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideoViewHolder>
             for (VideoReference videoReference : videoReferences) {
                 videoIds.add(videoReference.getId());
             }
-            //TODO(profile):add proper ordering
             itemList = new Select().from(Video.class).where(Video_Table.id.in(videoIds)).orderBy(OrderBy.fromProperty(Video_Table.date).descending()).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();

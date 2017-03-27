@@ -412,6 +412,37 @@
     <string name="text_profile_header_orientation">Orientation:</string>
     <string name="text_profile_header_looking_for">Looking For:</string>
     <string name="text_profile_header_relationships">Relationships:</string>
+    <string name="title_fragment_profile_info">Basic Info</string>
+    <string name="title_fragment_profile_about">About</string>
+    <string name="title_fragment_profile_statuses">Statuses</string>
+    <string name="title_fragment_profile_pictures">Pictures</string>
+    <string name="title_fragment_profile_videos">Videos</string>
+    <string name="title_fragment_profile_friends">Friends</string>
+    <string name="title_fragment_profile_following">Following</string>
+    <string name="title_fragment_profile_followers">Followers</string>
+    <string name="text_profile_lookingfor_ltr">A lifetime relationship</string>
+    <string name="text_profile_lookingfor_relationship">A relationship</string>
+    <string name="text_profile_lookingfor_teacher">A mentor/teacher</string>
+    <string name="text_profile_lookingfor_playpartner">A play partner</string>
+    <string name="text_profile_lookingfor_princessslut">Princess by day, slut by night</string>
+    <string name="text_profile_lookingfor_friendship">Friendship</string>
+    <string name="text_profile_lookingfor_slave">A slave</string>
+    <string name="text_profile_lookingfor_sub">A sub</string>
+    <string name="text_profile_lookingfor_master">A Master</string>
+    <string name="text_profile_lookingfor_mistress">A Mistress</string>
+    <string name="text_profile_lookingfor_events">Events</string>
+    <string name="text_profile_orientation_straight">Straight</string>
+    <string name="text_profile_orientation_heteroflexible">Heteroflexible</string>
+    <string name="text_profile_orientation_bisexual">Bisexual</string>
+    <string name="text_profile_orientation_homoflexible">Homoflexible</string>
+    <string name="text_profile_orientation_gay">Gay</string>
+    <string name="text_profile_orientation_lesbian">Lesbian</string>
+    <string name="text_profile_orientation_queer">Queer</string>
+    <string name="text_profile_orientation_pansexual">Pansexual</string>
+    <string name="text_profile_orientation_evolving">Fluctuating/Evolving</string>
+    <string name="text_profile_orientation_asexual">Asexual</string>
+    <string name="text_profile_orientation_unsure">Unsure</string>
+    <string name="text_profile_orientation_na">Not Applicable</string>
 
 
 </resources>

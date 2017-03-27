@@ -1,6 +1,7 @@
 package com.bitlove.fetlife.model.pojos;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.util.DateUtil;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -15,6 +16,12 @@ public class StatusReference extends BaseModel {
 
     @Column
     private String userId;
+
+    @Column
+    private long date;
+
+    @Column
+    private String createdAt;
 
     public String getId() {
         return id;
@@ -31,4 +38,27 @@ public class StatusReference extends BaseModel {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+        if (createdAt != null) {
+            try {
+                setDate(DateUtil.parseDate(createdAt));
+            } catch (Exception e) {
+            }
+        }
+    }
+
 }

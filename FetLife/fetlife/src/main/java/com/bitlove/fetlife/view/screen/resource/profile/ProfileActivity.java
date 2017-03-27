@@ -120,24 +120,23 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
             @Override
             public CharSequence getPageTitle(int position) {
-                //TODO(profile): move to text file
                 switch (position) {
                     case 0:
-                        return "Basic Info";
+                        return getString(R.string.title_fragment_profile_info);
                     case 1:
-                        return "About";
+                        return getString(R.string.title_fragment_profile_about);
                     case 2:
-                        return "Statuses";
+                        return getString(R.string.title_fragment_profile_statuses);
                     case 3:
-                        return "Pictures";
+                        return getString(R.string.title_fragment_profile_pictures);
                     case 4:
-                        return "Video";
+                        return getString(R.string.title_fragment_profile_videos);
                     case 5:
-                        return "Friends";
+                        return getString(R.string.title_fragment_profile_friends);
                     case 6:
-                        return "Following";
+                        return getString(R.string.title_fragment_profile_following);
                     case 7:
-                        return "Followers";
+                        return getString(R.string.title_fragment_profile_followers);
                     default:
                         return null;
                 }
@@ -325,7 +324,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
             case Member.VALUE_FRIEND_REQUEST_PENDING:
-                showToast("Friend request is waiting from your approval; Check Friend Requests Screen");
+                showToast("Friend request is waiting for your approval; Check Friend Requests Screen");
                 break;
             default:
                 showToast(getString(R.string.message_friend_request_sent,member.getNickname()));

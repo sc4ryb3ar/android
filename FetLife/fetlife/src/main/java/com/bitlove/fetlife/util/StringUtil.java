@@ -6,6 +6,10 @@ public class StringUtil {
 
     public static final CharSequence parseHtml(String htmlString) {
 
+        if (htmlString == null) {
+            return null;
+        }
+
         htmlString = htmlString.replace("\n","<br/>");
 
 //        CharSequence sequence = Html.fromHtml(htmlString);

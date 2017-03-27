@@ -24,7 +24,6 @@ public class AboutFragment extends ProfileFragment {
     private TextView aboutTextView;
 
     public static AboutFragment newInstance(String memberId) {
-        //TODO(profile): make it work with current user too (mergeSave user as member and keep only id in other table)
         AboutFragment aboutFragment = new AboutFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MEMBER_ID, memberId);
@@ -37,7 +36,6 @@ public class AboutFragment extends ProfileFragment {
         if (member == null) {
             return;
         }
-        //TODO(profile) use localized values
         aboutTextView.setText(member.getAbout());
     }
 

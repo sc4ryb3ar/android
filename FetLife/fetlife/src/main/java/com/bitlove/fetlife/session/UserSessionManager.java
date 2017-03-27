@@ -345,7 +345,7 @@ public class UserSessionManager {
             boolean oldSettings = oldPreference.getBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS,true);
             userPreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, oldSettings).putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, fetLifeApplication.getVersionNumber()).apply();
         }
-        if (lastVersionUpgrade < 20611) {
+        if (lastVersionUpgrade < FetLifeApplication.VERSION_NUMBER_FOR_DB_UPDATE) {
             Crashlytics.log("UserSessionManager version upgrade under 20607");
             closeDb();
             Crashlytics.log("UserSessionManager db closed");
@@ -364,7 +364,7 @@ public class UserSessionManager {
 
     private boolean versionUpgradeNeeded(SharedPreferences userPreferences) {
         int lastVersionUpgrade = userPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        return lastVersionUpgrade < 20611;
+        return lastVersionUpgrade < FetLifeApplication.VERSION_NUMBER_FOR_DB_UPDATE;
     }
 
 }

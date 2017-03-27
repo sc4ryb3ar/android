@@ -65,7 +65,6 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
             for (PictureReference pictureReference : pictureReferences) {
                 pictureIds.add(pictureReference.getId());
             }
-            //TODO(profile):add proper ordering
             itemList = new Select().from(Picture.class).where(Picture_Table.id.in(pictureIds)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
             displayLinks = new ArrayList<>();
             for (Picture picture : itemList) {

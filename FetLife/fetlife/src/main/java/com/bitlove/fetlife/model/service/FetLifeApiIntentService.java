@@ -44,6 +44,7 @@ import com.bitlove.fetlife.model.pojos.Conversation;
 import com.bitlove.fetlife.model.pojos.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.Feed;
 import com.bitlove.fetlife.model.pojos.FollowRequest;
+import com.bitlove.fetlife.model.pojos.Picture_Table;
 import com.bitlove.fetlife.model.pojos.RelationReference;
 import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
@@ -99,40 +100,6 @@ import retrofit.Call;
 import retrofit.Response;
 
 public class FetLifeApiIntentService extends IntentService {
-
-    /*TODO(profile):
-
-    - delete friend
-    - alert dialog before friend etc
-    - todos
-
-    + Follower/Following List (+Clean up Friend Term)
-    + Pagination during image swipe
-    + Toolbar Profile Avatar
-
-    ++ Styling cleanup
-    ++ Db Refactor
-
-    - Hitrec for profile icons - done
-    - images order - done
-    - Pagination (relations, images) - done
-    - unfollow - done
-    - FIX FEED LINK ISSUE WITH single new relation - done
-    - Progress BAR - done
-    - Basic info screen - done
-    - Fix friend paging with flickering (disappearing items) - done
-    - DB delete - done
-    - Self profile screen - done
-    - Done - Menu: Follow
-    - Done - Menu: Send friend requets
-    - Status style - Done
-    - Profile link from everywhere - Done
-    - Videos - Done
-    - Menu icons - done
-    - Menu: Send message - done
-    - Menu: View - done
-    - Image swipe browsing - Done
-    */
 
 
     //****
@@ -1167,7 +1134,6 @@ public class FetLifeApiIntentService extends IntentService {
 
             for (Conversation conversation : conversations) {
 
-                //TODO(profile): use merge not to have less values
                 conversation.getMember().mergeSave();
 
                 int foundPos;
@@ -1299,7 +1265,6 @@ public class FetLifeApiIntentService extends IntentService {
 
             for (Member friendMember : friendMembers) {
 
-                //TODO(profile) : merge mergeSave
                 friendMember.mergeSave();
 
                 int foundPos;
@@ -1363,8 +1328,7 @@ public class FetLifeApiIntentService extends IntentService {
         if (picturesResponse.isSuccess()) {
 
             final List<Picture> retrievedPictures = picturesResponse.body();
-            //TODO(profile) : use same ordering
-            List<PictureReference> currentPictures = new Select().from(PictureReference.class).where(PictureReference_Table.userId.is(userId)).queryList();
+            List<PictureReference> currentPictures = new Select().from(PictureReference.class).where(PictureReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(PictureReference_Table.date).descending()).queryList();
 
             int lastConfirmedPicturePosition;
             if (page == 1) {
@@ -1386,7 +1350,7 @@ public class FetLifeApiIntentService extends IntentService {
                     newItemCount++;
                     PictureReference pictureReference = new PictureReference();
                     pictureReference.setId(retrievedPicture.getId());
-                    //TODO(profile) mergeSave here the ordering param
+                    pictureReference.setCreatedAt(retrievedPicture.getCreatedAt());
                     pictureReference.setUserId(userId);
                     pictureReference.save();
                 } else {
@@ -1396,7 +1360,6 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                     lastConfirmedPicturePosition = foundPos;
                 }
-                //TODO(profile) : merge mergeSave
                 retrievedPicture.save();
             }
 
@@ -1437,8 +1400,7 @@ public class FetLifeApiIntentService extends IntentService {
         if (videosResponse.isSuccess()) {
 
             final List<Video> retrievedVideos = videosResponse.body();
-            //TODO(profile) : use same ordering
-            List<VideoReference> currentVideos = new Select().from(VideoReference.class).where(VideoReference_Table.userId.is(userId)).queryList();
+            List<VideoReference> currentVideos = new Select().from(VideoReference.class).where(VideoReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
 
             int lastConfirmedVideoPosition;
             if (page == 1) {
@@ -1460,7 +1422,7 @@ public class FetLifeApiIntentService extends IntentService {
                     newItemCount++;
                     VideoReference videoReference = new VideoReference();
                     videoReference.setId(retrievedVideo.getId());
-                    //TODO(profile) mergeSave here the ordering param
+                    videoReference.setCreatedAt(retrievedVideo.getCreatedAt());
                     videoReference.setUserId(userId);
                     videoReference.save();
                 } else {
@@ -1470,7 +1432,6 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                     lastConfirmedVideoPosition = foundPos;
                 }
-                //TODO(profile) : merge mergeSave
                 retrievedVideo.save();
             }
 
@@ -1511,8 +1472,7 @@ public class FetLifeApiIntentService extends IntentService {
         if (statussResponse.isSuccess()) {
 
             final List<Status> retrievedStatuses = statussResponse.body();
-            //TODO(profile) : use same ordering
-            List<StatusReference> currentStatus = new Select().from(StatusReference.class).where(StatusReference_Table.userId.is(userId)).queryList();
+            List<StatusReference> currentStatus = new Select().from(StatusReference.class).where(StatusReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
 
             int lastConfirmedStatusPosition;
             if (page == 1) {
@@ -1534,7 +1494,7 @@ public class FetLifeApiIntentService extends IntentService {
                     newItemCount++;
                     StatusReference statusReference = new StatusReference();
                     statusReference.setId(retrievedStatus.getId());
-                    //TODO(profile) mergeSave here the ordering param
+                    statusReference.setCreatedAt(retrievedStatus.getCreatedAt());
                     statusReference.setUserId(userId);
                     statusReference.save();
                 } else {
@@ -1544,7 +1504,6 @@ public class FetLifeApiIntentService extends IntentService {
                     }
                     lastConfirmedStatusPosition = foundPos;
                 }
-                //TODO(profile) : merge mergeSave
                 retrievedStatus.save();
             }
 
