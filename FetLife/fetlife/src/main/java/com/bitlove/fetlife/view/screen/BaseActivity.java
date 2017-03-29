@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    public static final int PERMISSION_REQUEST_PICTURE_UPLOAD = 10000;
+    public static final int PERMISSION_REQUEST_VIDEO_UPLOAD = 20000;
 
     protected boolean waitingForResult;
     protected ProgressBar progressIndicator;
@@ -247,6 +251,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         super.onActivityResult(requestCode, resultCode, data);
         for (ActivityComponent activityComponent : activityComponentList) {
             activityComponent.onActivityResult(this, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for (ActivityComponent activityComponent : activityComponentList) {
+            activityComponent.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
         }
     }
 

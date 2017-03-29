@@ -121,6 +121,8 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_REMOVE_LOVE = "com.bitlove.fetlife.action.apicall.remove_love";
     public static final String ACTION_APICALL_LOGON_USER = "com.bitlove.fetlife.action.apicall.logon_user";
     public static final String ACTION_APICALL_FRIENDREQUESTS = "com.bitlove.fetlife.action.apicall.friendrequests";
+    public static final String ACTION_APICALL_CANCEL_FRIENDREQUEST = "com.bitlove.fetlife.action.apicall.cancel_friendrequest";
+    public static final String ACTION_APICALL_CANCEL_FRIENDSHIP = "com.bitlove.fetlife.action.apicall.cancel_friendship";
     public static final String ACTION_APICALL_PENDING_RELATIONS = "com.bitlove.fetlife.action.apicall.pendingrelations";
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
@@ -149,6 +151,8 @@ public class FetLifeApiIntentService extends IntentService {
 
     private static final int PENDING_MESSAGE_RETRY_COUNT = 3;
     private static final int PENDING_FRIENDREQUEST_RETRY_COUNT = 3;
+
+    private static final int MAX_PAGE_LIMIT = 25;
 
     private static String actionInProgress = null;
 
@@ -286,6 +290,12 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_MEMBER_STATUSES:
                     result = retrieveMemberStatuses(params);
+                    break;
+                case ACTION_APICALL_CANCEL_FRIENDSHIP:
+                    result = cancelFriendship(params);
+                    break;
+                case ACTION_APICALL_CANCEL_FRIENDREQUEST:
+                    result = cancelFriendRequest(params);
                     break;
                 case ACTION_APICALL_FRIENDREQUESTS:
                     result = retrieveFriendRequests(params);
@@ -565,7 +575,6 @@ public class FetLifeApiIntentService extends IntentService {
         try {
             postMessageResponse = postMessagesCall.execute();
         } catch (IOException ioe) {
-            Crashlytics.logException(new Exception("Message send failed", ioe));
             throw ioe;
         }
 
@@ -678,7 +687,7 @@ public class FetLifeApiIntentService extends IntentService {
                 friendRequestsCall = getFetLifeApi().acceptFriendRequests(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getId());
                 break;
             case REJECTED:
-                friendRequestsCall = getFetLifeApi().removeFriendRequests(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getId());
+                friendRequestsCall = getFetLifeApi().removeFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getId());
                 break;
             default:
                 return false;
@@ -1513,6 +1522,14 @@ public class FetLifeApiIntentService extends IntentService {
         } else {
             return Integer.MIN_VALUE;
         }
+    }
+
+    private int cancelFriendRequest(String[] params) throws IOException {
+        return Integer.MIN_VALUE;
+    }
+
+    private int cancelFriendship(String[] params) throws IOException {
+        return Integer.MIN_VALUE;
     }
 
     private int retrieveFriendRequests(String[] params) throws IOException {

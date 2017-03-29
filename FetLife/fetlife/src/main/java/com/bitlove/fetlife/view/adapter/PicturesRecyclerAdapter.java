@@ -99,7 +99,12 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
                 new ImageViewer.Builder(context, displayLinks).setStartPosition(position).setOverlayView(overlay).setImageChangeListener(new ImageViewer.OnImageChangeListener() {
                     @Override
                     public void onImageChange(int position) {
-                        setOverlayContent(overlay, itemList.get(position), onPictureClickListener);
+                        try {
+                            setOverlayContent(overlay, itemList.get(position), onPictureClickListener);
+                        } catch (IndexOutOfBoundsException ioobe) {
+                            //Rare issue when user is browsing photos while Picture list is updated.
+                            //TODO: return user to picture list screen in this case
+                        }
                     }
                 }).show();
             }

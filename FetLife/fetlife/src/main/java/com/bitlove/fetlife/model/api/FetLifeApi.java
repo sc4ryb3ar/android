@@ -91,7 +91,7 @@ public interface FetLifeApi {
     Call<FriendRequest> acceptFriendRequests(@Header("Authorization") String authHeader, @Path("friendRequestId") String friendRequestId);
 
     @DELETE("/api/v2/me/friendrequests/{friendRequestId}")
-    Call<FriendRequest> removeFriendRequests(@Header("Authorization") String authHeader, @Path("friendRequestId") String friendRequestId);
+    Call<FriendRequest> removeFriendRequest(@Header("Authorization") String authHeader, @Path("friendRequestId") String friendRequestId);
 
     @FormUrlEncoded
     @POST("/api/v2/me/friendrequests")

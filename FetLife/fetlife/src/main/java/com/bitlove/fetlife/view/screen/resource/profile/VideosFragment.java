@@ -25,7 +25,6 @@ import org.greenrobot.eventbus.ThreadMode;
 public class VideosFragment extends ProfileFragment {
 
     private static final int VIDEO_GRID_COLUMN_COUNT = 3;
-    private RecyclerView recyclerView;
     public static int PAGE_COUNT = 24;
 
     public static VideosFragment newInstance(String memberId) {

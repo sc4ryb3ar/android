@@ -27,7 +27,6 @@ import org.greenrobot.eventbus.ThreadMode;
 public class PicturesFragment extends ProfileFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
 
     private static final int PICTURE_GRID_COLUMN_COUNT = 3;
-    private RecyclerView recyclerView;
     public static int PAGE_COUNT = 24;
 
     public static PicturesFragment newInstance(String memberId) {

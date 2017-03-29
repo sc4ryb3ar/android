@@ -1,10 +1,14 @@
 package com.bitlove.fetlife.view.screen.component;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -183,9 +187,17 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_upload_pic) {
-            PictureUploadSelectionDialog.show(menuActivity);
+            if (isStoragePermissionGranted()) {
+                PictureUploadSelectionDialog.show(menuActivity);
+            } else {
+                requestStoragePermission(BaseActivity.PERMISSION_REQUEST_PICTURE_UPLOAD);
+            }
         } else if (id == R.id.nav_upload_video) {
-            VideoUploadSelectionDialog.show(menuActivity);
+            if (isStoragePermissionGranted()) {
+                VideoUploadSelectionDialog.show(menuActivity);
+            } else {
+                requestStoragePermission(BaseActivity.PERMISSION_REQUEST_VIDEO_UPLOAD);
+            }
         } else if (id == R.id.nav_settings) {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
@@ -200,6 +212,36 @@ public class MenuActivityComponent extends ActivityComponent {
         }
 
         return false;
+    }
+
+    private void requestStoragePermission(int requestAction) {
+        ActivityCompat.requestPermissions(menuActivity,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                requestAction);
+    }
+
+    private boolean isStoragePermissionGranted() {
+        return ContextCompat.checkSelfPermission(menuActivity,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(BaseActivity baseActivity, int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(baseActivity, requestCode, permissions, grantResults);
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case BaseActivity.PERMISSION_REQUEST_PICTURE_UPLOAD:
+                    PictureUploadSelectionDialog.show(menuActivity);
+                    break;
+                case BaseActivity.PERMISSION_REQUEST_VIDEO_UPLOAD:
+                    VideoUploadSelectionDialog.show(menuActivity);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private boolean isNavigation(int id) {

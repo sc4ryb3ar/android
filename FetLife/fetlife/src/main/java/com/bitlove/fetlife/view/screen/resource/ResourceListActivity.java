@@ -108,6 +108,15 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        //Workaround for Android OS crash issue
+        if (recyclerView != null) {
+            recyclerView.stopScroll();
+        }
+    }
+
+    @Override
     protected void onSetContentView() {
         setContentView(R.layout.activity_resource_recycler_menu);
     }

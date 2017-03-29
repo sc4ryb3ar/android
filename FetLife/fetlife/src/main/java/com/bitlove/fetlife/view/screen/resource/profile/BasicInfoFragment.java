@@ -68,9 +68,9 @@ public class BasicInfoFragment extends ProfileFragment {
                 if (lookingFor == null || lookingFor.isEmpty()) {
                     continue;
                 }
-                lookingForText += lookingFor + "\n";
+                lookingForText += getLookingForDisplayString(lookingFor) + "\n";
             }
-            lookingForTextView.setText(getLookingForDisplayString(lookingForText));
+            lookingForTextView.setText(lookingForText);
         } else {
             lookingForRowView.setVisibility(View.GONE);
             lookingForTextView.setText("");

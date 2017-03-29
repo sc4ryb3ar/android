@@ -78,7 +78,7 @@ public class FeedItemResourceHelper {
                 } else if (firstEvent.getSecondaryTarget().getStatus() != null) {
                     return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_like_status) : fetLifeApplication.getString(R.string.feed_title_like_statuses, eventCount);
                 } else {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("Like on not yet supported item");
                 }
             case FRIEND_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_friend) : fetLifeApplication.getString(R.string.feed_title_new_friends, eventCount);

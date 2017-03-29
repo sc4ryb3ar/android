@@ -20,8 +20,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class StatusesFragment extends ProfileFragment {
 
-    private RecyclerView recyclerView;
-
     public static StatusesFragment newInstance(String memberId) {
         StatusesFragment statusesFragment = new StatusesFragment();
         Bundle args = new Bundle();

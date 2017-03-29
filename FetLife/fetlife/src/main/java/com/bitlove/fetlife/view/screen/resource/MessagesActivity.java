@@ -224,6 +224,12 @@ public class MessagesActivity extends ResourceActivity
     @Override
     protected void onPause() {
         super.onPause();
+
+        //Workaround for Android OS crash issue
+        if (recyclerView != null) {
+            recyclerView.stopScroll();
+        }
+
         Conversation conversation = messagesAdapter.getConversation();
         if (conversation != null) {
             conversation.setDraftMessage(textInput.getText().toString());

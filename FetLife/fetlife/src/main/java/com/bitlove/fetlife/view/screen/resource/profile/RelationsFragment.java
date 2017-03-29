@@ -23,8 +23,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class RelationsFragment extends ProfileFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
-    private RecyclerView recyclerView;
-
     public static RelationsFragment newInstance(String memberId, int relationType) {
         RelationsFragment friendsFragment = new RelationsFragment();
         Bundle args = new Bundle();

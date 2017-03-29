@@ -62,5 +62,7 @@ public abstract class ActivityComponent {
 
     }
 
+    public void onRequestPermissionsResult(BaseActivity baseActivity, int requestCode, String[] permissions, int[] grantResults) {
 
+    }
 }

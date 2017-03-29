@@ -39,6 +39,15 @@ public abstract class ProfileFragment extends BaseFragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        //Workaround for Android OS crash issue
+        if (recyclerView != null) {
+            recyclerView.stopScroll();
+        }
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
