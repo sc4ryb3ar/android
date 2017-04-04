@@ -1049,6 +1049,9 @@ public class FetLifeApiIntentService extends IntentService {
 
         if (conversationResponse.isSuccess()) {
             Conversation retrievedConversation = conversationResponse.body();
+
+            retrievedConversation.getMember().mergeSave();
+
             Conversation localConversation = new Select().from(Conversation.class).where(Conversation_Table.id.is(conversationId)).querySingle();
             if (localConversation !=null) {
                 retrievedConversation.setDraftMessage(localConversation.getDraftMessage());

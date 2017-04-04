@@ -369,7 +369,7 @@ public class FetLifeApplication extends MultiDexApplication {
             //Check if we started an external task (like taking photo) for that we should wait and keep the user logged in
             if (!isAppInForeground() && !activity.isChangingConfigurations() && !isWaitingForResult) {
                 //If none of the above cases happen to be true log out the user in case (s)he selected to be logged out always
-                if (userSessionManager.getActivePasswordAlwaysPreference()) {
+                if (userSessionManager.getCurrentUser() != null && !userSessionManager.keepUserSignedIn()) {
                     userSessionManager.onUserLogOut();
                 }
             } else if(isWaitingForResult) {
@@ -382,7 +382,7 @@ public class FetLifeApplication extends MultiDexApplication {
                             //Check if App is still displayed
                             //Check if the user is not already logged out
                             //Check if the user wants us to log her/him out in case of leaving the app
-                            if (!isAppInForeground() && userSessionManager.getCurrentUser() != null && userSessionManager.getActivePasswordAlwaysPreference()) {
+                            if (!isAppInForeground() && userSessionManager.getCurrentUser() != null && !userSessionManager.keepUserSignedIn()) {
                                 userSessionManager.onUserLogOut();
                             }
                         }

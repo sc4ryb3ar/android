@@ -2,6 +2,8 @@ package com.bitlove.fetlife.util;
 
 import android.text.Html;
 
+import java.util.List;
+
 public class StringUtil {
 
     public static final CharSequence parseHtml(String htmlString) {
@@ -10,7 +12,7 @@ public class StringUtil {
             return null;
         }
 
-        htmlString = htmlString.replace("\n","<br/>");
+        htmlString = htmlString.replace("\n", "<br/>");
 
 //        CharSequence sequence = Html.fromHtml(htmlString);
 //        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
@@ -36,4 +38,17 @@ public class StringUtil {
 //        strBuilder.removeSpan(span);
 //    }
 
+    public static final String toString(List<String> list, String separator) {
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean first = false;
+        for (String item : list) {
+            if (!first) {
+                stringBuilder.append(separator);
+            } else {
+                first = true;
+            }
+            stringBuilder.append(item);
+        }
+        return stringBuilder.toString();
+    }
 }

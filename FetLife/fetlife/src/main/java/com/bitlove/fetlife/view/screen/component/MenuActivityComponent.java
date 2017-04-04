@@ -173,7 +173,9 @@ public class MenuActivityComponent extends ActivityComponent {
 
         if (id == R.id.nav_logout) {
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
+            menuActivity.finish();
             LoginActivity.startLogin(menuActivity.getFetLifeApplication());
+            return false;
         } else if (id == R.id.nav_conversations) {
             ConversationsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_friends) {
