@@ -51,13 +51,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private TextView nickNameView,metaView;
     private SimpleDraweeView avatarView,imageHeaderView,toolbarHeaderView;
     private ImageView friendIconView,followIconView,messageIconView,viewIconView;
+    private TextView friendIconTextView,followIconTextView,messageIconTextView;
 
     public static void startActivity(BaseActivity baseActivity, String memberId) {
-        Member member = Member.loadMember(memberId);
-        if (member == null) {
-            Crashlytics.logException(new Exception("Null member"));
-        }
-
         Intent intent = new Intent(baseActivity, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(EXTRA_MEMBERID,memberId);
@@ -85,6 +81,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         friendIconView = (ImageView) findViewById(R.id.profile_menu_icon_friend);
         followIconView = (ImageView) findViewById(R.id.profile_menu_icon_follow);
         messageIconView = (ImageView) findViewById(R.id.profile_menu_icon_message);
+        friendIconTextView = (TextView) findViewById(R.id.profile_menu_text_friend);
+        followIconTextView = (TextView) findViewById(R.id.profile_menu_text_follow);
+        messageIconTextView = (TextView) findViewById(R.id.profile_menu_text_message);
         viewIconView = (ImageView) findViewById(R.id.profile_menu_icon_view);
 
         setMemberDetails(member);
@@ -156,6 +155,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             Crashlytics.logException(new Exception("Member is null"));
         }
 
+        Member currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        boolean sameUser = member != null && currentUser != null && member.getId().equals(currentUser.getId());
+
         setTitle(member != null ? member.getNickname() : "");
         nickNameView.setText(member != null ? member.getNickname() : "");
         metaView.setText(member != null ? member.getMetaInfo() : "");
@@ -190,6 +192,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFriend();
             }
         });
+        friendIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        friendIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(friendIconView,PROFILE_MENU_HITREC_PADDING);
         followIconView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
         followIconView.setOnClickListener(new View.OnClickListener() {
@@ -198,6 +202,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFollow();
             }
         });
+        followIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        followIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(followIconView,PROFILE_MENU_HITREC_PADDING);
         messageIconView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +211,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconMessage();
             }
         });
+        messageIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        messageIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(messageIconView,PROFILE_MENU_HITREC_PADDING);
         viewIconView.setOnClickListener(new View.OnClickListener() {
             @Override
