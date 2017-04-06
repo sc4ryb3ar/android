@@ -18,6 +18,7 @@
 package com.bitlove.fetlife.model.db;
 
 import com.bitlove.fetlife.model.pojos.Conversation;
+import com.bitlove.fetlife.model.pojos.FriendRequest;
 import com.raizlabs.android.dbflow.annotation.Database;
 import com.raizlabs.android.dbflow.annotation.Migration;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -32,7 +33,7 @@ public class FetLifeDatabase {
     public static final String NAME = "fetlife";
 
     //Simple increase the version number in case of new tables
-    public static final int VERSION = 27;
+    public static final int VERSION = 28;
 
     //Add new Migration classes in case of table structure change
     @Migration(version = 26, database = FetLifeDatabase.class)
@@ -55,5 +56,20 @@ public class FetLifeDatabase {
         public void migrate(DatabaseWrapper database) {
         }
     }
+
+    //Add new Migration classes in case of table structure change
+    @Migration(version = 28, database = FetLifeDatabase.class)
+    public static class Migration28 extends AlterTableMigration<FriendRequest> {
+
+        public Migration28(Class<FriendRequest> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.TEXT, "targetMemberId");
+        }
+    }
+
 
 }

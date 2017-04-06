@@ -35,6 +35,9 @@ public class FriendRequest extends BaseModel implements FriendRequestScreenModel
     @JsonProperty("member")
     private Member member;
 
+    @JsonProperty("target_member")
+    private Member targetMember;
+
     @Column
     private long date;
 
@@ -46,6 +49,9 @@ public class FriendRequest extends BaseModel implements FriendRequestScreenModel
 
     @Column
     private String memberId;
+
+    @Column
+    private String targetMemberId;
 
     @Column
     private String memberLink;
@@ -168,6 +174,24 @@ public class FriendRequest extends BaseModel implements FriendRequestScreenModel
         }
     }
 
+    public Member getTargetMember() {
+        return targetMember;
+    }
+
+    public void setTargetMember(Member targetMember) {
+        this.targetMember = targetMember;
+        if (targetMember != null) {
+            setTargetMemberId(targetMember.getId());
+        }
+    }
+
+    public String getTargetMemberId() {
+        return targetMemberId;
+    }
+
+    public void setTargetMemberId(String targetMemberId) {
+        this.targetMemberId = targetMemberId;
+    }
 }
 
 

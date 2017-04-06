@@ -319,6 +319,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_CANCEL_FRIENDSHIP,member.getId());
                         member.setRelationWithMe(null);
+                        member.save();
+                        setMemberDetails(member);
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -332,16 +334,14 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
             case Member.VALUE_FRIEND_REQUEST_SENT:
-                if (true) {
-                    showToast("You have already sent a Friend Request. To cancel the Friend Request please visit the FetLife website");
-                    break;
-                }
-                profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendrequest),getString(R.string.message_dialog_cancel_friendrequest));
+                 profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendrequest),getString(R.string.message_dialog_cancel_friendrequest));
                 profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
                     @Override
                     public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_CANCEL_FRIENDREQUEST,member.getId());
                         member.setRelationWithMe(currentRelation.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT) ? Member.VALUE_FOLLOWING : null);
+                        member.save();
+                        setMemberDetails(member);
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -377,7 +377,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     @Override
                     public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
                         FriendRequest friendRequest = new FriendRequest();
-                        friendRequest.setMemberId(member.getId());
+                        friendRequest.setTargetMemberId(member.getId());
                         friendRequest.setPendingState(FriendRequest.PendingState.OUTGOING);
                         friendRequest.setPending(true);
                         friendRequest.save();

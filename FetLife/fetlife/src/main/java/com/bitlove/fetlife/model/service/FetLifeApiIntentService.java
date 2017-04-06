@@ -132,6 +132,9 @@ public class FetLifeApiIntentService extends IntentService {
 
     public static final String ACTION_EXTERNAL_CALL_CHECK_4_UPDATES = "com.bitlove.fetlife.action.external.check_for_updates";
 
+    private static final String PARAM_VALUE_FRIEND_REQUEST_SENT = "sent";
+    private static final String PARAM_VALUE_FRIEND_REQUEST_RECEIVED = "received";
+
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
 
@@ -351,9 +354,9 @@ public class FetLifeApiIntentService extends IntentService {
 
             int lastResponseCode = getFetLifeApplication().getFetLifeService().getLastResponseCode();
 
-            if (result != Integer.MIN_VALUE) {
-                //If the call succeed notify all subscribers about
-                sendLoadFinishedNotification(action, result, params);
+            if (result == Integer.MIN_VALUE) {
+                //If the call failed notify all subscribers about
+                sendLoadFailedNotification(action, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
                 if (refreshToken(currentUser)) {
@@ -366,8 +369,8 @@ public class FetLifeApiIntentService extends IntentService {
                 }
                 //TODO: error handling for endless loop
             } else if (result != Integer.MAX_VALUE) {
-                //If the call failed notify all subscribers about
-                sendLoadFailedNotification(action, params);
+                //If the call succeed notify all subscribers about
+                sendLoadFinishedNotification(action, result, params);
             }
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
@@ -646,7 +649,7 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private boolean sendPendingFriendRequest(FriendRequest pendingFriendRequest) throws IOException {
-        Call<FriendRequest> createFriendRequestCall = getFetLifeApi().createFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getMemberId());
+        Call<FriendRequest> createFriendRequestCall = getFetLifeApi().createFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getTargetMemberId());
         Response<FriendRequest> friendRequestResponse = createFriendRequestCall.execute();
         if (friendRequestResponse.isSuccess()) {
             pendingFriendRequest.delete();
@@ -687,7 +690,7 @@ public class FetLifeApiIntentService extends IntentService {
                 friendRequestsCall = getFetLifeApi().acceptFriendRequests(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getId());
                 break;
             case REJECTED:
-                friendRequestsCall = getFetLifeApi().removeFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getId());
+                friendRequestsCall = getFetLifeApi().cancelFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingFriendRequest.getId());
                 break;
             default:
                 return false;
@@ -1528,18 +1531,48 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private int cancelFriendRequest(String[] params) throws IOException {
-        return Integer.MIN_VALUE;
+        String memberId = params[0];
+
+        int page = 1;
+
+        while (true) {
+            Call<List<FriendRequest>> getFriendRequestsCall = getFetLifeApi().getFriendRequests(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), PARAM_VALUE_FRIEND_REQUEST_SENT, MAX_PAGE_LIMIT, page++);
+            Response<List<FriendRequest>> friendRequestsResponse = getFriendRequestsCall.execute();
+            if (!friendRequestsResponse.isSuccess()) {
+                return Integer.MIN_VALUE;
+            }
+            final List<FriendRequest> friendRequests = friendRequestsResponse.body();
+            if (friendRequests.isEmpty()) {
+                return Integer.MIN_VALUE;
+            }
+            for (FriendRequest friendRequest : friendRequests) {
+                if (memberId.equals(friendRequest.getTargetMemberId())) {
+                    Call<FriendRequest> friendRequestsCall = getFetLifeApi().cancelFriendRequest(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), friendRequest.getId());
+                    Response<FriendRequest> friendRequestResponse = friendRequestsCall.execute();
+                    if (friendRequestResponse.isSuccess()) {
+                        return 1;
+                    } else {
+                        return Integer.MIN_VALUE;
+                    }
+                }
+            }
+            //Safety check to never go to endless loop not even if the API behaviour change.
+            if (page == 20) {
+                Crashlytics.logException(new Exception("Cancel friend request page limit has reached"));
+                return Integer.MIN_VALUE;
+            }
+        }
     }
 
     private int cancelFriendship(String[] params) throws IOException {
         return Integer.MIN_VALUE;
     }
 
-    private int retrieveFriendRequests(String[] params) throws IOException {
+    private int retrieveFriendRequests(String... params) throws IOException {
         final int limit = getIntFromParams(params, 0, 10);
         final int page = getIntFromParams(params, 1, 1);
 
-        Call<List<FriendRequest>> getFriendRequestsCall = getFetLifeApi().getFriendRequests(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), limit, page);
+        Call<List<FriendRequest>> getFriendRequestsCall = getFetLifeApi().getFriendRequests(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), PARAM_VALUE_FRIEND_REQUEST_RECEIVED, limit, page);
         Response<List<FriendRequest>> friendRequestsResponse = getFriendRequestsCall.execute();
         if (friendRequestsResponse.isSuccess()) {
             final List<FriendRequest> friendRequests = friendRequestsResponse.body();

@@ -443,16 +443,15 @@
     <string name="text_profile_orientation_asexual">Asexual</string>
     <string name="text_profile_orientation_unsure">Unsure</string>
     <string name="text_profile_orientation_na">Not Applicable</string>
-    <string name="title_dialog_cancel_friendship">You are friends</string>
-    <string name="message_dialog_cancel_friendship">Do you want to cancel your friendship?</string>
+    <string name="title_dialog_cancel_friendship">Friendship</string>
+    <string name="message_dialog_cancel_friendship">You are already Friends.\nDo you want to cancel your friendship?</string>
     <string name="button_dialog_yes">Yes</string>
     <string name="button_dialog_no">No</string>
-    <string name="title_dialog_cancel_friendrequest">Friend request has been already sent</string>
-    <string name="title_dialog_approve_friendrequest">Friend request is waiting for your approval</string>
-    <string name="title_dialog_send_friendrequest">You are not friends yet</string>
-    <string name="message_dialog_send_friendrequest">Do you want to send a Friend Request?</string>
-    <string name="message_dialog_approve_friendrequest">Do you want to check it out now?</string>
-    <string name="message_dialog_cancel_friendrequest">Do you want to cancel it?</string>
-
+    <string name="title_dialog_cancel_friendrequest">Friend Request Sent</string>
+    <string name="title_dialog_approve_friendrequest">Incoming Friend Request</string>
+    <string name="title_dialog_send_friendrequest">New Friendship</string>
+    <string name="message_dialog_send_friendrequest">You are not friends yet. Do you want to send a Friend Request?</string>
+    <string name="message_dialog_approve_friendrequest">Friend request is waiting for your approval.\nDo you want to check it out now?</string>
+    <string name="message_dialog_cancel_friendrequest">Friend request has been already sent.\nDo you want to cancel it?</string>
 
 </resources>

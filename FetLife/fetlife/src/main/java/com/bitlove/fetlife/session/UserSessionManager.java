@@ -31,6 +31,8 @@ import java.util.List;
 
 public class UserSessionManager {
 
+    private static final String MAIN_PREF_KEY_LAST_VERSION_UPGRADE = "MAIN_PREF_KEY_LAST_VERSION_UPGRADE";
+
     private final FetLifeApplication fetLifeApplication;
 
     private Member currentUser;
@@ -77,6 +79,23 @@ public class UserSessionManager {
     }
 
     private void applyVersionUpgrade() {
+        SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        int lastVersionUpgrade = mainPreferences.getInt(MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
+        if (lastVersionUpgrade < 20618) {
+            try {
+                File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
+                File databaseDir = databaseFile.getParentFile();
+                File[] files = databaseDir.listFiles();
+                for (File file : files) {
+                    if (file.getName().endsWith(".db")) {
+                        file.delete();
+                    }
+                }
+            } catch (Exception e) {
+                Crashlytics.logException(e);
+            }
+            mainPreferences.edit().putInt(MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber()).apply();
+        }
         //TODO: migrate user preferences
         //TODO: set default preference applience fr new default setting appliance
         //TODO: remove all previous DB file

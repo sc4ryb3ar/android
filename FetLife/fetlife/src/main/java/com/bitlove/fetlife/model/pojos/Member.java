@@ -293,6 +293,12 @@ public class Member extends BaseModel {
             savedMember.setAvatar(getAvatar());
             savedMember.setMetaInfo(getMetaInfo());
             savedMember.setNickname(getNickname());
+            if (accessToken != null && accessToken.trim().length() != 0) {
+                savedMember.setAccessToken(accessToken);
+            }
+            if (refreshToken != null && refreshToken.trim().length() != 0) {
+                savedMember.setRefreshToken(refreshToken);
+            }
             savedMember.save();
         } else {
             save();
