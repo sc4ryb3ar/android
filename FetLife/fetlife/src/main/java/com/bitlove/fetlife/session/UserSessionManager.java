@@ -2,6 +2,7 @@ package com.bitlove.fetlife.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -63,8 +64,15 @@ public class UserSessionManager {
         }
 
         loadUserPreferences(lastLoggedInUserId);
-        if (keepUserSignedIn()) {
+        if(isUserLoggedIn() && !keepUserSignedIn()) {
+            setupUserSession(lastLoggedInUserId);
+            logOutUser(true);
+        } else if (isUserLoggedIn()) {
+            setupUserSession(lastLoggedInUserId);
+        } else if (keepUserSignedIn()) {
             logInUser(lastLoggedInUserId, null);
+        } else {
+            activePreferences = null;
         }
     }
 
@@ -103,13 +111,13 @@ public class UserSessionManager {
     private void logInUser(String userId, Member userRecord) {
         loadUserPreferences(userId);
         loadUserDb(userId);
+        setUserLoggedIn(true);
         startDb();
         if (userRecord != null) {
             updateUserRecord(userRecord);
         } else {
             loadUserRecord(userId);
         }
-        loadUserRecord(userId);
         updateUserMetaInfo(userId);
         registerToPushMessages(currentUser);
     }
@@ -118,6 +126,7 @@ public class UserSessionManager {
         stopDb();
         clearUserDb(saveUserData);
         clearUserPreferences(saveUserData);
+        setUserLoggedIn(false);
         currentUser = null;
     }
 
@@ -127,6 +136,11 @@ public class UserSessionManager {
         deleteUserMetaInfo(userId);
         deletedUserPreference(userId);
         deleteUserDb(userId);
+    }
+
+    private void setupUserSession(String userId) {
+        startDb();
+        loadUserRecord(userId);
     }
 
     //*** User Preferences managing Calls
@@ -332,6 +346,7 @@ public class UserSessionManager {
             Log.d("UserSession","Updating user record for user " + userRecord.getId());
         }
         userRecord.mergeSave();
+        currentUser = userRecord;
     }
 
     private static String getDefaultDatabaseName() {
@@ -348,12 +363,27 @@ public class UserSessionManager {
     private static final String MAIN_PREF_KEY_USER_SESSION_META_INFO = "MAIN_PREF_KEY_USER_SESSION_META_INFO";
     private static final String SEPARATOR_SESSION_META_INFO_USER = "\n";
 
+    private static final String MAIN_PREF_KEY_USER_SESSION_STATE = "MAIN_PREF_KEY_USER_SESSION_STATE";
+
+    private boolean isUserLoggedIn(){
+        SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        return mainPreferences.getBoolean(MAIN_PREF_KEY_USER_SESSION_STATE,false);
+    }
+
+    private void setUserLoggedIn(boolean loggedIn) {
+        SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        mainPreferences.edit().putBoolean(MAIN_PREF_KEY_USER_SESSION_STATE,loggedIn).commit();
+    }
+
     private String getLastLoggedInUserId() {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Retrieving User Session Meta Info");
         }
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
         String sessionMetaInfo = mainPreferences.getString(MAIN_PREF_KEY_USER_SESSION_META_INFO,null);
+        if (BuildConfig.DEBUG) {
+            Log.d("UserSession","Session Meta Info: " + sessionMetaInfo);
+        }
         String[] loggedInUsers = sessionMetaInfo != null ? sessionMetaInfo.split(SEPARATOR_SESSION_META_INFO_USER) : new String[0];
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","User Session Meta Info Session History length: " + loggedInUsers.length);
@@ -408,7 +438,11 @@ public class UserSessionManager {
         if (!removeOnly) {
             sessionHistory.add(0,userId);
         }
-        mainPreferences.edit().putString(MAIN_PREF_KEY_USER_SESSION_META_INFO, StringUtil.toString(sessionHistory,SEPARATOR_SESSION_META_INFO_USER)).commit();
+        String newSessionMeta = StringUtil.toString(sessionHistory,SEPARATOR_SESSION_META_INFO_USER);
+        if (BuildConfig.DEBUG) {
+            Log.d("UserSession","New Session Meta Info: " + newSessionMeta);
+        }
+        mainPreferences.edit().putString(MAIN_PREF_KEY_USER_SESSION_META_INFO, newSessionMeta).commit();
     }
 
     //*** Push message registration managing calls

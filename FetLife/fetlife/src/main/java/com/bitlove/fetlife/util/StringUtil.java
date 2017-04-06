@@ -40,12 +40,12 @@ public class StringUtil {
 
     public static final String toString(List<String> list, String separator) {
         StringBuilder stringBuilder = new StringBuilder();
-        boolean first = false;
+        boolean first = true;
         for (String item : list) {
             if (!first) {
                 stringBuilder.append(separator);
             } else {
-                first = true;
+                first = false;
             }
             stringBuilder.append(item);
         }

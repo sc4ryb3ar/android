@@ -300,12 +300,12 @@ public class Member extends BaseModel {
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         Member savedMember = Member.loadMember(id);
         if (savedMember != null) {
             setAccessToken(savedMember.getAccessToken());
             setRefreshToken(savedMember.getRefreshToken());
         }
-        super.save();
+        return super.save();
     }
 }
