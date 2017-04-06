@@ -85,13 +85,13 @@ public interface FetLifeApi {
     Call<Conversation> postConversation(@Header("Authorization") String authHeader, @Field("user_id") String userId, @Field("subject") String subject, @Field("body") String body);
 
     @GET("/api/v2/me/friendrequests")
-    Call<List<FriendRequest>> getFriendRequests(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
+    Call<List<FriendRequest>> getFriendRequests(@Header("Authorization") String authHeader, @Query("filter") String filter, @Query("limit") int limit, @Query("page") int page);
 
     @PUT("/api/v2/me/friendrequests/{friendRequestId}")
     Call<FriendRequest> acceptFriendRequests(@Header("Authorization") String authHeader, @Path("friendRequestId") String friendRequestId);
 
     @DELETE("/api/v2/me/friendrequests/{friendRequestId}")
-    Call<FriendRequest> removeFriendRequest(@Header("Authorization") String authHeader, @Path("friendRequestId") String friendRequestId);
+    Call<FriendRequest> cancelFriendRequest(@Header("Authorization") String authHeader, @Path("friendRequestId") String friendRequestId);
 
     @FormUrlEncoded
     @POST("/api/v2/me/friendrequests")

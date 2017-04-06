@@ -2,8 +2,10 @@ package com.bitlove.fetlife.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
@@ -49,6 +51,7 @@ public class UserSessionManager {
     }
 
     public void init() {
+
         String userKey = loadLastLoggedUserKey();
         if (userKey == null) {
             return;
@@ -67,6 +70,8 @@ public class UserSessionManager {
 
     public synchronized void onUserLogIn(Member loggedInUser, boolean rememberPassword) {
         if (!isSameUser(loggedInUser, currentUser) || versionUpgradeNeeded(getUserPreferences(getUserKey(loggedInUser)))) {
+            initDb();
+            updateUserRecord(loggedInUser);
             logOutUser(currentUser);
             logInUser(loggedInUser);
             currentUser = loggedInUser;
@@ -235,7 +240,8 @@ public class UserSessionManager {
         if (userId == null) {
             return null;
         }
-        return new Select().from(Member.class).where(Member_Table.id.is(userId)).querySingle();
+        Member user = new Select().from(Member.class).where(Member_Table.id.is(userId)).querySingle();
+        return user;
     }
 
     private void saveUserDb(String userKey) {
