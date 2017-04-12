@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -375,7 +376,7 @@ public class FetLifeApiIntentService extends IntentService {
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
             sendConnectionFailedNotification(action, params);
-        } catch (InvalidDBConfiguration|SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
+        } catch (SQLiteDiskIOException|InvalidDBConfiguration|SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
             //the exception go in case of it is not the case
             //TODO: create separate DB Manager class to synchronize db executions and DB close due to user logout
@@ -1183,6 +1184,9 @@ public class FetLifeApiIntentService extends IntentService {
 
     private String getAccessToken() {
         Member currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        if (currentUser == null) {
+            return null;
+        }
         return currentUser.getAccessToken();
     }
 
@@ -1562,7 +1566,10 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private int cancelFriendship(String[] params) throws IOException {
-        return Integer.MIN_VALUE;
+        String memberId = params[0];
+        Call<ResponseBody> removeFriendshipCall = getFetLifeApi().removeFriendship(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId);
+        Response<ResponseBody> response = removeFriendshipCall.execute();
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
     private int retrieveFriendRequests(String... params) throws IOException {

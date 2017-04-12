@@ -172,6 +172,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         }
         switch (relationWithMe) {
             case Member.VALUE_FRIEND:
+            case Member.VALUE_FRIEND_WITHOUT_FOLLOWING:
                 friendIconView.setImageResource(R.drawable.ic_friend);
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
@@ -303,10 +304,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         final String currentRelation = member.getRelationWithMe() != null ? member.getRelationWithMe() : "";
         switch (currentRelation) {
             case Member.VALUE_FRIEND:
-                if (true) {
-                    showToast("You are already Friends. To cancel Friendship please visit the FetLife website");
-                    break;
-                }
+            case Member.VALUE_FRIEND_WITHOUT_FOLLOWING:
                 ProfileConfirmationDialog profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendship),getString(R.string.message_dialog_cancel_friendship));
                 profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
                     @Override

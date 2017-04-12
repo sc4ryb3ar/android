@@ -377,8 +377,11 @@ public class MessagesActivity extends ResourceActivity
         FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
 
         Conversation conversation = messagesAdapter.getConversation();
-        conversation.setDraftMessage("");
-        conversation.save();
+        if (conversation != null) {
+            conversation.setDraftMessage("");
+            conversation.save();
+
+        }
 
         messagesAdapter.refresh();
     }
