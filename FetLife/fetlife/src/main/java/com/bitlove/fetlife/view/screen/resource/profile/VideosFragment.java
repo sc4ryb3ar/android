@@ -10,17 +10,8 @@ import android.view.ViewGroup;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Video;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.VideosRecyclerAdapter;
-import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.BaseFragment;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class VideosFragment extends ProfileFragment {
 
@@ -57,7 +48,7 @@ public class VideosFragment extends ProfileFragment {
         return PAGE_COUNT;
     }
 
-    public void refresh() {
+    public void refreshUi() {
         if (recyclerView != null) {
             VideosRecyclerAdapter recyclerViewAdapter = (VideosRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();

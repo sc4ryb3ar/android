@@ -98,6 +98,12 @@ public class PictureUploadConfirmationDialog extends DialogFragment {
     }
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return super.onCreateDialog(savedInstanceState);
     }

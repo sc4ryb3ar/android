@@ -8,15 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.screen.BaseFragment;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.List;
 
 public class AboutFragment extends ProfileFragment {
 
@@ -54,7 +47,7 @@ public class AboutFragment extends ProfileFragment {
     }
 
     @Override
-    public void refresh() {
+    public void refreshUi() {
         loadAndSetAbout();
     }
 

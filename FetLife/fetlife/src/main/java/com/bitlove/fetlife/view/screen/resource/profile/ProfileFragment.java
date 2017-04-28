@@ -1,18 +1,14 @@
 package com.bitlove.fetlife.view.screen.resource.profile;
 
 import android.os.Bundle;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.BaseFragment;
 
@@ -31,11 +27,30 @@ public abstract class ProfileFragment extends BaseFragment {
     protected int requestedItems = 0;
     protected int requestedPage = 1;
 
+    //TODO: replace this with a more sophisticated solution od checking queue of FetLife Intent service
+    private boolean onCreateCallInProgress;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        refresh();
+        onCreateCallInProgress = true;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
+        if (!onCreateCallInProgress) {
+            refresh();
+        } else {
+            onCreateCallInProgress = false;
+        }
+    }
+
+    public void refresh() {
         requestedPage = 1;
         requestedItems = getPageCount();
+        startResourceCall(getPageCount(),requestedPage);
     }
 
     @Override
@@ -80,14 +95,14 @@ public abstract class ProfileFragment extends BaseFragment {
                 //One Item we already expected at the call
                 requestedItems += countIncrease - getPageCount();
             }
-            refresh();
+            refreshUi();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
         if (serviceCallFailedEvent.getServiceCallAction().equals(getApiCallAction())) {
-            refresh();
+            refreshUi();
         }
     }
 
@@ -118,7 +133,7 @@ public abstract class ProfileFragment extends BaseFragment {
         }
     }
 
-    public abstract void refresh();
+    public abstract void refreshUi();
 
 
 }

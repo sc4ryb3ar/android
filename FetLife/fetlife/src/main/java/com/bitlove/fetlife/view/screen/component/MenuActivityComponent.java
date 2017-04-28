@@ -2,9 +2,7 @@ package com.bitlove.fetlife.view.screen.component;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -21,20 +19,21 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
+import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
+import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
+import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.FriendsActivity;
+import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
-import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
-import com.bitlove.fetlife.view.screen.resource.FriendsActivity;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
-import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
-import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
-import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 public class MenuActivityComponent extends ActivityComponent {
@@ -204,6 +203,9 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_updates) {
+            menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
+            FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));
         }
 
         DrawerLayout drawer = (DrawerLayout) menuActivity.findViewById(R.id.drawer_layout);

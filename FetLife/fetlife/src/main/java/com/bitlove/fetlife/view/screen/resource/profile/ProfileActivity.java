@@ -1,8 +1,6 @@
 package com.bitlove.fetlife.view.screen.resource.profile;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -10,7 +8,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +19,11 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.FollowRequest;
-import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.RelationReference;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.ViewUtil;
 import com.bitlove.fetlife.view.dialog.ProfileConfirmationDialog;
@@ -52,6 +49,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private SimpleDraweeView avatarView,imageHeaderView,toolbarHeaderView;
     private ImageView friendIconView,followIconView,messageIconView,viewIconView;
     private TextView friendIconTextView,followIconTextView,messageIconTextView;
+    private String memberId;
 
     public static void startActivity(BaseActivity baseActivity, String memberId) {
         Intent intent = new Intent(baseActivity, ProfileActivity.class);
@@ -70,7 +68,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
+        memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
         Member member = Member.loadMember(memberId);
 
         nickNameView = (TextView) findViewById(R.id.profile_nickname);
@@ -100,14 +98,16 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     case 2:
                         return StatusesFragment.newInstance(memberId);
                     case 3:
-                        return PicturesFragment.newInstance(memberId);
+                        return ActivityFeedFragment.newInstance(memberId);
                     case 4:
-                        return VideosFragment.newInstance(memberId);
+                        return PicturesFragment.newInstance(memberId);
                     case 5:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
+                        return VideosFragment.newInstance(memberId);
                     case 6:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
                     case 7:
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                    case 8:
                         return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWER);
                     default:
                         return null;
@@ -116,7 +116,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
             @Override
             public int getCount() {
-                return 8;
+                return 9;
             }
 
             @Override
@@ -129,14 +129,16 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     case 2:
                         return getString(R.string.title_fragment_profile_statuses);
                     case 3:
-                        return getString(R.string.title_fragment_profile_pictures);
+                        return getString(R.string.title_fragment_profile_feed);
                     case 4:
-                        return getString(R.string.title_fragment_profile_videos);
+                        return getString(R.string.title_fragment_profile_pictures);
                     case 5:
-                        return getString(R.string.title_fragment_profile_friends);
+                        return getString(R.string.title_fragment_profile_videos);
                     case 6:
-                        return getString(R.string.title_fragment_profile_following);
+                        return getString(R.string.title_fragment_profile_friends);
                     case 7:
+                        return getString(R.string.title_fragment_profile_following);
+                    case 8:
                         return getString(R.string.title_fragment_profile_followers);
                     default:
                         return null;
@@ -243,7 +245,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallStarted(ServiceCallStartedEvent serviceCallStartedEvent) {
-        if (isRelatedCall(serviceCallStartedEvent.getServiceCallAction())) {
+        if (isRelatedCall(serviceCallStartedEvent.getServiceCallAction(), serviceCallStartedEvent.getParams())) {
             showProgress();
         }
     }
@@ -255,20 +257,26 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             Member member = Member.loadMember(memberId);
             setMemberDetails(member);
         }
-        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction())) {
+        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(),serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(),FetLifeApiIntentService.getInProgressActionParams())) {
             dismissProgress();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
-        if (isRelatedCall(serviceCallFailedEvent.getServiceCallAction())) {
+        if (isRelatedCall(serviceCallFailedEvent.getServiceCallAction(), serviceCallFailedEvent.getParams())) {
             dismissProgress();
         }
     }
 
-    private boolean isRelatedCall(String serviceCallAction) {
+    private boolean isRelatedCall(String serviceCallAction, String[] params) {
+        if (params != null && params.length > 0 && memberId != null && !memberId.equals(params[0])) {
+            return false;
+        }
         if (FetLifeApiIntentService.ACTION_APICALL_MEMBER.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_FEED.equals(serviceCallAction)) {
             return true;
         }
         if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES.equals(serviceCallAction)) {
@@ -462,18 +470,23 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
     @Override
     protected void onResourceStart() {
-        final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
-        refresh(memberId);
     }
 
-    private void refresh(String memberId) {
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.PAGE_COUNT), "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.PAGE_COUNT), "1");
+//    private void refresh(String memberId) {
+//        showProgress();
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.PAGE_COUNT), "1");
+//    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getFetLifeApplication().getInMemoryStorage().clearProfileFeed();
     }
 
     @Override

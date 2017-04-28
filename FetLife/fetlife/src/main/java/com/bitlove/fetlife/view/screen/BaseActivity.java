@@ -14,10 +14,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.view.screen.component.ActivityComponent;
@@ -47,6 +50,18 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         super.onCreate(savedInstanceState);
         onCreateActivityComponents();
         onSetContentView();
+
+        TextView previewText = (TextView)findViewById(R.id.text_preview);
+        if (previewText != null) {
+            if (BuildConfig.PREVIEW) {
+                RotateAnimation rotate= (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.preview_rotation);
+                previewText.setAnimation(rotate);
+                previewText.setVisibility(View.VISIBLE);
+            } else {
+                previewText.setVisibility(View.GONE);
+            }
+        }
+
         for (ActivityComponent activityComponent : activityComponentList) {
             activityComponent.onActivityCreated(this, savedInstanceState);
         }

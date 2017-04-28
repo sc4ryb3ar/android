@@ -2,14 +2,13 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.RelationReference;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;

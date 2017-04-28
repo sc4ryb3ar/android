@@ -72,6 +72,12 @@ public class VideoUploadSelectionDialog extends DialogFragment {
         return view;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
 //    private boolean cameraAppAvailable() {
 //        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 //        return takePictureIntent.resolveActivity(getActivity().getPackageManager()) == null)

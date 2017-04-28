@@ -16,7 +16,7 @@ public class VersionUtil {
     private static final String PREF_NOTIFIED_LATEST_RELEASE = "PREF_NOTIFIED_LATEST_RELEASE";
     private static final String PREF_NOTIFIED_LATEST_PRERELEASE = "PREF_NOTIFIED_LATEST_PRERELEASE";
 
-    public static boolean toBeNotified(BaseActivity baseActivity, Release release) {
+    public static boolean toBeNotified(BaseActivity baseActivity, Release release, boolean forcedCheck) {
 
         String releaseVersion = release.getTag();
 
@@ -26,7 +26,7 @@ public class VersionUtil {
             return false;
         }
 
-        if (release.isPrerelease() && !notifyAboutPrereleases(baseActivity)) {
+        if (release.isPrerelease() && !forcedCheck && !notifyAboutPrereleases(baseActivity)) {
             return false;
         }
 

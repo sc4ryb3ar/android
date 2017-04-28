@@ -1,22 +1,20 @@
 package com.bitlove.fetlife;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.app.PendingIntent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.api.GitHubService;
-import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
@@ -30,12 +28,13 @@ import com.facebook.imagepipeline.cache.CacheKeyFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.config.FlowManager;
 
-import io.fabric.sdk.android.Fabric;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.util.regex.Pattern;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Main Application class. The lifecycle of the object of this class is the same as the App itself
@@ -43,9 +42,6 @@ import java.util.regex.Pattern;
 public class FetLifeApplication extends MultiDexApplication {
 
     private static final String IMAGE_TOKEN_MIDFIX = "?token=";
-
-    public static final int VERSION_NUMBER_FOR_DB_UPDATE = 20612;
-
 
     /**
      * Preference key for version number for last upgrade was executed.
@@ -96,6 +92,10 @@ public class FetLifeApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
+        if (BuildConfig.DEBUG) {
+            Debug.waitForDebugger();
+        }
+
         //Setup default instance and callbacks
         instance = this;
 
@@ -114,6 +114,9 @@ public class FetLifeApplication extends MultiDexApplication {
         //Init crash logging
         Fabric.with(this, new Crashlytics());
 
+        PendingIntent restartIntent = PendingIntent.getActivity(this,42, LoginActivity.createIntent(this,getString(R.string.error_session_invalid)),PendingIntent.FLAG_ONE_SHOT);
+        Thread.setDefaultUncaughtExceptionHandler(new FetLifeUncaughtExceptionHandler(Thread.getDefaultUncaughtExceptionHandler(),restartIntent));
+
         //Init push notifications
         OneSignal.startInit(this).inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
 
@@ -122,11 +125,6 @@ public class FetLifeApplication extends MultiDexApplication {
 
         //Init user session manager
         userSessionManager = new UserSessionManager(this);
-
-        //Apply version upgrade if needed to ensure backward compatibility
-        //Note: this place is intentional as user session manager might need to be created but not initialised to do the proper upgrade
-        applyVersionUpgradeIfNeeded();
-
         userSessionManager.init();
 
         //Init service members
@@ -145,6 +143,11 @@ public class FetLifeApplication extends MultiDexApplication {
         notificationParser = new NotificationParser();
         eventBus = EventBus.getDefault();
         inMemoryStorage = new InMemoryStorage();
+    }
+
+    @Override
+    public File getDatabasePath(String name) {
+        return super.getDatabasePath(name);
     }
 
     private void initFrescoImageLibrary() {
@@ -314,22 +317,6 @@ public class FetLifeApplication extends MultiDexApplication {
     //****
     //Version upgrade method to ensure backward compatibility
     //****
-
-    private void applyVersionUpgradeIfNeeded() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < VERSION_NUMBER_FOR_DB_UPDATE) {
-            Crashlytics.log("FetLifeApp version upgrade under 20607");
-            FlowManager.destroy();
-            Crashlytics.log("FetLifeApp Flow Manager Destroyed");
-            boolean deleted = deleteDatabase(FetLifeDatabase.NAME + ".db");
-            Crashlytics.log("Db with .db suffix deleted : " + deleted);
-            deleted = deleteDatabase(FetLifeDatabase.NAME);
-            Crashlytics.log("Db without .db suffix deleted : " + deleted);
-            sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, getVersionNumber()).apply();
-            Crashlytics.log("Upgrade version number updated");
-        }
-    }
 
     //****
     //Class to help monitoring Activity State

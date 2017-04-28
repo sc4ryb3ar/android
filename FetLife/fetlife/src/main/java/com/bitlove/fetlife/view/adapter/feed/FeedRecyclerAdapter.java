@@ -12,8 +12,9 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Story;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.SwipeableViewHolder;
 import com.crashlytics.android.Crashlytics;
@@ -23,10 +24,13 @@ import java.util.List;
 
 public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, FeedViewHolder> {
 
+    private final String memberId;
+
     public interface OnFeedItemClickListener {
         void onMemberClick(Member member);
         void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, Member targetMember);
-        void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, Member targetMember);
+        void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember);
+        void onFeedImageLongClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember);
         void onVisitItem(Object object, String url);
     }
 
@@ -38,11 +42,12 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     FeedAdapterBinder feedImageAdapterBinder;
     FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder;
 
-    public FeedRecyclerAdapter(FetLifeApplication fetLifeApplication, OnFeedItemClickListener onFeedItemClickListener) {
+    public FeedRecyclerAdapter(FetLifeApplication fetLifeApplication, OnFeedItemClickListener onFeedItemClickListener, String memberId) {
         this.fetLifeApplication = fetLifeApplication;
         feedImageAdapterBinder = new FeedAdapterBinder(fetLifeApplication, this);
         feedNotSupportedAdapterBinder = new FeedNotSupportedAdapterBinder(this);
         this.onFeedItemClickListener = onFeedItemClickListener;
+        this.memberId = memberId;
         loadItems();
     }
 
@@ -59,7 +64,11 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
 
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
-        itemList = fetLifeApplication.getInMemoryStorage().getFeed();
+        if (memberId != null) {
+            itemList = fetLifeApplication.getInMemoryStorage().getProfileFeed();
+        } else {
+            itemList = fetLifeApplication.getInMemoryStorage().getFeed();
+        }
     }
 
     @Override

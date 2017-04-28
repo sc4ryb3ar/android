@@ -10,10 +10,10 @@ import android.view.MenuItem;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NotificationReceivedEvent;
-import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
-import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
 import com.bitlove.fetlife.view.adapter.NotificationHistoryRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 
 import org.greenrobot.eventbus.Subscribe;

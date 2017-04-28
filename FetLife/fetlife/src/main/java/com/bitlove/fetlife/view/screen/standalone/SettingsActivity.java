@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 

@@ -1,10 +1,8 @@
 package com.bitlove.fetlife.view.screen.resource.profile;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,17 +10,12 @@ import android.view.ViewGroup;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.PicturesRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.BaseFragment;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class PicturesFragment extends ProfileFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
 
@@ -59,7 +52,7 @@ public class PicturesFragment extends ProfileFragment implements PicturesRecycle
         return PAGE_COUNT;
     }
 
-    public void refresh() {
+    public void refreshUi() {
         if (recyclerView != null) {
             PicturesRecyclerAdapter recyclerViewAdapter = (PicturesRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();

@@ -10,16 +10,11 @@ import android.view.ViewGroup;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.BaseFragment;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class RelationsFragment extends ProfileFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
@@ -52,7 +47,7 @@ public class RelationsFragment extends ProfileFragment implements ResourceListRe
         return FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS;
     }
 
-    public void refresh() {
+    public void refreshUi() {
         if (recyclerView != null) {
             RelationsRecyclerAdapter recyclerViewAdapter = (RelationsRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();

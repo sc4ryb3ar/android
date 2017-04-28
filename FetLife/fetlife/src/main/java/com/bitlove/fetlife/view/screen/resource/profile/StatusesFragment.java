@@ -10,13 +10,8 @@ import android.view.ViewGroup;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.StatusesRecyclerAdapter;
-import com.bitlove.fetlife.view.screen.BaseFragment;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class StatusesFragment extends ProfileFragment {
 
@@ -45,7 +40,7 @@ public class StatusesFragment extends ProfileFragment {
         return FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES;
     }
 
-    public void refresh() {
+    public void refreshUi() {
         if (recyclerView != null) {
             StatusesRecyclerAdapter recyclerViewAdapter = (StatusesRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();

@@ -37,36 +37,37 @@ import com.bitlove.fetlife.event.VideoChunkUploadFinishedEvent;
 import com.bitlove.fetlife.event.VideoChunkUploadStartedEvent;
 import com.bitlove.fetlife.event.VideoUploadFailedEvent;
 import com.bitlove.fetlife.model.api.FetLifeApi;
-import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.api.FetLifeMultipartUploadApi;
+import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.AuthBody;
-import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.Conversation_Table;
-import com.bitlove.fetlife.model.pojos.Feed;
-import com.bitlove.fetlife.model.pojos.FollowRequest;
-import com.bitlove.fetlife.model.pojos.Picture_Table;
-import com.bitlove.fetlife.model.pojos.RelationReference;
-import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Picture;
-import com.bitlove.fetlife.model.pojos.PictureReference;
-import com.bitlove.fetlife.model.pojos.PictureReference_Table;
-import com.bitlove.fetlife.model.pojos.RelationReference_Table;
-import com.bitlove.fetlife.model.pojos.SharedProfile;
-import com.bitlove.fetlife.model.pojos.Message;
-import com.bitlove.fetlife.model.pojos.Message_Table;
-import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
-import com.bitlove.fetlife.model.pojos.Status;
-import com.bitlove.fetlife.model.pojos.StatusReference;
-import com.bitlove.fetlife.model.pojos.StatusReference_Table;
-import com.bitlove.fetlife.model.pojos.Story;
-import com.bitlove.fetlife.model.pojos.Token;
-import com.bitlove.fetlife.model.pojos.Video;
-import com.bitlove.fetlife.model.pojos.VideoReference;
-import com.bitlove.fetlife.model.pojos.VideoReference_Table;
-import com.bitlove.fetlife.model.pojos.VideoUploadResult;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
+import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile;
+import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.StatusReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.StatusReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.VideoReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.VideoReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
+import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
+import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.FileUtil;
@@ -114,6 +115,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MEMBER_VIDEOS = "com.bitlove.fetlife.action.apicall.member_videos";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.conversations";
     public static final String ACTION_APICALL_FEED = "com.bitlove.fetlife.action.apicall.feed";
+    public static final String ACTION_APICALL_MEMBER_FEED = "com.bitlove.fetlife.action.apicall.member_feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
     public static final String ACTION_APICALL_SEND_MESSAGES = "com.bitlove.fetlife.action.apicall.send_messages";
@@ -161,6 +163,7 @@ public class FetLifeApiIntentService extends IntentService {
     private static String actionInProgress = null;
 
     private static int callCount;
+    private static String[] inProgressActionParams;
 
     /**
      * Main interaction method with this class to initiate a new Api call with the given parameters
@@ -208,6 +211,14 @@ public class FetLifeApiIntentService extends IntentService {
         actionInProgress = action;
     }
 
+    private static void setInProgressActionParams(String[] params) {
+        inProgressActionParams = params;
+    }
+
+    public static String[] getInProgressActionParams() {
+        return inProgressActionParams;
+    }
+
     public static synchronized String getActionInProgress() {
         return actionInProgress;
     }
@@ -251,9 +262,10 @@ public class FetLifeApiIntentService extends IntentService {
 
             //Set the current action in progress and notify about whoever is interested
             setActionInProgress(action);
-            sendLoadStartedNotification(action);
+            setInProgressActionParams(params);
+            sendLoadStartedNotification(action,params);
 
-            //If we do not have any access token (for example because it is expired and removed) try to get new one with the stored refresh token
+            //If we do not have any access token (for example because it is expired and removed) try to get new one with the stored refreshUi token
             if (action != ACTION_APICALL_LOGON_USER && getAccessToken() == null) {
                 if (refreshToken(currentUser)) {
                     //If token successfully refreshed restart the original request
@@ -294,6 +306,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_MEMBER_STATUSES:
                     result = retrieveMemberStatuses(params);
+                    break;
+                case ACTION_APICALL_MEMBER_FEED:
+                    result = retrieveMemberFeed(params);
                     break;
                 case ACTION_APICALL_CANCEL_FRIENDSHIP:
                     result = cancelFriendship(params);
@@ -359,9 +374,9 @@ public class FetLifeApiIntentService extends IntentService {
                 //If the call failed notify all subscribers about
                 sendLoadFailedNotification(action, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
-                //If the result is failed due to Authentication or Authorization issue, let's try to refresh the token as it is most probably expired
+                //If the result is failed due to Authentication or Authorization issue, let's try to refreshUi the token as it is most probably expired
                 if (refreshToken(currentUser)) {
-                    //If token refresh succeed restart the original request
+                    //If token refreshUi succeed restart the original request
                     //TODO think about if we can end up endless loop in here in case of not proper response from the backend.
                     onHandleIntent(intent);
                 } else {
@@ -376,7 +391,7 @@ public class FetLifeApiIntentService extends IntentService {
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
             sendConnectionFailedNotification(action, params);
-        } catch (SQLiteDiskIOException|InvalidDBConfiguration|SQLiteReadOnlyDatabaseException|IllegalStateException idb) {
+        } catch (SQLiteDiskIOException | InvalidDBConfiguration | SQLiteReadOnlyDatabaseException | IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
             //the exception go in case of it is not the case
             //TODO: create separate DB Manager class to synchronize db executions and DB close due to user logout
@@ -386,10 +401,12 @@ public class FetLifeApiIntentService extends IntentService {
         } finally {
             //make sure we set the action in progress indicator correctly
             setActionInProgress(null);
+            setInProgressActionParams(null);
         }
     }
 
     private int checkForUpdates(String... params) throws IOException {
+        boolean forcedCheck = getBoolFromParams(params,0,false);
         Call<List<Release>> releasesCall = getFetLifeApplication().getGitHubService().getGitHubApi().getReleases();
         Response<List<Release>> releasesCallResponse = releasesCall.execute();
         if (releasesCallResponse.isSuccess()) {
@@ -405,7 +422,7 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 }
             }
-            getFetLifeApplication().getEventBus().post(new LatestReleaseEvent(latestRelease, latestPreRelease));
+            getFetLifeApplication().getEventBus().post(new LatestReleaseEvent(latestRelease, latestPreRelease, forcedCheck));
             return Integer.MAX_VALUE;
         } else {
             return Integer.MIN_VALUE;
@@ -416,7 +433,7 @@ public class FetLifeApiIntentService extends IntentService {
     //Authentication related methods / Api calls
     //****
 
-    //Special internal call for refreshing token using refresh token
+    //Special internal call for refreshing token using refreshUi token
     private boolean refreshToken(Member currentUser) throws IOException {
 
         if (currentUser == null) {
@@ -1044,6 +1061,7 @@ public class FetLifeApiIntentService extends IntentService {
     //****
 
     private int retrieveMessages(Member user, String... params) throws IOException {
+
         final String conversationId = params[0];
 
         final boolean loadNewMessages = getBoolFromParams(params, 1, true);
@@ -1130,6 +1148,24 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int retrieveMemberFeed(String[] params) throws IOException {
+        final String memberId = params[0];
+        final int limit = getIntFromParams(params, 1, 25);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Call<Feed> getFeedCall = getFetLifeApi().getMemberFeed(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId, limit, page);
+        Response<Feed> feedResponse = getFeedCall.execute();
+        if (feedResponse.isSuccess()) {
+            final Feed feed = feedResponse.body();
+            final List<Story> stories = feed.getStories();
+            getFetLifeApplication().getInMemoryStorage().addProfileFeed(page,stories);
+
+            return stories.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int retrieveConversations(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
@@ -1194,10 +1230,25 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private int getMember(String... params) throws IOException {
-        Call<Member> getMemberCall = getFetLifeApi().getMember(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), params[0]);
+        String memberId = params[0];
+        Call<Member> getMemberCall = getFetLifeApi().getMember(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId);
         Response<Member> getMemberResponse = getMemberCall.execute();
         if (getMemberResponse.isSuccess()) {
-            getMemberResponse.body().save();
+            Member member = getMemberResponse.body();
+            Call<List<Relationship>> getMemberRelationshipCall = getFetLifeApi().getMemberRelationship(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId);
+            Response<List<Relationship>> getMemberRelationshipResponse = getMemberRelationshipCall.execute();
+            if (getMemberRelationshipResponse.isSuccess()) {
+                List<Relationship> relationships = getMemberRelationshipResponse.body();
+                for (Relationship relationship : relationships) {
+                    Member targetMember = relationship.getTargetMember();
+                    if (targetMember != null) {
+                        targetMember.mergeSave();
+                    }
+                    relationship.setMemberId(memberId);
+                    relationship.save();
+                }
+            }
+            member.save();
             return 1;
         } else {
             return Integer.MIN_VALUE;
@@ -1613,7 +1664,7 @@ public class FetLifeApiIntentService extends IntentService {
         getFetLifeApplication().getEventBus().post(new AuthenticationFailedEvent());
     }
 
-    private void sendLoadStartedNotification(String action) {
+    private void sendLoadStartedNotification(String action, String[] params) {
         switch (action) {
             case ACTION_APICALL_LOGON_USER:
                 getFetLifeApplication().getEventBus().post(new LoginStartedEvent());
@@ -1626,7 +1677,7 @@ public class FetLifeApiIntentService extends IntentService {
                 //Invoked directly from the methods
                 break;
             default:
-                getFetLifeApplication().getEventBus().post(new ServiceCallStartedEvent(action));
+                getFetLifeApplication().getEventBus().post(new ServiceCallStartedEvent(action,params));
                 break;
         }
     }

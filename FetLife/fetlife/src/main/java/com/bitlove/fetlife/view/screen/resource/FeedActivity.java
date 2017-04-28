@@ -2,17 +2,19 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Story;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
-import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
-import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
 public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack, FeedRecyclerAdapter.OnFeedItemClickListener {
@@ -43,7 +45,7 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
 
     @Override
     protected ResourceListRecyclerAdapter<Story, ?> createRecyclerAdapter(Bundle savedInstanceState) {
-        return new FeedRecyclerAdapter(getFetLifeApplication(), this);
+        return new FeedRecyclerAdapter(getFetLifeApplication(), this, null);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     }
 
     @Override
-    public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, Member targetMember) {
+    public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember) {
         if (targetMember != null) {
             if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
                 //TODO(feed): Remove this mergeSave after Feed is stored in local db
@@ -89,6 +91,18 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
                 return;
             }
         }
+        if (feedStoryType == Story.FeedStoryType.LIKE_CREATED && feedEvent.getSecondaryTarget().getVideo() != null) {
+            Uri uri = Uri.parse(feedEvent.getSecondaryTarget().getVideo().getVideoUrl());
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.setDataAndType(uri, "video/*");
+            startActivity(intent);
+            return;
+        }
+        UrlUtil.openUrl(this,url);
+    }
+
+    @Override
+    public void onFeedImageLongClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember) {
         UrlUtil.openUrl(this,url);
     }
 
@@ -96,7 +110,6 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     public void onVisitItem(Object object, String url) {
         UrlUtil.openUrl(this,url);
     }
-
 
     @Override
     public boolean finishAtMenuNavigation() {

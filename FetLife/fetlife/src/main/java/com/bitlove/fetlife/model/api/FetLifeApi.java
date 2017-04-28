@@ -1,16 +1,17 @@
 package com.bitlove.fetlife.model.api;
 
-import com.bitlove.fetlife.model.pojos.AuthBody;
-import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.Feed;
-import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Message;
-import com.bitlove.fetlife.model.pojos.Picture;
-import com.bitlove.fetlife.model.pojos.Status;
-import com.bitlove.fetlife.model.pojos.Token;
-import com.bitlove.fetlife.model.pojos.Video;
-import com.bitlove.fetlife.model.pojos.VideoUploadResult;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
+import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
+import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
@@ -53,6 +54,12 @@ public interface FetLifeApi {
 
     @GET("/api/v2/members/{memberId}")
     Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
+
+    @GET("/api/v2/members/{memberId}/latest_activity")
+    Call<Feed> getMemberFeed(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/members/{memberId}/relationships")
+    Call<List<Relationship>> getMemberRelationship(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
 
     @GET("/api/v2/members/{memberId}/pictures")
     Call<List<Picture>> getMemberPictures(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);

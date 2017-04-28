@@ -8,12 +8,12 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
 import com.bitlove.fetlife.event.FriendSuggestionAddedEvent;
-import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.SharedProfile;
+import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.FriendRequestsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 

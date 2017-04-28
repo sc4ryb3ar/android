@@ -95,6 +95,12 @@ public class ProfileConfirmationDialog extends DialogFragment {
         return view;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
     public void setLeftButton(String text, final OnClickListener clickListener) {
         leftButtonText = text;
         leftButtonListener = clickListener;

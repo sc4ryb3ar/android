@@ -1,9 +1,6 @@
 package com.bitlove.fetlife.model.api;
 
-import android.content.Context;
-
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.R;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.Interceptor;
@@ -12,16 +9,9 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManagerFactory;
 
 import retrofit.JacksonConverterFactory;
 import retrofit.Retrofit;

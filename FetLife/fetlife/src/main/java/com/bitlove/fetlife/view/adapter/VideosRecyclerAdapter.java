@@ -1,24 +1,21 @@
 package com.bitlove.fetlife.view.adapter;
 
-import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Video;
-import com.bitlove.fetlife.model.pojos.VideoReference;
-import com.bitlove.fetlife.model.pojos.VideoReference_Table;
-import com.bitlove.fetlife.model.pojos.Video_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.VideoReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.VideoReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video_Table;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -74,7 +71,17 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideoViewHolder>
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Uri uri = Uri.parse(video.getVideoUrl());
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                intent.setDataAndType(uri, "video/*");
+                holder.imageView.getContext().startActivity(intent);
+            }
+        });
+        holder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
                 UrlUtil.openUrl(view.getContext(),video.getUrl());
+                return true;
             }
         });
     }

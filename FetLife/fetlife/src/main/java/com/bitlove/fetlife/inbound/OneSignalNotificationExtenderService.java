@@ -1,11 +1,9 @@
 package com.bitlove.fetlife.inbound;
 
 import android.app.Notification;
-import android.content.SharedPreferences;
 import android.support.v4.app.NotificationCompat;
 
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NotificationReceivedEvent;
 import com.bitlove.fetlife.notification.AnonymNotification;
 import com.bitlove.fetlife.notification.NotificationParser;

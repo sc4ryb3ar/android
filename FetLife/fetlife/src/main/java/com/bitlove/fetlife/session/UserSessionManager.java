@@ -10,7 +10,7 @@ import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class UserSessionManager {
-
-    private static final String MAIN_PREF_KEY_LAST_VERSION_UPGRADE = "MAIN_PREF_KEY_LAST_VERSION_UPGRADE";
 
     private final FetLifeApplication fetLifeApplication;
 
@@ -80,8 +78,12 @@ public class UserSessionManager {
 
     private void applyVersionUpgrade() {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        int lastVersionUpgrade = mainPreferences.getInt(MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
-        if (lastVersionUpgrade < 20618) {
+        int lastVersionUpgrade = mainPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
+        if (lastVersionUpgrade < 20620) {
+            SharedPreferences.Editor preferenceEditor = mainPreferences.edit();
+            if (lastVersionUpgrade != 0) {
+                preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,lastVersionUpgrade);
+            }
             try {
                 File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
                 File databaseDir = databaseFile.getParentFile();
@@ -94,7 +96,7 @@ public class UserSessionManager {
             } catch (Exception e) {
                 Crashlytics.logException(e);
             }
-            mainPreferences.edit().putInt(MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber()).apply();
+            preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber()).apply();
         }
         //TODO: migrate user preferences
         //TODO: set default preference applience fr new default setting appliance
@@ -121,13 +123,14 @@ public class UserSessionManager {
         if (currentUser == null) {
             return;
         }
-        logOutUser(false);
         deleteUser(currentUser);
+        logOutUser(false);
     }
 
     //*** Session State Methods
 
     private void logInUser(String userId, Member userRecord) {
+        stopDb();
         loadUserPreferences(userId);
         loadUserDb(userId);
         setUserLoggedIn(true);
@@ -135,7 +138,11 @@ public class UserSessionManager {
         if (userRecord != null) {
             updateUserRecord(userRecord);
         } else {
-            loadUserRecord(userId);
+            currentUser = loadUserRecord(userId);
+            if (currentUser == null) {
+                logOutUser(false);
+                return;
+            }
         }
         updateUserMetaInfo(userId);
         registerToPushMessages(currentUser);
@@ -159,7 +166,7 @@ public class UserSessionManager {
 
     private void setupUserSession(String userId) {
         startDb();
-        loadUserRecord(userId);
+        currentUser = loadUserRecord(userId);
     }
 
     //*** User Preferences managing Calls
@@ -271,6 +278,7 @@ public class UserSessionManager {
         FlowManager.init(new FlowConfig.Builder(fetLifeApplication).build());
     }
 
+
     private void stopDb() {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Stopping Db");
@@ -347,17 +355,18 @@ public class UserSessionManager {
         }
     }
 
-    private void loadUserRecord(String userId) {
+    private Member loadUserRecord(String userId) {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Loading user record for user " + userId);
         }
-        currentUser = Member.loadMember(userId);
-        if (currentUser == null) {
+        Member user = Member.loadMember(userId);
+        if (user == null) {
             if (BuildConfig.DEBUG) {
                 Log.e("UserSession","User record could not be found");
             }
             Crashlytics.logException(new Exception("User record could not be found"));
         }
+        return user;
     }
 
     private void updateUserRecord(Member userRecord) {
@@ -379,19 +388,16 @@ public class UserSessionManager {
 
     //*** User Session Meta Info managing calls
 
-    private static final String MAIN_PREF_KEY_USER_SESSION_META_INFO = "MAIN_PREF_KEY_USER_SESSION_META_INFO";
     private static final String SEPARATOR_SESSION_META_INFO_USER = "\n";
-
-    private static final String MAIN_PREF_KEY_USER_SESSION_STATE = "MAIN_PREF_KEY_USER_SESSION_STATE";
 
     private boolean isUserLoggedIn(){
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        return mainPreferences.getBoolean(MAIN_PREF_KEY_USER_SESSION_STATE,false);
+        return mainPreferences.getBoolean(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_STATE,false);
     }
 
     private void setUserLoggedIn(boolean loggedIn) {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        mainPreferences.edit().putBoolean(MAIN_PREF_KEY_USER_SESSION_STATE,loggedIn).commit();
+        mainPreferences.edit().putBoolean(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_STATE,loggedIn).commit();
     }
 
     private String getLastLoggedInUserId() {
@@ -399,7 +405,7 @@ public class UserSessionManager {
             Log.d("UserSession","Retrieving User Session Meta Info");
         }
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        String sessionMetaInfo = mainPreferences.getString(MAIN_PREF_KEY_USER_SESSION_META_INFO,null);
+        String sessionMetaInfo = mainPreferences.getString(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_META_INFO,null);
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Session Meta Info: " + sessionMetaInfo);
         }
@@ -439,7 +445,7 @@ public class UserSessionManager {
 
     private void setUserInMetaInfo(String userId, boolean removeOnly) {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
-        String sessionMetaInfo = mainPreferences.getString(MAIN_PREF_KEY_USER_SESSION_META_INFO,null);
+        String sessionMetaInfo = mainPreferences.getString(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_META_INFO,null);
         String[] loggedInUsers = sessionMetaInfo != null ? sessionMetaInfo.split(SEPARATOR_SESSION_META_INFO_USER) : new String[0];
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","User Session Meta Info Session History length: " + loggedInUsers.length);
@@ -461,7 +467,7 @@ public class UserSessionManager {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","New Session Meta Info: " + newSessionMeta);
         }
-        mainPreferences.edit().putString(MAIN_PREF_KEY_USER_SESSION_META_INFO, newSessionMeta).commit();
+        mainPreferences.edit().putString(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_META_INFO, newSessionMeta).commit();
     }
 
     //*** Push message registration managing calls

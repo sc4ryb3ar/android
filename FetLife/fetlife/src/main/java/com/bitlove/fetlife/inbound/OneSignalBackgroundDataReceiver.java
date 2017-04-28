@@ -7,11 +7,6 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.bitlove.fetlife.BuildConfig;
-import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.notification.OneSignalNotification;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //One of the inbound and extension points for OneSignal solution
 //As of now other extension point is used but it is kept for logging purpuses and for future extensions

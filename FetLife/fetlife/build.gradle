@@ -20,10 +20,13 @@ android {
         targetSdkVersion 25
         multiDexEnabled true
 
-        versionCode 20618
-        versionName "2.6.18"
+        versionCode 20620
+        versionName "2.6.20"
 
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField "Boolean", "PREVIEW", "true"
+
     }
 
     signingConfigs {

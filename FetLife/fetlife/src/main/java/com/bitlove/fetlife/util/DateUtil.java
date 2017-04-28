@@ -21,8 +21,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.ISODateTimeFormat;
 
-import java.util.Calendar;
-
 public class DateUtil {
 
     private static final DateTimeFormatter parser = ISODateTimeFormat.dateTime();

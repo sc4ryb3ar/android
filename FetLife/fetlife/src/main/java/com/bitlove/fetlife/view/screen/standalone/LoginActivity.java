@@ -10,6 +10,8 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,18 +19,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
 import com.bitlove.fetlife.event.LoginStartedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.PreferenceKeys;
+import com.bitlove.fetlife.view.dialog.MessageDialog;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class LoginActivity extends Activity {
+
+    private static final String EXTRA_OPTIONAL_TOAST = "EXTRA_OPTIONAL_TOAST";
 
     private EditText mUserNameView;
     private EditText mPasswordView;
@@ -42,13 +49,39 @@ public class LoginActivity extends Activity {
 
         setContentView(R.layout.activity_login);
 
-        boolean vanilla = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication()).getBoolean(getFetLifeApplication().getString(R.string.settings_key_general_vanilla),false);
+        if (getIntent().hasExtra(EXTRA_OPTIONAL_TOAST)) {
+            showToast(getIntent().getStringExtra(EXTRA_OPTIONAL_TOAST));
+        }
+
+        TextView previewText = (TextView)findViewById(R.id.text_preview);
+        if (previewText != null) {
+            if (BuildConfig.PREVIEW) {
+                RotateAnimation rotate= (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.preview_rotation);
+                previewText.setAnimation(rotate);
+                previewText.setVisibility(View.VISIBLE);
+            } else {
+                previewText.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
+
+        boolean vanilla = sharedPreferences.getBoolean(getFetLifeApplication().getString(R.string.settings_key_general_vanilla),false);
         if (vanilla) {
             TextView loginHeader = (TextView) findViewById(R.id.login_header);
             loginHeader.setText(getString(R.string.app_name_vanilla));
             TextView loginText = (TextView) findViewById(R.id.login_text);
             loginText.setText(getString(R.string.logon_title_vanilla));
         }
+
+        int lastVersionNotification = sharedPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,0);
+        if (lastVersionNotification < 20620) {
+            if (lastVersionNotification != 0) {
+                MessageDialog.show(this,getString(R.string.title_dialog_reset_settings),getString(R.string.message_dialog_reset_settings));
+            }
+            sharedPreferences.edit().putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,getFetLifeApplication().getVersionNumber()).apply();
+        }
+
 
         // Set up the login form.
         mUserNameView = (EditText) findViewById(R.id.username);
@@ -153,10 +186,16 @@ public class LoginActivity extends Activity {
     }
 
     public static void startLogin(FetLifeApplication fetLifeApplication) {
-        //TODO: add toast
+        fetLifeApplication.startActivity(createIntent(fetLifeApplication,null));
+    }
+
+    public static Intent createIntent(FetLifeApplication fetLifeApplication, String toast) {
         Intent intent = new Intent(fetLifeApplication, LoginActivity.class);
+        if (toast != null) {
+            intent.putExtra(EXTRA_OPTIONAL_TOAST,toast);
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        fetLifeApplication.startActivity(intent);
+        return intent;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -1,6 +1,5 @@
 package com.bitlove.fetlife.notification;
 
-import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenResult;

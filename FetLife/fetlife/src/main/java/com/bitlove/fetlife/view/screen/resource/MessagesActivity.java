@@ -2,7 +2,6 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,16 +20,14 @@ import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.Conversation;
-
-import com.bitlove.fetlife.model.pojos.Conversation_Table;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Message;
-
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
-import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;

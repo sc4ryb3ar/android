@@ -77,6 +77,12 @@ public class PictureUploadSelectionDialog extends DialogFragment {
 //        return takePictureIntent.resolveActivity(getActivity().getPackageManager()) == null)
 //    }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
     private void onGalleryUpload() {
         Intent intent = new Intent();
         intent.setType("image/*");

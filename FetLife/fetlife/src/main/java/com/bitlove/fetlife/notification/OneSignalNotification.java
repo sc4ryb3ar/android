@@ -2,7 +2,6 @@ package com.bitlove.fetlife.notification;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.bitlove.fetlife.FetLifeApplication;
 

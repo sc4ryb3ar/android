@@ -15,10 +15,10 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.FeedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Picture;
-import com.bitlove.fetlife.model.pojos.Story;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.util.ViewUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
@@ -234,7 +234,14 @@ public class FeedAdapterBinder {
                 simpleDraweeView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event), feedItemResourceHelper.getTargetMember(event));
+                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event), event, feedItemResourceHelper.getTargetMember(event));
+                    }
+                });
+                simpleDraweeView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        onItemClickListener.onFeedImageLongClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event), event, feedItemResourceHelper.getTargetMember(event));
+                        return true;
                     }
                 });
             }
@@ -361,7 +368,7 @@ public class FeedAdapterBinder {
                 simpleDraweeView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(events.get(position)), feedItemResourceHelper.getTargetMember(events.get(position)));
+                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(events.get(position)), events.get(position), feedItemResourceHelper.getTargetMember(events.get(position)));
                     }
                 });
             }

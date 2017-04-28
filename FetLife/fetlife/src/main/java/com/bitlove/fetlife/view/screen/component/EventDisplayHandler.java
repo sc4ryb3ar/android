@@ -24,7 +24,7 @@ import com.bitlove.fetlife.event.VideoChunkUploadFailedEvent;
 import com.bitlove.fetlife.event.VideoChunkUploadFinishedEvent;
 import com.bitlove.fetlife.event.VideoChunkUploadStartedEvent;
 import com.bitlove.fetlife.event.VideoUploadFailedEvent;
-import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
 import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.model.service.ServiceCallCancelReceiver;
@@ -136,11 +136,18 @@ public class EventDisplayHandler {
     public void onLatestReleaseChecked(BaseActivity baseActivity, LatestReleaseEvent latestReleaseEvent) {
         Release latestRelease = latestReleaseEvent.getLatestRelease();
         Release latestPreRelease = latestReleaseEvent.getLatestPreRelease();
-        if (VersionUtil.toBeNotified(baseActivity, latestRelease)) {
+        boolean forcedCheck = latestReleaseEvent.isForcedCheck();
+        boolean notified = false;
+        if (VersionUtil.toBeNotified(baseActivity, latestRelease, forcedCheck)) {
             notifyAboutNewRelease(baseActivity, latestRelease);
+            notified = true;
         }
-        if (VersionUtil.toBeNotified(baseActivity, latestPreRelease)) {
+        if (VersionUtil.toBeNotified(baseActivity, latestPreRelease, forcedCheck)) {
             notifyAboutNewRelease(baseActivity, latestPreRelease);
+            notified = true;
+        }
+        if (forcedCheck && !notified) {
+            baseActivity.showToast(baseActivity.getString(R.string.message_toast_no_update_found));
         }
     }
 

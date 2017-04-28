@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem_Table;
 import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
-import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.SimpleDateFormat;
