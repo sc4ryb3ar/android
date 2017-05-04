@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -75,7 +76,8 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
 
     @Override
     public boolean finishAtMenuNavigation() {
-        return getFetLifeApplication().getUserSessionManager().getActiveUserPreferences().getBoolean(getString(R.string.settings_key_general_feed_as_start),false);
+        SharedPreferences userPreferences = getFetLifeApplication().getUserSessionManager().getActiveUserPreferences();
+        return userPreferences != null ? userPreferences.getBoolean(getString(R.string.settings_key_general_feed_as_start),false) : false;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

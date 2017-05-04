@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.api.GitHubService;
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
@@ -32,6 +33,7 @@ import com.onesignal.OneSignal;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 import io.fabric.sdk.android.Fabric;
@@ -55,11 +57,14 @@ public class FetLifeApplication extends MultiDexApplication {
      */
     private static final long WAITING_FOR_RESULT_LOGOUT_DELAY_MILLIS = 60 * 1000;
 
+    private static final String PREFIX_FILE_DB = "db_";
+
     //****
     //App singleton behaviour to make it accessible where dependency injection is not possible
     //****
 
     private static FetLifeApplication instance;
+    private String dbPathContent;
 
     public static FetLifeApplication getInstance() {
         return instance;
@@ -145,11 +150,6 @@ public class FetLifeApplication extends MultiDexApplication {
         inMemoryStorage = new InMemoryStorage();
     }
 
-    @Override
-    public File getDatabasePath(String name) {
-        return super.getDatabasePath(name);
-    }
-
     private void initFrescoImageLibrary() {
         ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this).setCacheKeyFactory(new CacheKeyFactory() {
             @Override
@@ -189,6 +189,49 @@ public class FetLifeApplication extends MultiDexApplication {
         }).build();
 
         Fresco.initialize(this, imagePipelineConfig);
+    }
+
+    public void setDbPathContent(String dbPathContent) {
+        this.dbPathContent = dbPathContent;
+    }
+
+    @Override
+    public File getDatabasePath(String name) {
+        if (dbPathContent != null) {
+            File dbFile = new File(getFilesDir(),PREFIX_FILE_DB + dbPathContent);
+            return dbFile;
+        } else {
+            Crashlytics.log("Db Path content is not set");
+            return super.getDatabasePath(name);
+        }
+    }
+
+    public void deleteAllDatabase() {
+        File[] files = getFilesDir().listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().startsWith(PREFIX_FILE_DB)) {
+                    file.delete();
+                }
+            }
+        }
+        File legacyDir = super.getDatabasePath(FetLifeDatabase.NAME + ".db");
+        if (legacyDir == null) {
+            return;
+        }
+        files = legacyDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().endsWith(".db")) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    public void deleteDatabase() {
+        File file = new File(getFilesDir(),dbPathContent);
+        file.delete();
     }
 
     static class FrescoTokenLessCacheKey implements CacheKey {

@@ -25,17 +25,18 @@ public class FetLifeUncaughtExceptionHandler implements Thread.UncaughtException
         if (throwable instanceof SQLiteException ||
                 throwable instanceof InvalidDBConfiguration ||
                 throwable instanceof IllegalStateException) {
-            if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() == null) {
-                Crashlytics.logException(new Exception("DB closed",throwable));
-                //Duck exception DB is closed before background thread finished its job
-                FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
-                if (fetLifeApplication.isAppInForeground()) {
-                    AlarmManager mgr = (AlarmManager) fetLifeApplication.getSystemService(Context.ALARM_SERVICE);
-                    mgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + RESTART_DELAY, restartIntent);
-                    System.exit(2);
-                }
+            if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() != null) {
+                FetLifeApplication.getInstance().getUserSessionManager().resetDb();
+            }
+            Crashlytics.logException(new Exception("DB closed",throwable));
+            //Duck exception DB is closed before background thread finished its job
+            FetLifeApplication fetLifeApplication = FetLifeApplication.getInstance();
+            if (fetLifeApplication.isAppInForeground()) {
+                AlarmManager mgr = (AlarmManager) fetLifeApplication.getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + RESTART_DELAY, restartIntent);
                 System.exit(2);
             }
+            System.exit(2);
         }
 
         defaultUncaughtExceptionHandler.uncaughtException(thread,throwable);

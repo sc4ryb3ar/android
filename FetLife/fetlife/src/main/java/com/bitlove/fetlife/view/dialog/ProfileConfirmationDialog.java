@@ -36,6 +36,9 @@ public class ProfileConfirmationDialog extends DialogFragment {
     }
 
     public static void show(Activity activity, String title, String message) {
+        if (activity.isFinishing()) {
+            return;
+        }
         FragmentTransaction ft = activity.getFragmentManager().beginTransaction();
         Fragment prev = activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (prev != null) {

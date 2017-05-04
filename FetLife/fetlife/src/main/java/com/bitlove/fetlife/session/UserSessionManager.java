@@ -2,7 +2,6 @@ package com.bitlove.fetlife.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -66,7 +65,7 @@ public class UserSessionManager {
         loadUserPreferences(lastLoggedInUserId);
         if(isUserLoggedIn() && !keepUserSignedIn()) {
             setupUserSession(lastLoggedInUserId);
-            logOutUser(true);
+            logOutUser();
         } else if (isUserLoggedIn()) {
             setupUserSession(lastLoggedInUserId);
         } else if (keepUserSignedIn()) {
@@ -79,20 +78,13 @@ public class UserSessionManager {
     private void applyVersionUpgrade() {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
         int lastVersionUpgrade = mainPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
-        if (lastVersionUpgrade < 20620) {
+        if (lastVersionUpgrade < 20622) {
             SharedPreferences.Editor preferenceEditor = mainPreferences.edit();
             if (lastVersionUpgrade != 0) {
                 preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,lastVersionUpgrade);
             }
             try {
-                File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
-                File databaseDir = databaseFile.getParentFile();
-                File[] files = databaseDir.listFiles();
-                for (File file : files) {
-                    if (file.getName().endsWith(".db")) {
-                        file.delete();
-                    }
-                }
+                resetDb();
             } catch (Exception e) {
                 Crashlytics.logException(e);
             }
@@ -116,15 +108,15 @@ public class UserSessionManager {
     }
 
     public synchronized void onUserLogOut() {
-        logOutUser(true);
+        logOutUser();
     }
 
     public synchronized void onUserReset() {
         if (currentUser == null) {
             return;
         }
-        deleteUser(currentUser);
-        logOutUser(false);
+        deleteCurrentUser();
+        logOutUser();
     }
 
     //*** Session State Methods
@@ -140,7 +132,7 @@ public class UserSessionManager {
         } else {
             currentUser = loadUserRecord(userId);
             if (currentUser == null) {
-                logOutUser(false);
+                logOutUser();
                 return;
             }
         }
@@ -148,23 +140,22 @@ public class UserSessionManager {
         registerToPushMessages(currentUser);
     }
 
-    private void logOutUser(boolean saveUserData) {
+    private void logOutUser() {
         stopDb();
-        clearUserDb(saveUserData);
-        clearUserPreferences(saveUserData);
+        clearUserPreferences();
         setUserLoggedIn(false);
         currentUser = null;
     }
 
-    private void deleteUser(Member user) {
-        unregisterFromPushMessages(user);
-        String userId = user.getId();
-        deleteUserMetaInfo(userId);
-        deletedUserPreference(userId);
-        deleteUserDb(userId);
+    private void deleteCurrentUser() {
+        unregisterFromPushMessages(currentUser);
+        deleteUserMetaInfo(currentUser.getId());
+        deletedUserPreference(currentUser.getId());
+        deleteCurrentUserDb();
     }
 
     private void setupUserSession(String userId) {
+        loadUserDb(userId);
         startDb();
         currentUser = loadUserRecord(userId);
     }
@@ -233,7 +224,7 @@ public class UserSessionManager {
         return "fetlife" + "_" + SecurityUtil.hash_sha256(userId) + ".pref";
     }
 
-    private void clearUserPreferences(boolean saveData) {
+    private void clearUserPreferences() {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Clearing user preferences");
         }
@@ -283,76 +274,67 @@ public class UserSessionManager {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Stopping Db");
         }
-        FlowManager.destroy();
+        fetLifeApplication.setDbPathContent(null);
+        FlowManager.init(fetLifeApplication);
+//        FlowManager.destroy();
     }
 
     private void loadUserDb(String userId) {
-        if (BuildConfig.DEBUG) {
-            Log.d("UserSession","Loading Db for " + userId);
-        }
-        File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
-        if (databaseFile == null || !databaseFile.exists()) {
-            if (BuildConfig.DEBUG) {
-                Log.e("UserSession","Default Db File was not found");
-            }
-            Crashlytics.logException(new Exception("Default Database File not found"));
-            return;
-        }
-        File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(userId));
-        if (!userDatabaseFile.exists()) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","User Db File does not exist; Clearing Default Db");
-            }
-            FileUtil.clearContent(databaseFile);
-            return;
-        } else {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","User Db File found; Copying content to Default Db");
-            }
-            FileUtil.copyFileContent(userDatabaseFile,databaseFile);
-        }
+        fetLifeApplication.setDbPathContent(getUserDatabaseName(userId));
+//
+//        if (BuildConfig.DEBUG) {
+//            Log.d("UserSession","Loading Db for " + userId);
+//        }
+//        File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
+//        if (databaseFile == null || !databaseFile.exists()) {
+//            if (BuildConfig.DEBUG) {
+//                Log.e("UserSession","Default Db File was not found");
+//            }
+//            Crashlytics.logException(new Exception("Default Database File not found"));
+//            return;
+//        }
+//        File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(userId));
+//        if (!userDatabaseFile.exists()) {
+//            if (BuildConfig.DEBUG) {
+//                Log.d("UserSession","User Db File does not exist; Clearing Default Db");
+//            }
+//            FileUtil.clearContent(databaseFile);
+//            return;
+//        } else {
+//            if (BuildConfig.DEBUG) {
+//                Log.d("UserSession","User Db File found; Copying content to Default Db");
+//            }
+//            FileUtil.copyFileContent(userDatabaseFile,databaseFile);
+//        }
     }
 
-    private void clearUserDb(boolean saveUserData) {
-        if (BuildConfig.DEBUG) {
-            Log.d("UserSession","Clearing Db for " + currentUser.getId());
-        }
-        File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
-        if (databaseFile == null || !databaseFile.exists()) {
-            if (BuildConfig.DEBUG) {
-                Log.e("UserSession","Default Db File was not found");
-            }
-            Crashlytics.logException(new Exception("Default Database File not found"));
-            return;
-        }
-        if (saveUserData) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","Saving User Db");
-            }
-            File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(currentUser.getId()));
-            FileUtil.copyFileContent(databaseFile,userDatabaseFile);
-        }
-        if (BuildConfig.DEBUG) {
-            Log.d("UserSession","Clearing content of Default Db");
-        }
-        FileUtil.clearContent(databaseFile);
+
+    public void resetDb() {
+        startDb();
+        FlowManager.reset();
+        fetLifeApplication.deleteAllDatabase();
+        FlowManager.destroy();
+        logOutUser();
     }
 
-    private void deleteUserDb(String userId) {
-        if (BuildConfig.DEBUG) {
-            Log.d("UserSession","Deleting user Db");
-        }
-        File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(userId));
-        if (userDatabaseFile.exists()) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","User Db was found");
-            }
-            userDatabaseFile.delete();
-        } else {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","User Db does not exist");
-            }
-        }
+    private void deleteCurrentUserDb() {
+        fetLifeApplication.deleteDatabase();
+        FlowManager.reset();
+        FlowManager.destroy();
+//        if (BuildConfig.DEBUG) {
+//            Log.d("UserSession","Deleting user Db");
+//        }
+//        File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(userId));
+//        if (userDatabaseFile.exists()) {
+//            if (BuildConfig.DEBUG) {
+//                Log.d("UserSession","User Db was found");
+//            }
+//            userDatabaseFile.delete();
+//        } else {
+//            if (BuildConfig.DEBUG) {
+//                Log.d("UserSession","User Db does not exist");
+//            }
+//        }
     }
 
     private Member loadUserRecord(String userId) {
@@ -375,11 +357,6 @@ public class UserSessionManager {
         }
         userRecord.mergeSave();
         currentUser = userRecord;
-    }
-
-    private static String getDefaultDatabaseName() {
-        //DBFlow library uses .db suffix, but they mentioned they might going to change this in the future
-        return FetLifeDatabase.NAME + ".db";
     }
 
     private static String getUserDatabaseName(String userId) {

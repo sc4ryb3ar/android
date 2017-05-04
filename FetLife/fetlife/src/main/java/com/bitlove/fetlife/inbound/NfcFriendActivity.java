@@ -31,6 +31,13 @@ public class NfcFriendActivity extends Activity {
 
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
                 NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+        if (rawMsgs == null) {
+            //TODO add text resource.
+            Toast.makeText(context, "NFC communication failed. Please try it again.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         NdefMessage msg = (NdefMessage) rawMsgs[0];
 
         try {

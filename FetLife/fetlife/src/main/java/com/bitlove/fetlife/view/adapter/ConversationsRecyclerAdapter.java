@@ -27,11 +27,11 @@ public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Co
     }
 
     public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                //TODO: think of possibility of update only specific items instead of the whole list
+                loadItems();
                 notifyDataSetChanged();
             }
         });

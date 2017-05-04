@@ -121,7 +121,6 @@ public class Member extends BaseModel {
         return member;
     }
 
-
     public String getAbout() {
         return about;
     }
