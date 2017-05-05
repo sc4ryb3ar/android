@@ -29,6 +29,7 @@ import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
@@ -178,7 +179,7 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_conversations) {
             ConversationsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_friends) {
-            FriendsActivity.startActivity(menuActivity);
+            MembersActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_friendrequests) {
             FriendRequestsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_introduce) {

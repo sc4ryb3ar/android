@@ -589,5 +589,8 @@
     <string name="menu_updates">Check for updates</string>
     <string name="message_toast_checking_for_updates">Checking for updates...</string>
     <string name="message_toast_no_update_found">No update found\nYou are using the latest version</string>
+    <string name="title_activity_members">Members</string>
+    <string name="action_search">Search</string>
+    <string name="title_fragment_member_serach">Search</string>
 
 </resources>

@@ -97,9 +97,9 @@ public class FetLifeApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-        if (BuildConfig.DEBUG) {
-            Debug.waitForDebugger();
-        }
+//        if (BuildConfig.DEBUG) {
+//            Debug.waitForDebugger();
+//        }
 
         //Setup default instance and callbacks
         instance = this;

@@ -1,20 +1,10 @@
 package com.bitlove.fetlife.view.adapter;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -25,27 +15,29 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class RelationsRecyclerAdapter extends MembersRecyclerAdapter {
+public class SearchMemberRecyclerAdapter extends MembersRecyclerAdapter {
 
-    private final String memberId;
-    private final int relationType;
+    private String query;
 
-    public RelationsRecyclerAdapter(String memberId, int relationType, FetLifeApplication fetLifeApplication) {
+    public SearchMemberRecyclerAdapter(String query, FetLifeApplication fetLifeApplication) {
         super(fetLifeApplication);
-        this.memberId = memberId;
-        this.relationType = relationType;
+        this.query = query;
         loadItems();
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            List<RelationReference> relationReferences = new Select().from(RelationReference.class).where(RelationReference_Table.userId.is(memberId)).and(RelationReference_Table.relationType.is(relationType)).orderBy(OrderBy.fromProperty(RelationReference_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
-            List<String> relationIds = new ArrayList<>();
-            for (RelationReference relationReference : relationReferences) {
-                relationIds.add(relationReference.getId());
+            if (query == null || query.trim().length() == 0) {
+                itemList = new ArrayList<>();
+                return;
             }
-            itemList = new Select().from(Member.class).where(Member_Table.id.in(relationIds)).orderBy(OrderBy.fromProperty(Member_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
+
+            itemList = new Select().from(Member.class).where(Member_Table.nickname.like("%" + query + "%")).orderBy(OrderBy.fromProperty(Member_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
             final Collator coll = Collator.getInstance();
             coll.setStrength(Collator.IDENTICAL);
             Collections.sort(itemList, new Comparator<Member>() {

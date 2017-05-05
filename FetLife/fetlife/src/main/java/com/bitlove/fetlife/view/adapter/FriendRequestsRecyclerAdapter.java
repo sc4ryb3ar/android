@@ -39,8 +39,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         AtomicBoolean pending = new AtomicBoolean(true);
     }
 
-    private List<FriendRequest> friendRequestList;
-    private List<SharedProfile> friendSuggestionList;
+    private List<FriendRequest> friendRequestList = new ArrayList<>();
+    private List<SharedProfile> friendSuggestionList = new ArrayList<>();
 
     public FriendRequestsRecyclerAdapter(boolean clearItems) {
         if (clearItems) {
