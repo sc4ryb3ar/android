@@ -9,21 +9,19 @@ import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.hack.HackFlowManager;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
-import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
 import com.bitlove.fetlife.util.StringUtil;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -78,7 +76,7 @@ public class UserSessionManager {
     private void applyVersionUpgrade() {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
         int lastVersionUpgrade = mainPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
-        if (lastVersionUpgrade < 20622) {
+        if (lastVersionUpgrade < 20627) {
             SharedPreferences.Editor preferenceEditor = mainPreferences.edit();
             if (lastVersionUpgrade != 0) {
                 preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,lastVersionUpgrade);
@@ -266,21 +264,19 @@ public class UserSessionManager {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Starting Db");
         }
-        FlowManager.init(new FlowConfig.Builder(fetLifeApplication).build());
+        HackFlowManager.init(fetLifeApplication);
     }
-
 
     private void stopDb() {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Stopping Db");
         }
-        fetLifeApplication.setDbPathContent(null);
-        FlowManager.init(fetLifeApplication);
-//        FlowManager.destroy();
+        fetLifeApplication.setUserDbName(null);
+        HackFlowManager.close();
     }
 
     private void loadUserDb(String userId) {
-        fetLifeApplication.setDbPathContent(getUserDatabaseName(userId));
+        fetLifeApplication.setUserDbName(getUserDatabaseName(userId));
 //
 //        if (BuildConfig.DEBUG) {
 //            Log.d("UserSession","Loading Db for " + userId);
@@ -307,7 +303,6 @@ public class UserSessionManager {
 //            FileUtil.copyFileContent(userDatabaseFile,databaseFile);
 //        }
     }
-
 
     public void resetDb() {
         startDb();

@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.multidex.MultiDexApplication;
@@ -33,7 +32,6 @@ import com.onesignal.OneSignal;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 import io.fabric.sdk.android.Fabric;
@@ -64,7 +62,7 @@ public class FetLifeApplication extends MultiDexApplication {
     //****
 
     private static FetLifeApplication instance;
-    private String dbPathContent;
+    private String userDbName;
 
     public static FetLifeApplication getInstance() {
         return instance;
@@ -97,9 +95,9 @@ public class FetLifeApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-        if (BuildConfig.DEBUG) {
-            Debug.waitForDebugger();
-        }
+//        if (BuildConfig.DEBUG) {
+//            Debug.waitForDebugger();
+//        }
 
         //Setup default instance and callbacks
         instance = this;
@@ -191,19 +189,18 @@ public class FetLifeApplication extends MultiDexApplication {
         Fresco.initialize(this, imagePipelineConfig);
     }
 
-    public void setDbPathContent(String dbPathContent) {
-        this.dbPathContent = dbPathContent;
+    public void setUserDbName(String userDbName) {
+        this.userDbName = userDbName;
+    }
+
+    public String getUserDbName() {
+        return userDbName;
     }
 
     @Override
     public File getDatabasePath(String name) {
-        if (dbPathContent != null) {
-            File dbFile = new File(getFilesDir(),PREFIX_FILE_DB + dbPathContent);
-            return dbFile;
-        } else {
-            Crashlytics.log("Db Path content is not set");
-            return super.getDatabasePath(name);
-        }
+        File dbFile = new File(getFilesDir(),PREFIX_FILE_DB + name);
+        return dbFile;
     }
 
     public void deleteAllDatabase() {
@@ -230,7 +227,7 @@ public class FetLifeApplication extends MultiDexApplication {
     }
 
     public void deleteDatabase() {
-        File file = new File(getFilesDir(),dbPathContent);
+        File file = new File(getFilesDir(), userDbName);
         file.delete();
     }
 
