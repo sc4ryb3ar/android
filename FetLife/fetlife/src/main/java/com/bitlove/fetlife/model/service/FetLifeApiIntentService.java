@@ -109,6 +109,7 @@ public class FetLifeApiIntentService extends IntentService {
     //***
 
     public static final String ACTION_APICALL_MEMBER = "com.bitlove.fetlife.action.apicall.member";
+    public static final String ACTION_APICALL_SEARCH_MEMBER = "com.bitlove.fetlife.action.apicall.search_member";
     public static final String ACTION_APICALL_MEMBER_RELATIONS = "com.bitlove.fetlife.action.apicall.member_relations";
     public static final String ACTION_APICALL_MEMBER_STATUSES = "com.bitlove.fetlife.action.apicall.member_statuses";
     public static final String ACTION_APICALL_MEMBER_PICTURES = "com.bitlove.fetlife.action.apicall.member_pictures";
@@ -359,6 +360,9 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_CANCEL_UPLOAD_VIDEO_CHUNK:
                     cancelUploadVideoChunk(params);
                     result = 1;
+                    break;
+                case ACTION_APICALL_SEARCH_MEMBER:
+                    result = searchMember(params);
                     break;
                 case ACTION_APICALL_MEMBER:
                     result = getMember(params);
@@ -1250,6 +1254,24 @@ public class FetLifeApiIntentService extends IntentService {
             }
             member.save();
             return 1;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int searchMember(String... params) throws IOException {
+
+        final String queryString = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Response<List<Member>> relationsResponse = getFetLifeApi().searchMembers(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),queryString,limit,page).execute();
+        if (relationsResponse.isSuccess()) {
+            final List<Member> foundMembers = relationsResponse.body();
+            for (Member friendMember : foundMembers) {
+                friendMember.mergeSave();
+            }
+            return foundMembers.size();
         } else {
             return Integer.MIN_VALUE;
         }
