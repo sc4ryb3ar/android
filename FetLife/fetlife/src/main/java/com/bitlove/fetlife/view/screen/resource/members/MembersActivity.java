@@ -93,7 +93,7 @@ public class MembersActivity extends ResourceActivity {
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
 
             @Override
@@ -116,29 +116,42 @@ public class MembersActivity extends ResourceActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResourceListCallStarted(ServiceCallStartedEvent serviceCallStartedEvent) {
-//        if (isRelatedCall(serviceCallStartedEvent.getServiceCallAction(), serviceCallStartedEvent.getParams())) {
-//            showProgress();
-//        }
+        if (isRelatedCall(serviceCallStartedEvent.getServiceCallAction(), serviceCallStartedEvent.getParams())) {
+            showProgress();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-//        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.)) {
-//
-//        }
-//        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(),serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(),FetLifeApiIntentService.getInProgressActionParams())) {
-//            dismissProgress();
-//        }
+        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(),serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(),FetLifeApiIntentService.getInProgressActionParams())) {
+            dismissProgress();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
-//        if (isRelatedCall(serviceCallFailedEvent.getServiceCallAction(), serviceCallFailedEvent.getParams())) {
-//            dismissProgress();
-//        }
+        if (isRelatedCall(serviceCallFailedEvent.getServiceCallAction(), serviceCallFailedEvent.getParams())) {
+            dismissProgress();
+        }
     }
 
     private boolean isRelatedCall(String serviceCallAction, String[] params) {
+        Member currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        if (params != null && params.length > 0 && currentUser.getId() != null && !currentUser.getId().equals(params[0])) {
+            return false;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_SEARCH_MEMBER.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER.equals(serviceCallAction)) {
+            return true;
+        }
         return false;
     }
 

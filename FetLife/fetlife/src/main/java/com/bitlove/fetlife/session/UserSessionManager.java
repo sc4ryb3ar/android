@@ -86,6 +86,7 @@ public class UserSessionManager {
             } catch (Exception e) {
                 Crashlytics.logException(e);
             }
+            preferenceEditor.putBoolean(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_STATE,false);
             preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber()).apply();
         }
         //TODO: migrate user preferences

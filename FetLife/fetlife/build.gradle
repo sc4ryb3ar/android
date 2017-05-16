@@ -20,8 +20,8 @@ android {
         targetSdkVersion 25
         multiDexEnabled true
 
-        versionCode 20624
-        versionName "2.6.24"
+        versionCode 20701
+        versionName "2.7.1"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -61,6 +61,9 @@ android {
             buildConfigField "String", "CLIENT_SECRET", "\"47273306a9a3a3448a908748eff13a21a477cc46f6a3968b5c7d05611c4f2f26\""
             buildConfigField "String", "REDIRECT_URL", "\"urn:ietf:wg:oauth:2.0:oob\""
 
+            buildConfigField "String", "SECURE_API_SALT", "\"\""
+            buildConfigField "String", "SECURE_API_IV", "\"\""
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
@@ -80,6 +83,9 @@ android {
                 buildConfigField "String", "CLIENT_ID", releaseProperties['api.clientId']
                 buildConfigField "String", "CLIENT_SECRET", releaseProperties['api.clientSecret']
                 buildConfigField "String", "REDIRECT_URL", releaseProperties['api.redirectUrl']
+
+                buildConfigField "String", "SECURE_API_SALT", releaseProperties['secureapi.salt']
+                buildConfigField "String", "SECURE_API_IV", releaseProperties['secureapi.iv']
             }
 
             signingConfig signingConfigs.release

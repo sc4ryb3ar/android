@@ -5,16 +5,22 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
+import android.support.v7.app.AlertDialog;
+import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
@@ -85,9 +91,15 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ResponseBody;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AlgorithmParameters;
+import java.security.SecureRandom;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.KeySpec;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,7 +108,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import retrofit.Call;
 import retrofit.Response;
@@ -452,7 +472,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         Call<Token> tokenRefreshCall = getFetLifeApplication().getFetLifeService().getFetLifeApi().refreshToken(
                 BuildConfig.CLIENT_ID,
-                BuildConfig.CLIENT_SECRET,
+                getClientSecret(),
                 BuildConfig.REDIRECT_URL,
                 FetLifeService.GRANT_TYPE_TOKEN_REFRESH,
                 refreshToken
@@ -476,7 +496,7 @@ public class FetLifeApiIntentService extends IntentService {
     private int logonUser(String... params) throws IOException {
         Call<Token> tokenCall = getFetLifeApplication().getFetLifeService().getFetLifeApi().login(
                 BuildConfig.CLIENT_ID,
-                BuildConfig.CLIENT_SECRET,
+                getClientSecret(),
                 BuildConfig.REDIRECT_URL,
                 new AuthBody(params[0], params[1]));
 
@@ -1807,6 +1827,38 @@ public class FetLifeApiIntentService extends IntentService {
     private int loadLastSyncedPosition(SyncedPositionType syncedPositionType, String modifier) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFetLifeApplication());
         return preferences.getInt(syncedPositionType.toString() + modifier, -1);
+    }
+
+    private String getClientSecret() {
+
+        try {
+
+            String salt = BuildConfig.SECURE_API_SALT;
+            String iv = BuildConfig.SECURE_API_IV;
+            if (salt.isEmpty() || iv.isEmpty()) {
+                return BuildConfig.CLIENT_SECRET;
+            }
+
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+
+            byte[] cert = pInfo.signatures[0].toByteArray();
+            InputStream input = new ByteArrayInputStream(cert);
+            CertificateFactory cf = CertificateFactory.getInstance("X509");
+            X509Certificate c = (X509Certificate) cf.generateCertificate(input);
+
+            KeySpec spec = new PBEKeySpec(new String(c.getPublicKey().getEncoded()).toCharArray(), Base64.decode(salt,Base64.NO_WRAP), 65536, 128);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(Base64.decode(iv,Base64.NO_WRAP)));
+
+            return new String(cipher.doFinal(Base64.decode(BuildConfig.CLIENT_SECRET,Base64.NO_WRAP)));
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

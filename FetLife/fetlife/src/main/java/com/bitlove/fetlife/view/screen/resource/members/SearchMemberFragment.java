@@ -27,12 +27,12 @@ public class SearchMemberFragment extends ProfileFragment implements ResourceLis
 
     private static final String ARG_SEARCH_QUERY = "ARG_SEARCH_QUERY";
 
-    private String lastQueryString;
+    private String lastQueryString = "";
 
     public static SearchMemberFragment newInstance(String searchQuery) {
         SearchMemberFragment friendsFragment = new SearchMemberFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SEARCH_QUERY, searchQuery);
+        args.putString(ARG_SEARCH_QUERY, searchQuery != null ? searchQuery : "");
         friendsFragment.setArguments(args);
         return friendsFragment;
     }
@@ -55,6 +55,19 @@ public class SearchMemberFragment extends ProfileFragment implements ResourceLis
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.post(new Runnable() {
+            @Override
+            public void run() {
+                searchView.setQuery(lastQueryString,false);
+            }
+        });
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.activity_search, menu);
@@ -68,7 +81,6 @@ public class SearchMemberFragment extends ProfileFragment implements ResourceLis
                 refresh();
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -98,7 +110,9 @@ public class SearchMemberFragment extends ProfileFragment implements ResourceLis
 
     @Override
     public void startResourceCall(int pageCount, int requestedPage) {
-        FetLifeApiIntentService.startApiCall(getContext(),FetLifeApiIntentService.ACTION_APICALL_SEARCH_MEMBER, lastQueryString,Integer.toString(pageCount),Integer.toString(requestedPage));
+        if (lastQueryString != null && lastQueryString.trim().length() > 0) {
+            FetLifeApiIntentService.startApiCall(getContext(),FetLifeApiIntentService.ACTION_APICALL_SEARCH_MEMBER, lastQueryString,Integer.toString(pageCount),Integer.toString(requestedPage));
+        }
     }
 
     @Override

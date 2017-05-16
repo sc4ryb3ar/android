@@ -84,7 +84,7 @@ public class HackDatabaseDefinition extends DatabaseDefinition {
 
     @Override
     public boolean backupEnabled() {
-        return base.backupEnabled();
+        return false;
     }
 
     @Override

@@ -43,15 +43,15 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
     @Override
     protected void onResourceCreate(Bundle savedInstanceState) {
         super.onResourceCreate(savedInstanceState);
-
-        floatingActionButton.setVisibility(View.VISIBLE);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FriendsActivity.startActivity(ConversationsActivity.this, FriendsActivity.FriendListMode.NEW_CONVERSATION);
-            }
-        });
-        floatingActionButton.setContentDescription(getString(R.string.button_new_conversation_discription));
+//
+//        floatingActionButton.setVisibility(View.VISIBLE);
+//        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                FriendsActivity.startActivity(ConversationsActivity.this, FriendsActivity.FriendListMode.NEW_CONVERSATION);
+//            }
+//        });
+//        floatingActionButton.setContentDescription(getString(R.string.button_new_conversation_discription));
     }
 
     @Override

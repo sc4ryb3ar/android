@@ -16,8 +16,7 @@
   <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
   <string name="navigation_drawer_close">Navigationsleiste schließen</string>
 
-  <string name="menu_friends">Freunde</string>
-  <string name="menu_about">Über</string>
+  <string name="menu_members">Members</string>
   <string name="menu_friendrequests">Freundschaftsanfragen</string>
   <string name="menu_introduce">Mein Profil teilen</string>
   <string name="menu_notifications">Benachrichtigungen</string>
