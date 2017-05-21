@@ -2,6 +2,33 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.bitlove.fetlife.view.widget.BoldPreferenceCategory
+        android:title="@string/settings_category_notification_general">
+
+        <RingtonePreference
+            android:title="@string/settings_title_notification_ringtone"
+            android:key="@string/settings_key_notification_ringtone"
+            android:summary="@string/settings_summary_notification_ringtone"
+            android:defaultValue="content://settings/system/notification_sound"/>
+
+        <ListPreference
+            android:title="@string/settings_title_notification_color"
+            android:key="@string/settings_key_notification_color"
+            android:summary="@string/settings_summary_notification_color"
+            android:entries="@array/settings_entries_notification_color"
+            android:entryValues="@array/settings_values_notification_color"
+            android:defaultValue="@string/settings_default_notification_color"/>
+
+        <ListPreference
+            android:title="@string/settings_title_notification_vibrate"
+            android:key="@string/settings_key_notification_vibrate"
+            android:summary="@string/settings_summary_notification_vibrate"
+            android:entries="@array/settings_entries_notification_vibrate"
+            android:entryValues="@array/settings_values_notification_vibrate"
+            android:defaultValue="@string/settings_default_notification_vibrate"/>
+
+    </com.bitlove.fetlife.view.widget.BoldPreferenceCategory>
+
+    <com.bitlove.fetlife.view.widget.BoldPreferenceCategory
         android:title="@string/settings_category_notification_text">
 
         <CheckBoxPreference
@@ -14,7 +41,7 @@
 
     <com.bitlove.fetlife.view.widget.BoldPreferenceCategory
         android:title="@string/settings_category_notification_enablement">
-
+        
         <CheckBoxPreference
             android:key="@string/settings_key_notification_info_enabled"
             android:defaultValue="@string/settings_default_notification_info_enabled"

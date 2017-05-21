@@ -9,9 +9,14 @@ import com.bitlove.fetlife.notification.AnonymNotification;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.bitlove.fetlife.util.AppUtil;
+import com.crashlytics.android.Crashlytics;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationDisplayedResult;
 import com.onesignal.OSNotificationReceivedResult;
+
+import org.json.JSONObject;
+
+import java.lang.reflect.Field;
 
 /**
  * Extension point for One Signal notification library to override default display and onclick behaviour
@@ -20,6 +25,26 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
 
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult notification) {
+
+        //Workaround hack for OneSignal grouped notification.
+
+        try {
+            Field jsonField = NotificationExtenderService.class.getDeclaredField("currentJsonPayload");
+            jsonField.setAccessible(true);
+
+            JSONObject json = (JSONObject) jsonField.get(this);
+            json.put("sound",getFetLifeApplication().getUserSessionManager().getNotificationRingtone());
+
+            jsonField.set(this,json);
+
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
+
+
+
+        //end hack
+
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
 
         //Parse the incoming notification so we can handle it accordingly based on its type
@@ -41,6 +66,9 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
                     @Override
                     public NotificationCompat.Builder extend(NotificationCompat.Builder builder) {
                         // Sets the background notification color to Green on Android 5.0+ devices.
+                        builder.setSound(getFetLifeApplication().getUserSessionManager().getNotificationRingtone());
+                        builder.setVibrate(getFetLifeApplication().getUserSessionManager().getNotificationVibration());
+                        builder.setColor(getFetLifeApplication().getUserSessionManager().getNotificationColor());
                         return builder.setVisibility(Notification.VISIBILITY_PRIVATE);
                     }
                 };

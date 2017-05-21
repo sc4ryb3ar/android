@@ -2,6 +2,7 @@ package com.bitlove.fetlife.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -161,11 +162,6 @@ public class UserSessionManager {
 
     //*** User Preferences managing Calls
 
-    private static final String USER_PREF_KEY_GENERAL_PREFERNCES_APPLIED = "USER_PREF_KEY_GENERAL_PREFERNCES_APPLIED";
-    private static final String USER_PREF_KEY_NOTIFICATION_PREFERNCES_APPLIED = "USER_PREF_KEY_NOTIFICATION_PREFERNCES_APPLIED";
-    private static final String USER_PREF_KEY_PROFILE_PREFERNCES_APPLIED = "USER_PREF_KEY_PROFILE_PREFERNCES_APPLIED";
-    private static final String USER_PREF_KEY_FEED_PREFERENCES_APPLIED = "USER_PREF_KEY_FEED_PREFERENCES_APPLIED";
-
     private void loadUserPreferences(String userId) {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Loading user preferences for " + userId);
@@ -185,38 +181,11 @@ public class UserSessionManager {
             Log.d("UserSession","Loaded preferences contains " + activePreferences.getAll().size() + " preferences");
         }
 
-        if (!activePreferences.getBoolean(USER_PREF_KEY_GENERAL_PREFERNCES_APPLIED, false)) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","Applying default preferences for general preferences");
-            }
-            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.general_preferences, false);
-            activePreferences.edit().putBoolean(USER_PREF_KEY_GENERAL_PREFERNCES_APPLIED, true);
-        }
-
-        if (!activePreferences.getBoolean(USER_PREF_KEY_NOTIFICATION_PREFERNCES_APPLIED, false)) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","Applying default preferences for notification preferences");
-            }
-            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, true);
-            activePreferences.edit().putBoolean(USER_PREF_KEY_NOTIFICATION_PREFERNCES_APPLIED, true);
-        }
-
-        if (!activePreferences.getBoolean(USER_PREF_KEY_PROFILE_PREFERNCES_APPLIED, false)) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","Applying default preferences for profile preferences");
-            }
-            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.profile_preferences, true);
-            activePreferences.edit().putBoolean(USER_PREF_KEY_PROFILE_PREFERNCES_APPLIED, true);
-        }
-
-        if (!activePreferences.getBoolean(USER_PREF_KEY_FEED_PREFERENCES_APPLIED, false)) {
-            if (BuildConfig.DEBUG) {
-                Log.d("UserSession","Applying default preferences for feed preferences");
-            }
-            PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, true);
-            activePreferences.edit().putBoolean(USER_PREF_KEY_FEED_PREFERENCES_APPLIED, true);
-        }
-
+        //Note: modified values won't be reset
+        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.general_preferences, true);
+        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.notification_preferences, true);
+        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.profile_preferences, true);
+        PreferenceManager.setDefaultValues(fetLifeApplication, userPreferenceName, Context.MODE_PRIVATE, R.xml.feed_preferences, true);
     }
 
     private String getUserPreferenceName(String userId) {
@@ -257,6 +226,43 @@ public class UserSessionManager {
     private void setKeepUserSignedIn(boolean keepUserSignedIn) {
         boolean askAlwaysForPassword = !keepUserSignedIn;
         activePreferences.edit().putBoolean(PreferenceKeys.PREF_KEY_PASSWORD_ALWAYS, askAlwaysForPassword).apply();
+    }
+
+    public long[] getNotificationVibration() {
+        SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getActiveUserPreferences();
+        String vibrationSetting = sharedPreferences.getString(fetLifeApplication.getString(R.string.settings_key_notification_vibrate),null);
+        switch (vibrationSetting) {
+            case "off":
+                return new long[] {0,0};
+            case "short":
+                return new long[] {500,500};
+            case "long":
+                return new long[] {1000,1000};
+            default:
+                return null;
+        }
+    }
+
+    public int getNotificationColor() {
+        SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getActiveUserPreferences();
+        String colotSetting = sharedPreferences.getString(fetLifeApplication.getString(R.string.settings_key_notification_color),null);
+        switch (colotSetting) {
+            case "red":
+                return 256;
+            default:
+                return -1;
+        }
+    }
+
+    public Uri getNotificationRingtone() {
+        SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getActiveUserPreferences();
+        String ringToneSetting = sharedPreferences.getString(fetLifeApplication.getString(R.string.settings_key_notification_ringtone),null);
+        switch (ringToneSetting) {
+            case "none":
+                return null;
+            default:
+                return Uri.parse(ringToneSetting);
+        }
     }
 
     //User Database managing calls

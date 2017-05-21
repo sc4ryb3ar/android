@@ -230,6 +230,17 @@
     <string name="settings_category_profile_data">User Data Settings</string>
     <string name="settings_title_profile_clear_data">Clear local User Data</string>
     <string name="settings_summary_profile_clear_data">Clear all data related to current FetLife profile stored on this device. Also logs out you out and disable any further notifications sent to this user</string>
+
+    <string name="settings_category_notification_general">Notifications</string>
+    <string name="settings_title_notification_ringtone">Ringtone</string>
+    <string name="settings_summary_notification_ringtone">Select your Notification Ringtone.\nTo select a custom Ringtone first copy your ringtone to the Ringtones folder of your device.</string>
+
+    <string name="settings_title_notification_color">Notification Color</string>
+    <string name="settings_summary_notification_color">Color signal for notifications</string>
+
+    <string name="settings_title_notification_vibrate">Notification Vibration</string>
+    <string name="settings_summary_notification_vibrate">Vibration signal for notifications</string>
+
     <string name="title_delete_user_data_confirmation">Delete local User Data</string>
     <string name="message_delete_user_data_confirmation">Do you really want to delete all App local user data and logout?\nYou won\'t receive App notifications until you log in again</string>
     <string name="button_delete_user_data_confirmation">Yes</string>

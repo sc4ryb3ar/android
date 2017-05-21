@@ -3,6 +3,9 @@
     <string name="settings_default_general_vanilla">false</string>
     <string name="settings_default_general_feed_as_start">false</string>
     <string name="settings_default_notification_anonymtext">false</string>
+    <string name="settings_default_notification_ringtone">default</string>
+    <string name="settings_default_notification_color">none</string>
+    <string name="settings_default_notification_vibrate">default</string>
     <string name="settings_default_notification_messages_enabled">true</string>
     <string name="settings_default_notification_friendrequests_enabled">true</string>
     <string name="settings_default_notification_others_enabled">true</string>
