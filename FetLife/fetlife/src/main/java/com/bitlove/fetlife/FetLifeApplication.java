@@ -21,6 +21,7 @@ import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
+import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.crashlytics.android.Crashlytics;
@@ -220,26 +221,11 @@ public class FetLifeApplication extends MultiDexApplication {
         return dbFile;
     }
 
-    public void deleteAllDatabase() {
-        File[] files = getFilesDir().listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().startsWith(PREFIX_FILE_DB)) {
-                    file.delete();
-                }
-            }
-        }
-        File legacyDir = super.getDatabasePath(FetLifeDatabase.NAME + ".db");
-        if (legacyDir == null) {
-            return;
-        }
-        files = legacyDir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().endsWith(".db")) {
-                    file.delete();
-                }
-            }
+    public void clearCache() {
+        try {
+            FileUtil.deleteDir(getCacheDir());
+        } catch (Exception e) {
+            Crashlytics.logException(e);
         }
     }
 

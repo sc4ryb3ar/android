@@ -77,21 +77,17 @@ public class UserSessionManager {
     private void applyVersionUpgrade() {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
         int lastVersionUpgrade = mainPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
-        if (lastVersionUpgrade < 20627) {
+        if (lastVersionUpgrade < 20702) {
             SharedPreferences.Editor preferenceEditor = mainPreferences.edit();
             if (lastVersionUpgrade != 0) {
                 preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,lastVersionUpgrade);
             }
-            try {
-                resetDb();
-            } catch (Exception e) {
-                Crashlytics.logException(e);
-            }
+            fetLifeApplication.clearCache();
             preferenceEditor.putBoolean(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_STATE,false);
             preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber()).apply();
         }
         //TODO: migrate user preferences
-        //TODO: set default preference applience fr new default setting appliance
+        //TODO: set default preference appliance fr new default setting appliance
         //TODO: remove all previous DB file
         //TODO: remove previous user history
     }
@@ -309,14 +305,6 @@ public class UserSessionManager {
 //            }
 //            FileUtil.copyFileContent(userDatabaseFile,databaseFile);
 //        }
-    }
-
-    public void resetDb() {
-        startDb();
-        FlowManager.reset();
-        fetLifeApplication.deleteAllDatabase();
-        FlowManager.destroy();
-        logOutUser();
     }
 
     private void deleteCurrentUserDb() {
