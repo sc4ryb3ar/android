@@ -299,7 +299,6 @@ public class Member extends BaseModel {
         this.followable = followable;
     }
 
-
     public void mergeSave() {
         Member savedMember = Member.loadMember(id);
         if (savedMember != null) {
@@ -316,16 +315,6 @@ public class Member extends BaseModel {
         } else {
             save();
         }
-    }
-
-    @Override
-    public boolean save() {
-        Member savedMember = Member.loadMember(id);
-        if (savedMember != null) {
-            setAccessToken(savedMember.getAccessToken());
-            setRefreshToken(savedMember.getRefreshToken());
-        }
-        return super.save();
     }
 
     public String toJsonString() throws JsonProcessingException {
