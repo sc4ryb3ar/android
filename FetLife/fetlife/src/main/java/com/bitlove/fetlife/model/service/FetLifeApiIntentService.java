@@ -1826,27 +1826,26 @@ public class FetLifeApiIntentService extends IntentService {
     private String getClientSecret() {
 
         try {
-
-            String salt = BuildConfig.SECURE_API_SALT;
             String iv = BuildConfig.SECURE_API_IV;
-            if (salt.isEmpty() || iv.isEmpty()) {
+            if (iv.isEmpty()) {
                 return BuildConfig.CLIENT_SECRET;
             }
 
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-
             byte[] cert = pInfo.signatures[0].toByteArray();
             InputStream input = new ByteArrayInputStream(cert);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             X509Certificate c = (X509Certificate) cf.generateCertificate(input);
 
-            KeySpec spec = new PBEKeySpec(new String(c.getPublicKey().getEncoded()).toCharArray(), Base64.decode(salt,Base64.NO_WRAP), 65536, 128);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            byte[] key = new byte[16];
+            System.arraycopy(c.getPublicKey().getEncoded(),0,key,0,16);
+
+            SecretKey secret = new SecretKeySpec(key, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(Base64.decode(iv,Base64.NO_WRAP)));
+
+            input.close();
 
             return new String(cipher.doFinal(Base64.decode(BuildConfig.CLIENT_SECRET,Base64.NO_WRAP)));
 
