@@ -124,12 +124,6 @@ public class NotificationParser {
             case JSON_VALUE_TYPE_FRIEND_REQUEST:
             case JSON_VALUE_TYPE_LEGACY_FRIEND_REQUEST_CREATED:
                 return new FriendRequestNotification(title, message, launchUrl, additionalData, id, group);
-//            case "friendship_request_accepted":
-//                return new FriendAddedNotification(title, message, launchUrl, additionalData, id, group);
-//            case "friend_deleted":
-//                return new FriendDeletedNotification(title, message, launchUrl, additionalData, id, group);
-//            case "conversation_archived":
-//                return new ConversationArchivedNotification(message, launchUrl, additionalData, id, group);
             default:
                 if (title != null || message != null) {
                     return new InfoNotification(title, message, launchUrl, additionalData, id, group);
@@ -137,7 +131,30 @@ public class NotificationParser {
                     return new UnknownNotification(title, message, launchUrl, additionalData, id, group);
                 }
         }
+    }
 
+    public void clearNotification(String notificationType) {
+        switch (notificationType) {
+            case JSON_VALUE_TYPE_INFO:
+                InfoNotification.clearNotifications();
+                break;
+            case JSON_VALUE_TYPE_LEGACY_VERSION:
+                //Legacy, skip
+                break;
+            case JSON_VALUE_TYPE_LEGACY_CONVERSATION_CREATED:
+            case JSON_VALUE_TYPE_LEGACY_MESSAGE_CREATED:
+            case JSON_VALUE_TYPE_NEW_CONVERSATION:
+            case JSON_VALUE_TYPE_CONVERSATION_RESPONSE:
+                MessageNotification.clearNotifications();
+                break;
+            case JSON_VALUE_TYPE_FRIEND_REQUEST:
+            case JSON_VALUE_TYPE_LEGACY_FRIEND_REQUEST_CREATED:
+                FriendRequestNotification.clearNotifications();
+                break;
+            default:
+                AnonymNotification.clearNotifications();
+                break;
+        }
     }
 
 }

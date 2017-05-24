@@ -1,6 +1,7 @@
 package com.bitlove.fetlife.notification;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.bitlove.fetlife.FetLifeApplication;
@@ -8,6 +9,11 @@ import com.bitlove.fetlife.FetLifeApplication;
 import org.json.JSONObject;
 
 public abstract class OneSignalNotification {
+
+    public static final int NOTIFICATION_ID_ANONYM = 10;
+    public static final int NOTIFICATION_ID_FRIEND_REQUEST = 20;
+    public static final int NOTIFICATION_ID_MESSAGE = 30;
+    public static int NOTIFICATION_ID_INFO_INTERVAL = 100;
 
     protected final String id;
     protected final String title;
@@ -23,6 +29,12 @@ public abstract class OneSignalNotification {
         this.additionalData = additionalData;
         this.group = group;
         this.id = id;
+    }
+
+    public void display(FetLifeApplication fetLifeApplication) {}
+
+    Intent getIntent(Context context) {
+        return null;
     }
 
     public abstract boolean handle(FetLifeApplication fetLifeApplication);

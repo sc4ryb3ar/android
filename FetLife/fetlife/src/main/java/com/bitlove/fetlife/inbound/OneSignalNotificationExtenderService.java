@@ -22,6 +22,14 @@ import java.lang.reflect.Field;
  * Extension point for One Signal notification library to override default display and onclick behaviour
  */
 public class OneSignalNotificationExtenderService extends NotificationExtenderService {
+/*TODO
+    - real setting array handling color etc
+    - revise texts
+    - BackStack for messages Activity
+    - Correct icon for notifications
+    - Test all 4 types of notifications
+    - Merge common code into super class
+*/
 
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult notification) {
@@ -41,8 +49,6 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
             Crashlytics.logException(e);
         }
 
-
-
         //end hack
 
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
@@ -58,23 +64,25 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
         if (!handledInternally && oneSignalNotification.isEnabled(fetLifeApplication)) {
             //Check if the user use settings for hiding details of the notifications
             if (AppUtil.useAnonymNotifications(fetLifeApplication)) {
-                AnonymNotification anonymNotification = new AnonymNotification();
+                AnonymNotification anonymNotification = new AnonymNotification(oneSignalNotification);
                 anonymNotification.display(getFetLifeApplication());
             } else {
-                OverrideSettings overrideSettings = new OverrideSettings();
-                overrideSettings.extender = new NotificationCompat.Extender() {
-                    @Override
-                    public NotificationCompat.Builder extend(NotificationCompat.Builder builder) {
-                        // Sets the background notification color to Green on Android 5.0+ devices.
-                        builder.setSound(getFetLifeApplication().getUserSessionManager().getNotificationRingtone());
-                        builder.setVibrate(getFetLifeApplication().getUserSessionManager().getNotificationVibration());
-                        builder.setColor(getFetLifeApplication().getUserSessionManager().getNotificationColor());
-                        return builder.setVisibility(Notification.VISIBILITY_PRIVATE);
-                    }
-                };
-                OSNotificationDisplayedResult displayedResult  = displayNotification(overrideSettings);
-                //Let the notification react on notification displayed state so it can get the displayed notification identifier
-                oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.androidNotificationId);
+                oneSignalNotification.display(fetLifeApplication);
+//            } else {
+//                OverrideSettings overrideSettings = new OverrideSettings();
+//                overrideSettings.extender = new NotificationCompat.Extender() {
+//                    @Override
+//                    public NotificationCompat.Builder extend(NotificationCompat.Builder builder) {
+//                        // Sets the background notification color to Green on Android 5.0+ devices.
+//                        builder.setSound(getFetLifeApplication().getUserSessionManager().getNotificationRingtone());
+//                        builder.setVibrate(getFetLifeApplication().getUserSessionManager().getNotificationVibration());
+//                        builder.setColor(getFetLifeApplication().getUserSessionManager().getNotificationColor());
+//                        return builder.setVisibility(Notification.VISIBILITY_PRIVATE);
+//                    }
+//                };
+//                OSNotificationDisplayedResult displayedResult  = displayNotification(overrideSettings);
+//                //Let the notification react on notification displayed state so it can get the displayed notification identifier
+//                oneSignalNotification.onNotificationDisplayed(fetLifeApplication, displayedResult.androidNotificationId);
             }
         }
 

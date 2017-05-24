@@ -8,6 +8,7 @@
             android:title="@string/settings_title_notification_ringtone"
             android:key="@string/settings_key_notification_ringtone"
             android:summary="@string/settings_summary_notification_ringtone"
+            android:ringtoneType="notification"
             android:defaultValue="content://settings/system/notification_sound"/>
 
         <ListPreference

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated
 public class StackedNotification extends OneSignalNotification {
 
     protected List<OneSignalNotification> subNotificaions = new ArrayList<>();
@@ -87,7 +88,7 @@ public class StackedNotification extends OneSignalNotification {
         }
     }
 
-    private MessageNotification isSameConversations(List<OneSignalNotification> notifications) {
+    static MessageNotification isSameConversations(List<OneSignalNotification> notifications) {
         MessageNotification lastMatchingMessageNotification = null;
         for (OneSignalNotification notification : notifications) {
             if (!(notification instanceof MessageNotification)) {
