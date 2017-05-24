@@ -12,12 +12,12 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.FriendRequestScreenModelObject;
 import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile;
 import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;

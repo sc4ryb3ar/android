@@ -11,8 +11,8 @@ import android.widget.Toast;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.FriendSuggestionAddedEvent;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**

@@ -1,20 +1,10 @@
 package com.bitlove.fetlife.view.adapter;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;

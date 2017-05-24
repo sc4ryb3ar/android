@@ -26,7 +26,7 @@ public class FetLifeUncaughtExceptionHandler implements Thread.UncaughtException
                 throwable instanceof InvalidDBConfiguration ||
                 throwable instanceof IllegalStateException) {
             if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() != null) {
-                FetLifeApplication.getInstance().clearCache();
+                FetLifeApplication.getInstance().getUserSessionManager().resetAllUserDatabase();
             }
             Crashlytics.logException(new Exception("DB closed",throwable));
             //Duck exception DB is closed before background thread finished its job

@@ -2,7 +2,6 @@
 package com.bitlove.fetlife.model.pojos.fetlife.json;
 
 import com.bitlove.fetlife.model.pojos.fetlife.MediaVariantsInterface;
-import com.bitlove.fetlife.model.pojos.fetlife.json.PictureVariant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PictureVariants implements MediaVariantsInterface {

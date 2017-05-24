@@ -1,8 +1,8 @@
 package com.bitlove.fetlife.model.pojos.fetlife.db;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.FriendRequestScreenModelObject;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
