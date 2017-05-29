@@ -1,8 +1,6 @@
 package com.bitlove.fetlife.view.adapter;
 
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
 import com.raizlabs.android.dbflow.annotation.Collate;
@@ -13,7 +11,6 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 public class SearchMemberRecyclerAdapter extends MembersRecyclerAdapter {
 

@@ -24,11 +24,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MessageNotification extends OneSignalNotification {
 
-    private static List<OneSignalNotification> notifications = new ArrayList<OneSignalNotification>();
+    private static List<MessageNotification> notifications = new ArrayList<MessageNotification>();
 
     protected String conversationId;
     protected String nickname;
@@ -37,6 +39,7 @@ public class MessageNotification extends OneSignalNotification {
         super(title, message,launchUrl,additionalData,id, group);
         conversationId = additionalData.optString(NotificationParser.JSON_FIELD_STRING_CONVERSATIONID);
         nickname = additionalData.optString(NotificationParser.JSON_FIELD_STRING_NICKNAME);
+        notificationType = NotificationParser.JSON_VALUE_TYPE_CONVERSATION_RESPONSE;
     }
 
     @Override
@@ -74,53 +77,48 @@ public class MessageNotification extends OneSignalNotification {
         synchronized (notifications) {
             notifications.add(this);
 
-            Intent contentIntent = getIntent(fetLifeApplication);
+            NotificationCompat.Builder notificationBuilder = getDefaultNotificationBuilder(fetLifeApplication);
 
-            PendingIntent contentPendingIntent =
-                    PendingIntent.getActivity(
-                            fetLifeApplication,
-                            0,
-                            contentIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
+            List<String> messages = getGroupedMessageTexts(fetLifeApplication, notifications);
+            String title = notifications.size() == 1 ? fetLifeApplication.getString(R.string.noification_title_new_message) : fetLifeApplication.getString(R.string.noification_title_new_messages,notifications.size());
+            String firstMessage = messages.get(0);
 
-            NotificationCompat.Builder notificationBuilder =
-                    new NotificationCompat.Builder(fetLifeApplication)
-                            .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_vanilla))
-                            .setSmallIcon(R.drawable.ic_anonym_notif_small)
-                            .setContentTitle("Title")
-                            .setContentText("Text")
-                            .setAutoCancel(true)
-                            .setGroup(getClass().getSimpleName())
-                            .setVisibility(Notification.VISIBILITY_SECRET)
-                            .setContentIntent(contentPendingIntent)
-                            .setVibrate(fetLifeApplication.getUserSessionManager().getNotificationVibration())
-                            .setColor(fetLifeApplication.getUserSessionManager().getNotificationColor())
-                            .setSound(fetLifeApplication.getUserSessionManager().getNotificationRingtone());
+            notificationBuilder.setGroup(group).setContentTitle(title).setContentText(firstMessage);
 
-            NotificationCompat.InboxStyle inboxStyle =
-                    new NotificationCompat.InboxStyle();
-            // Sets a title for the Inbox in expanded layout
-            inboxStyle.setBigContentTitle("Big Title");
-            inboxStyle.setSummaryText("Summary Text");
-            // Moves events into the expanded layout
-            for (int i=0; i < notifications.size(); i++) {
-                inboxStyle.addLine(notifications.get(i).message);
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            inboxStyle.setBigContentTitle(title);
+            //TODO: localization
+            inboxStyle.setSummaryText("…");
+            for (String message : messages) {
+                inboxStyle.addLine(message);
             }
-            // Moves the expanded layout object into the notification object.
             notificationBuilder.setStyle(inboxStyle);
 
-            // Sets an ID for the notification
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(fetLifeApplication);
             notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_MESSAGE, notificationBuilder.build());
         }
     }
 
     @Override
-     Intent getIntent(Context context) {
-        Intent intent = StackedNotification.isSameConversations(notifications) != null ? MessagesActivity.createIntent(context,conversationId,nickname,null,true) : ConversationsActivity.createIntent(context,true);
-        intent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,NotificationParser.JSON_VALUE_TYPE_CONVERSATION_RESPONSE);
-        return intent;
+    PendingIntent getPendingIntent(Context context) {
+        synchronized (notifications) {
+            if (getGroupedMessageTexts(FetLifeApplication.getInstance(),notifications).size() != 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                Intent contentIntent = MessagesActivity.createIntent(context, conversationId, nickname, null, true);
+                contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
+                return TaskStackBuilder.create(context).addNextIntent(ConversationsActivity.createIntent(context, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+            }
+        }
+
+        Intent contentIntent = ConversationsActivity.createIntent(context,true);
+        PendingIntent contentPendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        contentIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        return contentPendingIntent;
     }
 
     @Override
@@ -146,5 +144,24 @@ public class MessageNotification extends OneSignalNotification {
     @Override
     public String getAssociatedPreferenceKey(Context context) {
         return context.getString(R.string.settings_key_notification_messages_enabled);
+    }
+
+    private List<String> getGroupedMessageTexts(FetLifeApplication fetLifeApplication, List<MessageNotification> notifications) {
+        LinkedHashMap<String,Integer> userMessageGroups = new LinkedHashMap<>();
+        for (MessageNotification notification : notifications) {
+            Integer userMessageCount = userMessageGroups.get(notification.title);
+            if (userMessageCount == null) {
+                userMessageCount = 1;
+            } else {
+                userMessageCount++;
+            }
+            userMessageGroups.put(notification.title,userMessageCount);
+        }
+        List<String> messages = new ArrayList<>();
+        for (Map.Entry<String,Integer> userMessageGroup : userMessageGroups.entrySet()) {
+            messages.add(new Integer(1).equals(userMessageGroup.getValue()) ? fetLifeApplication.getString(R.string.noification_text_new_message,userMessageGroup.getKey()) : fetLifeApplication.getString(R.string.noification_text_new_messages,userMessageGroup.getValue(),userMessageGroup.getKey()));
+        }
+        Collections.reverse(messages);
+        return messages;
     }
 }

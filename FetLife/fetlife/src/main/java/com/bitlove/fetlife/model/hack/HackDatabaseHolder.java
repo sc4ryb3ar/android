@@ -15,7 +15,7 @@ public class HackDatabaseHolder extends DatabaseHolder {
 
     public HackDatabaseHolder() throws Exception {
         this.base = (DatabaseHolder) Class.forName("com.raizlabs.android.dbflow.config.GeneratedDatabaseHolder").newInstance();
-        this.databaseName = FetLifeApplication.getInstance().getUserDbName();
+        this.databaseName = FetLifeApplication.getInstance().getUserSessionManager().getUserDbName();
 
         Field baseField = DatabaseHolder.class.getDeclaredField("databaseDefinitionMap");
         baseField.setAccessible(true);

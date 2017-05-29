@@ -10,7 +10,10 @@
     <string name="settings_key_notification_friendrequests_enabled">notification_friendrequests_enabled</string>
     <string name="settings_key_notification_others_enabled">notification_others_enabled</string>
     <string name="settings_key_notification_info_enabled">notification_info_enabled</string>
-    <string name="settings_key_notification_prerelease_enabled">notification_info_enabled</string>
+    <string name="settings_key_notification_prerelease_enabled">notification_prerelease_enabled</string>
+    <string name="settings_key_notification_loves_enabled">notification_loves_enabled</string>
+    <string name="settings_key_notification_comments_enabled">notification_comments_enabled</string>
+    <string name="settings_key_notification_mentions_enabled">notification_mentions_enabled</string>
     <string name="settings_key_profile_password_always">preference_password_always</string>
     <string name="settings_key_profile_clear_data">profile_clear_user_data</string>
     <string name="settings_key_feed_auto_expand_like">settings_key_feed_auto_expand_like</string>

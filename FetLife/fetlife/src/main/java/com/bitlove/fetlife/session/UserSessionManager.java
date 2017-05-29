@@ -1,7 +1,9 @@
 package com.bitlove.fetlife.session;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -33,6 +35,7 @@ public class UserSessionManager {
 
     private Member currentUser;
     private SharedPreferences activePreferences;
+    private String userDbName;
 
     public UserSessionManager(FetLifeApplication fetLifeApplication) {
         this.fetLifeApplication = fetLifeApplication;
@@ -48,6 +51,9 @@ public class UserSessionManager {
         return activePreferences;
     }
 
+    public String getUserDbName() {
+        return userDbName;
+    }
 
     //*** Public State Change Calls
 
@@ -69,27 +75,32 @@ public class UserSessionManager {
             setupUserSession(lastLoggedInUserId);
         } else if (keepUserSignedIn()) {
             logInUser(lastLoggedInUserId, null);
-        } else {
-            activePreferences = null;
         }
     }
 
     private void applyVersionUpgrade() {
         SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
         int lastVersionUpgrade = mainPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
-        if (lastVersionUpgrade < 20702) {
-            SharedPreferences.Editor preferenceEditor = mainPreferences.edit();
-            if (lastVersionUpgrade != 0) {
-                preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,lastVersionUpgrade);
-            }
-            fetLifeApplication.clearCache();
-            preferenceEditor.putBoolean(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_STATE,false);
-            preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber()).apply();
+        if (lastVersionUpgrade < 20711) {
+            resetAllUserDatabase();
         }
-        //TODO: migrate user preferences
-        //TODO: set default preference appliance fr new default setting appliance
-        //TODO: remove all previous DB file
-        //TODO: remove previous user history
+    }
+
+    public void resetAllUserDatabase() {
+
+        fetLifeApplication.deleteAllDatabases();
+
+        SharedPreferences mainPreferences = PreferenceManager.getDefaultSharedPreferences(fetLifeApplication);
+        int lastVersionUpgrade = mainPreferences.getInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,0);
+        SharedPreferences.Editor preferenceEditor = mainPreferences.edit();
+        if (lastVersionUpgrade != 0) {
+            preferenceEditor.putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_NOTIFICATION,lastVersionUpgrade);
+        }
+        preferenceEditor
+                .putBoolean(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_STATE,false)
+                .putString(PreferenceKeys.MAIN_PREF_KEY_USER_SESSION_META_INFO, null)
+                .putInt(PreferenceKeys.MAIN_PREF_KEY_LAST_VERSION_UPGRADE,fetLifeApplication.getVersionNumber())
+                .apply();
     }
 
     public synchronized void onUserLogIn(Member loggedInUser, boolean autoLogin) {
@@ -138,7 +149,6 @@ public class UserSessionManager {
 
     private void logOutUser() {
         stopDb();
-        clearUserPreferences();
         setUserLoggedIn(false);
         currentUser = null;
     }
@@ -188,14 +198,6 @@ public class UserSessionManager {
         return "fetlife" + "_" + SecurityUtil.hash_sha256(userId) + ".pref";
     }
 
-    private void clearUserPreferences() {
-        if (BuildConfig.DEBUG) {
-            Log.d("UserSession","Clearing user preferences");
-        }
-        //Note: Preferences are already saved
-        activePreferences = null;
-    }
-
     private void deletedUserPreference(String userId) {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Deleting user preferences for user " + userId);
@@ -227,26 +229,36 @@ public class UserSessionManager {
     public long[] getNotificationVibration() {
         SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getActiveUserPreferences();
         String vibrationSetting = sharedPreferences.getString(fetLifeApplication.getString(R.string.settings_key_notification_vibrate),null);
-        switch (vibrationSetting) {
-            case "off":
-                return new long[] {0,0};
-            case "short":
-                return new long[] {500,500};
-            case "long":
-                return new long[] {1000,1000};
-            default:
-                return null;
+        if (fetLifeApplication.getString(R.string.settings_value_notification_vibration_off).equals(vibrationSetting)) {
+            return new long[]{0l};
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_vibration_short).equals(vibrationSetting)) {
+            return new long[] {1000,300};
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_vibration_long).equals(vibrationSetting)) {
+            return new long[] {1000,1000};
+        } else {
+            return null;
         }
     }
 
     public int getNotificationColor() {
         SharedPreferences sharedPreferences = fetLifeApplication.getUserSessionManager().getActiveUserPreferences();
-        String colotSetting = sharedPreferences.getString(fetLifeApplication.getString(R.string.settings_key_notification_color),null);
-        switch (colotSetting) {
-            case "red":
-                return 256;
-            default:
-                return -1;
+        String colorSetting = sharedPreferences.getString(fetLifeApplication.getString(R.string.settings_key_notification_color),null);
+        if (fetLifeApplication.getString(R.string.settings_value_notification_color_red).equals(colorSetting)) {
+            return Color.RED;
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_color_blue).equals(colorSetting)) {
+            return Color.BLUE;
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_color_cyan).equals(colorSetting)) {
+            return Color.CYAN;
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_color_green).equals(colorSetting)) {
+            return Color.GREEN;
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_color_magenta).equals(colorSetting)) {
+            return Color.MAGENTA;
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_color_white).equals(colorSetting)) {
+            return Color.WHITE;
+        } else if (fetLifeApplication.getString(R.string.settings_value_notification_color_yellow).equals(colorSetting)) {
+            return Color.YELLOW;
+        } else {
+            return Color.BLACK;
         }
     }
 
@@ -274,57 +286,18 @@ public class UserSessionManager {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Stopping Db");
         }
-        fetLifeApplication.setUserDbName(null);
+        userDbName = null;
         HackFlowManager.close();
     }
 
     private void loadUserDb(String userId) {
-        fetLifeApplication.setUserDbName(getUserDatabaseName(userId));
-//
-//        if (BuildConfig.DEBUG) {
-//            Log.d("UserSession","Loading Db for " + userId);
-//        }
-//        File databaseFile = fetLifeApplication.getDatabasePath(getDefaultDatabaseName());
-//        if (databaseFile == null || !databaseFile.exists()) {
-//            if (BuildConfig.DEBUG) {
-//                Log.e("UserSession","Default Db File was not found");
-//            }
-//            Crashlytics.logException(new Exception("Default Database File not found"));
-//            return;
-//        }
-//        File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(userId));
-//        if (!userDatabaseFile.exists()) {
-//            if (BuildConfig.DEBUG) {
-//                Log.d("UserSession","User Db File does not exist; Clearing Default Db");
-//            }
-//            FileUtil.clearContent(databaseFile);
-//            return;
-//        } else {
-//            if (BuildConfig.DEBUG) {
-//                Log.d("UserSession","User Db File found; Copying content to Default Db");
-//            }
-//            FileUtil.copyFileContent(userDatabaseFile,databaseFile);
-//        }
+        userDbName = getUserDatabaseName(userId);
     }
 
     private void deleteCurrentUserDb() {
-        fetLifeApplication.deleteDatabase();
+        fetLifeApplication.deleteDatabase(getUserDatabaseName(currentUser.getId()));
         FlowManager.reset();
         FlowManager.destroy();
-//        if (BuildConfig.DEBUG) {
-//            Log.d("UserSession","Deleting user Db");
-//        }
-//        File userDatabaseFile = new File(fetLifeApplication.getFilesDir(),getUserDatabaseName(userId));
-//        if (userDatabaseFile.exists()) {
-//            if (BuildConfig.DEBUG) {
-//                Log.d("UserSession","User Db was found");
-//            }
-//            userDatabaseFile.delete();
-//        } else {
-//            if (BuildConfig.DEBUG) {
-//                Log.d("UserSession","User Db does not exist");
-//            }
-//        }
     }
 
     private Member loadUserRecord(String userId) {
@@ -337,6 +310,8 @@ public class UserSessionManager {
                 Log.e("UserSession","User record could not be found");
             }
             Crashlytics.logException(new Exception("User record could not be found"));
+        } else {
+            Crashlytics.log("User notification:" + user.getNotificationToken());
         }
         return user;
     }
@@ -345,12 +320,13 @@ public class UserSessionManager {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Updating user record for user " + userRecord.getId());
         }
+        Crashlytics.log("User notification:" + userRecord.getNotificationToken());
         userRecord.mergeSave();
         currentUser = userRecord;
     }
 
     private static String getUserDatabaseName(String userId) {
-        return FetLifeDatabase.NAME + "_" + SecurityUtil.hash_sha256(userId) + ".db";
+        return FetLifeDatabase.NAME + "_" + SecurityUtil.hash_sha256(userId);
     }
 
     //*** User Session Meta Info managing calls

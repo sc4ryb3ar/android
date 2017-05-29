@@ -23,6 +23,7 @@ public class AnonymNotification {
 
     public AnonymNotification(OneSignalNotification oneSignalNotification) {
         this.oneSignalNotification = oneSignalNotification;
+        oneSignalNotification.setNotificationType(getClass().getSimpleName());
     }
 
     public static void clearNotifications() {
@@ -33,54 +34,24 @@ public class AnonymNotification {
 
     public void display(FetLifeApplication fetLifeApplication) {
         synchronized (notifications) {
+            notifications.add(this);
 
-        notifications.add(this);
+            NotificationCompat.Builder notificationBuilder = oneSignalNotification.getDefaultNotificationBuilder(fetLifeApplication);
 
-        Intent contentIntent = oneSignalNotification.getIntent(fetLifeApplication);
-        contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getClass().getSimpleName());
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_vanilla))
+                    .setSmallIcon(R.drawable.ic_anonym_notif_small)
+                    .setContentTitle(fetLifeApplication.getString(R.string.noification_title_new_one_or_more_notification))
+                    .setGroup(getClass().getSimpleName());
 
-        PendingIntent contentPendingIntent =
-                PendingIntent.getActivity(
-                        fetLifeApplication,
-                        0,
-                        contentIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
+            if (notifications.size() > 1) {
+                notificationBuilder.setContentText(fetLifeApplication.getString(R.string.noification_text_new_anonym_notifications, notifications.size()));
+            } else {
+                notificationBuilder.setContentText(fetLifeApplication.getString(R.string.noification_text_new_anonym_notification));
+            }
 
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(fetLifeApplication)
-                        .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_vanilla))
-                        .setSmallIcon(R.drawable.ic_anonym_notif_small)
-                        .setContentTitle(fetLifeApplication.getString(R.string.noification_title_new_one_or_more_notification))
-                        .setAutoCancel(true)
-                        .setGroup(getClass().getSimpleName())
-                        .setVisibility(Notification.VISIBILITY_SECRET)
-                        .setContentIntent(contentPendingIntent)
-                        .setVibrate(fetLifeApplication.getUserSessionManager().getNotificationVibration())
-                        .setColor(fetLifeApplication.getUserSessionManager().getNotificationColor())
-                        .setSound(fetLifeApplication.getUserSessionManager().getNotificationRingtone());
-
-        if (notifications.size() > 1) {
-            notificationBuilder.setContentText(fetLifeApplication.getString(R.string.noification_text_new_anonym_notifications, notifications.size()));
-        } else {
-            notificationBuilder.setContentText(fetLifeApplication.getString(R.string.noification_text_new_anonym_notification));
-        }
-
-//        NotificationCompat.InboxStyle inboxStyle =
-//                new NotificationCompat.InboxStyle();
-//        // Sets a title for the Inbox in expanded layout
-//        inboxStyle.setBigContentTitle("Title - Notification");
-//        inboxStyle.setSummaryText("You have " + notifications.size()+ " Notifications.");
-//        // Moves events into the expanded layout
-//        for (int i=0; i < notifications.size(); i++) {
-//            inboxStyle.addLine("Private Message");
-//        }
-//        // Moves the expanded layout object into the notification object.
-//        notificationBuilder.setStyle(inboxStyle);
-
-        // Sets an ID for the notification
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(fetLifeApplication);
-        notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_ANONYM, notificationBuilder.build());
+            // Sets an ID for the notification
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(fetLifeApplication);
+            notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_ANONYM, notificationBuilder.build());
         }
     }
 }

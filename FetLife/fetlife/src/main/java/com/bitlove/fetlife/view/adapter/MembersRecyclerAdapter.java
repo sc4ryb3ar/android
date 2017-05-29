@@ -10,19 +10,9 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.raizlabs.android.dbflow.annotation.Collate;
-import com.raizlabs.android.dbflow.sql.language.OrderBy;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class MembersRecyclerAdapter extends ResourceListRecyclerAdapter<Member, MemberViewHolder> {

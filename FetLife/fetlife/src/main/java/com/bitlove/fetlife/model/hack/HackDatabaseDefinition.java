@@ -2,7 +2,6 @@ package com.bitlove.fetlife.model.hack;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
-import com.raizlabs.android.dbflow.config.DatabaseHolder;
 import com.raizlabs.android.dbflow.sql.migration.Migration;
 import com.raizlabs.android.dbflow.structure.ModelAdapter;
 import com.raizlabs.android.dbflow.structure.ModelViewAdapter;

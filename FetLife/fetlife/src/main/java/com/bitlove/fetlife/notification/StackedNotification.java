@@ -37,27 +37,27 @@ public class StackedNotification extends OneSignalNotification {
 
     @Override
     public void onClick(FetLifeApplication fetLifeApplication) {
-        switch (group) {
-            case NotificationParser.JSON_VALUE_GROUP_LEGACY_FETLIFE:
-            case NotificationParser.JSON_VALUE_GROUP_INFO:
-                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
-                break;
-            case NotificationParser.JSON_VALUE_GROUP_LEGACY_MESSAGE:
-            case NotificationParser.JSON_VALUE_GROUP_FETLIFE_MESSAGE:
-                MessageNotification sampleMessageNotification = isSameConversations(subNotificaions);
-                if (sampleMessageNotification != null) {
-                    startMessageActivity(fetLifeApplication, sampleMessageNotification);
-                } else {
-                    ConversationsActivity.startActivity(fetLifeApplication, true);
-                }
-                break;
-            case "":
-                //Issue opened for OneSignal because of the missing grouping information
-                missingGroupFallBack(fetLifeApplication);
-                break;
-            default:
-                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
-        }
+//        switch (group) {
+//            case NotificationParser.JSON_VALUE_GROUP_LEGACY_FETLIFE:
+//            case NotificationParser.JSON_VALUE_GROUP_INFO:
+//                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
+//                break;
+//            case NotificationParser.JSON_VALUE_GROUP_LEGACY_MESSAGE:
+//            case NotificationParser.JSON_VALUE_GROUP_FETLIFE_MESSAGE:
+//                MessageNotification sampleMessageNotification = isSameConversations(subNotificaions);
+//                if (sampleMessageNotification != null) {
+//                    startMessageActivity(fetLifeApplication, sampleMessageNotification);
+//                } else {
+//                    ConversationsActivity.startActivity(fetLifeApplication, true);
+//                }
+//                break;
+//            case "":
+//                //Issue opened for OneSignal because of the missing grouping information
+//                missingGroupFallBack(fetLifeApplication);
+//                break;
+//            default:
+//                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
+//        }
     }
 
     @Override
@@ -66,17 +66,17 @@ public class StackedNotification extends OneSignalNotification {
     }
 
     private void missingGroupFallBack(FetLifeApplication fetLifeApplication) {
-        MessageNotification sampleMessageNotification = isSameConversations(getSubNotificaions());
-        if (sampleMessageNotification != null) {
-            startMessageActivity(fetLifeApplication, sampleMessageNotification);
-        } else {
-            OneSignalNotification firstNotification = subNotificaions.isEmpty() ? null : subNotificaions.get(0);
-            if (firstNotification != null && firstNotification instanceof MessageNotification) {
-                ConversationsActivity.startActivity(fetLifeApplication, true);
-            } else {
-                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
-            }
-        }
+//        MessageNotification sampleMessageNotification = isSameConversations(getSubNotificaions());
+//        if (sampleMessageNotification != null) {
+//            startMessageActivity(fetLifeApplication, sampleMessageNotification);
+//        } else {
+//            OneSignalNotification firstNotification = subNotificaions.isEmpty() ? null : subNotificaions.get(0);
+//            if (firstNotification != null && firstNotification instanceof MessageNotification) {
+//                ConversationsActivity.startActivity(fetLifeApplication, true);
+//            } else {
+//                NotificationHistoryActivity.startActivity(fetLifeApplication, true);
+//            }
+//        }
     }
 
     private void startMessageActivity(FetLifeApplication fetLifeApplication, MessageNotification sampleMessageNotification) {
@@ -88,21 +88,4 @@ public class StackedNotification extends OneSignalNotification {
         }
     }
 
-    static MessageNotification isSameConversations(List<OneSignalNotification> notifications) {
-        MessageNotification lastMatchingMessageNotification = null;
-        for (OneSignalNotification notification : notifications) {
-            if (!(notification instanceof MessageNotification)) {
-                return null;
-            }
-            if (lastMatchingMessageNotification == null) {
-                lastMatchingMessageNotification = (MessageNotification) notification;
-                continue;
-            }
-            String conversationId = ((MessageNotification) notification).conversationId;
-            if (!lastMatchingMessageNotification.conversationId.equals(conversationId)) {
-                return null;
-            }
-        }
-        return lastMatchingMessageNotification;
-    }
 }

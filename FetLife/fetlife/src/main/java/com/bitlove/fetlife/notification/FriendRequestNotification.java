@@ -11,7 +11,9 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 
 import org.json.JSONObject;
 
@@ -25,6 +27,7 @@ public class FriendRequestNotification extends OneSignalNotification {
 
     public FriendRequestNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
         super(title, message,launchUrl,additionalData,id,group);
+        notificationType = NotificationParser.JSON_VALUE_TYPE_FRIEND_REQUEST;
     }
 
     @Override
@@ -40,57 +43,47 @@ public class FriendRequestNotification extends OneSignalNotification {
 
     @Override
     public void display(FetLifeApplication fetLifeApplication) {
-
         synchronized (notifications) {
-        notifications.add(this);
+            notifications.add(this);
 
-        Intent contentIntent = getIntent(fetLifeApplication);
+            NotificationCompat.Builder notificationBuilder = getDefaultNotificationBuilder(fetLifeApplication);
+
+            String title = notifications.size() == 1 ? fetLifeApplication.getString(R.string.noification_title_new_friendrequest) : fetLifeApplication.getString(R.string.noification_title_new_friendrequests,notifications.size());
+            String firstMessage = notifications.get(0).message;
+
+            notificationBuilder.setGroup(group).setContentTitle(title).setContentText(firstMessage);
+
+            NotificationCompat.InboxStyle inboxStyle =
+                    new NotificationCompat.InboxStyle();
+            inboxStyle.setBigContentTitle(title);
+            //TODO: localization
+            inboxStyle.setSummaryText("…");
+            for (int i=0; i < notifications.size(); i++) {
+                FriendRequestNotification friendRequestNotification = notifications.get(i);
+                //TODO: localization
+                inboxStyle.addLine(friendRequestNotification.title + " " + friendRequestNotification.message);
+            }
+            notificationBuilder.setStyle(inboxStyle);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(fetLifeApplication);
+            notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_FRIEND_REQUEST, notificationBuilder.build());
+        }
+    }
+
+    @Override
+    PendingIntent getPendingIntent(Context context) {
+        Intent contentIntent = FriendRequestsActivity.createIntent(context,true);
+        contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
 
         PendingIntent contentPendingIntent =
                 PendingIntent.getActivity(
-                        fetLifeApplication,
+                        context,
                         0,
                         contentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(fetLifeApplication)
-                        .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_vanilla))
-                        .setSmallIcon(R.drawable.ic_anonym_notif_small)
-                        .setContentTitle("Title")
-                        .setContentText("Text")
-                        .setAutoCancel(true)
-                        .setGroup(getClass().getSimpleName())
-                        .setVisibility(Notification.VISIBILITY_SECRET)
-                        .setContentIntent(contentPendingIntent)
-                        .setVibrate(fetLifeApplication.getUserSessionManager().getNotificationVibration())
-                        .setColor(fetLifeApplication.getUserSessionManager().getNotificationColor())
-                        .setSound(fetLifeApplication.getUserSessionManager().getNotificationRingtone());
-
-        NotificationCompat.InboxStyle inboxStyle =
-                new NotificationCompat.InboxStyle();
-        // Sets a title for the Inbox in expanded layout
-        inboxStyle.setBigContentTitle("Big Title");
-        inboxStyle.setSummaryText("Summary Text");
-        // Moves events into the expanded layout
-        for (int i=0; i < notifications.size(); i++) {
-            inboxStyle.addLine(notifications.get(i).message);
-        }
-        // Moves the expanded layout object into the notification object.
-        notificationBuilder.setStyle(inboxStyle);
-
-        // Sets an ID for the notification
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(fetLifeApplication);
-        notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_FRIEND_REQUEST, notificationBuilder.build());
-        }
-    }
-
-    @Override
-    Intent getIntent(Context context) {
-        Intent intent = FriendRequestsActivity.createIntent(context,true);
-        intent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,NotificationParser.JSON_VALUE_TYPE_FRIEND_REQUEST);
-        return intent;
+        return contentPendingIntent;
     }
 
     @Override

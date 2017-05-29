@@ -215,6 +215,12 @@
     <string name="settings_summary_notification_prerelease_enabled">Enable Notifications about new preview releases</string>
     <string name="settings_title_notification_others_enabled">Other Notifications</string>
     <string name="settings_summary_notification_others_enabled">Enable Notifications for any other event</string>
+    <string name="settings_title_notification_loves_enabled">Love Notifications</string>
+    <string name="settings_summary_notification_loves_enabled">Enable Notifications about your stuff Loved by other users</string>
+    <string name="settings_title_notification_comments_enabled">Comment Notifications</string>
+    <string name="settings_summary_notification_comments_enabled">Enable Notifications about your stuff commented by other users</string>
+    <string name="settings_title_notification_mentions_enabled">Mention Notifications</string>
+    <string name="settings_summary_notification_mentions_enabled">Enable Notifications about you got mentioned by other users</string>
 
 
     <string name="settings_title_notification_info_enabled">Info Notifications</string>
@@ -617,5 +623,17 @@
     <string name="title_activity_members">Members</string>
     <string name="action_search">Search</string>
     <string name="title_fragment_member_serach">Search</string>
+    <string name="noification_title_new_message">New private message</string>
+    <string name="noification_title_new_messages">%1$d new private messages</string>
+    <string name="noification_text_new_message">New message from %1$s</string>
+    <string name="noification_text_new_messages">%1$d messages from %2$s</string>
+    <string name="noification_title_new_friendrequest">New Friend Request</string>
+    <string name="noification_title_new_friendrequests">%1$d new Friend Requests</string>
+    <string name="noification_text_new_love">%1$s loved your stuff</string>
+    <string name="noification_text_new_comment">%1$s commented your stuff</string>
+    <string name="noification_text_new_mention">%1$s mentioned you</string>
+    <string name="noification_title_new_loves">You received new loves</string>
+    <string name="noification_title_new_comments">You received new comments</string>
+    <string name="noification_title_new_mentions">You were mentioned</string>
 
 </resources>

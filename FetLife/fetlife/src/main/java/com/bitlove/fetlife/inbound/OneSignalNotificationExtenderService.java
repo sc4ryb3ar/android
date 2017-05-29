@@ -23,33 +23,19 @@ import java.lang.reflect.Field;
  */
 public class OneSignalNotificationExtenderService extends NotificationExtenderService {
 /*TODO
-    - real setting array handling color etc
     - revise texts
+
+    - Test all 4 types of notifications
+
     - BackStack for messages Activity
     - Correct icon for notifications
-    - Test all 4 types of notifications
     - Merge common code into super class
+    - real setting array handling color etc
+
 */
 
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult notification) {
-
-        //Workaround hack for OneSignal grouped notification.
-
-        try {
-            Field jsonField = NotificationExtenderService.class.getDeclaredField("currentJsonPayload");
-            jsonField.setAccessible(true);
-
-            JSONObject json = (JSONObject) jsonField.get(this);
-            json.put("sound",getFetLifeApplication().getUserSessionManager().getNotificationRingtone());
-
-            jsonField.set(this,json);
-
-        } catch (Exception e) {
-            Crashlytics.logException(e);
-        }
-
-        //end hack
 
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
 

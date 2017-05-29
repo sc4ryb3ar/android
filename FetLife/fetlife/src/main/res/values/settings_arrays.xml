@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="settings_value_notification_color_none">none</string>
+    <string name="settings_value_notification_color_white">white</string>
+    <string name="settings_value_notification_color_red">red</string>
+    <string name="settings_value_notification_color_yellow">yellow</string>
+    <string name="settings_value_notification_color_green">green</string>
+    <string name="settings_value_notification_color_cyan">cyan</string>
+    <string name="settings_value_notification_color_blue">blue</string>
+    <string name="settings_value_notification_color_magenta">magenta</string>
+
+    <string name="settings_value_notification_vibration_default">default</string>
+    <string name="settings_value_notification_vibration_off">off</string>
+    <string name="settings_value_notification_vibration_short">short</string>
+    <string name="settings_value_notification_vibration_long">long</string>
+
     <string-array name="settings_entries_notification_color">
         <item>None</item>
         <item>White</item>
@@ -9,18 +23,17 @@
         <item>Green</item>
         <item>Cyan</item>
         <item>Blue</item>
-        <item>Purple</item>
+        <item>Magenta</item>
     </string-array>
 
     <string-array name="settings_values_notification_color">
-        <item>none</item>
-        <item>white</item>
-        <item>red</item>
-        <item>yellow</item>
-        <item>green</item>
-        <item>cyan</item>
-        <item>blue</item>
-        <item>purple</item>
+        <item>@string/settings_value_notification_color_none</item>
+        <item>@string/settings_value_notification_color_white</item>
+        <item>@string/settings_value_notification_color_red</item>
+        <item>@string/settings_value_notification_color_yellow</item>
+        <item>@string/settings_value_notification_color_green</item>
+        <item>@string/settings_value_notification_color_cyan</item>
+        <item>@string/settings_value_notification_color_magenta</item>
     </string-array>
 
     <string-array name="settings_entries_notification_vibrate">
@@ -31,10 +44,10 @@
     </string-array>
 
     <string-array name="settings_values_notification_vibrate">
-        <item>default</item>
-        <item>off</item>
-        <item>short</item>
-        <item>long</item>
+        <item>@string/settings_value_notification_vibration_default</item>
+        <item>@string/settings_value_notification_vibration_off</item>
+        <item>@string/settings_value_notification_vibration_short</item>
+        <item>@string/settings_value_notification_vibration_long</item>
     </string-array>
 
 </resources>

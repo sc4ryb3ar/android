@@ -62,6 +62,24 @@
             android:summary="@string/settings_summary_notification_friendrequests_enabled"/>
 
         <CheckBoxPreference
+            android:key="@string/settings_key_notification_loves_enabled"
+            android:defaultValue="@string/settings_default_notification_loves_enabled"
+            android:title="@string/settings_title_notification_loves_enabled"
+            android:summary="@string/settings_summary_notification_loves_enabled"/>
+
+        <CheckBoxPreference
+            android:key="@string/settings_key_notification_comments_enabled"
+            android:defaultValue="@string/settings_default_notification_comments_enabled"
+            android:title="@string/settings_title_notification_comments_enabled"
+            android:summary="@string/settings_summary_notification_comments_enabled"/>
+
+        <CheckBoxPreference
+            android:key="@string/settings_key_notification_mentions_enabled"
+            android:defaultValue="@string/settings_default_notification_mentions_enabled"
+            android:title="@string/settings_title_notification_mentions_enabled"
+            android:summary="@string/settings_summary_notification_mentions_enabled"/>
+
+        <CheckBoxPreference
             android:key="@string/settings_key_notification_prerelease_enabled"
             android:defaultValue="@string/settings_default_notification_prerelease_enabled"
             android:title="@string/settings_title_notification_prerelease_enabled"

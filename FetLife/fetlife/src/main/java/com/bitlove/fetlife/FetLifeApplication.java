@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.multidex.MultiDexApplication;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
@@ -35,21 +34,17 @@ import com.onesignal.OneSignal;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.security.AlgorithmParameters;
-import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.KeySpec;
-import java.util.Random;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import io.fabric.sdk.android.Fabric;
@@ -80,7 +75,6 @@ public class FetLifeApplication extends MultiDexApplication {
     //****
 
     private static FetLifeApplication instance;
-    private String userDbName;
 
     public static FetLifeApplication getInstance() {
         return instance;
@@ -205,33 +199,6 @@ public class FetLifeApplication extends MultiDexApplication {
         }).build();
 
         Fresco.initialize(this, imagePipelineConfig);
-    }
-
-    public void setUserDbName(String userDbName) {
-        this.userDbName = userDbName;
-    }
-
-    public String getUserDbName() {
-        return userDbName;
-    }
-
-    @Override
-    public File getDatabasePath(String name) {
-        File dbFile = new File(getFilesDir(),PREFIX_FILE_DB + name);
-        return dbFile;
-    }
-
-    public void clearCache() {
-        try {
-            FileUtil.deleteDir(getCacheDir());
-        } catch (Exception e) {
-            Crashlytics.logException(e);
-        }
-    }
-
-    public void deleteDatabase() {
-        File file = new File(getFilesDir(), userDbName);
-        file.delete();
     }
 
     static class FrescoTokenLessCacheKey implements CacheKey {
@@ -360,6 +327,14 @@ public class FetLifeApplication extends MultiDexApplication {
     //****
     //Version upgrade method to ensure backward compatibility
     //****
+
+    public void deleteAllDatabases() {
+        try {
+            FileUtil.deleteDir(getDatabasePath(FetLifeDatabase.NAME + ".db").getParentFile());
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
+    }
 
     //****
     //Class to help monitoring Activity State

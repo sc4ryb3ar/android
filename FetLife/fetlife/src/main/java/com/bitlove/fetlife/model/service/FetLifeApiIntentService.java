@@ -13,14 +13,11 @@ import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
-import android.support.v7.app.AlertDialog;
 import android.util.Base64;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
@@ -46,12 +43,6 @@ import com.bitlove.fetlife.model.api.FetLifeApi;
 import com.bitlove.fetlife.model.api.FetLifeMultipartUploadApi;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
@@ -67,6 +58,12 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
@@ -95,8 +92,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.AlgorithmParameters;
-import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.KeySpec;
@@ -108,7 +103,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import javax.crypto.Cipher;
@@ -1832,27 +1826,26 @@ public class FetLifeApiIntentService extends IntentService {
     private String getClientSecret() {
 
         try {
-
-            String salt = BuildConfig.SECURE_API_SALT;
             String iv = BuildConfig.SECURE_API_IV;
-            if (salt.isEmpty() || iv.isEmpty()) {
+            if (iv.isEmpty()) {
                 return BuildConfig.CLIENT_SECRET;
             }
 
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-
             byte[] cert = pInfo.signatures[0].toByteArray();
             InputStream input = new ByteArrayInputStream(cert);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             X509Certificate c = (X509Certificate) cf.generateCertificate(input);
 
-            KeySpec spec = new PBEKeySpec(new String(c.getPublicKey().getEncoded()).toCharArray(), Base64.decode(salt,Base64.NO_WRAP), 65536, 128);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            byte[] key = new byte[16];
+            System.arraycopy(c.getPublicKey().getEncoded(),0,key,0,16);
+
+            SecretKey secret = new SecretKeySpec(key, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(Base64.decode(iv,Base64.NO_WRAP)));
+
+            input.close();
 
             return new String(cipher.doFinal(Base64.decode(BuildConfig.CLIENT_SECRET,Base64.NO_WRAP)));
 
