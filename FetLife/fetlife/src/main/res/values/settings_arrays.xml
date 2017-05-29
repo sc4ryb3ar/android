@@ -33,6 +33,7 @@
         <item>@string/settings_value_notification_color_yellow</item>
         <item>@string/settings_value_notification_color_green</item>
         <item>@string/settings_value_notification_color_cyan</item>
+        <item>@string/settings_value_notification_color_blue</item>
         <item>@string/settings_value_notification_color_magenta</item>
     </string-array>
 
