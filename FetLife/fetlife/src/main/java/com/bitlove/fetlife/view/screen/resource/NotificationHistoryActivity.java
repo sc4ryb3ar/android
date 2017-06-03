@@ -11,6 +11,11 @@ import android.view.MenuItem;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NotificationReceivedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
+import com.bitlove.fetlife.notification.AnonymNotification;
+import com.bitlove.fetlife.notification.CommentNotification;
+import com.bitlove.fetlife.notification.InfoNotification;
+import com.bitlove.fetlife.notification.LoveNotification;
+import com.bitlove.fetlife.notification.MentionNotification;
 import com.bitlove.fetlife.view.adapter.NotificationHistoryRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
@@ -47,6 +52,16 @@ public class NotificationHistoryActivity extends ResourceListActivity<Notificati
         swipeRefreshLayout.setEnabled(false);
 
         showToast(getResources().getString(R.string.notificationhistory_activity_hint));
+    }
+
+    @Override
+    protected void onResourceStart() {
+        super.onResourceStart();
+        CommentNotification.clearNotifications();
+        InfoNotification.clearNotifications();
+        LoveNotification.clearNotifications();
+        MentionNotification.clearNotifications();
+        AnonymNotification.clearNotifications();
     }
 
     @Override

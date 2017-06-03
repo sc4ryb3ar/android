@@ -161,6 +161,24 @@ public class FetLifeApplication extends MultiDexApplication {
     }
 
     private void initFrescoImageLibrary() {
+
+//        final OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
+//                .addInterceptor(new Interceptor() {
+//                    @Override
+//                    public Response intercept(Chain chain) throws IOException {
+//                        if (!chain.request().url().host().equals("myhost.com")) {
+//                            return chain.proceed(chain.request());
+//                        }
+//                        final Request.Builder requestBuilder = chain.request().newBuilder();
+//                        requestBuilder.addHeader("authtoken", "foobar42");
+//                        return chain.proceed(requestBuilder.build());
+//                    }
+//                });
+//        final ImagePipelineConfig imagePipelineConfig = OkHttpImagePipelineConfigFactory.newBuilder(
+//                getApplicationContext(),
+//                okHttpClientBuilder.build())
+//                .build();
+
         ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this).setCacheKeyFactory(new CacheKeyFactory() {
             @Override
             public CacheKey getBitmapCacheKey(ImageRequest request, Object callerContext) {
