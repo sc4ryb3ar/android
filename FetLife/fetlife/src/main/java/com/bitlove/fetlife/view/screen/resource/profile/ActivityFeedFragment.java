@@ -79,7 +79,11 @@ public class ActivityFeedFragment extends ProfileFragment implements FeedRecycle
             }
         }
         if (feedStoryType == Story.FeedStoryType.LIKE_CREATED && feedEvent.getSecondaryTarget().getVideo() != null) {
-            Uri uri = Uri.parse(feedEvent.getSecondaryTarget().getVideo().getVideoUrl());
+            String videoUrl = feedEvent.getSecondaryTarget().getVideo().getVideoUrl();
+            if (videoUrl == null || videoUrl.endsWith("null")) {
+                return;
+            }
+            Uri uri = Uri.parse(videoUrl);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             intent.setDataAndType(uri, "video/*");
             startActivity(intent);

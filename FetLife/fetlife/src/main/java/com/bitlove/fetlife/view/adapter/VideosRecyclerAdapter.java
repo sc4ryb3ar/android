@@ -71,7 +71,11 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideoViewHolder>
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse(video.getVideoUrl());
+                String videoUrl = video.getVideoUrl();
+                if (videoUrl == null || videoUrl.endsWith("null")) {
+                    return;
+                }
+                Uri uri = Uri.parse(videoUrl);
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 intent.setDataAndType(uri, "video/*");
                 holder.imageView.getContext().startActivity(intent);

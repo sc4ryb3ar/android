@@ -26,6 +26,7 @@ import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.cache.CacheKeyFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -34,6 +35,7 @@ import com.onesignal.OneSignal;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.security.AlgorithmParameters;
@@ -48,6 +50,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import io.fabric.sdk.android.Fabric;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Main Application class. The lifecycle of the object of this class is the same as the App itself
@@ -162,24 +168,20 @@ public class FetLifeApplication extends MultiDexApplication {
 
     private void initFrescoImageLibrary() {
 
-//        final OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
-//                .addInterceptor(new Interceptor() {
-//                    @Override
-//                    public Response intercept(Chain chain) throws IOException {
-//                        if (!chain.request().url().host().equals("myhost.com")) {
-//                            return chain.proceed(chain.request());
-//                        }
-//                        final Request.Builder requestBuilder = chain.request().newBuilder();
-//                        requestBuilder.addHeader("authtoken", "foobar42");
-//                        return chain.proceed(requestBuilder.build());
-//                    }
-//                });
-//        final ImagePipelineConfig imagePipelineConfig = OkHttpImagePipelineConfigFactory.newBuilder(
-//                getApplicationContext(),
-//                okHttpClientBuilder.build())
-//                .build();
+        final OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        if (!chain.request().url().host().endsWith("fetlife.com")) {
+                            return chain.proceed(chain.request());
+                        }
+                        final Request.Builder requestBuilder = chain.request().newBuilder();
+                        requestBuilder.addHeader("Referer", "fetlife.com");
+                        return chain.proceed(requestBuilder.build());
+                    }
+                });
 
-        ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this).setCacheKeyFactory(new CacheKeyFactory() {
+        ImagePipelineConfig imagePipelineConfig = OkHttpImagePipelineConfigFactory.newBuilder(this,okHttpClientBuilder.build()).setCacheKeyFactory(new CacheKeyFactory() {
             @Override
             public CacheKey getBitmapCacheKey(ImageRequest request, Object callerContext) {
                 Uri uri = request.getSourceUri();
@@ -196,6 +198,11 @@ public class FetLifeApplication extends MultiDexApplication {
             public CacheKey getEncodedCacheKey(ImageRequest request, Object callerContext) {
                 Uri uri = request.getSourceUri();
                 return getCacheKey(uri);
+            }
+
+            @Override
+            public CacheKey getEncodedCacheKey(ImageRequest request, Uri sourceUri, Object callerContext) {
+                return getCacheKey(sourceUri);
             }
 
             private CacheKey getCacheKey(Uri uri) {
@@ -235,6 +242,11 @@ public class FetLifeApplication extends MultiDexApplication {
         @Override
         public boolean containsUri(Uri uri) {
             return uri.toString().startsWith(cacheUrl);
+        }
+
+        @Override
+        public String getUriString() {
+            return cacheUrl;
         }
 
         @Override
