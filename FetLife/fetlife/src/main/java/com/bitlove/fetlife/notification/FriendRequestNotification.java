@@ -51,7 +51,7 @@ public class FriendRequestNotification extends OneSignalNotification {
             String title = notifications.size() == 1 ? fetLifeApplication.getString(R.string.noification_title_new_friendrequest) : fetLifeApplication.getString(R.string.noification_title_new_friendrequests,notifications.size());
             String firstMessage = notifications.get(0).message;
 
-            notificationBuilder.setGroup(group).setContentTitle(title).setContentText(firstMessage);
+            notificationBuilder.setContentTitle(title).setContentText(firstMessage);
 
             NotificationCompat.InboxStyle inboxStyle =
                     new NotificationCompat.InboxStyle();

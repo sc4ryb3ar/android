@@ -40,8 +40,7 @@ public class AnonymNotification {
 
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(),R.mipmap.app_icon_vanilla))
                     .setSmallIcon(R.drawable.ic_anonym_notif_small)
-                    .setContentTitle(fetLifeApplication.getString(R.string.noification_title_new_one_or_more_notification))
-                    .setGroup(getClass().getSimpleName());
+                    .setContentTitle(fetLifeApplication.getString(R.string.noification_title_new_one_or_more_notification));
 
             if (notifications.size() > 1) {
                 notificationBuilder.setContentText(fetLifeApplication.getString(R.string.noification_text_new_anonym_notifications, notifications.size()));
