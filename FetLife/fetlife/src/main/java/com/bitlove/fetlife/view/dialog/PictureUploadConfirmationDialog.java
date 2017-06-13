@@ -37,6 +37,9 @@ public class PictureUploadConfirmationDialog extends DialogFragment {
     }
 
     public static void show(Activity activity, String mediaUri, boolean isVideo, boolean deleteAfterUpload) {
+        if (activity.isFinishing()) {
+            return;
+        }
         FragmentTransaction ft = activity.getFragmentManager().beginTransaction();
         Fragment prev = activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (prev != null) {
@@ -95,6 +98,12 @@ public class PictureUploadConfirmationDialog extends DialogFragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 
     @Override

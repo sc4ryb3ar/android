@@ -1,6 +1,6 @@
 package com.bitlove.fetlife.util;
 
-import com.bitlove.fetlife.model.pojos.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.UnsupportedEncodingException;

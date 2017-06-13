@@ -3,34 +3,25 @@
 package com.bitlove.fetlife.view.adapter.feed;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.net.Uri;
-import android.text.Html;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.event.ServiceCallFailedEvent;
-import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
-import com.bitlove.fetlife.model.pojos.FeedEvent;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Picture;
-import com.bitlove.fetlife.model.pojos.Story;
-import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.util.MaterialIcons;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
+import com.bitlove.fetlife.util.ViewUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.malinskiy.materialicons.widget.IconTextView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,10 +160,10 @@ public class FeedAdapterBinder {
                             //TODO: reuse the same imageclick code instead of having it several places in this class
                             LayoutInflater inflater = LayoutInflater.from(v.getContext());
                             final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                            setOverlayContent(overlay, picture, onItemClickListener, feedItemResourceHelper);
+                            setOverlayContent(overlay, picture, onItemClickListener);
                             new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                         } else {
-                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
+                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
                         }
                     }
                 });
@@ -211,7 +202,7 @@ public class FeedAdapterBinder {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent));
+                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
                 }
             });
 
@@ -235,7 +226,7 @@ public class FeedAdapterBinder {
                     public void onClick(View v) {
                         LayoutInflater inflater = LayoutInflater.from(v.getContext());
                         final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                        setOverlayContent(overlay, picture, onItemClickListener, feedItemResourceHelper);
+                        setOverlayContent(overlay, picture, onItemClickListener);
                         new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                     }
                 });
@@ -243,7 +234,14 @@ public class FeedAdapterBinder {
                 simpleDraweeView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event));
+                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event), event, feedItemResourceHelper.getTargetMember(event));
+                    }
+                });
+                simpleDraweeView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        onItemClickListener.onFeedImageLongClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(event), event, feedItemResourceHelper.getTargetMember(event));
+                        return true;
                     }
                 });
             }
@@ -259,32 +257,30 @@ public class FeedAdapterBinder {
         return events.size() == 1;
     }
 
-    private void setOverlayContent(View overlay, final Picture picture, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener, FeedItemResourceHelper feedItemResourceHelper) {
+    private void setOverlayContent(View overlay, final Picture picture, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
         TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
         TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
 
-        final IconTextView imageLove = (IconTextView) overlay.findViewById(R.id.feedImageLove);
-        increaseTouchArea(imageLove);
+        final ImageView imageLove = (ImageView) overlay.findViewById(R.id.feedImageLove);
+        ViewUtil.increaseTouchArea(imageLove,OVERLAY_HITREC_PADDING);
 
-        boolean isLoved = picture.isIsLovedByMe();
-        imageLove.setText(isLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-        imageLove.setTextColor(overlay.getContext().getResources().getColor(isLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
+        boolean isLoved = picture.isLovedByMe();
+        imageLove.setImageResource(isLoved ? R.drawable.ic_loved : R.drawable.ic_love);
         imageLove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IconTextView imageLove = (IconTextView) v;
-                boolean isLoved = picture.isIsLovedByMe();
+                ImageView imageLove = (ImageView) v;
+                boolean isLoved = picture.isLovedByMe();
                 boolean newIsLoved = !isLoved;
-                imageLove.setText(newIsLoved ? MaterialIcons.FAVORITE : MaterialIcons.FAVORITE_OUTLINE);
-                imageLove.setTextColor(v.getContext().getResources().getColor(newIsLoved ? android.R.color.holo_red_dark : R.color.text_color_secondary));
-                startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
-                picture.setIsLovedByMe(newIsLoved);
+                imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
+                Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
+                picture.setLovedByMe(newIsLoved);
             }
         });
 
         View imageVisit = overlay.findViewById(R.id.feedImageVisit);
-        increaseTouchArea(imageVisit);
+        ViewUtil.increaseTouchArea(imageVisit,OVERLAY_HITREC_PADDING);
         imageVisit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -298,65 +294,9 @@ public class FeedAdapterBinder {
                 onItemClickListener.onMemberClick(picture.getMember());
             }
         });
-        imageDescription.setText(feedItemResourceHelper.getFormattedText(picture.getBody()));
+        imageDescription.setText(Picture.getFormattedBody(picture.getBody()));
         imageMeta.setText(picture.getMember().getMetaInfo());
         imageName.setText(picture.getMember().getNickname());
-    }
-
-    private void increaseTouchArea(final View view) {
-        final View parent = (View) view.getParent();
-        parent.post( new Runnable() {
-            // Post in the parent's message queue to make sure the parent
-            // lays out its children before we call getHitRect()
-            public void run() {
-                final Rect r = new Rect();
-                view.getHitRect(r);
-                r.top -= OVERLAY_HITREC_PADDING;
-                r.bottom += OVERLAY_HITREC_PADDING;
-                r.left -= OVERLAY_HITREC_PADDING;
-                r.right += OVERLAY_HITREC_PADDING;
-                parent.setTouchDelegate( new TouchDelegate( r , view));
-            }
-        });
-    }
-
-    private void startLoveCallWithObserver(final FetLifeApplication fetLifeApplication, final Picture picture, final boolean loved) {
-        final String action = loved ? FetLifeApiIntentService.ACTION_APICALL_ADD_LOVE : FetLifeApiIntentService.ACTION_APICALL_REMOVE_LOVE;
-        fetLifeApplication.getEventBus().register(new LoveImageCallObserver(action, picture, loved));
-        FetLifeApiIntentService.startApiCall(fetLifeApplication, action, picture.getId(), picture.getContentType());
-    }
-
-    private class LoveImageCallObserver {
-        String action;
-        Picture picture;
-        boolean loved;
-
-        LoveImageCallObserver(String action, Picture picture, boolean loved) {
-            this.action = action;
-            this.picture = picture;
-            this.loved = loved;
-        }
-
-        @Subscribe(threadMode = ThreadMode.MAIN)
-        public void onResourceListCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-            if (serviceCallFinishedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFinishedEvent.getParams())) {
-                fetLifeApplication.getEventBus().unregister(this);
-            }
-        }
-
-        @Subscribe(threadMode = ThreadMode.MAIN)
-        public void onResourceListCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
-            if (serviceCallFailedEvent.getServiceCallAction().equals(action) && checkParams(serviceCallFailedEvent.getParams())) {
-                picture.setIsLovedByMe(!loved);
-                fetLifeApplication.getEventBus().unregister(this);
-            }
-        }
-        private boolean checkParams(String... params) {
-            if (params == null || params.length != 2) {
-                return false;
-            }
-            return picture.getId().equals(params[0]) && picture.getContentType().equals(params[1]);
-        }
     }
 
     class PictureGridAdapter extends BaseAdapter {
@@ -414,12 +354,12 @@ public class FeedAdapterBinder {
                     public void onClick(View v) {
                         LayoutInflater inflater = LayoutInflater.from(v.getContext());
                         final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                        setOverlayContent(overlay, getItem(position), onItemClickListener, feedItemResourceHelper);
+                        setOverlayContent(overlay, getItem(position), onItemClickListener);
 
                         new ImageViewer.Builder(v.getContext(), displayLinks).setStartPosition(position).setOverlayView(overlay).setImageChangeListener(new ImageViewer.OnImageChangeListener() {
                             @Override
                             public void onImageChange(int position) {
-                                setOverlayContent(overlay, getItem(position), onItemClickListener, feedItemResourceHelper);
+                                setOverlayContent(overlay, getItem(position), onItemClickListener);
                             }
                         }).show();
                     }
@@ -428,7 +368,7 @@ public class FeedAdapterBinder {
                 simpleDraweeView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(events.get(position)));
+                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(events.get(position)), events.get(position), feedItemResourceHelper.getTargetMember(events.get(position)));
                     }
                 });
             }

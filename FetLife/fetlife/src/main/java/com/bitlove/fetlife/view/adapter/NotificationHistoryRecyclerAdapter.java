@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.NotificationHistoryItem;
-import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
-import com.bitlove.fetlife.model.pojos.NotificationHistoryItem_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem_Table;
+import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.SimpleDateFormat;
@@ -39,11 +39,11 @@ public class NotificationHistoryRecyclerAdapter extends ResourceListRecyclerAdap
     }
 
     public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                //TODO: think of possibility of update only specific items instead of the whole list
+                loadItems();
                 notifyDataSetChanged();
             }
         });

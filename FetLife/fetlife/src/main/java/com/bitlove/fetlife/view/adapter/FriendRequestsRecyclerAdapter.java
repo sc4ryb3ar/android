@@ -8,18 +8,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.FriendRequest;
-import com.bitlove.fetlife.model.pojos.FriendRequestScreenModelObject;
-import com.bitlove.fetlife.model.pojos.FriendRequest_Table;
-import com.bitlove.fetlife.model.pojos.SharedProfile;
-import com.bitlove.fetlife.model.pojos.SharedProfile_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.FriendRequestScreenModelObject;
+import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile;
+import com.bitlove.fetlife.model.pojos.fetlife.db.SharedProfile_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
+import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.sql.language.Delete;
@@ -39,8 +39,8 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         AtomicBoolean pending = new AtomicBoolean(true);
     }
 
-    private List<FriendRequest> friendRequestList;
-    private List<SharedProfile> friendSuggestionList;
+    private List<FriendRequest> friendRequestList = new ArrayList<>();
+    private List<SharedProfile> friendSuggestionList = new ArrayList<>();
 
     public FriendRequestsRecyclerAdapter(boolean clearItems) {
         if (clearItems) {
@@ -51,11 +51,11 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
     }
 
     public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                //TODO: think of possibility of update only specific items instead of the whole list
+                loadItems();
                 notifyDataSetChanged();
             }
         });
@@ -69,7 +69,7 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            friendRequestList = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(false)).queryList();
+            friendRequestList = new Select().from(FriendRequest.class).where(FriendRequest_Table.pending.is(false)).and(FriendRequest_Table.pendingState.in(FriendRequest.PendingState.NEW, FriendRequest.PendingState.REJECTED)).queryList();
         } catch (Throwable t) {
             friendRequestList = new ArrayList<>();
         }
@@ -147,7 +147,7 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
                         if (accepted) {
                             friendSuggestion.setPending(true);
                             friendSuggestion.save();
-                            FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
+                            FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
                         } else {
                             friendSuggestion.delete();
                         }
@@ -202,7 +202,7 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
                     if (undo.pending.compareAndSet(true, false)) {
                         friendRequest.setPending(true);
                         friendRequest.save();
-                        FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_SEND_FRIENDREQUESTS);
+                        FetLifeApiIntentService.startApiCall(context, FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
                     }
                 } else {
                     FetLifeApplication.getInstance().showLongToast(R.string.message_friend_decision_failed);
@@ -300,8 +300,10 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
 
     public void onBindSharedProfileViewHolder(FriendRequestItemViewHolder friendRequestItemViewHolder, final SharedProfile friendSuggestion) {
 
-        friendRequestItemViewHolder.headerText.setText(friendSuggestion.getNickname());
-        friendRequestItemViewHolder.upperText.setText(friendSuggestion.getMetaInfo());
+        Member member = friendSuggestion.getMember();
+
+        friendRequestItemViewHolder.headerText.setText(member.getNickname());
+        friendRequestItemViewHolder.upperText.setText(member.getMetaInfo());
 
 //        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
 
@@ -324,7 +326,7 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         });
 
         friendRequestItemViewHolder.avatarImage.setImageResource(R.drawable.dummy_avatar);
-        String avatarUrl = friendSuggestion.getAvatarLink();
+        String avatarUrl = member.getAvatarLink();
         friendRequestItemViewHolder.avatarImage.setImageURI(avatarUrl);
 //        imageLoader.loadImage(friendRequestItemViewHolder.itemView.getContext(), avatarUrl, friendRequestItemViewHolder.avatarImage, R.drawable.dummy_avatar);
     }

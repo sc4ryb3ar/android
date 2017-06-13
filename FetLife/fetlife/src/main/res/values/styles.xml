@@ -11,6 +11,7 @@
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:itemBackground">@color/window_background</item>
         <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+        <item name="android:alertDialogTheme">@style/AppTheme.AlertDialog</item>
     </style>
 
     <style name="AppPreferenceTheme" parent="@style/PreferenceThemeOverlay.v14.Material">

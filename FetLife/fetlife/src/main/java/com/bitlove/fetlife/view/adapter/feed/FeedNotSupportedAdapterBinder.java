@@ -6,8 +6,7 @@ import android.view.View;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Story;
-import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 
 public class FeedNotSupportedAdapterBinder {
 

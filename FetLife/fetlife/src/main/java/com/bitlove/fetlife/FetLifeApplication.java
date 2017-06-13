@@ -1,17 +1,15 @@
 package com.bitlove.fetlife;
 
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.app.PendingIntent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
+import android.util.Base64;
 import android.widget.Toast;
 
 import com.bitlove.fetlife.inbound.OnNotificationOpenedHandler;
@@ -22,8 +20,9 @@ import com.bitlove.fetlife.model.inmemory.InMemoryStorage;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.session.UserSessionManager;
-import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
-import com.bitlove.fetlife.view.activity.standalone.LoginActivity;
+import com.bitlove.fetlife.util.FileUtil;
+import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
+import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -31,12 +30,24 @@ import com.facebook.imagepipeline.cache.CacheKeyFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.onesignal.OneSignal;
-import com.raizlabs.android.dbflow.config.FlowManager;
 
-import io.fabric.sdk.android.Fabric;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.security.AlgorithmParameters;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.regex.Pattern;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Main Application class. The lifecycle of the object of this class is the same as the App itself
@@ -56,6 +67,8 @@ public class FetLifeApplication extends MultiDexApplication {
      * We do not want to log out the user right away in this case
      */
     private static final long WAITING_FOR_RESULT_LOGOUT_DELAY_MILLIS = 60 * 1000;
+
+    private static final String PREFIX_FILE_DB = "db_";
 
     //****
     //App singleton behaviour to make it accessible where dependency injection is not possible
@@ -94,6 +107,10 @@ public class FetLifeApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
+//        if (BuildConfig.DEBUG) {
+//            Debug.waitForDebugger();
+//        }
+
         //Setup default instance and callbacks
         instance = this;
 
@@ -112,6 +129,9 @@ public class FetLifeApplication extends MultiDexApplication {
         //Init crash logging
         Fabric.with(this, new Crashlytics());
 
+        PendingIntent restartIntent = PendingIntent.getActivity(this,42, LoginActivity.createIntent(this,getString(R.string.error_session_invalid)),PendingIntent.FLAG_ONE_SHOT);
+        Thread.setDefaultUncaughtExceptionHandler(new FetLifeUncaughtExceptionHandler(Thread.getDefaultUncaughtExceptionHandler(),restartIntent));
+
         //Init push notifications
         OneSignal.startInit(this).inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification).setNotificationOpenedHandler(new OnNotificationOpenedHandler()).init();
 
@@ -120,11 +140,6 @@ public class FetLifeApplication extends MultiDexApplication {
 
         //Init user session manager
         userSessionManager = new UserSessionManager(this);
-
-        //Apply version upgrade if needed to ensure backward compatibility
-        //Note: this place is intentional as user session manager might need to be created but not initialised to do the proper upgrade
-        applyVersionUpgradeIfNeeded();
-
         userSessionManager.init();
 
         //Init service members
@@ -313,21 +328,13 @@ public class FetLifeApplication extends MultiDexApplication {
     //Version upgrade method to ensure backward compatibility
     //****
 
-    private void applyVersionUpgradeIfNeeded() {
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastVersionUpgrade = sharedPreferences.getInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, 0);
-        if (lastVersionUpgrade < 10510) {
-            sharedPreferences.edit().clear().apply();
-
-            FlowManager.destroy();
-            deleteDatabase(FetLifeDatabase.NAME + ".db");
-            openOrCreateDatabase(FetLifeDatabase.NAME + ".db", Context.MODE_PRIVATE, null);
-
-            sharedPreferences.edit().putInt(APP_PREF_KEY_INT_VERSION_UPGRADE_EXECUTED, versionNumber).apply();
+    public void deleteAllDatabases() {
+        try {
+            FileUtil.deleteDir(getDatabasePath(FetLifeDatabase.NAME + ".db").getParentFile());
+        } catch (Exception e) {
+            Crashlytics.logException(e);
         }
     }
-
 
     //****
     //Class to help monitoring Activity State
@@ -367,7 +374,7 @@ public class FetLifeApplication extends MultiDexApplication {
             //Check if we started an external task (like taking photo) for that we should wait and keep the user logged in
             if (!isAppInForeground() && !activity.isChangingConfigurations() && !isWaitingForResult) {
                 //If none of the above cases happen to be true log out the user in case (s)he selected to be logged out always
-                if (userSessionManager.getActivePasswordAlwaysPreference()) {
+                if (userSessionManager.getCurrentUser() != null && !userSessionManager.keepUserSignedIn()) {
                     userSessionManager.onUserLogOut();
                 }
             } else if(isWaitingForResult) {
@@ -380,7 +387,7 @@ public class FetLifeApplication extends MultiDexApplication {
                             //Check if App is still displayed
                             //Check if the user is not already logged out
                             //Check if the user wants us to log her/him out in case of leaving the app
-                            if (!isAppInForeground() && userSessionManager.getCurrentUser() != null && userSessionManager.getActivePasswordAlwaysPreference()) {
+                            if (!isAppInForeground() && userSessionManager.getCurrentUser() != null && !userSessionManager.keepUserSignedIn()) {
                                 userSessionManager.onUserLogOut();
                             }
                         }

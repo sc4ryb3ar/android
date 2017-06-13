@@ -14,12 +14,11 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Conversation;
-import com.bitlove.fetlife.model.pojos.Conversation_Table;
-import com.bitlove.fetlife.model.pojos.Message;
-
-import com.bitlove.fetlife.model.pojos.Message_Table;
-import com.bitlove.fetlife.model.pojos.User;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
 import com.bitlove.fetlife.util.ColorUtil;
 import com.bitlove.fetlife.util.StringUtil;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -42,11 +41,11 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
     }
 
     public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                //TODO: think of possibility of update only specific items instead of the whole list
+                loadItems();
                 notifyDataSetChanged();
             }
         });
@@ -145,7 +144,7 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
     public String getSelfMessageId() {
         if (selfMessageId == null) {
             FetLifeApplication fetLifeApplication = (FetLifeApplication) messageContainer.getContext().getApplicationContext();
-            User currentUser = fetLifeApplication.getUserSessionManager().getCurrentUser();
+            Member currentUser = fetLifeApplication.getUserSessionManager().getCurrentUser();
             if (currentUser != null) {
                 selfMessageId = currentUser.getId();
             }

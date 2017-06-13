@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.GridLayout;
 import android.widget.GridView;
 
 public class AutoAlignGridView extends GridView {

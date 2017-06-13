@@ -4,16 +4,12 @@ import android.text.Html;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.FeedEvent;
-import com.bitlove.fetlife.model.pojos.Fetish;
-import com.bitlove.fetlife.model.pojos.PeopleInto;
-import com.bitlove.fetlife.model.pojos.Picture;
-import com.bitlove.fetlife.model.pojos.PictureVariantsInterface;
-import com.bitlove.fetlife.model.pojos.Member;
-import com.bitlove.fetlife.model.pojos.Rsvp;
-import com.bitlove.fetlife.model.pojos.Story;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.json.PeopleInto;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.util.DateUtil;
-import com.bitlove.fetlife.util.EnumUtil;
 import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -78,7 +74,7 @@ public class FeedItemResourceHelper {
                 } else if (firstEvent.getSecondaryTarget().getStatus() != null) {
                     return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_like_status) : fetLifeApplication.getString(R.string.feed_title_like_statuses, eventCount);
                 } else {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("Like on not yet supported item");
                 }
             case FRIEND_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_friend) : fetLifeApplication.getString(R.string.feed_title_new_friends, eventCount);
@@ -148,7 +144,10 @@ public class FeedItemResourceHelper {
         if (events == null || events.isEmpty()) {
             return null;
         }
-        FeedEvent event = events.get(0);
+        return getMember(events.get(0));
+    }
+
+    public Member getMember(FeedEvent event) {
         try {
             switch (feedStoryType) {
                 case PEOPLE_INTO_CREATED:
@@ -179,6 +178,20 @@ public class FeedItemResourceHelper {
                     return event.getTarget().getRsvp().getMember();
                 case COMMENT_CREATED:
                     return event.getTarget().getComment().getMember();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Member getTargetMember(FeedEvent event) {
+        try {
+            switch (feedStoryType) {
+                case FRIEND_CREATED:
+                case FOLLOW_CREATED:
+                    return event.getTarget().getRelation().getTargetMember();
                 default:
                     return null;
             }

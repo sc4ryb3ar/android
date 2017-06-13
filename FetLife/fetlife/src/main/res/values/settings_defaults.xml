@@ -3,11 +3,17 @@
     <string name="settings_default_general_vanilla">false</string>
     <string name="settings_default_general_feed_as_start">false</string>
     <string name="settings_default_notification_anonymtext">false</string>
+    <string name="settings_default_notification_ringtone">default</string>
+    <string name="settings_default_notification_color">none</string>
+    <string name="settings_default_notification_vibrate">default</string>
     <string name="settings_default_notification_messages_enabled">true</string>
     <string name="settings_default_notification_friendrequests_enabled">true</string>
     <string name="settings_default_notification_others_enabled">true</string>
     <string name="settings_default_notification_info_enabled">true</string>
     <string name="settings_default_notification_prerelease_enabled">true</string>
+    <string name="settings_default_notification_loves_enabled">true</string>
+    <string name="settings_default_notification_comments_enabled">true</string>
+    <string name="settings_default_notification_mentions_enabled">true</string>
     <string name="settings_default_profile_password_always">true</string>
     <string name="settings_default_feed_auto_expand_relation">true</string>
     <string name="settings_default_feed_auto_expand_like">true</string>

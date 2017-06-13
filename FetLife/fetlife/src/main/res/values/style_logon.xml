@@ -30,7 +30,6 @@
     <style name="LogonHeader" parent="TextAppearance.AppCompat.Large">
         <item name="android:textColor">@color/text_color_secondary_dark</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:layout_margin">@dimen/logon_header_margin</item>
     </style>
 
     <style name="LogonText" parent="TextAppearance.AppCompat.Small">

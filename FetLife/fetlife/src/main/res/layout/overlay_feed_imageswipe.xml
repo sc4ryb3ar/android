@@ -24,14 +24,13 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
-                <com.malinskiy.materialicons.widget.IconTextView
+                <ImageView
                     android:id="@+id/feedImageLove"
-                    android:text="{zmdi_favorite_outline}"
-                    android:textColor="@color/text_color_secondary"
-                    android:textSize="24dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"/>
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_love"
+                    android:scaleType="fitXY"/>
             </FrameLayout>
 
             <FrameLayout
@@ -39,28 +38,26 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
-                <com.malinskiy.materialicons.widget.IconTextView
+                <ImageView
                     android:id="@+id/feedImageComment"
-                    android:textSize="24dp"
-                    android:text="{zmdi_comment_text}"
-                    android:textColor="@color/text_color_secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"/>
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_message"
+                    android:scaleType="fitXY"/>
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
-                <com.malinskiy.materialicons.widget.IconTextView
+                <ImageView
                     android:id="@+id/feedImageVisit"
-                    android:text="{zmdi_eye}"
-                    android:textSize="24dp"
-                    android:textColor="@color/text_color_secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"/>
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_view"
+                    android:scaleType="fitXY"/>
             </FrameLayout>
 
         </LinearLayout>

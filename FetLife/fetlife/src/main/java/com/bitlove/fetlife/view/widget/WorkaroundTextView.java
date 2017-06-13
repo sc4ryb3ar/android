@@ -1,7 +1,6 @@
 package com.bitlove.fetlife.view.widget;
 
 import android.content.Context;
-import android.support.design.widget.TextInputEditText;
 import android.text.Selection;
 import android.text.Spannable;
 import android.util.AttributeSet;

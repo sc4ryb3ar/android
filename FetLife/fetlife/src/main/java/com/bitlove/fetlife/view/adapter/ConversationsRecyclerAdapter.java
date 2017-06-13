@@ -6,13 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.Conversation;
-
-import com.bitlove.fetlife.model.pojos.Conversation_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
@@ -29,11 +27,11 @@ public class ConversationsRecyclerAdapter extends ResourceListRecyclerAdapter<Co
     }
 
     public void refresh() {
-        loadItems();
-        //TODO: think of possibility of update only specific items instead of the whole list
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
+                //TODO: think of possibility of update only specific items instead of the whole list
+                loadItems();
                 notifyDataSetChanged();
             }
         });

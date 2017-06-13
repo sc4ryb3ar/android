@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Inbound and extension point for OneSignal notification library to react on user interaction when user clicked on a notification
  */
+@Deprecated
 public class OnNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
 
     @Override

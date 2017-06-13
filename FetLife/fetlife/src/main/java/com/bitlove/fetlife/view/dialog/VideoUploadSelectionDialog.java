@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.view.activity.resource.ResourceListActivity;
+import com.bitlove.fetlife.view.screen.resource.ResourceListActivity;
 import com.crashlytics.android.Crashlytics;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -70,6 +70,12 @@ public class VideoUploadSelectionDialog extends DialogFragment {
         gallerySelectionView.setImageDrawable(galleryIcon);
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 
 //    private boolean cameraAppAvailable() {
@@ -184,6 +190,9 @@ public class VideoUploadSelectionDialog extends DialogFragment {
     }
 
     public static void show(Activity activity) {
+        if (activity.isFinishing()) {
+            return;
+        }
         FragmentTransaction ft = activity.getFragmentManager().beginTransaction();
         Fragment prev = activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (prev != null) {
