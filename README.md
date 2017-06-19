@@ -39,7 +39,7 @@ Download directly from GitHub and go throgh the following easy steps:
 1. Enable installing application from unknwon sources.
 For more information about how to do it please read the following [guideline](https://developer.android.com/distribute/tools/open-distribution.html#unknown-sources)
 
-2. Download and install the [fetlife-2.8.9.apk](https://github.com/fetlife/android/releases/download/v2.8.9/fetlife-2.8.9.apk) to your device.
+2. Download and install the [fetlife-2.8.10.apk](https://github.com/fetlife/android/releases/download/v2.8.10/fetlife-2.8.10.apk) to your device.
 
 3. (Optional) disable application install from unknown sources.
 
