@@ -2,9 +2,14 @@
 package com.bitlove.fetlife.model.pojos.fetlife.json;
 
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
-public class Event {
+import java.text.SimpleDateFormat;
+
+public class Event implements ClusterItem {
 
     @JsonProperty("address")
     private String address;
@@ -12,17 +17,11 @@ public class Event {
     @JsonProperty("content_type")
     private String contentType;
 
-    @JsonProperty("cost")
-    private String cost;
-
     @JsonProperty("created_at")
     private String createdAt;
 
     @JsonProperty("description")
     private String description;
-
-    @JsonProperty("dress_code")
-    private String dressCode;
 
     @JsonProperty("end_date_time")
     private String endDateTime;
@@ -48,6 +47,20 @@ public class Event {
     @JsonProperty("url")
     private String url;
 
+    @JsonProperty("latitude")
+    private float latitude;
+
+    @JsonProperty("longitude")
+    private float longitude;
+
+    @JsonProperty("distance")
+    private float distance;
+
+    @JsonProperty("cost")
+    private String cost;
+
+    @JsonProperty("dress_code")
+    private String dressCode;
 
     @JsonProperty("address")
     public String getAddress() {
@@ -189,4 +202,64 @@ public class Event {
         this.url = url;
     }
 
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
+    }
+
+    public float getDistance() {
+        return distance;
+    }
+
+    public void setDistance(float distance) {
+        this.distance = distance;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(getLatitude(),getLongitude());
+    }
+
+    @Override
+    public String getTitle() {
+        return name != null ? name : "";
+    }
+
+    @Override
+    public String getSnippet() {
+        String time = getStartDateTime();
+        String snippet = time != null ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time)) : "";
+        return snippet;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int)((latitude+longitude)*10000000);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Event)) {
+            return false;
+        }
+
+        Event otherEvent = (Event) obj;
+
+        return latitude == otherEvent.latitude
+                && longitude == otherEvent.longitude
+                && getTitle().equals(otherEvent.getTitle())
+                && getSnippet().equals(otherEvent.getSnippet());
+
+    }
 }

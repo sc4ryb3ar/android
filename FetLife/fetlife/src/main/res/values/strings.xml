@@ -311,7 +311,7 @@
     <string name="feed_title_new_postcomments">commented on %1$d writings</string>
     <string name="feed_title_people_into_fetish">is into a fetish</string>
     <string name="feed_title_people_into_fetishes">is into %1$d fetishes</string>
-    <string name="feed_caption_member_count" >%1$d members</string>
+    <string name="feed_caption_member_count">%1$d members</string>
 
     <string name="settings_title_feed">Feed Settings</string>
     <string name="settings_summary_feed">Settings about how the feed stories should be displayed on the feed screen</string>
@@ -442,6 +442,7 @@
     <string name="menu_profile_follow">Follow</string>
     <string name="menu_profile_message">Message</string>
     <string name="menu_profile_view">View</string>
+    <string name="menu_eventmap">Event Map</string>
 
     <string name="text_profile_location">%2$s, %1$s</string>
     <string name="text_profile_header_location">Location:</string>
@@ -640,5 +641,6 @@
     <string name="noification_title_new_loves">You received new loves</string>
     <string name="noification_title_new_comments">You received new comments</string>
     <string name="noification_title_new_mentions">You were mentioned</string>
+    <string name="title_activity_event_map">FetLife Event Map</string>
 
 </resources>

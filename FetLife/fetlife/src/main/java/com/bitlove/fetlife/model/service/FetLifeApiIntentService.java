@@ -14,11 +14,14 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
+import com.bitlove.fetlife.event.EventByLocationRetrieveFinishedEvent;
+import com.bitlove.fetlife.event.EventByLocationRetrievedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
 import com.bitlove.fetlife.event.LatestReleaseEvent;
@@ -67,6 +70,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
@@ -94,7 +98,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.KeySpec;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,14 +110,13 @@ import java.util.UUID;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import retrofit.Call;
 import retrofit.Response;
 
+//TODO use thread executor instead of new threads
 public class FetLifeApiIntentService extends IntentService {
 
 
@@ -145,6 +147,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_UPLOAD_PICTURE = "com.bitlove.fetlife.action.apicall.upload_picture";
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
     public static final String ACTION_APICALL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.apicall.upload_video_chunk";
+    public static final String ACTION_APICALL_SEARCH_EVENT_BY_LOCATION = "com.bitlove.fetlife.action.apicall.search_events_by_location";
 
     public static final String ACTION_CANCEL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.cancel.upload_video_chunk";
 
@@ -180,6 +183,12 @@ public class FetLifeApiIntentService extends IntentService {
     private static int callCount;
     private static String[] inProgressActionParams;
 
+    private static final String EXTRA_UID = "com.bitlove.fetlife.extra.uid";
+
+    private static final String EXTRA_CLEAR_UID = "com.bitlove.fetlife.extra.clear_uid";
+
+    private static Map<String,String> clearUidsPerAction = new HashMap<>();
+
     /**
      * Main interaction method with this class to initiate a new Api call with the given parameters
      *
@@ -191,6 +200,17 @@ public class FetLifeApiIntentService extends IntentService {
         Intent intent = new Intent(context, FetLifeApiIntentService.class);
         intent.setAction(action);
         intent.putExtra(EXTRA_PARAMS, params);
+        intent.putExtra(EXTRA_UID, UUID.randomUUID().toString());
+        context.startService(intent);
+    }
+
+    public static synchronized void startClearApiCall(Context context, String action, String... params) {
+        Intent intent = new Intent(context, FetLifeApiIntentService.class);
+        intent.setAction(action);
+        intent.putExtra(EXTRA_PARAMS, params);
+        String uid = UUID.randomUUID().toString();
+        intent.putExtra(EXTRA_UID, uid);
+        clearUidsPerAction.put(action,uid);
         context.startService(intent);
     }
 
@@ -198,6 +218,7 @@ public class FetLifeApiIntentService extends IntentService {
         Intent intent = new Intent(context, FetLifeApiIntentService.class);
         intent.setAction(action);
         intent.putExtra(EXTRA_PARAMS, params);
+        intent.putExtra(EXTRA_UID, UUID.randomUUID().toString());
         return intent;
     }
 
@@ -258,6 +279,19 @@ public class FetLifeApiIntentService extends IntentService {
 
         //Set up the Api call related variables
         final String action = intent.getAction();
+
+        String uId = intent.getStringExtra(EXTRA_UID);
+        synchronized (FetLifeApiIntentService.class) {
+            if (uId != null && clearUidsPerAction.containsKey(action)) {
+                String clearUid = clearUidsPerAction.get(action);
+                if (uId.equals(clearUid)) {
+                    clearUidsPerAction.remove(action);
+                } else {
+                    return;
+                }
+            }
+        }
+
         String[] params = intent.getStringArrayExtra(EXTRA_PARAMS);
 
         //Check current logged in user
@@ -377,6 +411,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_SEARCH_MEMBER:
                     result = searchMember(params);
+                    break;
+                case ACTION_APICALL_SEARCH_EVENT_BY_LOCATION:
+                    result = searchEventByLocation(params);
                     break;
                 case ACTION_APICALL_MEMBER:
                     result = getMember(params);
@@ -1287,6 +1324,34 @@ public class FetLifeApiIntentService extends IntentService {
             }
             return foundMembers.size();
         } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int searchEventByLocation(String... params) throws IOException {
+
+        final float latitude = Float.parseFloat(params[0]);
+        final float longitude = Float.parseFloat(params[1]);
+        final float range = Float.parseFloat(params[2]);
+        final int limit = getIntFromParams(params, 3, 100);
+        int page = getIntFromParams(params, 4, 1);
+
+        Log.d("Map","Searching: " + latitude + " " + longitude + " " + range + " " + page);
+
+        Response<List<Event>> relationsResponse = getFetLifeApi().searchEvents(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),latitude,longitude,range,limit,page).execute();
+        if (relationsResponse.isSuccess()) {
+            final List<Event> foundEvents = relationsResponse.body();
+            Log.d("Map","found: " + foundEvents.size());
+            if (foundEvents.size() > 0) {
+                getFetLifeApplication().getEventBus().post(new EventByLocationRetrievedEvent(foundEvents));
+                params = new String[] {params[0],params[1],params[2],Integer.toString(limit),Integer.toString(page+1)};
+                FetLifeApiIntentService.startApiCall(getFetLifeApplication(),FetLifeApiIntentService.ACTION_APICALL_SEARCH_EVENT_BY_LOCATION,params);
+            } else {
+                getFetLifeApplication().getEventBus().post(new EventByLocationRetrieveFinishedEvent());
+            }
+            return Integer.MAX_VALUE;
+        } else {
+            Log.d("Map","failed: " + getFetLifeApplication().getFetLifeService().getLastResponseCode());
             return Integer.MIN_VALUE;
         }
     }
