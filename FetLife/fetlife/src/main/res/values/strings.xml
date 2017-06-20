@@ -24,6 +24,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.8.10<br/>
+                    <ul>
+                        <li>Fix issue with image upload</li>
+                    </ul>
+
             <p/>v2.8.0<br/>
                     <ul>
                         <li>Improved Notification Settings</li>
