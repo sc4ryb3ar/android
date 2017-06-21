@@ -48,19 +48,23 @@ public class Event implements ClusterItem {
     private String url;
 
     @JsonProperty("latitude")
-    private float latitude;
+    private double latitude;
 
     @JsonProperty("longitude")
-    private float longitude;
+    private double longitude;
 
     @JsonProperty("distance")
-    private float distance;
+    private double distance;
 
     @JsonProperty("cost")
     private String cost;
 
     @JsonProperty("dress_code")
     private String dressCode;
+
+
+    private long date;
+
 
     @JsonProperty("address")
     public String getAddress() {
@@ -180,6 +184,9 @@ public class Event implements ClusterItem {
     @JsonProperty("start_date_time")
     public void setStartDateTime(String startDateTime) {
         this.startDateTime = startDateTime;
+        if (startDateTime != null) {
+            date = DateUtil.parseDate(startDateTime);
+        }
     }
 
     @JsonProperty("tagline")
@@ -202,33 +209,38 @@ public class Event implements ClusterItem {
         this.url = url;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public float getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(float distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 
     @Override
     public LatLng getPosition() {
         return new LatLng(getLatitude(),getLongitude());
+    }
+
+    public void setPosition(LatLng position) {
+        setLatitude(position.latitude);
+        setLongitude(position.longitude);
     }
 
     @Override
@@ -245,21 +257,19 @@ public class Event implements ClusterItem {
 
     @Override
     public int hashCode() {
-        return (int)((latitude+longitude)*10000000);
+        return (int) date;
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (!(obj instanceof Event)) {
             return false;
         }
 
         Event otherEvent = (Event) obj;
-
-        return latitude == otherEvent.latitude
-                && longitude == otherEvent.longitude
-                && getTitle().equals(otherEvent.getTitle())
-                && getSnippet().equals(otherEvent.getSnippet());
-
+        return id.equals(otherEvent.id);
     }
 }

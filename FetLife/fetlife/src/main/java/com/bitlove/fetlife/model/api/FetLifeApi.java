@@ -134,6 +134,6 @@ public interface FetLifeApi {
     Call<ResponseBody> uploadVideoFinish(@Header("Authorization") String authHeader, @Path("video_upload_id") String videoUploadId);
 
     @GET("/api/v2/search/events/by_location")
-    Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("latitude") float latitude, @Query("longitude") float longitude, @Query("range") float range, @Query("limit") int limit, @Query("page") int page);
+    Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("latitude") double latitude, @Query("longitude") double longitude, @Query("range") double range, @Query("limit") int limit, @Query("page") int page);
 
 }

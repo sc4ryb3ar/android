@@ -14,14 +14,13 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.util.Base64;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
-import com.bitlove.fetlife.event.EventByLocationRetrieveFinishedEvent;
-import com.bitlove.fetlife.event.EventByLocationRetrievedEvent;
+import com.bitlove.fetlife.event.EventsByLocationRetrieveFailedEvent;
+import com.bitlove.fetlife.event.EventsByLocationRetrievedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
 import com.bitlove.fetlife.event.LatestReleaseEvent;
@@ -78,9 +77,12 @@ import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.util.BytesUtil;
 import com.bitlove.fetlife.util.FileUtil;
+import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -1330,30 +1332,26 @@ public class FetLifeApiIntentService extends IntentService {
 
     private int searchEventByLocation(String... params) throws IOException {
 
-        final float latitude = Float.parseFloat(params[0]);
-        final float longitude = Float.parseFloat(params[1]);
-        final float range = Float.parseFloat(params[2]);
-        final int limit = getIntFromParams(params, 3, 100);
-        int page = getIntFromParams(params, 4, 1);
+        final double swLatitude = Double.parseDouble(params[0]);
+        final double swLongitude = Double.parseDouble(params[1]);
+        final double neLatitude = Double.parseDouble(params[2]);
+        final double neLongitude = Double.parseDouble(params[3]);
+        final int limit = getIntFromParams(params, 4, 42);
+        final int page = getIntFromParams(params, 5, 1);
 
-        Log.d("Map","Searching: " + latitude + " " + longitude + " " + range + " " + page);
 
-        Response<List<Event>> relationsResponse = getFetLifeApi().searchEvents(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),latitude,longitude,range,limit,page).execute();
+        LatLngBounds searchBounds = new LatLngBounds(new LatLng(swLatitude,swLongitude),new LatLng(neLatitude,neLongitude));
+        LatLng center = searchBounds.getCenter();
+        double range = MapUtil.getRange(searchBounds.southwest,center);
+
+        Response<List<Event>> relationsResponse = getFetLifeApi().searchEvents(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),center.latitude,center.longitude,range,limit,page).execute();
         if (relationsResponse.isSuccess()) {
             final List<Event> foundEvents = relationsResponse.body();
-            Log.d("Map","found: " + foundEvents.size());
-            if (foundEvents.size() > 0) {
-                getFetLifeApplication().getEventBus().post(new EventByLocationRetrievedEvent(foundEvents));
-                params = new String[] {params[0],params[1],params[2],Integer.toString(limit),Integer.toString(page+1)};
-                FetLifeApiIntentService.startApiCall(getFetLifeApplication(),FetLifeApiIntentService.ACTION_APICALL_SEARCH_EVENT_BY_LOCATION,params);
-            } else {
-                getFetLifeApplication().getEventBus().post(new EventByLocationRetrieveFinishedEvent());
-            }
-            return Integer.MAX_VALUE;
+            getFetLifeApplication().getEventBus().post(new EventsByLocationRetrievedEvent(searchBounds,page,foundEvents));
         } else {
-            Log.d("Map","failed: " + getFetLifeApplication().getFetLifeService().getLastResponseCode());
-            return Integer.MIN_VALUE;
+            getFetLifeApplication().getEventBus().post(new EventsByLocationRetrieveFailedEvent(searchBounds,page));
         }
+        return Integer.MAX_VALUE;
     }
 
     private int retrieveMyRelations(String[] params) throws IOException {

@@ -20,7 +20,8 @@ public class InMemoryStorage {
 
     private SparseArray<List<Story>> feeds = new SparseArray<>();
     private SparseArray<List<Story>> profileFeeds = new SparseArray<>();
-    private Map<LatLng,Event> mapEvents = new HashMap<>();
+    private Set<Event> mapEvents = new HashSet<>();
+    private Set<LatLng> mapPositions = new HashSet<>();
 
     public void clearFeed() {
         synchronized (feeds) {
@@ -66,7 +67,11 @@ public class InMemoryStorage {
         }
     }
 
-    public Map<LatLng,Event> getMapEvents() {
+    public Set<Event> getMapEvents() {
         return mapEvents;
+    }
+
+    public Set<LatLng> getMapPositions() {
+        return mapPositions;
     }
 }
