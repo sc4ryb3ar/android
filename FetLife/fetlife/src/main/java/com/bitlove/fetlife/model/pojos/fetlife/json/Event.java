@@ -1,6 +1,9 @@
 
 package com.bitlove.fetlife.model.pojos.fetlife.json;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +12,7 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import java.text.SimpleDateFormat;
 
-public class Event implements ClusterItem {
+public class Event implements Comparable<Event>, ClusterItem {
 
     @JsonProperty("address")
     private String address;
@@ -63,7 +66,7 @@ public class Event implements ClusterItem {
     private String dressCode;
 
 
-    private long date;
+    private long roughtDate;
 
 
     @JsonProperty("address")
@@ -185,7 +188,7 @@ public class Event implements ClusterItem {
     public void setStartDateTime(String startDateTime) {
         this.startDateTime = startDateTime;
         if (startDateTime != null) {
-            date = DateUtil.parseDate(startDateTime);
+            roughtDate = DateUtil.addRoughTimeOffset(DateUtil.parseDate(startDateTime), longitude);
         }
     }
 
@@ -255,9 +258,13 @@ public class Event implements ClusterItem {
         return snippet;
     }
 
+    public long getRoughtDate() {
+        return roughtDate;
+    }
+
     @Override
     public int hashCode() {
-        return (int) date;
+        return (int) roughtDate;
     }
 
     @Override
@@ -272,4 +279,14 @@ public class Event implements ClusterItem {
         Event otherEvent = (Event) obj;
         return id.equals(otherEvent.id);
     }
+
+    @Override
+    public int compareTo(@NonNull Event o) {
+        long diff = roughtDate - o.roughtDate;
+        Log.d("COMPARE", roughtDate + " ? " + o.roughtDate + " = " + diff);
+        if (diff == 0) return 0;
+        if (diff < 0) return -1;
+        return 1;
+    }
+
 }

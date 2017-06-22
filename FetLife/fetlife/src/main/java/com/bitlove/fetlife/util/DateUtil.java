@@ -56,4 +56,9 @@ public class DateUtil {
 
         return dateTimeFormatter.print(time);
     }
+
+    public static long addRoughTimeOffset(long date, double longitude) {
+        long offset = (long) (longitude * 24 / 360);
+        return date - (offset * 60 * 60 * 1000);
+    }
 }

@@ -107,6 +107,11 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"/>
         <activity
+            android:name=".view.screen.resource.EventMapActivity"
+            android:label="@string/title_activity_event_map"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
             android:name=".view.screen.resource.FriendsActivity"
             android:label="@string/title_activity_friends"
             android:theme="@style/AppTheme.NoActionBar"
@@ -195,10 +200,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
 
-        <activity
-            android:name=".view.screen.resource.EventMapActivity"
-            android:label="@string/title_activity_event_map">
-        </activity>
     </application>
 
 </manifest>

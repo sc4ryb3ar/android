@@ -24,6 +24,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.9.0<br/>
+                    <ul>
+                        <li>EventMap</li>
+                    </ul>
+
             <p/>v2.8.10<br/>
                     <ul>
                         <li>Fix issue with image upload</li>
