@@ -3,7 +3,7 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'io.fabric'
 
 def Properties releaseProperties = new Properties()
-def propFile = file('../../../fetlife-release/release.properties')
+def propFile = file('../../../android-release/release.properties')
 if (propFile.canRead()) {
     releaseProperties.load(new FileInputStream(propFile))
 } else {

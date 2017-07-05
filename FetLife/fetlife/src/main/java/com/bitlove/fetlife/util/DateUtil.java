@@ -29,6 +29,14 @@ public class DateUtil {
         return parser.parseDateTime(input).getMillis();
     }
 
+    public static long parseDate(String input, boolean local) {
+        if (local) {
+            return parser.parseLocalDateTime(input).toDateTime().getMillis();
+        } else {
+            return parser.parseDateTime(input).getMillis();
+        }
+    }
+
     public static String toString(long time) {
         return parser.print(time);
     }

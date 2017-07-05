@@ -188,7 +188,7 @@ public class Event implements Comparable<Event>, ClusterItem {
     public void setStartDateTime(String startDateTime) {
         this.startDateTime = startDateTime;
         if (startDateTime != null) {
-            roughtDate = DateUtil.addRoughTimeOffset(DateUtil.parseDate(startDateTime), longitude);
+            roughtDate = DateUtil.addRoughTimeOffset(DateUtil.parseDate(startDateTime,true), longitude);
         }
     }
 
@@ -254,7 +254,7 @@ public class Event implements Comparable<Event>, ClusterItem {
     @Override
     public String getSnippet() {
         String time = getStartDateTime();
-        String snippet = time != null ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time)) : "";
+        String snippet = time != null ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time,true)) : "";
         return snippet;
     }
 

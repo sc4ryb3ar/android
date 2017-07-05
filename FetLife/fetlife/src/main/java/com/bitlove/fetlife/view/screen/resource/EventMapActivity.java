@@ -357,7 +357,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
                     clusterManager.addItem(event);
                 } else {
                     String time = event.getStartDateTime();
-                    String snippet = time != null ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time)) : "";
+                    String snippet = time != null ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time,true)) : "";
                     Marker marker = map.addMarker(new MarkerOptions().position(markerLatLng).title(event.getName()).icon(BitmapDescriptorFactory
                             .defaultMarker(getMarkerColorForEvent(event))).snippet(snippet));
                     marker.setTag(event);
@@ -569,7 +569,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
         if (TextUtils.isEmpty(time)) {
             eventDate.setVisibility(View.GONE);
         } else {
-            eventDate.setText(SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time)));
+            eventDate.setText(SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(time,true)));
             eventDate.setVisibility(View.VISIBLE);
         }
         return layout;
