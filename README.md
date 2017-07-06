@@ -49,7 +49,7 @@ If you prefer not registering to GitHub you can still send your remark or questi
 
 We are appreciate any feedback or comment you have about our Android App, but if you feel like even going further and have a jump into our code you are more than welcome to do so.
 
-Just pick up any issue from the [open issues](https://github.com/fetlife/android/projects/1) add yourself as an assignee and go!
+Just pick up any issue from the [open issues](https://github.com/fetlife/android/projects/1) (issues marked with open and/or help wanted flags) add yourself as an assignee and go!
 Please use also the progress flags to make it clear if your are currently working on the specific issue.
 
 We also encourage you to start chatting about your progress and idea of the solution at the chat session of the issue, so we can make sure that merging of the outcome with our code base will go smoothly.
