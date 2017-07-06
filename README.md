@@ -20,6 +20,7 @@ With offcial FetLife Android App you can...
 ### Screenshots
 
 ![Screenshots of FetLife Android App](https://cloud.githubusercontent.com/assets/4168967/21648277/c3a33cfe-d29d-11e6-8fd6-f95bd47c757f.jpg)
+![screenshots2__merged](https://user-images.githubusercontent.com/4168967/27913982-0f1cb026-6262-11e7-9e9f-82bab010f165.png)
 
 ### Installing the App on your Android Device
 
