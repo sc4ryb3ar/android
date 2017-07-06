@@ -21,14 +21,15 @@ With offcial FetLife Android App you can...
 
 ![Screenshots of FetLife Android App](https://cloud.githubusercontent.com/assets/4168967/21648277/c3a33cfe-d29d-11e6-8fd6-f95bd47c757f.jpg)
 
-
 ### Installing the App on your Android Device
 
 Installation of FetLife App is a bit different than for Apps from the Google Play store, but it is still pretty straightforward, Android OS will guide you through the whole process. 
 
 Just download our latest version [fetlife-2.9.1.apk](https://github.com/fetlife/android/releases/download/v2.9.1/fetlife-2.9.1.apk) and follow the on-screen prompts on your device.
 
-If something went wrong and you still don’t have the App or you still have further questions left, don’t be worried just check out the FetLife Android App FAQ and Troubleshooting Guide or get in contact with us via caretakers@fetlife.com or dreamlite@fetlife.com
+For more details please check out [FetLife Android App Installation Guide](https://github.com/fetlife/android/files/1127920/FetLifeAndroidAppInstallationGuide.pdf)
+
+If something went wrong and you still don’t have the App or you still have further questions left, don’t be worried just check out the [FetLife Android App FAQ and Troubleshooting Guide](https://github.com/fetlife/android/files/1127921/FetLifeAndroidAppFAQandTroubleshootingGuide.pdf) or get in contact with us via caretakers@fetlife.com or dreamlite@fetlife.com
 
 ### Kinksters Helping Kinksters
 
@@ -37,7 +38,7 @@ Want to install the app on your phone but are not technically savvy? Ask your lo
 ### Got Issues?
 
 We are sorry for you facing issues with FetLife Android App.
-To get the fastest response we suggest you to look first at FetLife Android App FAQ and Troubleshooting Guide.
+To get the fastest response we suggest you to look first at [FetLife Android App FAQ and Troubleshooting Guide](https://github.com/fetlife/android/files/1127921/FetLifeAndroidAppFAQandTroubleshootingGuide.pdf).
 
 If did not find a solution or you find a bug or you have a nice idea hot to improve please start by reading through the current list of [open issues](https://github.com/fetlife/fetlife-android/issues) and if you can't find anything about your bug or suggestion please [submit a new issue](https://github.com/fetlife/fetlife-android/issues/new).
 
