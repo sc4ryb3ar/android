@@ -1,6 +1,6 @@
 package com.bitlove.fetlife.event;
 
-import com.bitlove.fetlife.model.pojos.fetlife.json.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.List;

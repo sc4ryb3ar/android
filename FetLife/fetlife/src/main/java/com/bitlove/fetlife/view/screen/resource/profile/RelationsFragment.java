@@ -15,8 +15,9 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class RelationsFragment extends ProfileFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class RelationsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
     public static RelationsFragment newInstance(String memberId, int relationType) {
         RelationsFragment friendsFragment = new RelationsFragment();

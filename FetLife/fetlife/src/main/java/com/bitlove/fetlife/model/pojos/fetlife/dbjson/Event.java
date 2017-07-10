@@ -1,71 +1,107 @@
 
-package com.bitlove.fetlife.model.pojos.fetlife.json;
+package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.text.SimpleDateFormat;
 
-public class Event implements Comparable<Event>, ClusterItem {
+@Table(database = FetLifeDatabase.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
+    public static Event loadEvent(String eventId) {
+        Event event = new Select().from(Event.class).where(Event_Table.id.is(eventId)).querySingle();
+        return event;
+    }
+
+    @Column
     @JsonProperty("address")
     private String address;
 
+    @Column
+    @JsonProperty("description")
+    private String description;
+
+    @Column
+    @JsonProperty("end_date_time")
+    private String endDateTime;
+
+    @Column
+    @PrimaryKey(autoincrement = false)
+    @JsonProperty("id")
+    private String id;
+
+    @Column
+    @JsonProperty("location")
+    private String location;
+
+    @Column
+    @JsonProperty("name")
+    private String name;
+
+    @Column
+    @JsonProperty("start_date_time")
+    private String startDateTime;
+
+    @Column
+    @JsonProperty("tagline")
+    private String tagline;
+
+    @Column
+    @JsonProperty("url")
+    private String url;
+
+    @Column
+    @JsonProperty("latitude")
+    private double latitude;
+
+    @Column
+    @JsonProperty("longitude")
+    private double longitude;
+
+    @Column
+    @JsonProperty("cost")
+    private String cost;
+
+    @Column
+    @JsonProperty("dress_code")
+    private String dressCode;
+
+    //db only
+
+    @Column
+    @JsonIgnore
+    private String memberId;
+
+    //Json only
     @JsonProperty("content_type")
     private String contentType;
 
     @JsonProperty("created_at")
     private String createdAt;
 
-    @JsonProperty("description")
-    private String description;
-
-    @JsonProperty("end_date_time")
-    private String endDateTime;
-
-    @JsonProperty("id")
-    private String id;
-
-    @JsonProperty("location")
-    private String location;
-
     @JsonProperty("member")
     private Member member;
-
-    @JsonProperty("name")
-    private String name;
-
-    @JsonProperty("start_date_time")
-    private String startDateTime;
-
-    @JsonProperty("tagline")
-    private String tagline;
-
-    @JsonProperty("url")
-    private String url;
-
-    @JsonProperty("latitude")
-    private double latitude;
-
-    @JsonProperty("longitude")
-    private double longitude;
 
     @JsonProperty("distance")
     private double distance;
 
-    @JsonProperty("cost")
-    private String cost;
-
-    @JsonProperty("dress_code")
-    private String dressCode;
-
-
+    //local
+    @JsonIgnore
     private long roughtDate;
 
 
@@ -289,4 +325,11 @@ public class Event implements Comparable<Event>, ClusterItem {
         return 1;
     }
 
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
 }

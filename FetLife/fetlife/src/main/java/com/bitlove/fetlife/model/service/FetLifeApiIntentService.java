@@ -69,7 +69,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
-import com.bitlove.fetlife.model.pojos.fetlife.json.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;

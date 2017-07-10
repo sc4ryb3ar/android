@@ -2,15 +2,13 @@ package com.bitlove.fetlife.model.inmemory;
 
 import android.util.SparseArray;
 
-import com.bitlove.fetlife.model.pojos.fetlife.json.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**

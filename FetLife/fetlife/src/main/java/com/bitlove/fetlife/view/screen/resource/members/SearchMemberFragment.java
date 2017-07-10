@@ -21,9 +21,9 @@ import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.SearchMemberRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
-import com.bitlove.fetlife.view.screen.resource.profile.ProfileFragment;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class SearchMemberFragment extends ProfileFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class SearchMemberFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
     private static final String ARG_SEARCH_QUERY = "ARG_SEARCH_QUERY";
 

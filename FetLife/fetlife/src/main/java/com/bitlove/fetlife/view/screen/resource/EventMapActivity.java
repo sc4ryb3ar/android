@@ -25,12 +25,11 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.EventsByLocationRetrieveFailedEvent;
 import com.bitlove.fetlife.event.EventsByLocationRetrievedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.fetlife.json.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.ReflectionUtil;
-import com.bitlove.fetlife.util.UrlUtil;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -519,17 +518,24 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        UrlUtil.openUrl(EventMapActivity.this,clickedEvent.getUrl());
+        clickedEvent.save();
+        EventActivity.startActivity(this,clickedEvent.getId());
+//        UrlUtil.openUrl(EventMapActivity.this,clickedEvent.getUrl());
     }
 
     @Override
     public void onClusterItemInfoWindowClick(Event event) {
-        UrlUtil.openUrl(EventMapActivity.this,clickedEvent.getUrl());
+        event.save();
+        EventActivity.startActivity(this,event.getId());
+//        UrlUtil.openUrl(EventMapActivity.this,clickedEvent.getUrl());
     }
 
     @Override
     public void onClusterInfoWindowClick(Cluster<Event> cluster) {
-        UrlUtil.openUrl(EventMapActivity.this,sortedCluster.get(eventInCluster).getUrl());
+        Event event = sortedCluster.get(eventInCluster);
+        event.save();
+        EventActivity.startActivity(this,event.getId());
+//        UrlUtil.openUrl(EventMapActivity.this,sortedCluster.get(eventInCluster).getUrl());
     }
 
     //Info Window Providing methods

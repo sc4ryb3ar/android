@@ -475,11 +475,11 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 //    private void refresh(String memberId) {
 //        showProgress();
 //        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(LoadFragment.PAGE_COUNT), "1");
 //        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(LoadFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(LoadFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(LoadFragment.PAGE_COUNT), "1");
 //        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.PAGE_COUNT), "1");
 //    }
 

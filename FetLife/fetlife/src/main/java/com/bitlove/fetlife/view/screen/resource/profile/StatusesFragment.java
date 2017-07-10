@@ -12,8 +12,9 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.StatusesRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class StatusesFragment extends ProfileFragment {
+public class StatusesFragment extends LoadFragment {
 
     public static StatusesFragment newInstance(String memberId) {
         StatusesFragment statusesFragment = new StatusesFragment();

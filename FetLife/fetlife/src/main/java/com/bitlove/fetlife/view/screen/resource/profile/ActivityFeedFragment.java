@@ -19,8 +19,9 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class ActivityFeedFragment extends ProfileFragment implements FeedRecyclerAdapter.OnFeedItemClickListener {
+public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAdapter.OnFeedItemClickListener {
 
     public static ActivityFeedFragment newInstance(String memberId) {
         ActivityFeedFragment friendsFragment = new ActivityFeedFragment();

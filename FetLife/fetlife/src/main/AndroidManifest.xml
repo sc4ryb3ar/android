@@ -19,6 +19,7 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
     <!--
  Large Heap added as a workaround to issue with Fresco library in case of large image lists.
     TODO: investigate further and check what can we do from App side, like fine-tuning images sizes
@@ -200,6 +201,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
 
+        <activity
+            android:name=".view.screen.resource.EventActivity"
+            android:label="@string/title_activity_event"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

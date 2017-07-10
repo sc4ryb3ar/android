@@ -12,8 +12,9 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.VideosRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class VideosFragment extends ProfileFragment {
+public class VideosFragment extends LoadFragment {
 
     private static final int VIDEO_GRID_COLUMN_COUNT = 3;
     public static int PAGE_COUNT = 24;
