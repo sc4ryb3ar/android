@@ -12,13 +12,21 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.util.DateUtil;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
+import br.tiagohm.markdownview.MarkdownView;
 
 public class EventInfoFragment extends LoadFragment {
 
     private static final String ARG_EVENT_ID = "ARG_EVENT_ID";
     private static final String DATE_INTERVAL_SEPARATOR = " - ";
-    private TextView locationTextView,addressTextView,dateTextView,dresscodeTextView,costTextView,descriptionTextView;
+    private TextView locationTextView;
+    private TextView addressTextView;
+    private TextView dateTextView;
+    private TextView dresscodeTextView;
+    private TextView costTextView;
+    private TextView descriptionTextView;
 
     public static EventInfoFragment newInstance(String eventId) {
         EventInfoFragment aboutFragment = new EventInfoFragment();
@@ -36,13 +44,30 @@ public class EventInfoFragment extends LoadFragment {
         locationTextView.setText(event.getLocation());
         addressTextView.setText(event.getAddress());
         String startDateTime = event.getStartDateTime();
-        startDateTime = (!TextUtils.isEmpty(startDateTime) ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(startDateTime)) : "");
         String endDateTime = event.getEndDateTime();
-        endDateTime = (!TextUtils.isEmpty(endDateTime) ? SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(endDateTime)) : "");
+        long startTimeLong = !TextUtils.isEmpty(startDateTime) ? DateUtil.parseDate(startDateTime,true) : -1;
+        long endTimeLong = !TextUtils.isEmpty(endDateTime) ? DateUtil.parseDate(endDateTime,true) : -1;
+        if (startTimeLong > -1) {
+            startDateTime = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT,SimpleDateFormat.SHORT).format(startTimeLong);
+            if (endTimeLong > -1) {
+                endDateTime = ((endTimeLong - startTimeLong) > 24*60*60*1000) ? SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT,SimpleDateFormat.SHORT).format(endDateTime) : SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(endTimeLong);
+            } else {
+                endDateTime = "";
+            }
+        } else {
+            startDateTime = "";
+            if (endTimeLong > -1) {
+                endDateTime = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT,SimpleDateFormat.SHORT).format(endTimeLong);
+            } else {
+                endDateTime = "";
+            }
+        }
         dateTextView.setText(startDateTime + DATE_INTERVAL_SEPARATOR + endDateTime);
         dresscodeTextView.setText(event.getDressCode());
         costTextView.setText(event.getCost());
         descriptionTextView.setText(event.getDescription());
+//        descriptionTextView.loadMarkdown(event.getDescription());
+//        descriptionTextView.setBackgroundColor(0);
     }
 
     @Nullable

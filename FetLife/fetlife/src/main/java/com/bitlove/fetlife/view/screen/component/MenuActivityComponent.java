@@ -267,6 +267,14 @@ public class MenuActivityComponent extends ActivityComponent {
                 default:
                     break;
             }
+        } else {
+            switch (requestCode) {
+                case BaseActivity.PERMISSION_REQUEST_LOCATION:
+                    EventMapActivity.startActivity(menuActivity);
+                    break;
+                default:
+                    return;
+            }
         }
     }
 

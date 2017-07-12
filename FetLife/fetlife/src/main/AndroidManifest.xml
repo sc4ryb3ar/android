@@ -20,6 +20,8 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <uses-sdk tools:overrideLibrary="br.tiagohm.markdownview" />
+
     <!--
  Large Heap added as a workaround to issue with Fresco library in case of large image lists.
     TODO: investigate further and check what can we do from App side, like fine-tuning images sizes

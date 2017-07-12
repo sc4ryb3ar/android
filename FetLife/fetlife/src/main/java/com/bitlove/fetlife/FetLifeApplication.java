@@ -177,8 +177,6 @@ public class FetLifeApplication extends MultiDexApplication {
                         }
                         final Request.Builder requestBuilder = chain.request().newBuilder();
                         requestBuilder.addHeader("Referer", "fetlife.com");
-                        requestBuilder.url(pugUrls[currentPos]);
-                        currentPos = (currentPos+1)%pugUrls.length;
                         return chain.proceed(requestBuilder.build());
                     }
                 });
@@ -227,14 +225,6 @@ public class FetLifeApplication extends MultiDexApplication {
 
         Fresco.initialize(this, imagePipelineConfig);
     }
-
-
-    private static String[] pugUrls = new String[] {
-            "http://www.petwave.com/~/media/Images/Center/Breed/Dogs/Toy-Group/Pug/Pug-dog-breed.ashx",
-            "https://www.pets4homes.co.uk/images/articles/2918/large/five-universal-personality-traits-of-the-pug-dog-556dc087b7caf.jpg"
-    };
-
-    private static int currentPos = 0;
 
 
     static class FrescoTokenLessCacheKey implements CacheKey {

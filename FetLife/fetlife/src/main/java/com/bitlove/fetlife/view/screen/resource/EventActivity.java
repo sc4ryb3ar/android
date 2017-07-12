@@ -1,8 +1,8 @@
 package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
@@ -13,39 +13,26 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.DateUtil;
-import com.bitlove.fetlife.util.ViewUtil;
-import com.bitlove.fetlife.view.dialog.ProfileConfirmationDialog;
+import com.bitlove.fetlife.util.StringUtil;
+import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.profile.AboutFragment;
-import com.bitlove.fetlife.view.screen.resource.profile.ActivityFeedFragment;
-import com.bitlove.fetlife.view.screen.resource.profile.BasicInfoFragment;
-import com.bitlove.fetlife.view.screen.resource.profile.PicturesFragment;
-import com.bitlove.fetlife.view.screen.resource.profile.RelationsFragment;
-import com.bitlove.fetlife.view.screen.resource.profile.StatusesFragment;
-import com.bitlove.fetlife.view.screen.resource.profile.VideosFragment;
 import com.bitlove.fetlife.view.widget.FlingBehavior;
-import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class EventActivity extends ResourceActivity implements AppBarLayout.OnOffsetChangedListener {
 
@@ -56,12 +43,12 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
     private TextView eventTitle;
 
     private ViewPager viewPager;
-    private String eventId;
+    private Event event;
 
     public static void startActivity(BaseActivity baseActivity, String eventId) {
         Intent intent = new Intent(baseActivity, EventActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(EXTRA_EVENTID,eventId);
+        intent.putExtra(EXTRA_EVENTID, eventId);
         baseActivity.startActivity(intent);
     }
 
@@ -75,11 +62,12 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        eventId = getIntent().getStringExtra(EXTRA_EVENTID);
-        Event event = Event.loadEvent(eventId);
+        String eventId = getIntent().getStringExtra(EXTRA_EVENTID);
+        event = Event.loadEvent(eventId);
 
-        eventTitle = (TextView) findViewById(R.id.profile_nickname);
-        eventSubTitle = (TextView) findViewById(R.id.profile_meta);
+        setTitle(event.getName());
+        eventSubTitle = (TextView) findViewById(R.id.event_subtitle);
+        eventSubTitle.setText(event.getTagline());
 
         setEventDetails(event);
 
@@ -89,7 +77,7 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
             public Fragment getItem(int position) {
                 switch (position) {
                     case 0:
-                        return EventInfoFragment.newInstance(eventId);
+                        return EventInfoFragment.newInstance(event.getId());
                     default:
                         return null;
                 }
@@ -104,7 +92,7 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
             public CharSequence getPageTitle(int position) {
                 switch (position) {
                     case 0:
-                        return getString(R.string.title_fragment_profile_info);
+                        return getString(R.string.title_fragment_event_details);
                     default:
                         return null;
                 }
@@ -112,9 +100,19 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         });
 
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)appBarLayout.getLayoutParams();
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
         params.setBehavior(new FlingBehavior());
         appBarLayout.addOnOffsetChangedListener(this);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle("");
+        getSupportActionBar().setTitle("");
+        TextView toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
+        TextView headerTitle = (TextView) findViewById(R.id.event_title);
+        toolbarTitle.setText(title);
+        headerTitle.setText(title);
     }
 
     private void setEventDetails(Event event) {
@@ -134,7 +132,7 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
 //            Event event = Event.loadEvent(eventId);
 //            setEventDetails(event);
 //        }
-        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(),serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(),FetLifeApiIntentService.getInProgressActionParams())) {
+        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(), serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(), FetLifeApiIntentService.getInProgressActionParams())) {
             dismissProgress();
         }
     }
@@ -147,6 +145,7 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
     }
 
     private boolean isRelatedCall(String serviceCallAction, String[] params) {
+        String eventId = event.getId();
         if (params != null && params.length > 0 && eventId != null && !eventId.equals(params[0])) {
             return false;
         }
@@ -156,16 +155,37 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         return false;
     }
 
-    private void onMenuIconMessage() {
+    public void onAddEventToCalendar(View v) {
+        Intent intent = new Intent(Intent.ACTION_INSERT);
+        intent.setType("vnd.android.cursor.item/event");
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, DateUtil.parseDate(event.getStartDateTime(),true));
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, DateUtil.parseDate(event.getEndDateTime(),true));
+        String eventName = event.getName();
+        if (!TextUtils.isEmpty(event.getTagline())) {
+            eventName += "\n" + event.getTagline();
+        }
+        intent.putExtra(CalendarContract.Events.TITLE, eventName);
+        String eventDescription = event.getDescription();
+        if (!TextUtils.isEmpty(event.getDressCode())) {
+            eventDescription += "\n\n" + getString(R.string.text_event_header_dresscodes) + " " + event.getDressCode();
+        }
+        if (!TextUtils.isEmpty(event.getCost())) {
+            eventDescription += "\n\n" + getString(R.string.text_event_header_cost) + " " + event.getCost();
+        }
+        intent.putExtra(CalendarContract.Events.DESCRIPTION,eventDescription);
+        String eventLocation = "";
+        if (!TextUtils.isEmpty(event.getLocation())) {
+            eventLocation = event.getLocation();
+        }
+        if (!TextUtils.isEmpty(eventLocation) && !TextUtils.isEmpty(event.getAddress())) {
+            eventLocation += ", " + event.getAddress();
+        }
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventLocation);
+        startActivity(intent);
     }
 
-    private void onMenuIconView() {
-    }
-
-    private void onMenuIconFriend() {
-    }
-
-    private void onMenuIconFollow() {
+    public void onViewEvent(View v) {
+        UrlUtil.openUrl(this,event.getUrl());
     }
 
     @Override
@@ -196,9 +216,9 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         setContentView(R.layout.activity_event);
     }
 
-    private static final float PERCENTAGE_TO_SHOW_TITLE_DETAILS = 0.8f;
+    private static final float PERCENTAGE_TO_SHOW_TITLE_DETAILS = 0.7f;
     private static final int ALPHA_ANIMATIONS_DURATION = 200;
-    private static final long ALPHA_ANIMATIONS_DELAY = 400l;
+    private static final long ALPHA_ANIMATIONS_DELAY = 200l;
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
@@ -212,10 +232,10 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
 
     private void setToolbarVisibility(AppBarLayout appBarLayout, View title, View image, float percentage) {
         if (percentage >= PERCENTAGE_TO_SHOW_TITLE_DETAILS) {
-            if(!isTitleVisible) {
+            if (!isTitleVisible) {
                 startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
                 startAlphaAnimation(image, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
-                ((SimpleDraweeView)image).setImageURI((String)image.getTag());
+                ((SimpleDraweeView) image).setImageURI((String) image.getTag());
                 isTitleVisible = true;
             }
         } else {

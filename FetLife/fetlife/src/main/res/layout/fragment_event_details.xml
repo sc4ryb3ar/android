@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,14 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/text_event_tagline"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textStyle="italic"
-            android:layout_margin="@dimen/text_margin"/>
 
         <LinearLayout
             android:id="@+id/text_event_row_location"
@@ -159,11 +152,11 @@
 
         <TextView
             android:id="@+id/text_event_description"
+            android:autoLink="web"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:autoLink="web"
-            android:textColorLink="@color/text_color_link"/>
+            android:textColorLink="@color/text_color_link"
+            android:layout_margin="@dimen/text_margin"/>
 
     </LinearLayout>
 
