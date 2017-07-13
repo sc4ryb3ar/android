@@ -42,10 +42,6 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
     @CallSuper
     protected void onResourceCreate(Bundle savedInstanceState) {
 
-        //TODO: consider removing this
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        floatingActionButton.setVisibility(View.GONE);
-
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);

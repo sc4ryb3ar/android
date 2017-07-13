@@ -33,6 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
     public static final int PERMISSION_REQUEST_PICTURE_UPLOAD = 10000;
     public static final int PERMISSION_REQUEST_VIDEO_UPLOAD = 20000;
+    public static final int PERMISSION_REQUEST_LOCATION = 30000;
 
     public static final String EXTRA_NOTIFICATION_SOURCE_TYPE = "EXTRA_NOTIFICATION_SOURCE_TYPE";
 

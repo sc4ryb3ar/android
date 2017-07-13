@@ -24,6 +24,22 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.9.2<br/>
+                    <ul>
+                        <li>Event Details Screen</li>
+                        <li>Add Events to Calendar from the Event Details Screen</li>
+                    </ul>
+
+            <p/>v2.9.0<br/>
+                    <ul>
+                        <li>EventMap</li>
+                    </ul>
+
+            <p/>v2.8.10<br/>
+                    <ul>
+                        <li>Fix issue with image upload</li>
+                    </ul>
+
             <p/>v2.8.0<br/>
                     <ul>
                         <li>Improved Notification Settings</li>
@@ -311,7 +327,7 @@
     <string name="feed_title_new_postcomments">commented on %1$d writings</string>
     <string name="feed_title_people_into_fetish">is into a fetish</string>
     <string name="feed_title_people_into_fetishes">is into %1$d fetishes</string>
-    <string name="feed_caption_member_count" >%1$d members</string>
+    <string name="feed_caption_member_count">%1$d members</string>
 
     <string name="settings_title_feed">Feed Settings</string>
     <string name="settings_summary_feed">Settings about how the feed stories should be displayed on the feed screen</string>
@@ -442,6 +458,7 @@
     <string name="menu_profile_follow">Follow</string>
     <string name="menu_profile_message">Message</string>
     <string name="menu_profile_view">View</string>
+    <string name="menu_eventmap">Event Map</string>
 
     <string name="text_profile_location">%2$s, %1$s</string>
     <string name="text_profile_header_location">Location:</string>
@@ -640,5 +657,21 @@
     <string name="noification_title_new_loves">You received new loves</string>
     <string name="noification_title_new_comments">You received new comments</string>
     <string name="noification_title_new_mentions">You were mentioned</string>
+    <string name="title_activity_event_map">FetLife Event Map</string>
+    <string name="title_activity_event">EventActivity</string>
+
+    <string name="text_event_header_location">Location:</string>
+    <string name="text_event_header_address">Address:</string>
+    <string name="text_event_header_date">Date:</string>
+    <string name="text_event_header_dresscodes">Dresscode:</string>
+    <string name="text_event_header_cost">Cost:</string>
+
+    <string name="title_fragment_event_details">Event Details</string>
+    <string name="menu_event_going">Going</string>
+    <string name="menu_event_maybe">Maybe</string>
+    <string name="menu_event_not">Not Going</string>
+    <string name="menu_event_view">View</string>
+    <string name="menu_event_calendar">Add to Calendar</string>
+
 
 </resources>

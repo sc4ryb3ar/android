@@ -293,4 +293,8 @@ public class Picture extends BaseModel {
         }
     }
 
+    @Override
+    public boolean save() {
+        return super.save();
+    }
 }

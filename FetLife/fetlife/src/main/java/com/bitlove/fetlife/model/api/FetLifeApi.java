@@ -9,6 +9,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
@@ -131,5 +132,8 @@ public interface FetLifeApi {
 
     @POST("/api/v2/me/videos/uploads/{video_upload_id}/finish")
     Call<ResponseBody> uploadVideoFinish(@Header("Authorization") String authHeader, @Path("video_upload_id") String videoUploadId);
+
+    @GET("/api/v2/search/events/by_location")
+    Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("latitude") double latitude, @Query("longitude") double longitude, @Query("range") double range, @Query("limit") int limit, @Query("page") int page);
 
 }

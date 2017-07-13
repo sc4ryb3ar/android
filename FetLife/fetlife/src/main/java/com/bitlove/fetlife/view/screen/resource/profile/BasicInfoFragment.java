@@ -17,12 +17,13 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BasicInfoFragment extends ProfileFragment {
+public class BasicInfoFragment extends LoadFragment {
 
     private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
     private View locationRowView, relationshipRowView, orientationRowView, lookingForRowView;

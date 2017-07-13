@@ -73,9 +73,8 @@ public abstract class OneSignalNotification {
                 .setSmallIcon(R.drawable.ic_stat_onesignal_default)
                 .setAutoCancel(true)
                 .setVisibility(Notification.VISIBILITY_SECRET)
-                .setGroup(getClass().getSimpleName())
                 .setContentIntent(getPendingIntent(fetLifeApplication))
-                .setColor(fetLifeApplication.getUserSessionManager().getNotificationColor())
+                .setLights(fetLifeApplication.getUserSessionManager().getNotificationColor(),1000,1000)
                 .setSound(fetLifeApplication.getUserSessionManager().getNotificationRingtone());
 
         long[] vibrationSetting = fetLifeApplication.getUserSessionManager().getNotificationVibration();

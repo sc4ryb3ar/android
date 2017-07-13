@@ -13,6 +13,11 @@
             android:title="@string/menu_feed" />
 
         <item
+            android:id="@+id/nav_eventmap"
+            android:icon="@drawable/ic_menu_map"
+            android:title="@string/menu_eventmap" />
+
+        <item
             android:id="@+id/nav_members"
             android:icon="@android:drawable/ic_menu_search"
             android:title="@string/menu_members" />

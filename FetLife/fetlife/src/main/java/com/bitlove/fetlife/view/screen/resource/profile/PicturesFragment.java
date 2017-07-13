@@ -16,8 +16,9 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.PicturesRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class PicturesFragment extends ProfileFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
+public class PicturesFragment extends LoadFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
 
     private static final int PICTURE_GRID_COLUMN_COUNT = 3;
     public static int PAGE_COUNT = 24;

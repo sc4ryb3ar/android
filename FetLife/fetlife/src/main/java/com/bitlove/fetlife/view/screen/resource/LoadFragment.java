@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource.profile;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,11 +11,12 @@ import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.BaseFragment;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public abstract class ProfileFragment extends BaseFragment {
+public abstract class LoadFragment extends BaseFragment {
 
     public static final int PAGE_COUNT = 25;
 
@@ -125,6 +126,9 @@ public abstract class ProfileFragment extends BaseFragment {
     }
 
     public void startResourceCall(int pageCount, int requestedPage) {
+        if (getApiCallAction() == null) {
+            return;
+        }
         int relationTypeReference = getRelationTypeReference();
         if (relationTypeReference != Integer.MIN_VALUE) {
             FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(),getMemberId(),Integer.toString(relationTypeReference),Integer.toString(pageCount),Integer.toString(requestedPage));

@@ -83,7 +83,7 @@ public class MessageNotification extends OneSignalNotification {
             String title = notifications.size() == 1 ? fetLifeApplication.getString(R.string.noification_title_new_message) : fetLifeApplication.getString(R.string.noification_title_new_messages,notifications.size());
             String firstMessage = messages.get(0);
 
-            notificationBuilder.setGroup(group).setContentTitle(title).setContentText(firstMessage);
+            notificationBuilder.setContentTitle(title).setContentText(firstMessage);
 
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(title);

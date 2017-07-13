@@ -10,6 +10,8 @@ import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.notification.AnonymNotification;
+import com.bitlove.fetlife.notification.MessageNotification;
 import com.bitlove.fetlife.view.adapter.ConversationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
@@ -51,6 +53,13 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
 //            }
 //        });
 //        floatingActionButton.setContentDescription(getString(R.string.button_new_conversation_discription));
+    }
+
+    @Override
+    protected void onResourceStart() {
+        super.onResourceStart();
+        MessageNotification.clearNotifications();
+        AnonymNotification.clearNotifications();
     }
 
     @Override

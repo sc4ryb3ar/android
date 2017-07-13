@@ -59,7 +59,7 @@ public abstract class MembersRecyclerAdapter extends ResourceListRecyclerAdapter
         relationViewHolder.headerText.setText(member.getNickname());
         relationViewHolder.upperText.setText(member.getMetaInfo());
 
-//        relationViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(friend.getDate())));
+//        relationViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(friend.getRoughtDate())));
 
         relationViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -272,7 +272,7 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         friendRequestItemViewHolder.headerText.setText(friendRequest.getNickname());
         friendRequestItemViewHolder.upperText.setText(friendRequest.getMetaInfo());
 
-//        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
+//        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getRoughtDate())));
 
         friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -305,7 +305,7 @@ public class FriendRequestsRecyclerAdapter extends ResourceListRecyclerAdapter<F
         friendRequestItemViewHolder.headerText.setText(member.getNickname());
         friendRequestItemViewHolder.upperText.setText(member.getMetaInfo());
 
-//        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getDate())));
+//        friendRequestItemViewHolder.dateText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(FriendRequest.getRoughtDate())));
 
         friendRequestItemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

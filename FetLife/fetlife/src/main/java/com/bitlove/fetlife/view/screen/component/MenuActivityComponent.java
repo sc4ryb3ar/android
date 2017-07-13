@@ -25,6 +25,7 @@ import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
 import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.screen.resource.EventMapActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
@@ -203,6 +204,12 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_eventmap) {
+            if (isLocationPermissionGranted()) {
+                EventMapActivity.startActivity(menuActivity);
+            } else {
+                requestLocationPermission(BaseActivity.PERMISSION_REQUEST_LOCATION);
+            }
         } else if (id == R.id.nav_updates) {
             menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
             FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));
@@ -230,6 +237,18 @@ public class MenuActivityComponent extends ActivityComponent {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    private void requestLocationPermission(int requestAction) {
+        ActivityCompat.requestPermissions(menuActivity,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                requestAction);
+    }
+
+    private boolean isLocationPermissionGranted() {
+        return ContextCompat.checkSelfPermission(menuActivity,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
     @Override
     public void onRequestPermissionsResult(BaseActivity baseActivity, int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(baseActivity, requestCode, permissions, grantResults);
@@ -242,8 +261,19 @@ public class MenuActivityComponent extends ActivityComponent {
                 case BaseActivity.PERMISSION_REQUEST_VIDEO_UPLOAD:
                     VideoUploadSelectionDialog.show(menuActivity);
                     break;
+                case BaseActivity.PERMISSION_REQUEST_LOCATION:
+                    EventMapActivity.startActivity(menuActivity);
+                    break;
                 default:
                     break;
+            }
+        } else {
+            switch (requestCode) {
+                case BaseActivity.PERMISSION_REQUEST_LOCATION:
+                    EventMapActivity.startActivity(menuActivity);
+                    break;
+                default:
+                    return;
             }
         }
     }

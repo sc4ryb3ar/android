@@ -29,6 +29,14 @@ public class DateUtil {
         return parser.parseDateTime(input).getMillis();
     }
 
+    public static long parseDate(String input, boolean local) {
+        if (local) {
+            return parser.parseLocalDateTime(input).toDateTime().getMillis();
+        } else {
+            return parser.parseDateTime(input).getMillis();
+        }
+    }
+
     public static String toString(long time) {
         return parser.print(time);
     }
@@ -55,5 +63,10 @@ public class DateUtil {
                 appendTimeZoneOffset(null,false,2,2).toFormatter();
 
         return dateTimeFormatter.print(time);
+    }
+
+    public static long addRoughTimeOffset(long date, double longitude) {
+        long offset = (long) (longitude * 24 / 360);
+        return date - (offset * 60 * 60 * 1000);
     }
 }
