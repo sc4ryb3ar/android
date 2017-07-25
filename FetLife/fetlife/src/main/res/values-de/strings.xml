@@ -9,7 +9,7 @@
 
   <string name="error_connection_failed">Der Server konnte nicht erreicht werden. Bitte überprüfe Deine Internetverbindung.</string>
   <string name="error_apicall_failed">Verbindung fehlgeschlagen. Bitte versuche es später noch einmal</string>
-  <string name="error_authentication_failed">Bitte logge dich noch einmal, aus Sicherheitsgründen, einzuloggen</string>
+  <string name="error_authentication_failed">Bitte versuche dich noch einmal, aus Sicherheitsgründen, einzuloggen</string>
   <string name="error_session_invalid">Bitte versuche dich noch einmal einzuloggen</string>
 
   <!-- *** Menu items *** -->
@@ -41,6 +41,7 @@
   <string name="title_activity_notificationhistory">Benachrichtigungen</string>
   <string name="title_intent_choose_media_upload">Wähle Medien-App</string>
   <string name="title_media_picture_upload_confirmation">Füge Dein Bild hinzu</string>
+  <string name="title_media_video_upload_confirmation">Füge dein Video hinzu</string>
 
   <!-- *** Settings texts *** -->
 
@@ -296,6 +297,7 @@
   <string name="menu_profile_follow">Folgen</string>
   <string name="menu_profile_message">Nachricht</string>
   <string name="menu_profile_view">Ansehen</string>
+  <string name="menu_eventmap">Veranstaltungskarte</string>
 
   <string name="text_profile_location">%2$s, %1$s</string>
   <string name="text_profile_header_location">Ort:</string>
@@ -316,8 +318,8 @@
   <string name="text_profile_lookingfor_playpartner">Eine_n Spielpartner_in</string>
   <string name="text_profile_lookingfor_princessslut">Prinzessin am Tag, Luder in der Nacht</string>
   <string name="text_profile_lookingfor_friendship">Freundschaft</string>
-  <string name="text_profile_lookingfor_slave">Eine_n Sklav(e)_in</string>
-  <string name="text_profile_lookingfor_sub">Ein_e sub</string>
+  <string name="text_profile_lookingfor_slave">Eine_n Sklav_in</string>
+  <string name="text_profile_lookingfor_sub">Eine_n sub</string>
   <string name="text_profile_lookingfor_master">Einen Meister</string>
   <string name="text_profile_lookingfor_mistress">Eine Herrin</string>
   <string name="text_profile_lookingfor_events">Veranstaltungen</string>
@@ -496,5 +498,20 @@
   <string name="noification_title_new_loves">Du hast neue Herzen erhalten</string>
   <string name="noification_title_new_comments">Du hast neue Kommentare erhalten</string>
   <string name="noification_title_new_mentions">Du wurdest erwähnt</string>
+  <string name="title_activity_event_map">FetLife-Veranstaltungskarte</string>
+  <!--<string name="title_activity_event">EventActivity</string> Nothing to translate atm -->
+
+  <string name="text_event_header_location">Ort:</string>
+  <string name="text_event_header_address">Adresse:</string>
+  <string name="text_event_header_date">Datum:</string>
+  <string name="text_event_header_dresscodes">Dresscode:</string>
+  <string name="text_event_header_cost">Kosten:</string>
+
+  <string name="title_fragment_event_details">Veranstaltungsdetails</string>
+  <string name="menu_event_going">Gehe hin</string>
+  <string name="menu_event_maybe">Vielleicht</string>
+  <string name="menu_event_not">Gehe nicht</string>
+  <string name="menu_event_view">Ansehen</string>
+  <string name="menu_event_calendar">Zum Kalender hinzufügen</string>
 
 </resources>
