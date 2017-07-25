@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -71,6 +70,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     private static final int MARKER_SEARCH_LIMIT = 100;
     private static final double MAX_MARKER_VISIBLE_RANGE = 0;
 
+    private static final float MARKER_COLOR_SELECTED = BitmapDescriptorFactory.HUE_RED;
     private static final float MARKER_COLOR_NO_DUE = BitmapDescriptorFactory.HUE_CYAN;
     private static final float MARKER_COLOR_SHORT_DUE = BitmapDescriptorFactory.HUE_VIOLET;
     private static final float MARKER_COLOR_MID_DUE = BitmapDescriptorFactory.HUE_BLUE;
@@ -80,6 +80,10 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
 
     private static final boolean USE_CLUSTERING = true;
     private static final double MAX_SEARCH_RANGE = 500d;
+
+    private static final String ARG_EVENT_ID = "ARG_EVENT_ID";
+    private static final String ARG_EVENT_LONGITUDE = "ARG_EVENT_LONGITUDE";
+    private static final String ARG_EVENT_LATITUDE = "ARG_EVENT_LATITUDE";
 
     private ClusterManager<Event> clusterManager;
     private CustomClusterRenderer customClusterRenderer;
@@ -93,6 +97,19 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, EventMapActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return intent;
+    }
+
+    public static void startActivity(Context context, Event event) {
+        context.startActivity(createIntent(context,event));
+    }
+
+    public static Intent createIntent(Context context, Event event) {
+        Intent intent = new Intent(context, EventMapActivity.class);
+        intent.putExtra(ARG_EVENT_ID,event.getId());
+        intent.putExtra(ARG_EVENT_LONGITUDE,event.getLongitude());
+        intent.putExtra(ARG_EVENT_LATITUDE,event.getLatitude());
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }
@@ -176,26 +193,35 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            map.setMyLocationEnabled(true);
+        double eventLongitude = getIntent().getDoubleExtra(ARG_EVENT_LONGITUDE,Double.MIN_VALUE);
+        double eventLatitude = getIntent().getDoubleExtra(ARG_EVENT_LATITUDE,Double.MIN_VALUE);
 
+        boolean locationEnabled = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if (locationEnabled) {
+            map.setMyLocationEnabled(true);
+        }
+
+        if (eventLatitude != Double.MIN_VALUE && eventLongitude != Double.MIN_VALUE) {
+            onLocationChanged(eventLatitude,eventLongitude);
+        } else if (locationEnabled) {
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            String provider = locationManager.getBestProvider(criteria, true);
-            Location location = locationManager.getLastKnownLocation(provider);
+//            Criteria criteria = new Criteria();
+//            String provider = locationManager.getBestProvider(criteria, true);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Long.MAX_VALUE, 0f, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Long.MAX_VALUE, 0f, this);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
             if(location != null){
                 onLocationChanged(location);
-            } else {
-                locationManager.requestLocationUpdates(provider, Long.MAX_VALUE, 0f, this);
             }
-//            map.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-//                @Override
-//                public void onMyLocationChange(Location location) {
-//                    CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL);
-//                    map.moveCamera(cu);
-//                    map.setOnMyLocationButtonClickListener(null);
-//                }
-//            });
+            map.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                @Override
+                public void onMyLocationChange(Location location) {
+                    onLocationChanged(location);
+                }
+            });
         }
         map.setMinZoomPreference(MIN_ZOOM_LEVEL);
         map.setOnCameraMoveListener(this);
@@ -231,9 +257,13 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     public void onLocationChanged(Location location) {
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
+        onLocationChanged(latitude,longitude);
+    }
+
+    public void onLocationChanged(double latitude,double longitude) {
+        clearLocationUpdates();
         LatLng latLng = new LatLng(latitude, longitude);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,DEFAULT_ZOOM_LEVEL));
-        clearLocationUpdates();
     }
 
     private void clearLocationUpdates() {
@@ -241,6 +271,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
             locationManager.removeUpdates(this);
             locationManager = null;
         }
+        map.setOnMyLocationChangeListener(null);
     }
 
     @Override
@@ -339,6 +370,10 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
         synchronized (eventSet) {
             //TODO implement both clustering and normal version
             for (Event event : events) {
+                if (!TextUtils.isEmpty(event.getEndDateTime()) && event.getRoughtEndDate() < System.currentTimeMillis()) {
+                    continue;
+                }
+
                 if (MAX_MARKER_VISIBLE_RANGE > 0 && MapUtil.getRange(event.getPosition(),map.getCameraPosition().target) > MAX_MARKER_VISIBLE_RANGE) {
                     continue;
                 }
@@ -390,12 +425,16 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     }
 
     private float getMarkerColorForEvent(Event event) {
+        String selectedEventId = getIntent().getStringExtra(ARG_EVENT_ID);
+        if (selectedEventId != null && selectedEventId.equals(event.getId())) {
+            return MARKER_COLOR_SELECTED;
+        }
         long now = System.currentTimeMillis();
         String eventDateTime = event.getStartDateTime();
         if (eventDateTime == null) {
             return MARKER_COLOR_NO_DUE;
         }
-        long eventTime = event.getRoughtDate();
+        long eventTime = event.getRoughtStartDate();
         long timeDistance = eventTime - now;
 
         if (timeDistance < MARKER_DUE_SHORT) {
@@ -408,14 +447,19 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     }
 
     private int getClusterColorForEvents(Collection<Event> items) {
+        String seletecedEventId = getIntent().getStringExtra(ARG_EVENT_ID);
         float markerHue = MARKER_COLOR_LONG_DUE;
         for (Event event : items) {
+            if (seletecedEventId != null && seletecedEventId.equals(event.getId())) {
+                markerHue = MARKER_COLOR_SELECTED;
+                break;
+            }
             float hue = getMarkerColorForEvent(event);
             if (hue == MARKER_COLOR_SHORT_DUE) {
                 markerHue = hue;
-                break;
+                continue;
             }
-            if (hue == MARKER_COLOR_MID_DUE) {
+            if (markerHue != MARKER_COLOR_SHORT_DUE && hue == MARKER_COLOR_MID_DUE) {
                 markerHue = hue;
                 continue;
             }

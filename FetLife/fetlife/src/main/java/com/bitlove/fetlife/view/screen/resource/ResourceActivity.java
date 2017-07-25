@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.widget.TextView;
 
+import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.AuthenticationFailedEvent;
 import com.bitlove.fetlife.event.LatestReleaseEvent;
@@ -19,6 +20,7 @@ import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.component.EventDisplayHandler;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
+import com.crashlytics.android.Crashlytics;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -84,6 +86,10 @@ public abstract class ResourceActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAuthenticationFailed(AuthenticationFailedEvent authenticationFailedEvent) {
         eventDisplayHandler.onAuthenticationFailed(this, authenticationFailedEvent);
+        Crashlytics.logException(new Exception("User authenticationFailed"));
+        if (FetLifeApplication.getInstance().getUserSessionManager().getCurrentUser() != null) {
+            FetLifeApplication.getInstance().getUserSessionManager().resetAllUserDatabase();
+        }
         getFetLifeApplication().getUserSessionManager().onUserLogOut();
         LoginActivity.startLogin(getFetLifeApplication());
     }

@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource.profile;
+package com.bitlove.fetlife.view.screen.resource;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,18 +12,19 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.adapter.EventRsvpsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.LoadFragment;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
-public class RelationsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class EventRsvpsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
-    public static RelationsFragment newInstance(String memberId, int relationType) {
-        RelationsFragment friendsFragment = new RelationsFragment();
+    public static EventRsvpsFragment newInstance(String eventId, int rsvpType) {
+        EventRsvpsFragment friendsFragment = new EventRsvpsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_REFERENCE_ID, memberId);
-        args.putInt(ARG_REFERENCE_TYPE, relationType);
+        args.putString(ARG_REFERENCE_ID, eventId);
+        args.putInt(ARG_REFERENCE_TYPE, rsvpType);
         friendsFragment.setArguments(args);
         return friendsFragment;
     }
@@ -36,7 +37,7 @@ public class RelationsFragment extends LoadFragment implements ResourceListRecyc
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
         //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        RelationsRecyclerAdapter adapter = new RelationsRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID), getArguments().getInt(ARG_REFERENCE_TYPE),getFetLifeApplication());
+        EventRsvpsRecyclerAdapter adapter = new EventRsvpsRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID), getArguments().getInt(ARG_REFERENCE_TYPE),getFetLifeApplication());
         adapter.setOnItemClickListener(this);
         adapter.setUseSwipe(false);
         recyclerView.setAdapter(adapter);
@@ -45,12 +46,12 @@ public class RelationsFragment extends LoadFragment implements ResourceListRecyc
 
     @Override
     public String getApiCallAction() {
-        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS;
+        return FetLifeApiIntentService.ACTION_APICALL_EVENT_RSVPS;
     }
 
     public void refreshUi() {
         if (recyclerView != null) {
-            RelationsRecyclerAdapter recyclerViewAdapter = (RelationsRecyclerAdapter) recyclerView.getAdapter();
+            EventRsvpsRecyclerAdapter recyclerViewAdapter = (EventRsvpsRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();
         }
     }

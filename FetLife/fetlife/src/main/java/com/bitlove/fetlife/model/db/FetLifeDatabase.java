@@ -17,7 +17,9 @@
 
 package com.bitlove.fetlife.model.db;
 
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.raizlabs.android.dbflow.annotation.Database;
 import com.raizlabs.android.dbflow.annotation.Migration;
@@ -32,7 +34,7 @@ public class FetLifeDatabase {
     public static final String NAME = "fetlife";
 
     //Simple increase the version number in case of new tables
-    public static final int VERSION = 32;
+    public static final int VERSION = 36;
 
     //Add new Migration classes in case of table structure change
     @Migration(version = 26, database = FetLifeDatabase.class)
@@ -67,6 +69,48 @@ public class FetLifeDatabase {
         @Override
         public void onPreMigrate() {
             addColumn(SQLiteType.TEXT, "targetMemberId");
+        }
+    }
+
+    //Add new Migration classes in case of table structure change
+    @Migration(version = 33, database = FetLifeDatabase.class)
+    public static class Migration33 extends AlterTableMigration<Event> {
+
+        public Migration33(Class<Event> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER, "date");
+        }
+    }
+
+    //Add new Migration classes in case of table structure change
+    @Migration(version = 34, database = FetLifeDatabase.class)
+    public static class Migration34 extends AlterTableMigration<EventReference> {
+
+        public Migration34(Class<EventReference> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER, "rsvpStatus");
+        }
+    }
+
+    //Add new Migration classes in case of table structure change
+    @Migration(version = 36, database = FetLifeDatabase.class)
+    public static class Migration36 extends AlterTableMigration<Event> {
+
+        public Migration36(Class<Event> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER, "rsvpStatus");
         }
     }
 

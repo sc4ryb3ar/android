@@ -20,8 +20,8 @@ public abstract class LoadFragment extends BaseFragment {
 
     public static final int PAGE_COUNT = 25;
 
-    protected static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
-    protected static final String ARG_RELATION_TYPE = "ARG_RELATION_TYPE";
+    protected static final String ARG_REFERENCE_ID = "ARG_REFERENCE_ID";
+    protected static final String ARG_REFERENCE_TYPE = "ARG_REFERENCE_TYPE";
 
     protected RecyclerView recyclerView;
 
@@ -115,25 +115,25 @@ public abstract class LoadFragment extends BaseFragment {
         return PAGE_COUNT;
     }
 
-    protected int getRelationTypeReference() {
-        return getArguments().getInt(ARG_RELATION_TYPE,Integer.MIN_VALUE);
+    protected int getReferenceArg() {
+        return getArguments().getInt(ARG_REFERENCE_TYPE,Integer.MIN_VALUE);
     }
 
     public abstract String getApiCallAction();
 
-    public String getMemberId() {
-        return getArguments().getString(ARG_MEMBER_ID);
+    public String getReferenceId() {
+        return getArguments().getString(ARG_REFERENCE_ID);
     }
 
     public void startResourceCall(int pageCount, int requestedPage) {
         if (getApiCallAction() == null) {
             return;
         }
-        int relationTypeReference = getRelationTypeReference();
-        if (relationTypeReference != Integer.MIN_VALUE) {
-            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(),getMemberId(),Integer.toString(relationTypeReference),Integer.toString(pageCount),Integer.toString(requestedPage));
+        int referenceArg = getReferenceArg();
+        if (referenceArg != Integer.MIN_VALUE) {
+            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(), getReferenceId(),Integer.toString(referenceArg),Integer.toString(pageCount),Integer.toString(requestedPage));
         } else {
-            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(),getMemberId(),Integer.toString(pageCount),Integer.toString(requestedPage));
+            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(), getReferenceId(),Integer.toString(pageCount),Integer.toString(requestedPage));
         }
     }
 

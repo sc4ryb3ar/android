@@ -13,26 +13,24 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.DateUtil;
-import com.bitlove.fetlife.util.StringUtil;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.widget.FlingBehavior;
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.Calendar;
 
 public class EventActivity extends ResourceActivity implements AppBarLayout.OnOffsetChangedListener {
 
@@ -61,13 +59,8 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
         String eventId = getIntent().getStringExtra(EXTRA_EVENTID);
         event = Event.loadEvent(eventId);
-
-        setTitle(event.getName());
-        eventSubTitle = (TextView) findViewById(R.id.event_subtitle);
-        eventSubTitle.setText(event.getTagline());
 
         setEventDetails(event);
 
@@ -78,6 +71,10 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
                 switch (position) {
                     case 0:
                         return EventInfoFragment.newInstance(event.getId());
+                    case 1:
+                        return EventRsvpsFragment.newInstance(event.getId(), EventRsvpReference.VALUE_RSVPTYPE_GOING);
+                    case 2:
+                        return EventRsvpsFragment.newInstance(event.getId(), EventRsvpReference.VALUE_RSVPTYPE_MAYBE);
                     default:
                         return null;
                 }
@@ -85,7 +82,7 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
 
             @Override
             public int getCount() {
-                return 1;
+                return 3;
             }
 
             @Override
@@ -93,6 +90,10 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
                 switch (position) {
                     case 0:
                         return getString(R.string.title_fragment_event_details);
+                    case 1:
+                        return getString(R.string.title_fragment_event_rsvp_going);
+                    case 2:
+                        return getString(R.string.title_fragment_event_rsvp_maybe);
                     default:
                         return null;
                 }
@@ -116,6 +117,32 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
     }
 
     private void setEventDetails(Event event) {
+        setTitle(event.getName());
+        eventSubTitle = (TextView) findViewById(R.id.event_subtitle);
+        eventSubTitle.setText(event.getTagline());
+        View showOnMapAction = findViewById(R.id.event_menu_icon_show_on_map);
+        showOnMapAction.setVisibility((event.getLatitude() != Event.NOT_SET && event.getLongitude() != Event.NOT_SET) ? View.VISIBLE : View.GONE);
+        View goingActionContainer = findViewById(R.id.event_menu_icon_going_container);
+        View maybeActionContainer = findViewById(R.id.event_menu_icon_maybe_container);
+        ImageView goingActionIndicator = (ImageView) findViewById(R.id.event_menu_icon_going);
+        ImageView maybeActionIndicator = (ImageView) findViewById(R.id.event_menu_icon_maybe);
+        if (event.getRsvpStatus() == null) {
+            goingActionContainer.setVisibility(View.INVISIBLE);
+            maybeActionContainer.setVisibility(View.INVISIBLE);
+        } else {
+            goingActionContainer.setVisibility(View.VISIBLE);
+            maybeActionContainer.setVisibility(View.VISIBLE);
+            if (event.getRsvpStatus() == Rsvp.RsvpStatus.YES) {
+                goingActionIndicator.setColorFilter(getResources().getColor(R.color.text_color_primary));
+                maybeActionIndicator.setColorFilter(getResources().getColor(R.color.text_color_secondary));
+            } else if (event.getRsvpStatus() == Rsvp.RsvpStatus.MAYBE){
+                goingActionIndicator.setColorFilter(getResources().getColor(R.color.text_color_secondary));
+                maybeActionIndicator.setColorFilter(getResources().getColor(R.color.text_color_primary));
+            } else {
+                goingActionIndicator.setColorFilter(getResources().getColor(R.color.text_color_secondary));
+                maybeActionIndicator.setColorFilter(getResources().getColor(R.color.text_color_secondary));
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -127,12 +154,10 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-//        if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_EVENT)) {
-//            final String eventId = getIntent().getStringExtra(EXTRA_EVENTID);
-//            Event event = Event.loadEvent(eventId);
-//            setEventDetails(event);
-//        }
         if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(), serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(), FetLifeApiIntentService.getInProgressActionParams())) {
+            final String eventId = getIntent().getStringExtra(EXTRA_EVENTID);
+            Event event = Event.loadEvent(eventId);
+            setEventDetails(event);
             dismissProgress();
         }
     }
@@ -149,10 +174,45 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         if (params != null && params.length > 0 && eventId != null && !eventId.equals(params[0])) {
             return false;
         }
-//        if (FetLifeApiIntentService.ACTION_APICALL_EVENT.equals(serviceCallAction)) {
-//            return true;
-//        }
+        if (FetLifeApiIntentService.ACTION_APICALL_EVENT.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_EVENT_RSVPS.equals(serviceCallAction)) {
+            return true;
+        }
         return false;
+    }
+
+    public void onShowEventOnMap(View v) {
+        EventMapActivity.startActivity(this,event);
+    }
+
+    public void onGoingToEvent(View v) {
+        if (event.getRsvpStatus() != Rsvp.RsvpStatus.YES) {
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_SET_RSVP_STATUS,event.getId(), Rsvp.RsvpStatus.YES.toString());
+            event.setRsvpStatus(Rsvp.RsvpStatus.YES);
+            event.save();
+            setEventDetails(event);
+        } else {
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_SET_RSVP_STATUS,event.getId(), Rsvp.RsvpStatus.NO.toString());
+            event.setRsvpStatus(Rsvp.RsvpStatus.NO);
+            event.save();
+            setEventDetails(event);
+        }
+    }
+
+    public void onMaybeToEvent(View v) {
+        if (event.getRsvpStatus() != Rsvp.RsvpStatus.MAYBE) {
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_SET_RSVP_STATUS,event.getId(), Rsvp.RsvpStatus.MAYBE.toString());
+            event.setRsvpStatus(Rsvp.RsvpStatus.MAYBE);
+            event.save();
+            setEventDetails(event);
+        } else {
+            FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_SET_RSVP_STATUS,event.getId(), Rsvp.RsvpStatus.NO.toString());
+            event.setRsvpStatus(Rsvp.RsvpStatus.NO);
+            event.save();
+            setEventDetails(event);
+        }
     }
 
     public void onAddEventToCalendar(View v) {
@@ -225,23 +285,20 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         int maxScroll = appBarLayout.getTotalScrollRange();
         float percentage = (float) Math.abs(offset) / (float) maxScroll;
 
-        setToolbarVisibility(appBarLayout, findViewById(R.id.toolbar_title), findViewById(R.id.toolbar_image), percentage);
+        setToolbarVisibility(appBarLayout, findViewById(R.id.toolbar_title), percentage);
     }
 
     private boolean isTitleVisible = false;
 
-    private void setToolbarVisibility(AppBarLayout appBarLayout, View title, View image, float percentage) {
+    private void setToolbarVisibility(AppBarLayout appBarLayout, View title, float percentage) {
         if (percentage >= PERCENTAGE_TO_SHOW_TITLE_DETAILS) {
             if (!isTitleVisible) {
                 startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
-                startAlphaAnimation(image, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.VISIBLE);
-                ((SimpleDraweeView) image).setImageURI((String) image.getTag());
                 isTitleVisible = true;
             }
         } else {
             if (isTitleVisible) {
                 startAlphaAnimation(title, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.INVISIBLE);
-                startAlphaAnimation(image, ALPHA_ANIMATIONS_DURATION, ALPHA_ANIMATIONS_DELAY, View.INVISIBLE);
                 isTitleVisible = false;
             }
         }

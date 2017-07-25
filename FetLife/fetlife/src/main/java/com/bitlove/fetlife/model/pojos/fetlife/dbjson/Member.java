@@ -1,5 +1,9 @@
 package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Avatar;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AvatarVariants;
@@ -299,22 +303,44 @@ public class Member extends BaseModel {
         this.followable = followable;
     }
 
-    public void mergeSave() {
+    public boolean mergeSave() {
         Member savedMember = Member.loadMember(id);
         if (savedMember != null) {
-            savedMember.setAvatar(getAvatar());
-            savedMember.setMetaInfo(getMetaInfo());
-            savedMember.setNickname(getNickname());
-            if (accessToken != null && accessToken.trim().length() != 0) {
-                savedMember.setAccessToken(accessToken);
+            if (TextUtils.isEmpty(accessToken)) {
+                setAccessToken(savedMember.accessToken);
             }
-            if (refreshToken != null && refreshToken.trim().length() != 0) {
-                savedMember.setRefreshToken(refreshToken);
+            if (TextUtils.isEmpty(refreshToken)) {
+                setRefreshToken(savedMember.refreshToken);
             }
-            savedMember.save();
-        } else {
-            save();
+            if (TextUtils.isEmpty(about)) {
+                setAbout(savedMember.about);
+            }
+            if (TextUtils.isEmpty(country)) {
+                setCountry(savedMember.country);
+            }
+            if (TextUtils.isEmpty(administrativeArea)) {
+                setAdministrativeArea(savedMember.administrativeArea);
+            }
+            if (TextUtils.isEmpty(city)) {
+                setCity(savedMember.city);
+            }
+            if (TextUtils.isEmpty(sexualOrientation)) {
+                setSexualOrientation(savedMember.sexualOrientation);
+            }
+            if (TextUtils.isEmpty(lookingForRawString)) {
+                setLookingForRawString(savedMember.lookingForRawString);
+            }
         }
+        return internalSave();
+    }
+
+    @Override
+    public boolean save() {
+        return mergeSave();
+    }
+
+    public boolean internalSave() {
+        return super.save();
     }
 
     public String toJsonString() throws JsonProcessingException {

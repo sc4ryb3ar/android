@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class BasicInfoFragment extends LoadFragment {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
+    private static final String ARG_MEMBER_ID = "ARG_REFERENCE_ID";
     private View locationRowView, relationshipRowView, orientationRowView, lookingForRowView;
     private TextView locationTextView, relationshipTextView, orientationTextView, lookingForTextView;
 

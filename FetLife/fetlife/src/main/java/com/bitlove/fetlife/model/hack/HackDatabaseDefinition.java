@@ -1,5 +1,8 @@
 package com.bitlove.fetlife.model.hack;
 
+import android.util.Log;
+
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.sql.migration.Migration;
@@ -58,6 +61,9 @@ public class HackDatabaseDefinition extends DatabaseDefinition {
 
     @Override
     public String getDatabaseName() {
+        if (BuildConfig.DEBUG) {
+            Log.d(getClass().getSimpleName(),"Returning databasename: " + databaseName);
+        }
         return databaseName;
     }
 

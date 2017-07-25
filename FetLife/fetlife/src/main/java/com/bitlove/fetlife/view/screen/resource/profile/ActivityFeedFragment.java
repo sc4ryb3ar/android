@@ -26,7 +26,7 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
     public static ActivityFeedFragment newInstance(String memberId) {
         ActivityFeedFragment friendsFragment = new ActivityFeedFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         friendsFragment.setArguments(args);
         return friendsFragment;
     }
@@ -38,7 +38,7 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        FeedRecyclerAdapter adapter = new FeedRecyclerAdapter(getFetLifeApplication(),this,getArguments().getString(ARG_MEMBER_ID));
+        FeedRecyclerAdapter adapter = new FeedRecyclerAdapter(getFetLifeApplication(),this,getArguments().getString(ARG_REFERENCE_ID));
         adapter.setUseSwipe(false);
         recyclerView.setAdapter(adapter);
         return view;
@@ -108,10 +108,6 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
             FeedRecyclerAdapter recyclerViewAdapter = (FeedRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();
         }
-    }
-
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
     }
 
     private void openProfileScreen(Member member) {

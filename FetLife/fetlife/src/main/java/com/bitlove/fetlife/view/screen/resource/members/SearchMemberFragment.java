@@ -124,10 +124,6 @@ public class SearchMemberFragment extends LoadFragment implements ResourceListRe
         }
     }
 
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
-    }
-
     @Override
     public void onItemClick(Member member) {
         openProfileScreen(member);

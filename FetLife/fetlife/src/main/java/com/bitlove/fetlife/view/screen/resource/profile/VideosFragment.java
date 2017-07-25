@@ -22,7 +22,7 @@ public class VideosFragment extends LoadFragment {
     public static VideosFragment newInstance(String memberId) {
         VideosFragment videosFragment = new VideosFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         videosFragment.setArguments(args);
         return videosFragment;
     }
@@ -34,7 +34,7 @@ public class VideosFragment extends LoadFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getFetLifeApplication(), VIDEO_GRID_COLUMN_COUNT);
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        VideosRecyclerAdapter adapter = new VideosRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID));
+        VideosRecyclerAdapter adapter = new VideosRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID));
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -56,7 +56,4 @@ public class VideosFragment extends LoadFragment {
         }
     }
 
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
-    }
 }

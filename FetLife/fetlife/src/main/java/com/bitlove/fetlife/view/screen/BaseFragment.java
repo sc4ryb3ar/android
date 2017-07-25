@@ -18,4 +18,20 @@ public class BaseFragment extends Fragment {
         FetLifeApplication.getInstance().getEventBus().unregister(this);
     }
 
+    protected void showProgress() {
+        getBaseActivity().showProgress();
+    }
+
+    protected void dismissProgress() {
+        getBaseActivity().dismissProgress();
+    }
+
+    protected BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
+
+    protected FetLifeApplication getFetLifeApplication() {
+        return getBaseActivity().getFetLifeApplication();
+    }
+
 }

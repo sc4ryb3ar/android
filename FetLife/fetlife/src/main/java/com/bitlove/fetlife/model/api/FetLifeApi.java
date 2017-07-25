@@ -11,6 +11,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.squareup.okhttp.ResponseBody;
@@ -59,6 +60,12 @@ public interface FetLifeApi {
     @GET("/api/v2/members/{memberId}")
     Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
 
+    @GET("/api/v2/events/{eventId}")
+    Call<Event> getEvent(@Header("Authorization") String authHeader, @Path("eventId") String memberId);
+
+    @GET("/api/v2/me/rsvps")
+    Call<List<Rsvp>> getRsvps(@Header("Authorization") String authHeader, @Query("event_id") String eventId);
+
     @GET("/api/v2/members/{memberId}/latest_activity")
     Call<Feed> getMemberFeed(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
 
@@ -82,6 +89,12 @@ public interface FetLifeApi {
 
     @GET("/api/v2/members/{memberId}/statuses")
     Call<List<Status>> getMemberStatuses(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/members/{memberId}/rsvps")
+    Call<List<Rsvp>> getMemberRsvps(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/events/{eventId}/rsvps")
+    Call<List<Rsvp>> getEventRsvps(@Header("Authorization") String authHeader, @Path("eventId") String eventid, @Query("limit") int limit, @Query("page") int page);
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")
@@ -122,6 +135,9 @@ public interface FetLifeApi {
 
     @PUT("/api/v2/me/loves/{content_type}/{content_id}")
     Call<ResponseBody> putLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);
+
+    @PUT("/api/v2/me/rsvps")
+    Call<ResponseBody> putRsvp(@Header("Authorization") String authHeader, @Query("event_id") String contentId, @Query("status") String rsvpsType);
 
     @DELETE("/api/v2/me/loves/{content_type}/{content_id}")
     Call<ResponseBody> deleteLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);

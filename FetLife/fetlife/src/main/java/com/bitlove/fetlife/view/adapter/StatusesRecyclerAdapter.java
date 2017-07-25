@@ -53,7 +53,7 @@ public class StatusesRecyclerAdapter extends RecyclerView.Adapter<StatusViewHold
             for (StatusReference statusReference : statusReferences) {
                 statusIds.add(statusReference.getId());
             }
-            itemList = new Select().from(Status.class).where(Status_Table.id.in(statusIds)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
+            itemList = new Select().from(Status.class).where(Status_Table.id.in(statusIds)).orderBy(OrderBy.fromProperty(Status_Table.date).descending()).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }

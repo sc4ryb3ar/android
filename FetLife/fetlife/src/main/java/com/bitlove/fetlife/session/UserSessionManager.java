@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -58,6 +59,10 @@ public class UserSessionManager {
     //*** Public State Change Calls
 
     public void init() {
+
+        if (BuildConfig.DEBUG) {
+//            Debug.waitForDebugger();
+        }
 
         applyVersionUpgrade();
 

@@ -45,6 +45,10 @@ import com.bitlove.fetlife.model.api.FetLifeApi;
 import com.bitlove.fetlife.model.api.FetLifeMultipartUploadApi;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
@@ -71,6 +75,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
@@ -130,6 +135,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEARCH_MEMBER = "com.bitlove.fetlife.action.apicall.search_member";
     public static final String ACTION_APICALL_MEMBER_RELATIONS = "com.bitlove.fetlife.action.apicall.member_relations";
     public static final String ACTION_APICALL_MEMBER_STATUSES = "com.bitlove.fetlife.action.apicall.member_statuses";
+    public static final String ACTION_APICALL_MEMBER_EVENTS = "com.bitlove.fetlife.action.apicall.member_events";
     public static final String ACTION_APICALL_MEMBER_PICTURES = "com.bitlove.fetlife.action.apicall.member_pictures";
     public static final String ACTION_APICALL_MEMBER_VIDEOS = "com.bitlove.fetlife.action.apicall.member_videos";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.conversations";
@@ -150,6 +156,9 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
     public static final String ACTION_APICALL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.apicall.upload_video_chunk";
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_LOCATION = "com.bitlove.fetlife.action.apicall.search_events_by_location";
+    public static final String ACTION_APICALL_EVENT = "com.bitlove.fetlife.action.apicall.event";
+    public static final String ACTION_APICALL_EVENT_RSVPS = "com.bitlove.fetlife.action.apicall.event.ravps";
+    public static final String ACTION_APICALL_SET_RSVP_STATUS = "com.bitlove.fetlife.action.apicall.event.set_ravp";
 
     public static final String ACTION_CANCEL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.cancel.upload_video_chunk";
 
@@ -358,6 +367,12 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MEMBER_STATUSES:
                     result = retrieveMemberStatuses(params);
                     break;
+                case ACTION_APICALL_MEMBER_EVENTS:
+                    result = retrieveMemberEvents(params);
+                    break;
+                case ACTION_APICALL_EVENT_RSVPS:
+                    result = retrieveEventRsvps(params);
+                    break;
                 case ACTION_APICALL_MEMBER_FEED:
                     result = retrieveMemberFeed(params);
                     break;
@@ -386,6 +401,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_ADD_LOVE:
                     result = addLove(params);
+                    break;
+                case ACTION_APICALL_SET_RSVP_STATUS:
+                    result = setRsvp(params);
                     break;
                 case ACTION_APICALL_REMOVE_LOVE:
                     result = removeLove(params);
@@ -422,6 +440,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_EXTERNAL_CALL_CHECK_4_UPDATES:
                     result = checkForUpdates(params);
+                    break;
+                case ACTION_APICALL_EVENT:
+                    result = getEvent(params);
                     break;
             }
 
@@ -494,12 +515,18 @@ public class FetLifeApiIntentService extends IntentService {
     private boolean refreshToken(Member currentUser) throws IOException {
 
         if (currentUser == null) {
+            if (BuildConfig.DEBUG) {
+//                Debug.waitForDebugger();
+            }
             return false;
         }
 
         String refreshToken = currentUser.getRefreshToken();
 
         if (refreshToken == null) {
+            if (BuildConfig.DEBUG) {
+//                Debug.waitForDebugger();
+            }
             return false;
         }
 
@@ -794,6 +821,14 @@ public class FetLifeApiIntentService extends IntentService {
         String[] messageIds = Arrays.copyOfRange(params, 1, params.length);
         Call<ResponseBody> setMessagesReadCall = getFetLifeApi().setMessagesRead(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), conversationId, messageIds);
         Response<ResponseBody> response = setMessagesReadCall.execute();
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
+    }
+
+    private int setRsvp(String[] params) throws IOException {
+        String eventId = params[0];
+        String rsvp = params[1];
+        Call<ResponseBody> setRsvpStatus = getFetLifeApi().putRsvp(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId, rsvp);
+        Response<ResponseBody> response = setRsvpStatus.execute();
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
@@ -1305,11 +1340,37 @@ public class FetLifeApiIntentService extends IntentService {
                     relationship.save();
                 }
             }
-            member.save();
+            member.mergeSave();
             return 1;
         } else {
             return Integer.MIN_VALUE;
         }
+    }
+
+    private int getEvent(String... params) throws IOException {
+        String eventId = params[0];
+        Call<Event> getEventCall = getFetLifeApi().getEvent(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId);
+        Response<Event> getEventResponse = getEventCall.execute();
+        if (getEventResponse.isSuccess()) {
+            Event event = getEventResponse.body();
+            event.setRsvpStatus(Rsvp.RsvpStatus.NO);
+            event.save();
+            Response<List<Rsvp>> rsvpsResponse = getFetLifeApi().getRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),eventId).execute();
+            if (rsvpsResponse.isSuccess()) {
+                List<Rsvp> rsvps = rsvpsResponse.body();
+                if (rsvps.size() > 0) {
+                    Rsvp rsvp = rsvps.get(0);
+                    event.setRsvpStatus(rsvp.getRsvpStatus());
+                    event.save();
+                }
+                return 1;
+            } else {
+                return Integer.MIN_VALUE;
+            }
+        } else {
+            return Integer.MIN_VALUE;
+        }
+
     }
 
     private int searchMember(String... params) throws IOException {
@@ -1684,6 +1745,123 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int retrieveEventRsvps(String[] params) throws IOException {
+        String eventId = params[0];
+        final int limit = getIntFromParams(params, 2, 10);
+        final int page = getIntFromParams(params, 3, 1);
+
+        final Call<List<Rsvp>> getRsvpsCall;
+        getRsvpsCall = getFetLifeApi().getEventRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId, /*"start_date_time",*/ limit, page);
+
+        Response<List<Rsvp>> rsvpsResponse = getRsvpsCall.execute();
+        if (rsvpsResponse.isSuccess()) {
+
+            final List<Rsvp> retrievedRsvps = rsvpsResponse.body();
+            List<EventRsvpReference> currentEventRsvps = new Select().from(EventRsvpReference.class).where(EventRsvpReference_Table.eventId.is(eventId)).orderBy(OrderBy.fromProperty(EventRsvpReference_Table.nickname).ascending()).queryList();
+
+            int lastConfirmedEventPosition;
+            if (page == 1) {
+                lastConfirmedEventPosition = -1;
+            } else {
+                lastConfirmedEventPosition = loadLastSyncedPosition(SyncedPositionType.EVENT_RSVP,eventId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Rsvp retrievedRsvp : retrievedRsvps) {
+
+                int foundPos;
+                for (foundPos = lastConfirmedEventPosition+1; foundPos < currentEventRsvps.size(); foundPos++) {
+                    EventRsvpReference checkEventRsvp = currentEventRsvps.get(foundPos);
+                    if (retrievedRsvp.getId().equals(checkEventRsvp.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentEventRsvps.size()) {
+                    newItemCount++;
+                    EventRsvpReference eventRsvpReference = new EventRsvpReference();
+                    eventRsvpReference.setId(retrievedRsvp.getMember().getId());
+                    eventRsvpReference.setNickname(retrievedRsvp.getMember().getNickname());
+                    eventRsvpReference.setRsvpType(retrievedRsvp.getRsvpStatus() == Rsvp.RsvpStatus.YES ? EventRsvpReference.VALUE_RSVPTYPE_GOING : EventRsvpReference.VALUE_RSVPTYPE_MAYBE);
+                    eventRsvpReference.setEventId(eventId);
+                    eventRsvpReference.save();
+                } else {
+                    for (int i = lastConfirmedEventPosition+1; i < foundPos; i++) {
+                        currentEventRsvps.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedEventPosition = foundPos;
+                }
+                retrievedRsvp.getMember().mergeSave();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.EVENT_RSVP,eventId,lastConfirmedEventPosition+newItemCount);
+
+            return retrievedRsvps.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveMemberEvents(String[] params) throws IOException {
+        String userId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Rsvp>> getRsvpsCall;
+        getRsvpsCall = getFetLifeApi().getMemberRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, /*"start_date_time",*/ limit, page);
+
+        Response<List<Rsvp>> rsvpsResponse = getRsvpsCall.execute();
+        if (rsvpsResponse.isSuccess()) {
+
+            final List<Rsvp> retrievedRsvps = rsvpsResponse.body();
+            List<EventReference> currentEvents = new Select().from(EventReference.class).where(EventReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
+
+            int lastConfirmedEventPosition;
+            if (page == 1) {
+                lastConfirmedEventPosition = -1;
+            } else {
+                lastConfirmedEventPosition = loadLastSyncedPosition(SyncedPositionType.EVENT,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Rsvp retrievedRsvp : retrievedRsvps) {
+                Event retrievedEvent = retrievedRsvp.getEvent();
+
+                int foundPos;
+                for (foundPos = lastConfirmedEventPosition+1; foundPos < currentEvents.size(); foundPos++) {
+                    EventReference checkEvent = currentEvents.get(foundPos);
+                    if (retrievedEvent.getId().equals(checkEvent.getId())) {
+                        checkEvent.setRsvpStatus(retrievedRsvp.getRsvpStatus());
+                        checkEvent.save();
+                        break;
+                    }
+                }
+                if (foundPos >= currentEvents.size()) {
+                    newItemCount++;
+                    EventReference eventReference = new EventReference();
+                    eventReference.setId(retrievedEvent.getId());
+                    eventReference.setCreatedAt(retrievedEvent.getCreatedAt());
+                    eventReference.setRsvpStatus(retrievedRsvp.getRsvpStatus());
+                    eventReference.setUserId(userId);
+                    eventReference.save();
+                } else {
+                    for (int i = lastConfirmedEventPosition+1; i < foundPos; i++) {
+                        currentEvents.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedEventPosition = foundPos;
+                }
+                retrievedEvent.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.EVENT,userId,lastConfirmedEventPosition+newItemCount);
+
+            return retrievedRsvps.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int cancelFriendRequest(String[] params) throws IOException {
         String memberId = params[0];
 
@@ -1867,6 +2045,8 @@ public class FetLifeApiIntentService extends IntentService {
     private enum SyncedPositionType {
         PICTURE,
         STATUS,
+        EVENT,
+        EVENT_RSVP,
         FRIEND,
         CONVERSATION, FOLLOWER, FOLLOWING, VIDEO;
 

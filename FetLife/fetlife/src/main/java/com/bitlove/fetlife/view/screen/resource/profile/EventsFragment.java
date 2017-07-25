@@ -10,22 +10,22 @@ import android.view.ViewGroup;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.EventsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.EventActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class RelationsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class EventsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Event> {
 
-    public static RelationsFragment newInstance(String memberId, int relationType) {
-        RelationsFragment friendsFragment = new RelationsFragment();
+    public static EventsFragment newInstance(String memberId) {
+        EventsFragment eventsFragment = new EventsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_REFERENCE_ID, memberId);
-        args.putInt(ARG_REFERENCE_TYPE, relationType);
-        friendsFragment.setArguments(args);
-        return friendsFragment;
+        eventsFragment.setArguments(args);
+        return eventsFragment;
     }
 
     @Nullable
@@ -35,37 +35,40 @@ public class RelationsFragment extends LoadFragment implements ResourceListRecyc
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        RelationsRecyclerAdapter adapter = new RelationsRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID), getArguments().getInt(ARG_REFERENCE_TYPE),getFetLifeApplication());
+        EventsRecyclerAdapter adapter = new EventsRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID));
         adapter.setOnItemClickListener(this);
-        adapter.setUseSwipe(false);
         recyclerView.setAdapter(adapter);
         return view;
     }
 
     @Override
     public String getApiCallAction() {
-        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS;
+        return FetLifeApiIntentService.ACTION_APICALL_MEMBER_EVENTS;
+    }
+
+    @Override
+    public void startResourceCall(int pageCount, int requestedPage) {
+        super.startResourceCall(pageCount, requestedPage);
+    }
+
+
+    @Override
+    public void onItemClick(Event event) {
+        event.save();
+        EventActivity.startActivity((BaseActivity) getActivity(),event.getId());
+    }
+
+    @Override
+    public void onAvatarClick(Event event) {
+
     }
 
     public void refreshUi() {
         if (recyclerView != null) {
-            RelationsRecyclerAdapter recyclerViewAdapter = (RelationsRecyclerAdapter) recyclerView.getAdapter();
+            EventsRecyclerAdapter recyclerViewAdapter = (EventsRecyclerAdapter) recyclerView.getAdapter();
+            recyclerViewAdapter.setOnItemClickListener(this);
             recyclerViewAdapter.refresh();
         }
     }
 
-    @Override
-    public void onItemClick(Member member) {
-        openProfileScreen(member);
-    }
-
-    @Override
-    public void onAvatarClick(Member member) {
-        openProfileScreen(member);
-    }
-
-    private void openProfileScreen(Member member) {
-        ProfileActivity.startActivity((BaseActivity) getActivity(),member.getId());
-    }
 }

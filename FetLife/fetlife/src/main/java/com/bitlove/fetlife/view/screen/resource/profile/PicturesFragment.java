@@ -26,7 +26,7 @@ public class PicturesFragment extends LoadFragment implements PicturesRecyclerAd
     public static PicturesFragment newInstance(String memberId) {
         PicturesFragment picturesFragment = new PicturesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         picturesFragment.setArguments(args);
         return picturesFragment;
     }
@@ -38,7 +38,7 @@ public class PicturesFragment extends LoadFragment implements PicturesRecyclerAd
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getFetLifeApplication(), PICTURE_GRID_COLUMN_COUNT);
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        PicturesRecyclerAdapter adapter = new PicturesRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID),this,getFetLifeApplication());
+        PicturesRecyclerAdapter adapter = new PicturesRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID),this,getFetLifeApplication());
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -60,10 +60,6 @@ public class PicturesFragment extends LoadFragment implements PicturesRecyclerAd
         }
     }
 
-
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
-    }
 
     @Override
     public void onVisitItem(Picture picture, String url) {

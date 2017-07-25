@@ -19,7 +19,7 @@ public class StatusesFragment extends LoadFragment {
     public static StatusesFragment newInstance(String memberId) {
         StatusesFragment statusesFragment = new StatusesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         statusesFragment.setArguments(args);
         return statusesFragment;
     }
@@ -31,7 +31,7 @@ public class StatusesFragment extends LoadFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        StatusesRecyclerAdapter adapter = new StatusesRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID));
+        StatusesRecyclerAdapter adapter = new StatusesRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID));
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -46,9 +46,5 @@ public class StatusesFragment extends LoadFragment {
             StatusesRecyclerAdapter recyclerViewAdapter = (StatusesRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();
         }
-    }
-
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
     }
 }
