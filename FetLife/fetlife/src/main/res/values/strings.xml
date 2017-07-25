@@ -24,6 +24,12 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.9.7<br/>
+                    <ul>
+                        <li>List of My Events</li>
+                        <li>Search Events by Tag</li>
+                    </ul>
+
             <p/>v2.9.5<br/>
                     <ul>
                         <li>Frequent Login issue fix</li>
@@ -465,7 +471,7 @@
     <string name="menu_profile_follow">Follow</string>
     <string name="menu_profile_message">Message</string>
     <string name="menu_profile_view">View</string>
-    <string name="menu_eventmap">Event Map</string>
+    <string name="menu_events">Events</string>
 
     <string name="text_profile_location">%2$s, %1$s</string>
     <string name="text_profile_header_location">Location:</string>
@@ -666,7 +672,7 @@
     <string name="noification_title_new_loves">You received new loves</string>
     <string name="noification_title_new_comments">You received new comments</string>
     <string name="noification_title_new_mentions">You were mentioned</string>
-    <string name="title_activity_event_map">FetLife Event Map</string>
+    <string name="title_activity_events">Events</string>
     <string name="title_activity_event">EventActivity</string>
 
     <string name="text_event_header_location">Location:</string>
@@ -684,5 +690,8 @@
     <string name="menu_event_show_on_map">Show on Map</string>
     <string name="title_fragment_event_rsvp_going">Going</string>
     <string name="title_fragment_event_rsvp_maybe">Maybe Going</string>
+    <string name="title_fragment_event_map">Event Map</string>
+    <string name="title_fragment_event_myevents">My Events</string>
+    <string name="title_fragment_event_search">Search</string>
 
 </resources>

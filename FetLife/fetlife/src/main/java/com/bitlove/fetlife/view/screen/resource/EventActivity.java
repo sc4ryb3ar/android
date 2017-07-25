@@ -184,7 +184,7 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
     }
 
     public void onShowEventOnMap(View v) {
-        EventMapActivity.startActivity(this,event);
+        EventsActivity.startActivity(this,event);
     }
 
     public void onGoingToEvent(View v) {

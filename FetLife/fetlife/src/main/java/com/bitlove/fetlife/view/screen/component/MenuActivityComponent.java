@@ -25,7 +25,7 @@ import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
 import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.screen.resource.EventMapActivity;
+import com.bitlove.fetlife.view.screen.resource.EventsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
@@ -204,9 +204,9 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
-        } else if (id == R.id.nav_eventmap) {
+        } else if (id == R.id.nav_events) {
             if (isLocationPermissionGranted()) {
-                EventMapActivity.startActivity(menuActivity);
+                EventsActivity.startActivity(menuActivity);
             } else {
                 requestLocationPermission(BaseActivity.PERMISSION_REQUEST_LOCATION);
             }
@@ -262,7 +262,7 @@ public class MenuActivityComponent extends ActivityComponent {
                     VideoUploadSelectionDialog.show(menuActivity);
                     break;
                 case BaseActivity.PERMISSION_REQUEST_LOCATION:
-                    EventMapActivity.startActivity(menuActivity);
+                    EventsActivity.startActivity(menuActivity);
                     break;
                 default:
                     break;
@@ -270,7 +270,7 @@ public class MenuActivityComponent extends ActivityComponent {
         } else {
             switch (requestCode) {
                 case BaseActivity.PERMISSION_REQUEST_LOCATION:
-                    EventMapActivity.startActivity(menuActivity);
+                    EventsActivity.startActivity(menuActivity);
                     break;
                 default:
                     return;

@@ -156,6 +156,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
     public static final String ACTION_APICALL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.apicall.upload_video_chunk";
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_LOCATION = "com.bitlove.fetlife.action.apicall.search_events_by_location";
+    public static final String ACTION_APICALL_SEARCH_EVENT_BY_TAG = "com.bitlove.fetlife.action.apicall.search_events_by_tag";
     public static final String ACTION_APICALL_EVENT = "com.bitlove.fetlife.action.apicall.event";
     public static final String ACTION_APICALL_EVENT_RSVPS = "com.bitlove.fetlife.action.apicall.event.ravps";
     public static final String ACTION_APICALL_SET_RSVP_STATUS = "com.bitlove.fetlife.action.apicall.event.set_ravp";
@@ -431,6 +432,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_SEARCH_MEMBER:
                     result = searchMember(params);
+                    break;
+                case ACTION_APICALL_SEARCH_EVENT_BY_TAG:
+                    result = searchEventByTag(params);
                     break;
                 case ACTION_APICALL_SEARCH_EVENT_BY_LOCATION:
                     result = searchEventByLocation(params);
@@ -1374,7 +1378,6 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private int searchMember(String... params) throws IOException {
-
         final String queryString = params[0];
         final int limit = getIntFromParams(params, 1, 10);
         final int page = getIntFromParams(params, 2, 1);
@@ -1386,6 +1389,23 @@ public class FetLifeApiIntentService extends IntentService {
                 friendMember.mergeSave();
             }
             return foundMembers.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int searchEventByTag(String... params) throws IOException {
+        final String queryString = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Response<List<Event>> relationsResponse = getFetLifeApi().searchEvents(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),queryString,limit,page).execute();
+        if (relationsResponse.isSuccess()) {
+            final List<Event> foundEvents = relationsResponse.body();
+            for (Event event : foundEvents) {
+                event.save();
+            }
+            return foundEvents.size();
         } else {
             return Integer.MIN_VALUE;
         }

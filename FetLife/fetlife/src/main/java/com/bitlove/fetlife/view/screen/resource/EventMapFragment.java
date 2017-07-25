@@ -2,22 +2,19 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.ColorUtils;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
@@ -29,10 +26,11 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.ReflectionUtil;
+import com.bitlove.fetlife.view.screen.BaseFragment;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -58,12 +56,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EventMapActivity extends ResourceActivity implements OnMapReadyCallback, PlaceSelectionListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener, ClusterManager.OnClusterClickListener<Event>, ClusterManager.OnClusterItemClickListener<Event>, ClusterManager.OnClusterInfoWindowClickListener<Event>, ClusterManager.OnClusterItemInfoWindowClickListener<Event>, GoogleMap.InfoWindowAdapter, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
-
-    //Check 500 max range
-    //Add progress
-    //Solve initial flickering
-    //(Cluster) Info Window
+public class EventMapFragment extends BaseFragment implements OnMapReadyCallback, PlaceSelectionListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraIdleListener, ClusterManager.OnClusterClickListener<Event>, ClusterManager.OnClusterItemClickListener<Event>, ClusterManager.OnClusterInfoWindowClickListener<Event>, ClusterManager.OnClusterItemInfoWindowClickListener<Event>, GoogleMap.InfoWindowAdapter, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
 
     private static final float MIN_ZOOM_LEVEL = 1f;
     private static final float DEFAULT_ZOOM_LEVEL = 10f;
@@ -81,82 +74,44 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     private static final boolean USE_CLUSTERING = true;
     private static final double MAX_SEARCH_RANGE = 500d;
 
-    private static final String ARG_EVENT_ID = "ARG_EVENT_ID";
-    private static final String ARG_EVENT_LONGITUDE = "ARG_EVENT_LONGITUDE";
-    private static final String ARG_EVENT_LATITUDE = "ARG_EVENT_LATITUDE";
-
     private ClusterManager<Event> clusterManager;
     private CustomClusterRenderer customClusterRenderer;
     private LocationManager locationManager;
 
     private GoogleMap map;
 
-    public static void startActivity(Context context) {
-        context.startActivity(createIntent(context));
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
-
-    public static Intent createIntent(Context context) {
-        Intent intent = new Intent(context, EventMapActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        return intent;
-    }
-
-    public static void startActivity(Context context, Event event) {
-        context.startActivity(createIntent(context,event));
-    }
-
-    public static Intent createIntent(Context context, Event event) {
-        Intent intent = new Intent(context, EventMapActivity.class);
-        intent.putExtra(ARG_EVENT_ID,event.getId());
-        intent.putExtra(ARG_EVENT_LONGITUDE,event.getLongitude());
-        intent.putExtra(ARG_EVENT_LATITUDE,event.getLatitude());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        return intent;
-    }
+    @Nullable
 
     @Override
-    protected void onResourceCreate(Bundle savedInstanceState) {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        showProgress();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isFinishing()) {
-                    return;
-                }
-                FrameLayout mapContainer = (FrameLayout) findViewById(R.id.map_container);
-                LayoutInflater layoutInflater = LayoutInflater.from(EventMapActivity.this);
-                View mapContent = layoutInflater.inflate(R.layout.content_eventmap,mapContainer,false);
-                mapContainer.addView(mapContent);
-                final SupportMapFragment mf = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-                mf.getMapAsync(EventMapActivity.this);
-                PlaceAutocompleteFragment searchFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-                searchFragment.setOnPlaceSelectedListener(EventMapActivity.this);
-            }
-        }, 200);
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_events_map,container,false);
+        return view;
     }
+
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        SupportMapFragment mf = (SupportMapFragment) getChildFragmentManager()
+//                .findFragmentById(R.id.map);
+//        if (mf != null) {
+//            getFragmentManager().beginTransaction().remove(mf).commit();
+//        }
+//    }
 
     @Override
-    protected void onSetContentView() {
-        setContentView(R.layout.activity_eventmap);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        final SupportMapFragment mf = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mf.getMapAsync(EventMapFragment.this);
+        SupportPlaceAutocompleteFragment searchFragment = (SupportPlaceAutocompleteFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        searchFragment.setOnPlaceSelectedListener(EventMapFragment.this);
     }
 
-    @Override
-    protected void onResourceStart() {
-    }
-
-    @Override
-    protected void onCreateActivityComponents() {
-    }
-
-    //Map events
-
-    private EventMapActivity.DelayedEventRetriever delayedEventRetriever;
+    private DelayedEventRetriever delayedEventRetriever;
     private Object delayedEventRetrieverLock = new Object();
 
     @Override
@@ -167,7 +122,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
         clearLocationUpdates();
         synchronized (delayedEventRetrieverLock) {
             if (delayedEventRetriever != null) {
-                delayedEventRetriever.runState.compareAndSet(EventMapActivity.DelayedEventRetriever.WAITING, EventMapActivity.DelayedEventRetriever.CANCELLED);
+                delayedEventRetriever.runState.compareAndSet(DelayedEventRetriever.WAITING, DelayedEventRetriever.CANCELLED);
                 delayedEventRetriever = null;
             }
         }
@@ -179,7 +134,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
             clusterManager.onCameraIdle();
         }
         synchronized (delayedEventRetrieverLock) {
-            delayedEventRetriever = new EventMapActivity.DelayedEventRetriever();
+            delayedEventRetriever = new DelayedEventRetriever();
             //TODO use thread executor
             new Thread(delayedEventRetriever).start();
         }
@@ -193,10 +148,10 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        double eventLongitude = getIntent().getDoubleExtra(ARG_EVENT_LONGITUDE,Double.MIN_VALUE);
-        double eventLatitude = getIntent().getDoubleExtra(ARG_EVENT_LATITUDE,Double.MIN_VALUE);
+        double eventLongitude = getActivity().getIntent().getDoubleExtra(EventsActivity.ARG_EVENT_LONGITUDE,Double.MIN_VALUE);
+        double eventLatitude = getActivity().getIntent().getDoubleExtra(EventsActivity.ARG_EVENT_LATITUDE,Double.MIN_VALUE);
 
-        boolean locationEnabled = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean locationEnabled = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         if (locationEnabled) {
             map.setMyLocationEnabled(true);
         }
@@ -204,7 +159,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
         if (eventLatitude != Double.MIN_VALUE && eventLongitude != Double.MIN_VALUE) {
             onLocationChanged(eventLatitude,eventLongitude);
         } else if (locationEnabled) {
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 //            Criteria criteria = new Criteria();
 //            String provider = locationManager.getBestProvider(criteria, true);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Long.MAX_VALUE, 0f, this);
@@ -231,7 +186,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
         getFetLifeApplication().getInMemoryStorage().getMapPositions().clear();
 
         if (USE_CLUSTERING) {
-            clusterManager = new ClusterManager<>(this, map);
+            clusterManager = new ClusterManager<>(getActivity(), map);
             map.setOnMarkerClickListener(clusterManager);
             map.setOnInfoWindowClickListener(clusterManager);
             map.setInfoWindowAdapter(this);
@@ -330,7 +285,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
 
     private void startEventSearch(LatLngBounds searchBounds,int page) {
         FetLifeApiIntentService.startClearApiCall(
-                EventMapActivity.this,
+                getActivity(),
                 FetLifeApiIntentService.ACTION_APICALL_SEARCH_EVENT_BY_LOCATION,
                 Double.toString(searchBounds.southwest.latitude),
                 Double.toString(searchBounds.southwest.longitude),
@@ -425,7 +380,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     }
 
     private float getMarkerColorForEvent(Event event) {
-        String selectedEventId = getIntent().getStringExtra(ARG_EVENT_ID);
+        String selectedEventId = getActivity().getIntent().getStringExtra(EventsActivity.ARG_EVENT_ID);
         if (selectedEventId != null && selectedEventId.equals(event.getId())) {
             return MARKER_COLOR_SELECTED;
         }
@@ -447,7 +402,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     }
 
     private int getClusterColorForEvents(Collection<Event> items) {
-        String seletecedEventId = getIntent().getStringExtra(ARG_EVENT_ID);
+        String seletecedEventId = getActivity().getIntent().getStringExtra(EventsActivity.ARG_EVENT_ID);
         float markerHue = MARKER_COLOR_LONG_DUE;
         for (Event event : items) {
             if (seletecedEventId != null && seletecedEventId.equals(event.getId())) {
@@ -475,7 +430,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
 
 
         public CustomClusterRenderer() {
-            super(EventMapActivity.this, map, clusterManager);
+            super(getActivity(), map, clusterManager);
         }
 
         public synchronized void setZoomLevel(float zoomLevel) {
@@ -563,23 +518,23 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
     @Override
     public void onInfoWindowClick(Marker marker) {
         clickedEvent.save();
-        EventActivity.startActivity(this,clickedEvent.getId());
-//        UrlUtil.openUrl(EventMapActivity.this,clickedEvent.getUrl());
+        EventActivity.startActivity(getBaseActivity(),clickedEvent.getId());
+//        UrlUtil.openUrl(EventsActivity.this,clickedEvent.getUrl());
     }
 
     @Override
     public void onClusterItemInfoWindowClick(Event event) {
         event.save();
-        EventActivity.startActivity(this,event.getId());
-//        UrlUtil.openUrl(EventMapActivity.this,clickedEvent.getUrl());
+        EventActivity.startActivity(getBaseActivity(),event.getId());
+//        UrlUtil.openUrl(EventsActivity.this,clickedEvent.getUrl());
     }
 
     @Override
     public void onClusterInfoWindowClick(Cluster<Event> cluster) {
         Event event = sortedCluster.get(eventInCluster);
         event.save();
-        EventActivity.startActivity(this,event.getId());
-//        UrlUtil.openUrl(EventMapActivity.this,sortedCluster.get(eventInCluster).getUrl());
+        EventActivity.startActivity(getBaseActivity(),event.getId());
+//        UrlUtil.openUrl(EventsActivity.this,sortedCluster.get(eventInCluster).getUrl());
     }
 
     //Info Window Providing methods
@@ -591,7 +546,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
 
     @Override
     public View getInfoContents(Marker marker) {
-        LayoutInflater layoutInflater = LayoutInflater.from(EventMapActivity.this);
+        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
         View layout = layoutInflater.inflate(R.layout.content_eventmap_infowindow,null);
         TextView eventCountInfo = (TextView) layout.findViewById(R.id.event_count_info);
         TextView eventName = (TextView) layout.findViewById(R.id.event_name);
@@ -625,16 +580,6 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
         return layout;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private class DelayedEventRetriever implements Runnable {
 
         static final long WAIT_FOR_STOP_DELAY = 500l;
@@ -658,7 +603,7 @@ public class EventMapActivity extends ResourceActivity implements OnMapReadyCall
                 }
             }
             if (runState.compareAndSet(WAITING,RUNNING)) {
-                runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         validateAndSearch();

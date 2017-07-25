@@ -152,4 +152,7 @@ public interface FetLifeApi {
     @GET("/api/v2/search/events/by_location")
     Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("latitude") double latitude, @Query("longitude") double longitude, @Query("range") double range, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/search/events")
+    Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
+
 }

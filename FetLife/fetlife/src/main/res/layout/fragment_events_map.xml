@@ -10,7 +10,7 @@
     map:mapType="normal"
     map:uiZoomControls="true"
     map:uiZoomGestures="true"
-    tools:context="com.bitlove.fetlife.view.screen.resource.EventMapActivity">
+    tools:context="com.bitlove.fetlife.view.screen.resource.EventsActivity">
 
     <fragment
         android:id="@+id/map"
@@ -29,7 +29,7 @@
 
             <fragment
                 android:id="@+id/place_autocomplete_fragment"
-                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </android.support.v7.widget.CardView>

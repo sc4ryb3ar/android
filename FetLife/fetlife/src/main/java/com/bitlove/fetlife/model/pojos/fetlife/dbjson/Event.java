@@ -113,6 +113,7 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
     //local
     @JsonIgnore
+    @Column
     private long roughtStartDate;
 
     @JsonIgnore
@@ -325,6 +326,10 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
     public long getRoughtStartDate() {
         return roughtStartDate;
+    }
+
+    public void setRoughtStartDate(long roughtStartDate) {
+        this.roughtStartDate = roughtStartDate;
     }
 
     public long getRoughtEndDate() {

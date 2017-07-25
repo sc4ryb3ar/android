@@ -32,7 +32,7 @@ public class EventsRecyclerAdapter extends ResourceListRecyclerAdapter<Event, Ev
     private static final String LOCATION_SEPARATOR = " - ";
 
     private final String memberId;
-    private List<Event> itemList;
+    protected List<Event> itemList;
     private HashMap<String,Rsvp.RsvpStatus> statusMap;
 
     public EventsRecyclerAdapter(String memberId) {
@@ -51,7 +51,7 @@ public class EventsRecyclerAdapter extends ResourceListRecyclerAdapter<Event, Ev
         });
     }
 
-    private void loadItems() {
+    protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
             List<EventReference> eventReferences = new Select().from(EventReference.class).where(EventReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(EventReference_Table.id).ascending().collate(Collate.NOCASE)).queryList();
@@ -110,9 +110,14 @@ public class EventsRecyclerAdapter extends ResourceListRecyclerAdapter<Event, Ev
         }
         holder.eventDate.setText(startDateTime + DATE_INTERVAL_SEPARATOR + endDateTime);
         holder.eventDate.setVisibility((startTimeLong + endTimeLong) > 0 ? View.VISIBLE : View.GONE);
-        boolean going = statusMap.get(event.getId()) == Rsvp.RsvpStatus.YES;
-        holder.eventRsvpText.setText(going ? R.string.menu_event_going : R.string.menu_event_maybe);
-        holder.eventRsvpIcon.setImageResource(going ? R.drawable.ic_event_going_24dp_black : R.drawable.ic_event_maybe_going_24dp_black);
+        if (statusMap != null) {
+            holder.eventRsvpContainer.setVisibility(View.VISIBLE);
+            boolean going = statusMap.get(event.getId()) == Rsvp.RsvpStatus.YES;
+            holder.eventRsvpText.setText(going ? R.string.menu_event_going : R.string.menu_event_maybe);
+            holder.eventRsvpIcon.setImageResource(going ? R.drawable.ic_event_going_24dp_black : R.drawable.ic_event_maybe_going_24dp_black);
+        } else {
+            holder.eventRsvpContainer.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -132,6 +137,7 @@ public class EventsRecyclerAdapter extends ResourceListRecyclerAdapter<Event, Ev
 }
 class EventsViewHolder extends SwipeableViewHolder {
 
+    View eventRsvpContainer;
     ImageView eventRsvpIcon;
     TextView eventName, eventDate, eventLocation, eventTagline, eventRsvpText;
 
@@ -143,6 +149,7 @@ class EventsViewHolder extends SwipeableViewHolder {
         eventDate = (TextView) itemView.findViewById(R.id.event_date);
         eventRsvpIcon = (ImageView) itemView.findViewById(R.id.event_rsvp_icon);
         eventRsvpText = (TextView) itemView.findViewById(R.id.event_rsvp_text);
+        eventRsvpContainer = itemView.findViewById(R.id.event_rsvp_container);
     }
 
     @Override

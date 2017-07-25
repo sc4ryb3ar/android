@@ -110,8 +110,8 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"/>
         <activity
-            android:name=".view.screen.resource.EventMapActivity"
-            android:label="@string/title_activity_event_map"
+            android:name=".view.screen.resource.EventsActivity"
+            android:label="@string/title_activity_events"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
