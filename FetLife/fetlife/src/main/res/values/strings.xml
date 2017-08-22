@@ -24,6 +24,14 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.9.11<br/>
+                    <ul>
+                        <li>Hot fix for resending rejected friend requests</li>
+                        <li>Small Profile Screen improvement</li>
+                        <li>Fix for Profile Screen refresh after relationship change</li>
+                        <li>Several crash fixes</li>
+                    </ul>
+
             <p/>v2.9.7<br/>
                     <ul>
                         <li>List of My Events</li>

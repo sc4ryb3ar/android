@@ -35,7 +35,10 @@ import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
+
+import io.fabric.sdk.android.services.common.Crash;
 
 public class MenuActivityComponent extends ActivityComponent {
 

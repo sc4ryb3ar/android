@@ -1,6 +1,7 @@
 package com.bitlove.fetlife.view.screen.resource;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -22,6 +23,7 @@ import com.bitlove.fetlife.event.EventsByLocationRetrieveFailedEvent;
 import com.bitlove.fetlife.event.EventsByLocationRetrievedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.json.PeopleInto;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.MapUtil;
@@ -603,12 +605,15 @@ public class EventMapFragment extends BaseFragment implements OnMapReadyCallback
                 }
             }
             if (runState.compareAndSet(WAITING,RUNNING)) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        validateAndSearch();
-                    }
-                });
+                Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            validateAndSearch();
+                        }
+                    });
+                }
             }
         }
     }

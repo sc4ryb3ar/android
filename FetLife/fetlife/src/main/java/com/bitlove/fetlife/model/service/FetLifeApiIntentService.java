@@ -70,6 +70,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
@@ -90,6 +91,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
@@ -410,12 +412,7 @@ public class FetLifeApiIntentService extends IntentService {
                     result = removeLove(params);
                     break;
                 case ACTION_APICALL_PENDING_RELATIONS:
-                    for (int i = PENDING_FRIENDREQUEST_RETRY_COUNT; i > 0; i--) {
-                        result = sendPendingFriendRequests();
-                        if (result != Integer.MIN_VALUE) {
-                            break;
-                        }
-                    }
+                    result = sendPendingFriendRequests();
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
@@ -720,7 +717,11 @@ public class FetLifeApiIntentService extends IntentService {
         for (FriendRequest pendingFriendRequest : pendingFriendRequests) {
             if (pendingFriendRequest.getPendingState() == FriendRequest.PendingState.OUTGOING) {
                 if (!sendPendingFriendRequest(pendingFriendRequest)) {
-                    pendingFriendRequest.delete();
+                    if (pendingFriendRequest.getClientId() == null) {
+                        new Delete().from(FriendRequest.class).where(FriendRequest_Table.targetMemberId.is(pendingFriendRequest.getTargetMemberId())).query();
+                    } else {
+                        pendingFriendRequest.delete();
+                    }
                 } else {
                     sentCount++;
                 }
@@ -1334,6 +1335,7 @@ public class FetLifeApiIntentService extends IntentService {
             Call<List<Relationship>> getMemberRelationshipCall = getFetLifeApi().getMemberRelationship(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId);
             Response<List<Relationship>> getMemberRelationshipResponse = getMemberRelationshipCall.execute();
             if (getMemberRelationshipResponse.isSuccess()) {
+                new Delete().from(Relationship.class).where(Relationship_Table.memberId.is(memberId)).query();
                 List<Relationship> relationships = getMemberRelationshipResponse.body();
                 for (Relationship relationship : relationships) {
                     Member targetMember = relationship.getTargetMember();
