@@ -50,6 +50,8 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
@@ -70,11 +72,13 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
@@ -90,6 +94,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
@@ -136,6 +141,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MEMBER_RELATIONS = "com.bitlove.fetlife.action.apicall.member_relations";
     public static final String ACTION_APICALL_MEMBER_STATUSES = "com.bitlove.fetlife.action.apicall.member_statuses";
     public static final String ACTION_APICALL_MEMBER_EVENTS = "com.bitlove.fetlife.action.apicall.member_events";
+    public static final String ACTION_APICALL_MEMBER_GROUPS = "com.bitlove.fetlife.action.apicall.member_groups";
     public static final String ACTION_APICALL_MEMBER_PICTURES = "com.bitlove.fetlife.action.apicall.member_pictures";
     public static final String ACTION_APICALL_MEMBER_VIDEOS = "com.bitlove.fetlife.action.apicall.member_videos";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.conversations";
@@ -158,6 +164,8 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_LOCATION = "com.bitlove.fetlife.action.apicall.search_events_by_location";
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_TAG = "com.bitlove.fetlife.action.apicall.search_events_by_tag";
     public static final String ACTION_APICALL_EVENT = "com.bitlove.fetlife.action.apicall.event";
+    public static final String ACTION_APICALL_SEARCH_GROUP = "com.bitlove.fetlife.action.apicall.search_group";
+    public static final String ACTION_APICALL_GROUP = "com.bitlove.fetlife.action.apicall.group";
     public static final String ACTION_APICALL_EVENT_RSVPS = "com.bitlove.fetlife.action.apicall.event.ravps";
     public static final String ACTION_APICALL_SET_RSVP_STATUS = "com.bitlove.fetlife.action.apicall.event.set_ravp";
 
@@ -371,6 +379,9 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MEMBER_EVENTS:
                     result = retrieveMemberEvents(params);
                     break;
+                case ACTION_APICALL_MEMBER_GROUPS:
+                    result = retrieveMemberGroups(params);
+                    break;
                 case ACTION_APICALL_EVENT_RSVPS:
                     result = retrieveEventRsvps(params);
                     break;
@@ -433,6 +444,9 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_SEARCH_MEMBER:
                     result = searchMember(params);
                     break;
+                case ACTION_APICALL_SEARCH_GROUP:
+                    result = searchGroup(params);
+                    break;
                 case ACTION_APICALL_SEARCH_EVENT_BY_TAG:
                     result = searchEventByTag(params);
                     break;
@@ -447,6 +461,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_EVENT:
                     result = getEvent(params);
+                    break;
+                case ACTION_APICALL_GROUP:
+                    result = getGroup(params);
                     break;
             }
 
@@ -1334,6 +1351,7 @@ public class FetLifeApiIntentService extends IntentService {
             Call<List<Relationship>> getMemberRelationshipCall = getFetLifeApi().getMemberRelationship(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId);
             Response<List<Relationship>> getMemberRelationshipResponse = getMemberRelationshipCall.execute();
             if (getMemberRelationshipResponse.isSuccess()) {
+                new Delete().from(Relationship.class).where(Relationship_Table.memberId.is(memberId)).query();
                 List<Relationship> relationships = getMemberRelationshipResponse.body();
                 for (Relationship relationship : relationships) {
                     Member targetMember = relationship.getTargetMember();
@@ -1377,6 +1395,19 @@ public class FetLifeApiIntentService extends IntentService {
 
     }
 
+    private int getGroup(String... params) throws IOException {
+        String groupId = params[0];
+        Call<Group> getGroupCall = getFetLifeApi().getGroup(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId);
+        Response<Group> getGroupResponse = getGroupCall.execute();
+        if (getGroupResponse.isSuccess()) {
+            Group group = getGroupResponse.body();
+            group.save();
+            return 1;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int searchMember(String... params) throws IOException {
         final String queryString = params[0];
         final int limit = getIntFromParams(params, 1, 10);
@@ -1389,6 +1420,23 @@ public class FetLifeApiIntentService extends IntentService {
                 friendMember.mergeSave();
             }
             return foundMembers.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int searchGroup(String... params) throws IOException {
+        final String queryString = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Response<List<Group>> searchResponse = getFetLifeApi().searchGroups(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),queryString,limit,page).execute();
+        if (searchResponse.isSuccess()) {
+            final List<Group> foundGroups = searchResponse.body();
+            for (Group foundGroup : foundGroups) {
+                foundGroup.save();
+            }
+            return foundGroups.size();
         } else {
             return Integer.MIN_VALUE;
         }
@@ -1822,6 +1870,63 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+
+    private int retrieveMemberGroups(String[] params) throws IOException {
+        String userId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Group>> getGroupsCall;
+        getGroupsCall = getFetLifeApi().getMemberGroups(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
+
+        Response<List<Group>> groupsResponse = getGroupsCall.execute();
+        if (groupsResponse.isSuccess()) {
+
+            final List<Group> retrievedGroups = groupsResponse.body();
+            List<GroupReference> currentGroups = new Select().from(GroupReference.class).where(GroupReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(GroupReference_Table.date).descending()).queryList();
+
+            int lastConfirmedGroupPosition;
+            if (page == 1) {
+                lastConfirmedGroupPosition = -1;
+            } else {
+                lastConfirmedGroupPosition = loadLastSyncedPosition(SyncedPositionType.GROUP,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Group retrievedGroup : retrievedGroups) {
+
+                int foundPos;
+                for (foundPos = lastConfirmedGroupPosition+1; foundPos < currentGroups.size(); foundPos++) {
+                    GroupReference checkGroup = currentGroups.get(foundPos);
+                    if (retrievedGroup.getId().equals(checkGroup.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentGroups.size()) {
+                    newItemCount++;
+                    GroupReference groupReference = new GroupReference();
+                    groupReference.setId(retrievedGroup.getId());
+                    groupReference.setUpdatedAt(retrievedGroup.getUpdatedAt());
+                    groupReference.setUserId(userId);
+                    groupReference.save();
+                } else {
+                    for (int i = lastConfirmedGroupPosition+1; i < foundPos; i++) {
+                        currentGroups.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedGroupPosition = foundPos;
+                }
+                retrievedGroup.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.GROUP,userId,lastConfirmedGroupPosition+newItemCount);
+
+            return retrievedGroups.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int retrieveMemberEvents(String[] params) throws IOException {
         String userId = params[0];
         final int limit = getIntFromParams(params, 1, 10);
@@ -2068,7 +2173,7 @@ public class FetLifeApiIntentService extends IntentService {
         EVENT,
         EVENT_RSVP,
         FRIEND,
-        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO;
+        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP;
 
         @Override
         public String toString() {

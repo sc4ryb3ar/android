@@ -693,5 +693,16 @@
     <string name="title_fragment_event_map">Event Map</string>
     <string name="title_fragment_event_myevents">My Events</string>
     <string name="title_fragment_event_search">Search</string>
+    <string name="text_group_member_count">%1$d member</string>
+    <string name="text_group_members_count">%1$d members</string>
+    <string name="menu_group_view">View</string>
+    <string name="menu_group_member_join">Join</string>
+    <string name="title_fragment_group_description">Description</string>
+    <string name="title_fragment_group_rules">Rules</string>
+    <string name="title_activity_group">Group</string>
+    <string name="title_fragment_groups">Groups</string>
+    <string name="title_fragment_group_serach">Search</string>
+    <string name="menu_groups">Groups</string>
+    <string name="title_activity_groups">Groups</string>
 
 </resources>

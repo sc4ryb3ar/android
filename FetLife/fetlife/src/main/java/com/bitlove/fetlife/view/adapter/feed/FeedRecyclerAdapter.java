@@ -27,8 +27,9 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
     private final String memberId;
 
     public interface OnFeedItemClickListener {
+
         void onMemberClick(Member member);
-        void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, Member targetMember);
+        void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, FeedItemResourceHelper feedItemResourceHelper);
         void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember);
         void onFeedImageLongClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember);
         void onVisitItem(Object object, String url);

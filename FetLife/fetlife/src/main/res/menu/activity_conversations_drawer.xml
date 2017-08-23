@@ -18,6 +18,11 @@
             android:title="@string/menu_events" />
 
         <item
+            android:id="@+id/nav_groups"
+            android:icon="@drawable/ic_menu_map"
+            android:title="@string/menu_groups" />
+
+        <item
             android:id="@+id/nav_members"
             android:icon="@android:drawable/ic_menu_search"
             android:title="@string/menu_members" />

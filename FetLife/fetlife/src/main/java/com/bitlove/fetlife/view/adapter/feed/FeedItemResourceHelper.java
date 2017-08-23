@@ -4,6 +4,8 @@ import android.text.Html;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
@@ -192,6 +194,35 @@ public class FeedItemResourceHelper {
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:
                     return event.getTarget().getRelation().getTargetMember();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Event getEvent(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case RSVP_CREATED:
+                    return feedEvent.getTarget().getRsvp().getEvent();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Group getGroup(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case GROUP_MEMBERSHIP_CREATED:
+                    return feedEvent.getTarget().getGroupMembership().getGroup();
+                case GROUP_POST_CREATED:
+                    return feedEvent.getTarget().getGroupPost().getGroup();
+                case GROUP_COMMENT_CREATED:
                 default:
                     return null;
             }

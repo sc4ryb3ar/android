@@ -7,12 +7,15 @@ import android.os.Bundle;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
@@ -69,12 +72,27 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     }
 
     @Override
-    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, Member targetMember) {
-        if (targetMember != null) {
-            if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
+    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, FeedItemResourceHelper feedItemResourceHelper) {
+        if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
+            Member targetMember = feedItemResourceHelper.getMember(feedEvent);
+            if (targetMember != null) {
                 //TODO(feed): Remove this mergeSave after Feed is stored in local db
                 targetMember.mergeSave();
                 ProfileActivity.startActivity(this, targetMember.getId());
+                return;
+            }
+        } else if (feedStoryType == Story.FeedStoryType.RSVP_CREATED) {
+            Event targetEvent = feedItemResourceHelper.getEvent(feedEvent);
+            if (targetEvent != null) {
+                targetEvent.save();
+                EventActivity.startActivity(this,targetEvent.getId());
+                return;
+            }
+        } else if (feedStoryType == Story.FeedStoryType.GROUP_COMMENT_CREATED || feedStoryType == Story.FeedStoryType.GROUP_MEMBERSHIP_CREATED || feedStoryType == Story.FeedStoryType.GROUP_POST_CREATED) {
+            Group targetGroup = feedItemResourceHelper.getGroup(feedEvent);
+            if (targetGroup != null) {
+                targetGroup.save();
+                GroupActivity.startActivity(this,targetGroup.getId());
                 return;
             }
         }

@@ -154,11 +154,13 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(), serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(), FetLifeApiIntentService.getInProgressActionParams())) {
+        if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(), serviceCallFinishedEvent.getParams())) {
             final String eventId = getIntent().getStringExtra(EXTRA_EVENTID);
             Event event = Event.loadEvent(eventId);
             setEventDetails(event);
-            dismissProgress();
+            if (!isRelatedCall(FetLifeApiIntentService.getActionInProgress(), FetLifeApiIntentService.getInProgressActionParams())) {
+                dismissProgress();
+            }
         }
     }
 
@@ -174,10 +176,13 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         if (params != null && params.length > 0 && eventId != null && !eventId.equals(params[0])) {
             return false;
         }
-        if (FetLifeApiIntentService.ACTION_APICALL_EVENT.equals(serviceCallAction)) {
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_EVENTS.equals(serviceCallAction)) {
             return true;
         }
-        if (FetLifeApiIntentService.ACTION_APICALL_EVENT_RSVPS.equals(serviceCallAction)) {
+        if (FetLifeApiIntentService.ACTION_APICALL_SEARCH_EVENT_BY_LOCATION.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_SEARCH_EVENT_BY_TAG.equals(serviceCallAction)) {
             return true;
         }
         return false;

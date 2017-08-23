@@ -1,32 +1,66 @@
-package com.bitlove.fetlife.model.pojos.fetlife.json;
+package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
+import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-public class Group {
+@Table(database = FetLifeDatabase.class)
+public class Group extends BaseModel {
 
-    @JsonProperty("content_type")
-    private String contentType;
+    public static Group loadGroup(String groupId) {
+        Group group = new Select().from(Group.class).where(Group_Table.id.is(groupId)).querySingle();
+        return group;
+    }
 
-    @JsonProperty("created_at")
-    private String createdAt;
-
-    @JsonProperty("description")
-    private String description;
-
+    //Primary key
+    @Column
+    @PrimaryKey(autoincrement = false)
     @JsonProperty("id")
     private String id;
 
+    //json only
+    @JsonProperty("content_type")
+    private String contentType;
+
+    //Column and Json
+    @Column
+    @JsonProperty("updated_at")
+    private String updatedAt;
+
+    @Column
+    @JsonProperty("created_at")
+    private String createdAt;
+
+    @Column
+    @JsonProperty("description")
+    private String description;
+
+    @Column
     @JsonProperty("member_count")
     private Integer memberCount;
 
+    @Column
     @JsonProperty("name")
     private String name;
 
+    @Column
     @JsonProperty("rules")
     private String rules;
 
+    @Column
     @JsonProperty("url")
     private String url;
+
+    //dbonly
+
+    @Column
+    private long date;
+
 
     @JsonProperty("content_type")
     public String getContentType() {
@@ -36,6 +70,30 @@ public class Group {
     @JsonProperty("content_type")
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    @JsonProperty("updated_at")
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @JsonProperty("updated_at")
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+        if (updatedAt != null) {
+            try {
+                setDate(DateUtil.parseDate(updatedAt));
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 
     @JsonProperty("created_at")

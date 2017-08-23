@@ -28,6 +28,8 @@ import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.EventsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.GroupActivity;
+import com.bitlove.fetlife.view.screen.resource.GroupsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
@@ -210,6 +212,8 @@ public class MenuActivityComponent extends ActivityComponent {
             } else {
                 requestLocationPermission(BaseActivity.PERMISSION_REQUEST_LOCATION);
             }
+        } else if (id == R.id.nav_groups) {
+            GroupsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_updates) {
             menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
             FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));

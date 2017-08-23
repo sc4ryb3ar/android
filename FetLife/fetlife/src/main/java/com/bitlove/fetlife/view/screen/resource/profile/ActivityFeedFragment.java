@@ -12,13 +12,18 @@ import android.view.ViewGroup;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
+import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.EventActivity;
+import com.bitlove.fetlife.view.screen.resource.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAdapter.OnFeedItemClickListener {
@@ -57,12 +62,27 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
     }
 
     @Override
-    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, Member targetMember) {
-        if (targetMember != null) {
-            if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
+    public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, FeedItemResourceHelper feedItemResourceHelper) {
+        if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
+            Member targetMember = feedItemResourceHelper.getMember(feedEvent);
+            if (targetMember != null) {
                 //TODO(feed): Remove this mergeSave after Feed is stored in local db
                 targetMember.mergeSave();
                 ProfileActivity.startActivity((BaseActivity) getActivity(), targetMember.getId());
+                return;
+            }
+        } else if (feedStoryType == Story.FeedStoryType.RSVP_CREATED) {
+            Event targetEvent = feedItemResourceHelper.getEvent(feedEvent);
+            if (targetEvent != null) {
+                targetEvent.save();
+                EventActivity.startActivity((BaseActivity) getActivity(),targetEvent.getId());
+                return;
+            }
+        } else if (feedStoryType == Story.FeedStoryType.GROUP_COMMENT_CREATED || feedStoryType == Story.FeedStoryType.GROUP_MEMBERSHIP_CREATED || feedStoryType == Story.FeedStoryType.GROUP_POST_CREATED) {
+            Group targetGroup = feedItemResourceHelper.getGroup(feedEvent);
+            if (targetGroup != null) {
+                targetGroup.save();
+                GroupActivity.startActivity((BaseActivity) getActivity(),targetGroup.getId());
                 return;
             }
         }

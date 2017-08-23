@@ -163,7 +163,7 @@ public class FeedAdapterBinder {
                             setOverlayContent(overlay, picture, onItemClickListener);
                             new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                         } else {
-                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
+                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedEvent, feedItemResourceHelper);
                         }
                     }
                 });
@@ -202,7 +202,7 @@ public class FeedAdapterBinder {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
+                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedEvent, feedItemResourceHelper);
                 }
             });
 

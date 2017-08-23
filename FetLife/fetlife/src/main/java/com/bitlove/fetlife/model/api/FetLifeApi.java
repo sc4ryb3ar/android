@@ -11,6 +11,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
@@ -42,6 +43,9 @@ public interface FetLifeApi {
     @GET("/api/v2/me")
     Call<Member> getMe(@Header("Authorization") String authHeader);
 
+    @GET("/api/v2/members/{memberId}/groups")
+    Call<List<Group>> getMemberGroups(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
     @GET("/api/v2/me/conversations")
     Call<List<Conversation>> getConversations(@Header("Authorization") String authHeader, @Query("order_by") String orderBy, @Query("limit") int limit, @Query("page") int page);
 
@@ -57,11 +61,17 @@ public interface FetLifeApi {
     @GET("/api/v2/search/members")
     Call<List<Member>> searchMembers(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/search/groups")
+    Call<List<Group>> searchGroups(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
+
     @GET("/api/v2/members/{memberId}")
     Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
 
     @GET("/api/v2/events/{eventId}")
     Call<Event> getEvent(@Header("Authorization") String authHeader, @Path("eventId") String memberId);
+
+    @GET("/api/v2/groups/{groupId}")
+    Call<Group> getGroup(@Header("Authorization") String authHeader, @Path("groupId") String memberId);
 
     @GET("/api/v2/me/rsvps")
     Call<List<Rsvp>> getRsvps(@Header("Authorization") String authHeader, @Query("event_id") String eventId);
