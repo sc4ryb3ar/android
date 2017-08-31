@@ -312,12 +312,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     }
 
     public void showToast(final String text) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
-            }
-        });
+        getFetLifeApplication().showToast(text);
     }
 
     public FetLifeApplication getFetLifeApplication() {

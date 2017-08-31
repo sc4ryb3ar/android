@@ -33,12 +33,11 @@ public class VersionUtil {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(baseActivity.getApplication());
 
         if (releaseVersion.equals(sharedPreferences.getString(release.isPrerelease() ? PREF_NOTIFIED_LATEST_PRERELEASE : PREF_NOTIFIED_LATEST_RELEASE, null))) {
-            return false;
+            return forcedCheck;
         }
         sharedPreferences.edit().putString(release.isPrerelease() ? PREF_NOTIFIED_LATEST_PRERELEASE : PREF_NOTIFIED_LATEST_RELEASE, releaseVersion).apply();
 
         return true;
-
     }
 
     private static boolean notifyAboutPrereleases(BaseActivity baseActivity) {
