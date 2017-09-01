@@ -22,7 +22,21 @@
             If you find a bug please start by reading through the current list of open issues and if you can\'t find anything about your bug please submit a new bug at our GitHub page:
             <br/>https://github.com/fetlife/android/issues
 
+            <p><b><br/>Need help or want to know more?</b></p>
+
+            Visit our GitHub page to access Trouble Shooting Guide, get more information about current and upcoming releases and many more:
+            <br/>https://github.com/fetlife/android/
+
             <p><b><br/>Version History</b></p>
+
+            <p/>v2.9.12<br/>
+                    <ul>
+                        <li>Crash fix</li>
+                        <li>Support for install on SD card</li>
+                        <li>Fix for stuck message about connection issues</li>
+                        <li>Directly opening conversation from notification</li>
+                        <li>Check for update fix</li>
+                    </ul>
 
             <p/>v2.9.11<br/>
                     <ul>
@@ -701,5 +715,8 @@
     <string name="title_fragment_event_map">Event Map</string>
     <string name="title_fragment_event_myevents">My Events</string>
     <string name="title_fragment_event_search">Search</string>
+    <string name="menu_support">Support FetLife</string>
+    <string name="title_activity_webview">FetLife</string>
+    <string name="title_activity_webview_support">Support FetLife</string>
 
 </resources>
