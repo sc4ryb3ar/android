@@ -1,3 +1,13 @@
+## WARNING! FetLife Android App Mandatory Update
+
+FetLife Android App version 2.10.0 has just been released with important security improvements.
+
+If you are using an earlier version, please update before 11th September 2017.
+
+**Support for versions below 2.10.0 will be stopped on 11th September 2017.**
+
+Thank you for your understanding and we're sorry for the inconveniences
+
 # FetLife for Android
 
 Welcome to FetLife's open-source Android app!
