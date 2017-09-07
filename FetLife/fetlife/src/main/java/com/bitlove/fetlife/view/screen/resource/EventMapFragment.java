@@ -286,8 +286,12 @@ public class EventMapFragment extends BaseFragment implements OnMapReadyCallback
     }
 
     private void startEventSearch(LatLngBounds searchBounds,int page) {
+        Activity context = getActivity();
+        if (context == null) {
+            return;
+        }
         FetLifeApiIntentService.startClearApiCall(
-                getActivity(),
+                context,
                 FetLifeApiIntentService.ACTION_APICALL_SEARCH_EVENT_BY_LOCATION,
                 Double.toString(searchBounds.southwest.latitude),
                 Double.toString(searchBounds.southwest.longitude),

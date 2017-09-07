@@ -28,8 +28,8 @@ import retrofit.Retrofit;
 
 public class FetLifeService {
 
-    private static final String LOGON_BASE_URL = "https://fetlife.com";
-    private static final String HOST_NAME = "fetlife.com";
+    private static final String LOGON_BASE_URL = "https://app.fetlife.com";
+    private static final String HOST_NAME = "app.fetlife.com";
     public static final String GRANT_TYPE_PASSWORD = "password";
     public static final String GRANT_TYPE_TOKEN_REFRESH = "refresh_token";
     public static final String AUTH_HEADER_PREFIX = "Bearer ";
@@ -127,7 +127,6 @@ public class FetLifeService {
     }
 
     private Certificate loadCertificate(Context context) {
-
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             InputStream inputStream = context.getResources().openRawResource(R.raw.fetlife_fastly_intermediate);
