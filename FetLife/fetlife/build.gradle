@@ -156,6 +156,8 @@ dependencies {
 
     compile 'com.github.tiagohm.MarkdownView:library:0.17.0'
 
+    compile 'com.basecamp:turbolinks:1.0.7'
+
     //compile 'com.squareup.okio:okio:1.10.0'
 
     testCompile 'junit:junit:4.12'

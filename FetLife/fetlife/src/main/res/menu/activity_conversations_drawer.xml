@@ -65,6 +65,11 @@
             android:title="@string/menu_support" />
 
         <item
+            android:id="@+id/nav_support_turbo"
+            android:icon="@android:drawable/ic_menu_myplaces"
+            android:title="@string/menu_support" />
+
+        <item
             android:id="@+id/nav_updates"
             android:icon="@drawable/ic_refresh_black_24dp"
             android:title="@string/menu_updates" />

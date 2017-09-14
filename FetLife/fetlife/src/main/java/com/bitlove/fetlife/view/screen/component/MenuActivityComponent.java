@@ -29,6 +29,7 @@ import com.bitlove.fetlife.view.screen.resource.EventsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.screen.resource.TurboLinkViewActivity;
 import com.bitlove.fetlife.view.screen.resource.WebViewActivity;
 import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
@@ -210,6 +211,8 @@ public class MenuActivityComponent extends ActivityComponent {
             FeedActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_support) {
             WebViewActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_support_turbo) {
+            TurboLinkViewActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_events) {
             if (isLocationPermissionGranted()) {
                 EventsActivity.startActivity(menuActivity);
