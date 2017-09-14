@@ -18,6 +18,10 @@ public class VersionUtil {
 
     public static boolean toBeNotified(BaseActivity baseActivity, Release release, boolean forcedCheck) {
 
+        if (release == null) {
+            return false;
+        }
+
         String releaseVersion = release.getTag();
 
         int version = getVersionInt(releaseVersion);

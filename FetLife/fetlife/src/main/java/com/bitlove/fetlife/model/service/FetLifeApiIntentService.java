@@ -86,6 +86,7 @@ import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
+import com.bitlove.fetlife.util.VersionUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -491,7 +492,14 @@ public class FetLifeApiIntentService extends IntentService {
         if (releasesCallResponse.isSuccess()) {
             Release latestRelease = null;
             Release latestPreRelease = null;
-            for (Release release : releasesCallResponse.body()) {
+            final List<Release> releases = releasesCallResponse.body();
+            Collections.sort(releases, new Comparator<Release>() {
+                @Override
+                public int compare(Release o1, Release o2) {
+                    return VersionUtil.getVersionInt(o1.getTag())-VersionUtil.getVersionInt(o2.getTag());
+                }
+            });
+            for (Release release : releases) {
                 if (release.isPrerelease()) {
                     latestPreRelease = release;
                 } else {

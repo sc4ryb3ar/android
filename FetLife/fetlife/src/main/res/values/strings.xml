@@ -29,6 +29,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.10.0<br/>
+                    <ul>
+                        <li>Important security update</li>
+                    </ul>
+
             <p/>v2.9.12<br/>
                     <ul>
                         <li>Crash fix</li>
