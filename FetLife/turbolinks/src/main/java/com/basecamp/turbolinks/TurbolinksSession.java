@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.override;
+package com.basecamp.turbolinks;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -20,17 +21,14 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.basecamp.turbolinks.TurbolinksAdapter;
-import com.basecamp.turbolinks.TurbolinksHelper;
-import com.basecamp.turbolinks.TurbolinksLog;
-import com.basecamp.turbolinks.TurbolinksScrollUpCallback;
-import com.basecamp.turbolinks.TurbolinksSession;
-import com.basecamp.turbolinks.TurbolinksView;
-
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
-public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
+/**
+ * <p>The main concrete class to use Turbolinks 5 in your app.</p>
+ */
+public class TurbolinksSession implements TurbolinksScrollUpCallback {
 
     // ---------------------------------------------------
     // Package public vars (allows for greater flexibility and access for testing)
@@ -48,6 +46,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
     Activity activity;
     HashMap<String, Object> javascriptInterfaces = new HashMap<>();
     HashMap<String, String> restorationIdentifierMap = new HashMap<>();
+    String previousLocation;
     String location;
     String currentVisitIdentifier;
     TurbolinksAdapter turbolinksAdapter;
@@ -70,6 +69,9 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
     final Context applicationContext;
     final WebView webView;
 
+    private ProgressObserver progressObserver;
+    private PageObserver pageObserver;
+
     // ---------------------------------------------------
     // Constructor
     // ---------------------------------------------------
@@ -90,6 +92,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
         this.webViewAttachedToNewParent = false;
 
         this.webView = TurbolinksHelper.createWebView(applicationContext);
+        webView.setBackgroundColor(Color.TRANSPARENT);
         this.webView.addJavascriptInterface(this, JAVASCRIPT_INTERFACE_NAME);
         this.webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -125,7 +128,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String location) {
                 if (!turbolinksIsReady || coldBootInProgress) {
-                    return false;
+                    return (coldBootInProgress && pageObserver != null) ? pageObserver.shouldOverrideUrlLoading(view,location) : false;
                 }
 
                 /**
@@ -210,6 +213,15 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
         defaultInstance = null;
     }
 
+    /**
+     * <p>Tells the logger whether to allow logging in debug mode.</p>
+     *
+     * @param enabled If true debug logging is enabled.
+     */
+    public static void setDebugLoggingEnabled(boolean enabled) {
+        TurbolinksLog.setDebugLoggingEnabled(enabled);
+    }
+
     // ---------------------------------------------------
     // Required chained methods
     // ---------------------------------------------------
@@ -248,6 +260,14 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
         return this;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public String getPreviousLocation() {
+        return previousLocation;
+    }
+
     /**
      * <p><b>REQUIRED</b> A {@link TurbolinksView} object that's been inflated in a custom layout is
      * required so the library can manage various view-related tasks: attaching/detaching the
@@ -279,6 +299,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
     public void visit(String location) {
         TurbolinksLog.d("visit called");
 
+        this.previousLocation = this.location;
         this.location = location;
 
         validateRequiredParams();
@@ -294,6 +315,50 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
         if (!turbolinksIsReady && !coldBootInProgress) {
             TurbolinksLog.d("Cold booting: " + location);
             webView.loadUrl(location);
+        }
+
+        // Reset so that cached snapshot is not the default for the next visit
+        restoreWithCachedSnapshot = false;
+
+        /*
+        if (!turbolinksIsReady && coldBootInProgress), we don't fire a new visit. This is
+        typically a slow connection load. This allows the previous cold boot to finish (inject TL).
+        No matter what, if new requests are sent to Turbolinks via Turbolinks.location, we'll
+        always have the last desired location. And when setTurbolinksIsReady(true) is called,
+        we open that last location.
+        */
+    }
+    /**
+     * <p><b>REQUIRED</b> Executes a Turbolinks visit. Must be called at the end of the chain --
+     * all required parameters will first be validated before firing.</p>
+     *
+     * @param location The URL to visit.
+     * @param token
+     */
+
+    public void visitWithAuthHeader(String location, String token) {
+        TurbolinksLog.d("visit called");
+
+        this.previousLocation = this.location;
+        this.location = location;
+
+        validateRequiredParams();
+
+        if (!turbolinksIsReady || webViewAttachedToNewParent) {
+            initProgressView();
+        }
+
+        runJavascript("webView.visitLocationWithActionAndRestorationIdentifier", "Authorization", token);
+
+        if (turbolinksIsReady) {
+            visitCurrentLocationWithTurbolinks();
+        }
+
+        if (!turbolinksIsReady && !coldBootInProgress) {
+            TurbolinksLog.d("Cold booting: " + location);
+            Map<String,String> headers = new HashMap<>();
+            headers.put("Authorization",token);
+            webView.loadUrl(location,headers);
         }
 
         // Reset so that cached snapshot is not the default for the next visit
@@ -332,6 +397,16 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
             throw new IllegalArgumentException("A progress indicator view must be provided in your custom progressView.");
         }
 
+        return this;
+    }
+
+    public TurbolinksSession addProgressObserver(ProgressObserver progressObserver) {
+        this.progressObserver = progressObserver;
+        return this;
+    }
+
+    public TurbolinksSession addPageObserver(PageObserver pageObserver) {
+        this.pageObserver = pageObserver;
         return this;
     }
 
@@ -535,7 +610,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
                  */
                 if (turbolinksIsReady && TextUtils.equals(visitIdentifier, currentVisitIdentifier)) {
                     TurbolinksLog.d("Hiding progress view for visitIdentifier: " + visitIdentifier + ", currentVisitIdentifier: " + currentVisitIdentifier);
-                    turbolinksView.hideProgress();
+                    hideProgress();
                 }
             }
         });
@@ -590,7 +665,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
             public void run() {
                 TurbolinksLog.d("Error instantiating turbolinks_bridge.js - resetting to cold boot.");
                 resetToColdBoot();
-                turbolinksView.hideProgress();
+                hideProgress();
             }
         });
     }
@@ -668,15 +743,6 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
     }
 
     /**
-     * <p>Tells the logger whether to allow logging in debug mode.</p>
-     *
-     * @param enabled If true debug logging is enabled.
-     */
-    public void setDebugLoggingEnabled(boolean enabled) {
-        TurbolinksLog.setDebugLoggingEnabled(enabled);
-    }
-
-    /**
      * <p>Determines whether screenshots are displayed (instead of a progress view) when resuming
      * an activity. Default is true.</p>
      *
@@ -692,8 +758,9 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
      *
      * @param enabled If true pulling to refresh the WebView is enabled
      */
-    public void setPullToRefreshEnabled(boolean enabled) {
+    public TurbolinksSession setPullToRefreshEnabled(boolean enabled) {
         pullToRefreshEnabled = enabled;
+        return this;
     }
 
     /**
@@ -712,6 +779,7 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
      * @param action   Whether to treat the request as an advance (navigating forward) or a replace (back).
      */
     public void visitLocationWithAction(String location, String action) {
+        this.previousLocation = this.location;
         this.location = location;
         runJavascript("webView.visitLocationWithActionAndRestorationIdentifier", TurbolinksHelper.encodeUrl(location), action, getRestorationIdentifierFromMap());
     }
@@ -749,11 +817,11 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
     private void initProgressView() {
         // No custom progress view provided, use default
         if (progressView == null) {
-            progressView = LayoutInflater.from(activity).inflate(com.basecamp.turbolinks.R.layout.turbolinks_progress, turbolinksView, false);
+            progressView = LayoutInflater.from(activity).inflate(R.layout.turbolinks_progress, turbolinksView, false);
 
             TurbolinksLog.d("TurbolinksSession background: " + turbolinksView.getBackground());
             progressView.setBackground(turbolinksView.getBackground());
-            progressIndicator = progressView.findViewById(com.basecamp.turbolinks.R.id.turbolinks_default_progress_indicator);
+            progressIndicator = progressView.findViewById(R.id.turbolinks_default_progress_indicator);
             progressIndicatorDelay = PROGRESS_INDICATOR_DELAY;
 
             Drawable background = turbolinksView.getBackground() != null ? turbolinksView.getBackground() : new ColorDrawable(activity.getResources().getColor(android.R.color.white));
@@ -765,8 +833,26 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
             ((ViewGroup) progressView.getParent()).removeView(progressView);
         }
 
-        // Executed from here to account for progress indicator delay
-        turbolinksView.showProgress(progressView, progressIndicator, progressIndicatorDelay);
+        showProgress();
+
+    }
+
+    private void showProgress() {
+        if (progressObserver == null) {
+            // Executed from here to account for progress indicator delay
+            turbolinksView.showProgress(progressView, progressIndicator, progressIndicatorDelay);
+        } else {
+            progressObserver.showProgress();
+        }
+    }
+
+    private void hideProgress() {
+        if (progressObserver == null) {
+            // Executed from here to account for progress indicator delay
+            turbolinksView.hideProgress();
+        } else {
+            progressObserver.hideProgress();
+        }
     }
 
     /**
@@ -816,5 +902,15 @@ public class FetLifeTurnoLinkSession implements TurbolinksScrollUpCallback {
     public boolean canChildScrollUp() {
         return this.webView.getScrollY() > 0;
     }
+
+    public interface ProgressObserver {
+        void showProgress();
+        void hideProgress();
+    }
+
+    public interface PageObserver {
+        boolean shouldOverrideUrlLoading(WebView view, String location);
+    }
+
 }
 

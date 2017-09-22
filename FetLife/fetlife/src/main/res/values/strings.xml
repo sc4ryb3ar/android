@@ -721,7 +721,11 @@
     <string name="title_fragment_event_myevents">My Events</string>
     <string name="title_fragment_event_search">Search</string>
     <string name="menu_support">Support FetLife</string>
+    <string name="menu_glossary">Kinktionary</string>
+    <string name="menu_ads">Advertise on FetLife</string>
     <string name="title_activity_webview">FetLife</string>
-    <string name="title_activity_webview_support">Support FetLife</string>
+    <string name="title_activity_support">Support FetLife</string>
+    <string name="title_activity_ads">Advertise on FetLife</string>
+    <string name="title_activity_glossary">Kinktionary</string>
 
 </resources>

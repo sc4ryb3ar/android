@@ -27,6 +27,11 @@
             android:icon="@android:drawable/ic_menu_my_calendar"
             android:title="@string/menu_friendrequests" />
 
+        <item
+            android:id="@+id/nav_notifications"
+            android:icon="@android:drawable/ic_dialog_alert"
+            android:title="@string/menu_notifications" />
+
     </group>
 
     <group android:id="@+id/interaction" android:checkableBehavior="single">
@@ -49,15 +54,6 @@
 
 
     <group android:id="@+id/about" android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_notifications"
-            android:icon="@android:drawable/ic_dialog_alert"
-            android:title="@string/menu_notifications" />
-
-        <item
-            android:id="@+id/nav_about"
-            android:icon="@android:drawable/ic_menu_info_details"
-            android:title="@string/menu_about" />
 
         <item
             android:id="@+id/nav_support"
@@ -65,9 +61,23 @@
             android:title="@string/menu_support" />
 
         <item
-            android:id="@+id/nav_support_turbo"
-            android:icon="@android:drawable/ic_menu_myplaces"
-            android:title="@string/menu_support" />
+            android:id="@+id/nav_ads"
+            android:icon="@android:drawable/ic_menu_agenda"
+            android:title="@string/menu_ads" />
+
+        <item
+            android:id="@+id/nav_glossary"
+            android:icon="@android:drawable/ic_menu_compass"
+            android:title="@string/menu_glossary" />
+
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/menu_about" />
+
+    </group>
+
+    <group android:id="@+id/logout" android:checkableBehavior="single">
 
         <item
             android:id="@+id/nav_updates"
@@ -78,9 +88,6 @@
             android:id="@+id/nav_settings"
             android:icon="@android:drawable/ic_menu_preferences"
             android:title="@string/menu_settings" />
-    </group>
-
-    <group android:id="@+id/logout" android:checkableBehavior="single">
         <item
             android:id="@+id/nav_logout"
             android:icon="@android:drawable/ic_menu_close_clear_cancel"
