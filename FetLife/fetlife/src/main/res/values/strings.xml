@@ -22,7 +22,42 @@
             If you find a bug please start by reading through the current list of open issues and if you can\'t find anything about your bug please submit a new bug at our GitHub page:
             <br/>https://github.com/fetlife/android/issues
 
+            <p><b><br/>Need help or want to know more?</b></p>
+
+            Visit our GitHub page to access Trouble Shooting Guide, get more information about current and upcoming releases and many more:
+            <br/>https://github.com/fetlife/android/
+
             <p><b><br/>Version History</b></p>
+
+            <p/>v2.10.0<br/>
+                    <ul>
+                        <p>Interim release before groups with fixes and 3 new screens:</p>
+                        <li>Support</li>
+                        <li>Ads</li>
+                        <li>Kinktionary</li>
+                    </ul>
+
+            <p/>v2.10.0<br/>
+                    <ul>
+                        <li>Important security update</li>
+                    </ul>
+
+            <p/>v2.9.12<br/>
+                    <ul>
+                        <li>Crash fix</li>
+                        <li>Support for install on SD card</li>
+                        <li>Fix for stuck message about connection issues</li>
+                        <li>Directly opening conversation from notification</li>
+                        <li>Check for update fix</li>
+                    </ul>
+
+            <p/>v2.9.11<br/>
+                    <ul>
+                        <li>Hot fix for resending rejected friend requests</li>
+                        <li>Small Profile Screen improvement</li>
+                        <li>Fix for Profile Screen refresh after relationship change</li>
+                        <li>Several crash fixes</li>
+                    </ul>
 
             <p/>v2.9.7<br/>
                     <ul>
@@ -704,5 +739,12 @@
     <string name="title_fragment_group_serach">Search</string>
     <string name="menu_groups">Groups</string>
     <string name="title_activity_groups">Groups</string>
+    <string name="menu_support">Support FetLife</string>
+    <string name="menu_glossary">Kinktionary</string>
+    <string name="menu_ads">Advertise on FetLife</string>
+    <string name="title_activity_webview">FetLife</string>
+    <string name="title_activity_support">Support FetLife</string>
+    <string name="title_activity_ads">Advertise on FetLife</string>
+    <string name="title_activity_glossary">Kinktionary</string>
 
 </resources>

@@ -27,6 +27,7 @@ public class BasicInfoFragment extends LoadFragment {
 
     private static final String ARG_MEMBER_ID = "ARG_REFERENCE_ID";
     private static final String LOCATION_SEPARATOR = ", ";
+
     private View locationRowView, relationshipRowView, orientationRowView, lookingForRowView;
     private TextView locationTextView, relationshipTextView, orientationTextView, lookingForTextView;
 
@@ -59,6 +60,9 @@ public class BasicInfoFragment extends LoadFragment {
         }
         if (city != null) {
             location = city + LOCATION_SEPARATOR + location;
+        }
+        if ("".equals(location)) {
+            location = null;
         }
 
         locationRowView.setVisibility(location != null ? View.VISIBLE : View.GONE);

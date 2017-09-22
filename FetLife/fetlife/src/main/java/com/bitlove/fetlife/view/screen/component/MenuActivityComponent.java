@@ -31,6 +31,7 @@ import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.GroupsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.screen.resource.TurboLinksViewActivity;
 import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
@@ -176,6 +177,7 @@ public class MenuActivityComponent extends ActivityComponent {
         if (id == R.id.nav_logout) {
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             menuActivity.finish();
+            menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             LoginActivity.startLogin(menuActivity.getFetLifeApplication());
             return false;
         } else if (id == R.id.nav_conversations) {
@@ -206,6 +208,12 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_support) {
+            TurboLinksViewActivity.startActivity(menuActivity,"support",menuActivity.getString(R.string.title_activity_support));
+        } else if (id == R.id.nav_ads) {
+            TurboLinksViewActivity.startActivity(menuActivity,"ads",menuActivity.getString(R.string.title_activity_ads));
+        } else if (id == R.id.nav_glossary) {
+            TurboLinksViewActivity.startActivity(menuActivity,"glossary",menuActivity.getString(R.string.title_activity_glossary));
         } else if (id == R.id.nav_events) {
             if (isLocationPermissionGranted()) {
                 EventsActivity.startActivity(menuActivity);

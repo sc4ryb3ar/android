@@ -85,7 +85,7 @@ public class FetLifeApplication extends MultiDexApplication {
     private String lastToastMessage;
     private long lastToastTime;
 
-    private static final long MIN_TOAST_TRASHOLD = 15*1000l;
+    private static final long MIN_TOAST_TRASHOLD = 5*1000l;
 
     public static FetLifeApplication getInstance() {
         return instance;

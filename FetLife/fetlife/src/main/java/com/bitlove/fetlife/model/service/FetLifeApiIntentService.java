@@ -89,6 +89,7 @@ import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
+import com.bitlove.fetlife.util.VersionUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -421,12 +422,7 @@ public class FetLifeApiIntentService extends IntentService {
                     result = removeLove(params);
                     break;
                 case ACTION_APICALL_PENDING_RELATIONS:
-                    for (int i = PENDING_FRIENDREQUEST_RETRY_COUNT; i > 0; i--) {
-                        result = sendPendingFriendRequests();
-                        if (result != Integer.MIN_VALUE) {
-                            break;
-                        }
-                    }
+                    result = sendPendingFriendRequests();
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
@@ -511,7 +507,14 @@ public class FetLifeApiIntentService extends IntentService {
         if (releasesCallResponse.isSuccess()) {
             Release latestRelease = null;
             Release latestPreRelease = null;
-            for (Release release : releasesCallResponse.body()) {
+            final List<Release> releases = releasesCallResponse.body();
+            Collections.sort(releases, new Comparator<Release>() {
+                @Override
+                public int compare(Release o1, Release o2) {
+                    return VersionUtil.getVersionInt(o1.getTag())-VersionUtil.getVersionInt(o2.getTag());
+                }
+            });
+            for (Release release : releases) {
                 if (release.isPrerelease()) {
                     latestPreRelease = release;
                 } else {
@@ -737,7 +740,11 @@ public class FetLifeApiIntentService extends IntentService {
         for (FriendRequest pendingFriendRequest : pendingFriendRequests) {
             if (pendingFriendRequest.getPendingState() == FriendRequest.PendingState.OUTGOING) {
                 if (!sendPendingFriendRequest(pendingFriendRequest)) {
-                    pendingFriendRequest.delete();
+                    if (pendingFriendRequest.getClientId() == null) {
+                        new Delete().from(FriendRequest.class).where(FriendRequest_Table.targetMemberId.is(pendingFriendRequest.getTargetMemberId())).query();
+                    } else {
+                        pendingFriendRequest.delete();
+                    }
                 } else {
                     sentCount++;
                 }

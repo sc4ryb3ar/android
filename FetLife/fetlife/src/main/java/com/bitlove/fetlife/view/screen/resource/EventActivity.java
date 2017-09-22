@@ -104,6 +104,37 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
         params.setBehavior(new FlingBehavior());
         appBarLayout.addOnOffsetChangedListener(this);
+
+        findViewById(R.id.event_menu_icon_going_container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onGoingToEvent(v);
+            }
+        });
+        findViewById(R.id.event_menu_icon_maybe_container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onMaybeToEvent(v);
+            }
+        });
+        findViewById(R.id.event_menu_icon_show_on_map).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onShowEventOnMap(v);
+            }
+        });
+        findViewById(R.id.event_menu_icon_calendar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddEventToCalendar(v);
+            }
+        });
+        findViewById(R.id.event_menu_icon_view).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onViewEvent(v);
+            }
+        });
     }
 
     @Override

@@ -28,8 +28,8 @@ import retrofit.Retrofit;
 
 public class FetLifeService {
 
-    private static final String LOGON_BASE_URL = "https://fetlife.com";
-    private static final String HOST_NAME = "fetlife.com";
+    public static final String BASE_URL = "https://app.fetlife.com";
+    public static final String HOST_NAME = "app.fetlife.com";
     public static final String GRANT_TYPE_PASSWORD = "password";
     public static final String GRANT_TYPE_TOKEN_REFRESH = "refresh_token";
     public static final String AUTH_HEADER_PREFIX = "Bearer ";
@@ -79,7 +79,7 @@ public class FetLifeService {
         mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         fetLifeApi = new Retrofit.Builder()
-                .baseUrl(LOGON_BASE_URL)
+                .baseUrl(BASE_URL)
                 .client(client)
                 .addConverterFactory(JacksonConverterFactory.create(mapper)).build()
                 .create(FetLifeApi.class);
@@ -107,7 +107,7 @@ public class FetLifeService {
         });
 
         fetLifeMultipartUploadApi = new Retrofit.Builder()
-                .baseUrl(LOGON_BASE_URL)
+                .baseUrl(BASE_URL)
                 .client(uploadClient)
                 .addConverterFactory(JacksonConverterFactory.create(mapper)).build()
                 .create(FetLifeMultipartUploadApi.class);
@@ -127,7 +127,6 @@ public class FetLifeService {
     }
 
     private Certificate loadCertificate(Context context) {
-
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             InputStream inputStream = context.getResources().openRawResource(R.raw.fetlife_fastly_intermediate);

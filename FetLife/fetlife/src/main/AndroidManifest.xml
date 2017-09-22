@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
+          android:installLocation="auto"
           package="com.bitlove.fetlife">
 
     <uses-permission android:name="com.sonyericsson.home.permission.BROADCAST_BADGE"/>
@@ -20,7 +21,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-    <uses-sdk tools:overrideLibrary="br.tiagohm.markdownview" />
+    <uses-sdk tools:overrideLibrary="br.tiagohm.markdownview, com.basecamp.turbolinks" />
 
     <!--
  Large Heap added as a workaround to issue with Fresco library in case of large image lists.
@@ -93,8 +94,11 @@
         <activity
             android:name=".view.screen.resource.ConversationsActivity"
             android:label="@string/title_activity_conversations"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".view.screen.resource.TurboLinksViewActivity"
+            android:label="@string/title_activity_webview"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.screen.resource.NotificationHistoryActivity"
             android:label="@string/title_activity_notificationhistory"

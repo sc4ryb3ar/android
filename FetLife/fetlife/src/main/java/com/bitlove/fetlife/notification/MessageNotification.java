@@ -102,7 +102,7 @@ public class MessageNotification extends OneSignalNotification {
     @Override
     PendingIntent getPendingIntent(Context context) {
         synchronized (notifications) {
-            if (getGroupedMessageTexts(FetLifeApplication.getInstance(),notifications).size() != 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (getGroupedMessageTexts(FetLifeApplication.getInstance(),notifications).size() == 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 Intent contentIntent = MessagesActivity.createIntent(context, conversationId, nickname, null, true);
                 contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
                 return TaskStackBuilder.create(context).addNextIntent(ConversationsActivity.createIntent(context, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);

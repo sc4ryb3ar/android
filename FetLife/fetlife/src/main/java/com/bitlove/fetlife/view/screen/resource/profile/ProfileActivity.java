@@ -52,6 +52,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private String memberId;
 
     public static void startActivity(BaseActivity baseActivity, String memberId) {
+        if (baseActivity == null) {
+            return;
+        }
         Intent intent = new Intent(baseActivity, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(EXTRA_MEMBERID,memberId);
@@ -390,6 +393,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     @Override
                     public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
                         FriendRequest friendRequest = new FriendRequest();
+                        friendRequest.setClientId(member.getId());
                         friendRequest.setTargetMemberId(member.getId());
                         friendRequest.setPendingState(FriendRequest.PendingState.OUTGOING);
                         friendRequest.setPending(true);
