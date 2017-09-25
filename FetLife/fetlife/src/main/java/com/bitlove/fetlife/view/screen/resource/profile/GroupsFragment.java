@@ -14,7 +14,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.GroupsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.GroupActivity;
+import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 public class GroupsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Group> {
@@ -30,7 +30,7 @@ public class GroupsFragment extends LoadFragment implements ResourceListRecycler
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);

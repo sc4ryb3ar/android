@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.VideosRecyclerAdapter;
@@ -30,7 +29,7 @@ public class VideosFragment extends LoadFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getFetLifeApplication(), VIDEO_GRID_COLUMN_COUNT);
         recyclerView.setLayoutManager(recyclerLayoutManager);

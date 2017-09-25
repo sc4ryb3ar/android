@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
@@ -23,7 +22,7 @@ import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.EventActivity;
-import com.bitlove.fetlife.view.screen.resource.GroupActivity;
+import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAdapter.OnFeedItemClickListener {
@@ -39,7 +38,7 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);

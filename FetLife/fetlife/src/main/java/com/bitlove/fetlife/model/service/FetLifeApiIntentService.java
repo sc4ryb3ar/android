@@ -50,6 +50,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
@@ -1604,6 +1605,73 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int retrieveGroupMembers(String groupId, String[] params) throws IOException {
+        final int limit = getIntFromParams(params, 0, 10);
+        final int page = getIntFromParams(params, 1, 1);
+
+        final Call<List<Member>> getGroupMembersCall = getFetLifeApi().getGroupMembers(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);;
+        final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
+
+        Response<List<Member>> groupMembersResponse = getGroupMembersCall.execute();
+        if (groupMembersResponse.isSuccess()) {
+
+            final List<Member> groupMembers = groupMembersResponse.body();
+            List<GroupMemberReference> currentGroupMembers = null;//new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            final Collator coll = Collator.getInstance(Locale.US);
+            coll.setStrength(Collator.IDENTICAL);
+            Collections.sort(currentGroupMembers, new Comparator<GroupMemberReference>() {
+                @Override
+                public int compare(GroupMemberReference relationReference, GroupMemberReference relationReference2) {
+                    //Workaround to match with DB sorting
+                    String nickname1 = relationReference.getNickname().replaceAll("_","z");
+                    String nickname2 = relationReference2.getNickname().replaceAll("_","z");
+                    return coll.compare(nickname1,nickname2);
+                }
+            });
+
+            int lastConfirmedPosition;
+            if (page == 1) {
+                lastConfirmedPosition = -1;
+            } else {
+                lastConfirmedPosition = loadLastSyncedPosition(syncedPositionType,groupId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Member groupMember : groupMembers) {
+
+                groupMember.mergeSave();
+
+                int foundPos;
+                for (foundPos = lastConfirmedPosition+1; foundPos < currentGroupMembers.size(); foundPos++) {
+                    GroupMemberReference checkGroupMember = currentGroupMembers.get(foundPos);
+                    if (groupMember.getId().equals(checkGroupMember.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentGroupMembers.size()) {
+                    newItemCount++;
+                    GroupMemberReference groupMemberReference = new GroupMemberReference();
+                    groupMemberReference.setId(groupMember.getId());
+                    groupMemberReference.setNickname(groupMember.getNickname());
+                    groupMemberReference.setGroupId(groupId);
+                    groupMemberReference.save();
+                } else {
+                    for (int i = lastConfirmedPosition+1; i < foundPos; i++) {
+                        currentGroupMembers.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedPosition = foundPos;
+                }
+            }
+
+            saveLastSyncedPosition(syncedPositionType,groupId,lastConfirmedPosition+newItemCount);
+
+            return groupMembers.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int retrieveMyPictures(String[] params) throws IOException {
         String currentUserId = getFetLifeApplication().getUserSessionManager().getCurrentUser().getId();
         return retrievePictures(true, currentUserId, params);
@@ -2180,7 +2248,7 @@ public class FetLifeApiIntentService extends IntentService {
         EVENT,
         EVENT_RSVP,
         FRIEND,
-        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP;
+        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP, GROUP_MEMBERS;
 
         @Override
         public String toString() {

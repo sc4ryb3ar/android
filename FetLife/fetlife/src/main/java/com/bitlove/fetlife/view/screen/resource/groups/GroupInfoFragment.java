@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource;
+package com.bitlove.fetlife.view.screen.resource.groups;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 public class GroupInfoFragment extends LoadFragment {
 

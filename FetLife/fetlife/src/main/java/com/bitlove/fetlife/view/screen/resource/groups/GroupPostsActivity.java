@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource;
+package com.bitlove.fetlife.view.screen.resource.groups;
 
 import android.content.Context;
 import android.content.Intent;

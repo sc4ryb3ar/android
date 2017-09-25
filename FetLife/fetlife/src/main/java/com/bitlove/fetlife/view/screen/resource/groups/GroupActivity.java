@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource;
+package com.bitlove.fetlife.view.screen.resource.groups;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +21,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
 import com.bitlove.fetlife.view.widget.FlingBehavior;
 
 import org.greenrobot.eventbus.Subscribe;

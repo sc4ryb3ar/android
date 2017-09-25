@@ -103,7 +103,7 @@ android {
     }
 }
 
-def dbflow_version = "4.0.0-beta5"
+def dbflow_version = "4.1.1"
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -145,7 +145,7 @@ dependencies {
     compile 'com.github.tiagohm.MarkdownView:library:0.17.0'
     //compile 'com.squareup.okio:okio:1.10.0'
     testCompile 'junit:junit:4.12'
-    compile project(':turbolinks')
+    compile project(path: ':turbolinks', configuration: 'default')
 }
 
 
@@ -154,10 +154,8 @@ import com.crashlytics.tools.utils.PropertiesUtils
 File crashlyticsProperties = new File("${project.projectDir.absolutePath}/fabric.properties")
 android.applicationVariants.all { variant ->
 
-    variant.outputs.each { output ->
-        output.outputFile = new File(
-                output.outputFile.parent,
-                output.outputFile.name.replace(".apk", "-${variant.versionName}.apk").replace("-release", ""))
+    variant.outputs.all {
+        outputFileName = "${variant.name}-${variant.versionName}.apk"
     }
 
     def variantSuffix = variant.name.capitalize()

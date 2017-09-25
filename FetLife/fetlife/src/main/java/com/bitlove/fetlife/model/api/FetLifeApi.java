@@ -64,6 +64,9 @@ public interface FetLifeApi {
     @GET("/api/v2/search/groups")
     Call<List<Group>> searchGroups(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/groups/{groupId}/members")
+    Call<List<Member>> getGroupMembers(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
+
     @GET("/api/v2/members/{memberId}")
     Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
 

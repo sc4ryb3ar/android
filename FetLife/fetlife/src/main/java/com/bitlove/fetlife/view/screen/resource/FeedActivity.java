@@ -18,6 +18,7 @@ import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
+import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
 public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack, FeedRecyclerAdapter.OnFeedItemClickListener {

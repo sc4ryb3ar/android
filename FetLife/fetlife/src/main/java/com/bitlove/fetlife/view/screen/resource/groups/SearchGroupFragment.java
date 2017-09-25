@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource;
+package com.bitlove.fetlife.view.screen.resource.groups;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,7 +19,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.SearchGroupRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 public class SearchGroupFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Group> {
 
@@ -89,12 +89,12 @@ public class SearchGroupFragment extends LoadFragment implements ResourceListRec
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
         //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        SearchGroupRecyclerAdapter adapter = new SearchGroupRecyclerAdapter(getArguments().getString(ARG_SEARCH_QUERY),getFetLifeApplication());
+        SearchGroupRecyclerAdapter adapter = new SearchGroupRecyclerAdapter(getArguments().getString(ARG_SEARCH_QUERY));
         adapter.setOnItemClickListener(this);
         adapter.setUseSwipe(false);
         recyclerView.setAdapter(adapter);
@@ -124,15 +124,10 @@ public class SearchGroupFragment extends LoadFragment implements ResourceListRec
 
     @Override
     public void onItemClick(Group group) {
-        openProfileScreen(group);
+        GroupActivity.startActivity((BaseActivity) getActivity(),group.getId());
     }
 
     @Override
     public void onAvatarClick(Group group) {
-        openProfileScreen(group);
-    }
-
-    private void openProfileScreen(Group group) {
-        ProfileActivity.startActivity((BaseActivity) getActivity(),group.getId());
     }
 }
