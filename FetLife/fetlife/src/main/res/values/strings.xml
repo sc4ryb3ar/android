@@ -29,9 +29,14 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v2.10.0<br/>
+            <p/>v2.11.0<br/>
                     <ul>
-                        <p>Interim release before groups with fixes and 3 new screens:</p>
+                        <li>Groups</li>
+                        <p>Note: Group discussion notifications are by default turned off. Check your settings to enable them.
+                    </ul>
+
+            <p/>v2.10.3<br/>
+                    <ul>
                         <li>Support</li>
                         <li>Ads</li>
                         <li>Kinktionary</li>

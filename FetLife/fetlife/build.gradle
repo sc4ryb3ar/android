@@ -25,7 +25,7 @@ android {
 
         vectorDrawables.useSupportLibrary = true
 
-        buildConfigField "Boolean", "PREVIEW", "false"
+        buildConfigField "Boolean", "PREVIEW", "true"
 
     }
 

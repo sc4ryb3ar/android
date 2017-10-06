@@ -7,7 +7,7 @@
     <string name="settings_default_notification_color">none</string>
     <string name="settings_default_notification_vibrate">default</string>
     <string name="settings_default_notification_messages_enabled">true</string>
-    <string name="settings_default_notification_group_messages_enabled">true</string>
+    <string name="settings_default_notification_group_messages_enabled">false</string>
     <string name="settings_default_notification_friendrequests_enabled">true</string>
     <string name="settings_default_notification_others_enabled">true</string>
     <string name="settings_default_notification_info_enabled">true</string>

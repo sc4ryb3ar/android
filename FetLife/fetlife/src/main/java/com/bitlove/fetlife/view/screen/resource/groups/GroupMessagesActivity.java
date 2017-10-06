@@ -108,6 +108,8 @@ public class GroupMessagesActivity extends ResourceActivity
     @Override
     protected void onResourceCreate(Bundle savedInstanceState) {
 
+        findViewById(R.id.text_preview).setVisibility(View.GONE);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
