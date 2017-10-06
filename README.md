@@ -1,13 +1,3 @@
-## WARNING! FetLife Android App Mandatory Update
-
-FetLife Android App version 2.10.0 has just been released with important security improvements.
-
-If you are using an earlier version, please update before 11th September 2017.
-
-**Support for versions below 2.10.0 will be stopped on 11th September 2017.**
-
-Thank you for your understanding and we're sorry for the inconveniences
-
 # FetLife for Android
 
 Welcome to FetLife's open-source Android app!
@@ -36,7 +26,8 @@ With offcial FetLife Android App you can...
 
 Installation of FetLife App is a bit different than for Apps from the Google Play store, but it is still pretty straightforward, Android OS will guide you through the whole process. 
 
-Just download our latest version [fetlife-2.10.0.apk](https://github.com/fetlife/android/releases/download/v2.10.0/fetlife-2.10.0.apk) and follow the on-screen prompts on your device.
+Just download our latest version [fetlife-2.10.0.apk](https://github.com/fetlife/android/releases/download/v2.10.0/fetlife-2.10.0.apk)
+or our preview version [fetlife-2.11.0.apk](https://github.com/fetlife/android/releases/download/v2.11.0/fetlife-2.11.0.apk) and follow the on-screen prompts on your device.
 
 For more details please check out [FetLife Android App Installation Guide](https://github.com/fetlife/android/files/1127920/FetLifeAndroidAppInstallationGuide.pdf)
 
