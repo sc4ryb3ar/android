@@ -54,7 +54,7 @@ public class GroupsFragment extends LoadFragment implements ResourceListRecycler
     @Override
     public void onItemClick(Group group) {
         group.save();
-        GroupActivity.startActivity((BaseActivity) getActivity(),group.getId());
+        GroupActivity.startActivity((BaseActivity) getActivity(),group.getId(),group.getName(),false);
     }
 
     @Override

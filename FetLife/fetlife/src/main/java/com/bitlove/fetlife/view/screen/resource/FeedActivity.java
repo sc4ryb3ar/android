@@ -93,7 +93,7 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
             Group targetGroup = feedItemResourceHelper.getGroup(feedEvent);
             if (targetGroup != null) {
                 targetGroup.save();
-                GroupActivity.startActivity(this,targetGroup.getId());
+                GroupActivity.startActivity(this,targetGroup.getId(),targetGroup.getName(),false);
                 return;
             }
         }

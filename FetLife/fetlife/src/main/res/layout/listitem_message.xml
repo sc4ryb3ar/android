@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/message_text_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/listitem_horizontal_margin"
@@ -15,13 +16,23 @@
         android:paddingBottom="@dimen/listitem_vertical_margin"
         android:paddingTop="@dimen/listitem_vertical_margin"
         android:gravity="bottom"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         style="@style/MessageItem">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/member_image"
+            android:visibility="gone"
+            android:padding="@dimen/toolbar_item_padding"
+            android:scaleType="fitCenter"
+            android:layout_gravity="right"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"/>
 
         <com.bitlove.fetlife.view.widget.WorkaroundTextView
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:autoLink="web"
             android:singleLine="false"
             android:textIsSelectable="true"

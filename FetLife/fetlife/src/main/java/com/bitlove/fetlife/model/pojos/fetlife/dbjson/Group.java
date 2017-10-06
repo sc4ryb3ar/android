@@ -2,6 +2,7 @@ package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.util.DateUtil;
+import com.bitlove.fetlife.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
@@ -113,7 +114,7 @@ public class Group extends BaseModel {
 
     @JsonProperty("description")
     public void setDescription(String description) {
-        this.description = description;
+        this.description = StringUtil.parseHtml(description).toString();
     }
 
     @JsonProperty("id")

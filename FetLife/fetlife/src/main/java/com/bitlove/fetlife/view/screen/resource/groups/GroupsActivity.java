@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.view.screen.resource.groups;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
@@ -15,20 +17,30 @@ import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.GroupsFragment;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.ref.WeakReference;
+
 public class GroupsActivity extends ResourceActivity {
 
     private ViewPager viewPager;
+    private WeakReference<Fragment> currentFragmentReference;
 
-    public static void startActivity(BaseActivity baseActivity) {
-        Intent intent = new Intent(baseActivity, GroupsActivity.class);
+    public static void startActivity(BaseActivity baseActivity,boolean newTask) {
+        baseActivity.startActivity(createIntent(baseActivity,newTask));
+    }
+    public static Intent createIntent(Context context, boolean newTask) {
+        Intent intent = new Intent(context, GroupsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        baseActivity.startActivity(intent);
+        if (newTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        return intent;
     }
 
     @Override
@@ -42,6 +54,12 @@ public class GroupsActivity extends ResourceActivity {
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+
+            @Override
+            public void setPrimaryItem(ViewGroup container, int position, Object object) {
+                currentFragmentReference = object != null ? new WeakReference<Fragment>((Fragment) object) : null;
+                super.setPrimaryItem(container, position, object);
+            }
 
             @Override
             public Fragment getItem(int position) {
@@ -105,11 +123,11 @@ public class GroupsActivity extends ResourceActivity {
         if (currentUser == null) {
             return false;
         }
-        if (params != null && params.length > 0 && currentUser.getId() != null && !currentUser.getId().equals(params[0])) {
-            return false;
-        }
         if (FetLifeApiIntentService.ACTION_APICALL_SEARCH_GROUP.equals(serviceCallAction)) {
             return true;
+        }
+        if (params != null && params.length > 0 && currentUser.getId() != null && !currentUser.getId().equals(params[0])) {
+            return false;
         }
         if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_GROUPS.equals(serviceCallAction)) {
             return true;
@@ -140,4 +158,28 @@ public class GroupsActivity extends ResourceActivity {
         setContentView(R.layout.activity_groups);
     }
 
+    @Override
+    public void showProgress() {
+        super.showProgress();
+        Fragment page = getCurrentFragment();
+        if (page != null && page instanceof LoadFragment) {
+            ((LoadFragment)page).showProgress();
+        }
+    }
+
+    @Override
+    public void dismissProgress() {
+        super.dismissProgress();
+        Fragment page = getCurrentFragment();
+        if (page != null && page instanceof LoadFragment) {
+            ((LoadFragment)page).dismissProgress();
+        }
+    }
+
+    private Fragment getCurrentFragment() {
+        if (currentFragmentReference == null) {
+            return null;
+        }
+        return currentFragmentReference.get();
+    }
 }

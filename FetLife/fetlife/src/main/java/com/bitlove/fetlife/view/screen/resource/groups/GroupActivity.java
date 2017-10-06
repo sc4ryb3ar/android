@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.view.screen.resource.groups;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -30,17 +31,27 @@ import org.greenrobot.eventbus.ThreadMode;
 public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private static final String EXTRA_GROUPID = "EXTRA_GROUPID";
+    private static final String EXTRA_GROUP_TITLE = "EXTRA_GROUP_TITLE";
+
     private TextView groupSubTitle;
     private TextView groupTitle;
 
     private ViewPager viewPager;
     private Group group;
 
-    public static void startActivity(BaseActivity baseActivity, String groupId) {
-        Intent intent = new Intent(baseActivity, GroupActivity.class);
+    public static Intent createIntent(Context context, String groupId, String groupTitle, boolean newTask) {
+        Intent intent = new Intent(context, GroupActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        if (newTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         intent.putExtra(EXTRA_GROUPID, groupId);
-        baseActivity.startActivity(intent);
+        intent.putExtra(EXTRA_GROUP_TITLE, groupTitle);
+        return intent;
+    }
+
+    public static void startActivity(BaseActivity baseActivity, String groupId, String groupTitle, boolean newTask) {
+        baseActivity.startActivity(createIntent(baseActivity,groupId,groupTitle,newTask));
     }
 
     @Override
@@ -54,8 +65,12 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
 
         String groupId = getIntent().getStringExtra(EXTRA_GROUPID);
         group = Group.loadGroup(groupId);
-
-        setGroupDetails(group);
+        if (group != null) {
+            setGroupDetails(group);
+        } else {
+            String groupTitle = getIntent().getStringExtra(EXTRA_GROUP_TITLE);
+            setGroupDetails(groupTitle,-1);
+        }
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
@@ -66,6 +81,10 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
                         return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.DESCRIPTION);
                     case 1:
                         return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.RULES);
+                    case 2:
+                        return GroupDiscussionsFragment.newInstance(group.getId());
+                    case 3:
+                        return GroupMembersFragment.newInstance(group.getId());
                     default:
                         return null;
                 }
@@ -73,7 +92,7 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
 
             @Override
@@ -83,6 +102,10 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
                         return getString(R.string.title_fragment_group_description);
                     case 1:
                         return getString(R.string.title_fragment_group_rules);
+                    case 2:
+                        return getString(R.string.title_fragment_group_discussions);
+                    case 3:
+                        return getString(R.string.title_fragment_group_members);
                     default:
                         return null;
                 }
@@ -106,10 +129,19 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
     }
 
     private void setGroupDetails(Group group) {
-        setTitle(group.getName());
+        setGroupDetails(group.getName(),group.getMemberCount());
+    }
+
+    private void setGroupDetails(String groupTitle, int memberCount) {
+        if (groupTitle != null) {
+            setTitle(groupTitle);
+        }
         groupSubTitle = (TextView) findViewById(R.id.group_subtitle);
-        int memberCount = group.getMemberCount();
-        groupSubTitle.setText(getString(memberCount == 1 ? R.string.text_group_member_count : R.string.text_group_members_count,memberCount));
+        if (memberCount > -1) {
+            groupSubTitle.setText(getString(memberCount == 1 ? R.string.text_group_member_count : R.string.text_group_members_count,memberCount));
+        } else {
+            groupSubTitle.setText("");
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -143,7 +175,10 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
         if (params != null && params.length > 0 && groupId != null && !groupId.equals(params[0])) {
             return false;
         }
-        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_GROUPS.equals(serviceCallAction)) {
+        if (FetLifeApiIntentService.ACTION_APICALL_GROUP.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_GROUP_DISCUSSIONS.equals(serviceCallAction)) {
             return true;
         }
         return false;

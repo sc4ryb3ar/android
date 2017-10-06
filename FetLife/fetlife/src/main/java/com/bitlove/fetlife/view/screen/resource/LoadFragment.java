@@ -4,7 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
@@ -27,6 +31,8 @@ public abstract class LoadFragment extends BaseFragment {
 
     protected int requestedItems = 0;
     protected int requestedPage = 1;
+
+    protected ProgressBar progressView;
 
     //TODO: replace this with a more sophisticated solution od checking queue of FetLife Intent service
     private boolean onCreateCallInProgress;
@@ -139,5 +145,28 @@ public abstract class LoadFragment extends BaseFragment {
 
     public abstract void refreshUi();
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        final MenuItem progressItem = menu.findItem(R.id.action_progress);
+        if (progressItem != null) {
+            progressView = (ProgressBar) progressItem.getActionView().findViewById(R.id.menu_progress_indicator);
+            progressView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void showProgress() {
+        if (progressView != null) {
+            progressView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void dismissProgress() {
+        if (progressView != null) {
+            progressView.setVisibility(View.INVISIBLE);
+        }
+    }
 
 }

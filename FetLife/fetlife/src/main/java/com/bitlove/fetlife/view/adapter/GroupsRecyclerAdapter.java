@@ -25,6 +25,7 @@ public class GroupsRecyclerAdapter extends ResourceListRecyclerAdapter<Group, Gr
 
     private static final String DATE_INTERVAL_SEPARATOR = " - ";
     private static final String LOCATION_SEPARATOR = " - ";
+    private static final int MAX_DESC_LENGTH = 125;
 
     private final String memberId;
     protected List<Group> itemList;
@@ -76,8 +77,11 @@ public class GroupsRecyclerAdapter extends ResourceListRecyclerAdapter<Group, Gr
             }
         });
         holder.groupName.setText(group.getName());
-        holder.groupDescription.setText(group.getDescription());
-        holder.groupDescription.setVisibility(TextUtils.isEmpty(group.getDescription()) ? View.GONE : View.VISIBLE);
+        String description = group.getDescription();
+        String descPreview = description.substring(0,Math.min(MAX_DESC_LENGTH,description.length())).trim();
+
+        holder.groupDescription.setText(descPreview);
+        holder.groupDescription.setVisibility(TextUtils.isEmpty(description) ? View.GONE : View.VISIBLE);
         String memberCount = holder.itemView.getContext().getString((group.getMemberCount() == 1 ? R.string.text_group_member_count : R.string.text_group_members_count),group.getMemberCount());
         holder.groupMemberCount.setText(memberCount);
     }

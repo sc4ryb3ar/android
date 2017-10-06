@@ -174,9 +174,9 @@ public class MenuActivityComponent extends ActivityComponent {
 
 
         if (id == R.id.nav_logout) {
+            menuActivity.getFetLifeApplication().getUserSessionManager().deleteCurrentUserDb();
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             menuActivity.finish();
-            menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             LoginActivity.startLogin(menuActivity.getFetLifeApplication());
             return false;
         } else if (id == R.id.nav_conversations) {
@@ -220,7 +220,7 @@ public class MenuActivityComponent extends ActivityComponent {
                 requestLocationPermission(BaseActivity.PERMISSION_REQUEST_LOCATION);
             }
         } else if (id == R.id.nav_groups) {
-            GroupsActivity.startActivity(menuActivity);
+            GroupsActivity.startActivity(menuActivity,false);
         } else if (id == R.id.nav_updates) {
             menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
             FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));

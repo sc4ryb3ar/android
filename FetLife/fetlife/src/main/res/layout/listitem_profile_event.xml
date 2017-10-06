@@ -5,13 +5,13 @@
              android:layout_height="wrap_content"
              android:layout_marginLeft="16dp"
              android:layout_marginRight="16dp"
-             android:layout_marginTop="16dp">
+             android:layout_marginTop="12dp">
 
     <RelativeLayout
         style="@style/FeedInnerListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/text_background_rounded"
+        android:background="@drawable/listitem_background_rounded"
         android:gravity="bottom"
         android:paddingBottom="@dimen/listitem_vertical_margin"
         android:paddingEnd="@dimen/listitem_horizontal_margin"

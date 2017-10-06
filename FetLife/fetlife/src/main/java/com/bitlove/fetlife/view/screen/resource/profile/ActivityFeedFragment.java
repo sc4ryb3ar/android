@@ -81,7 +81,7 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
             Group targetGroup = feedItemResourceHelper.getGroup(feedEvent);
             if (targetGroup != null) {
                 targetGroup.save();
-                GroupActivity.startActivity((BaseActivity) getActivity(),targetGroup.getId());
+                GroupActivity.startActivity((BaseActivity) getActivity(),targetGroup.getId(),targetGroup.getName(),false);
                 return;
             }
         }

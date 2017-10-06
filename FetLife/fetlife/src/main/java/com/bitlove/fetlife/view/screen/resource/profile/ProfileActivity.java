@@ -44,6 +44,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
     private static final String EXTRA_MEMBERID = "EXTRA_MEMBERID";
 
+    private static final int PAGE_NUMBER_PICTURES = 4;
+
     private ViewPager viewPager;
     private TextView nickNameView,metaView;
     private SimpleDraweeView avatarView,imageHeaderView,toolbarHeaderView;
@@ -102,7 +104,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         return StatusesFragment.newInstance(memberId);
                     case 3:
                         return ActivityFeedFragment.newInstance(memberId);
-                    case 4:
+                    case PAGE_NUMBER_PICTURES:
                         return PicturesFragment.newInstance(memberId);
                     case 5:
                         return VideosFragment.newInstance(memberId);
@@ -135,7 +137,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         return getString(R.string.title_fragment_profile_statuses);
                     case 3:
                         return getString(R.string.title_fragment_profile_feed);
-                    case 4:
+                    case PAGE_NUMBER_PICTURES:
                         return getString(R.string.title_fragment_profile_pictures);
                     case 5:
                         return getString(R.string.title_fragment_profile_videos);
@@ -172,6 +174,12 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         metaView.setText(member != null ? member.getMetaInfo() : "");
         avatarView.setImageURI(member != null ? member.getAvatarLink() : "");
         imageHeaderView.setImageURI(member != null ? member.getAvatarLink() : "");
+        imageHeaderView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(PAGE_NUMBER_PICTURES);
+            }
+        });
         toolbarHeaderView.setImageURI(member != null ? member.getAvatarLink() : "");
         toolbarHeaderView.setTag(member != null ? member.getAvatarLink() : "");
 
@@ -486,12 +494,12 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 //    private void refresh(String memberId) {
 //        showProgress();
 //        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(LoadFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(LoadFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(LoadFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(LoadFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.ITEM_PER_PAGE), "1");
 //    }
 
     @Override

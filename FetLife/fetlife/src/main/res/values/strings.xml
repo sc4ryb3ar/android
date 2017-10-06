@@ -278,6 +278,8 @@
     <string name="settings_category_notification_enablement">Enable Notifications</string>
     <string name="settings_title_notification_messages_enabled">Message Notifications</string>
     <string name="settings_summary_notification_messages_enabled">Enable Notifications for incoming Messages</string>
+    <string name="settings_title_notification_group_messages_enabled">Group Discussion Notifications</string>
+    <string name="settings_summary_notification_group_messages_enabled">Enable Notifications for Group Discussion Comments and Mentions</string>
     <string name="settings_title_notification_friendrequests_enabled">Friend Request Notifications</string>
     <string name="settings_summary_notification_friendrequests_enabled">Enable Notifications for incoming Friend Requests</string>
     <string name="settings_title_notification_prerelease_enabled">Pre-Release Notifications</string>
@@ -697,8 +699,12 @@
     <string name="title_fragment_member_serach">Search</string>
     <string name="noification_title_new_message">New private message</string>
     <string name="noification_title_new_messages">%1$d new private messages</string>
+    <string name="noification_title_new_group_message">New group comment</string>
+    <string name="noification_title_new_group_messages">%1$d new group comments</string>
     <string name="noification_text_new_message">New message from %1$s</string>
     <string name="noification_text_new_messages">%1$d messages from %2$s</string>
+    <string name="noification_text_new_group_message">New comment from %1$s</string>
+    <string name="noification_text_new_group_messages">%1$d comments from %2$s</string>
     <string name="noification_title_new_friendrequest">New Friend Request</string>
     <string name="noification_title_new_friendrequests">%1$d new Friend Requests</string>
     <string name="noification_text_new_love">%1$s loved your stuff</string>
@@ -746,5 +752,7 @@
     <string name="title_activity_support">Support FetLife</string>
     <string name="title_activity_ads">Advertise on FetLife</string>
     <string name="title_activity_glossary">Kinktionary</string>
+    <string name="title_fragment_group_discussions">Discussions</string>
+    <string name="title_fragment_group_members">Members</string>
 
 </resources>

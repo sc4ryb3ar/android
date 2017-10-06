@@ -64,6 +64,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
+                            android:visibility="gone"
                             android:id="@+id/group_menu_icon_member_container"
                             android:background="@color/area_background_dark"
                             android:onClick="onSetJoinStateOfGroup"

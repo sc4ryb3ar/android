@@ -23,6 +23,8 @@ import com.bitlove.fetlife.event.EventsByLocationRetrieveFailedEvent;
 import com.bitlove.fetlife.event.EventsByLocationRetrievedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
+import com.bitlove.fetlife.event.GroupMessageSendFailedEvent;
+import com.bitlove.fetlife.event.GroupMessageSendSucceededEvent;
 import com.bitlove.fetlife.event.LatestReleaseEvent;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
@@ -50,7 +52,10 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupDiscussionReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupDiscussionReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
@@ -67,6 +72,9 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
@@ -80,6 +88,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
@@ -151,7 +160,9 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MEMBER_FEED = "com.bitlove.fetlife.action.apicall.member_feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
+    public static final String ACTION_APICALL_GROUP_MESSAGES = "com.bitlove.fetlife.action.apicall.group_messages";
     public static final String ACTION_APICALL_SEND_MESSAGES = "com.bitlove.fetlife.action.apicall.send_messages";
+    public static final String ACTION_APICALL_SEND_GROUP_MESSAGES = "com.bitlove.fetlife.action.apicall.send_group_messages";
     public static final String ACTION_APICALL_SET_MESSAGES_READ = "com.bitlove.fetlife.action.apicall.set_messages_read";
     public static final String ACTION_APICALL_ADD_LOVE = "com.bitlove.fetlife.action.apicall.add_love";
     public static final String ACTION_APICALL_REMOVE_LOVE = "com.bitlove.fetlife.action.apicall.remove_love";
@@ -170,6 +181,8 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_GROUP = "com.bitlove.fetlife.action.apicall.group";
     public static final String ACTION_APICALL_EVENT_RSVPS = "com.bitlove.fetlife.action.apicall.event.ravps";
     public static final String ACTION_APICALL_SET_RSVP_STATUS = "com.bitlove.fetlife.action.apicall.event.set_ravp";
+    public static final String ACTION_APICALL_GROUP_MEMBERS = "com.bitlove.fetlife.action.apicall.group_members";
+    public static final String ACTION_APICALL_GROUP_DISCUSSIONS = "com.bitlove.fetlife.action.apicall.group_discussions";
 
     public static final String ACTION_CANCEL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.cancel.upload_video_chunk";
 
@@ -247,6 +260,9 @@ public class FetLifeApiIntentService extends IntentService {
     public static synchronized void startPendingCalls(Context context) {
         if (!isActionInProgress(ACTION_APICALL_SEND_MESSAGES)) {
             startApiCall(context, ACTION_APICALL_SEND_MESSAGES);
+        }
+        if (!isActionInProgress(ACTION_APICALL_SEND_GROUP_MESSAGES)) {
+            startApiCall(context, ACTION_APICALL_SEND_GROUP_MESSAGES);
         }
         if (!isActionInProgress(ACTION_APICALL_PENDING_RELATIONS)) {
             startApiCall(context, ACTION_APICALL_PENDING_RELATIONS);
@@ -384,6 +400,12 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MEMBER_GROUPS:
                     result = retrieveMemberGroups(params);
                     break;
+                case ACTION_APICALL_GROUP_MEMBERS:
+                    result = retrieveGroupMembers(params);
+                    break;
+                case ACTION_APICALL_GROUP_DISCUSSIONS:
+                    result = retrieveGroupDiscussions(params);
+                    break;
                 case ACTION_APICALL_EVENT_RSVPS:
                     result = retrieveEventRsvps(params);
                     break;
@@ -402,9 +424,20 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MESSAGES:
                     result = retrieveMessages(currentUser, params);
                     break;
+                case ACTION_APICALL_GROUP_MESSAGES:
+                    result = retrieveGroupMessages(currentUser, params);
+                    break;
                 case ACTION_APICALL_SEND_MESSAGES:
                     for (int i = PENDING_MESSAGE_RETRY_COUNT; i > 0; i--) {
                         result = sendPendingMessages(currentUser, 0);
+                        if (result != Integer.MIN_VALUE) {
+                            break;
+                        }
+                    }
+                    break;
+                case ACTION_APICALL_SEND_GROUP_MESSAGES:
+                    for (int i = PENDING_MESSAGE_RETRY_COUNT; i > 0; i--) {
+                        result = sendPendingGroupMessages(currentUser, 0);
                         if (result != Integer.MIN_VALUE) {
                             break;
                         }
@@ -730,6 +763,69 @@ public class FetLifeApiIntentService extends IntentService {
             pendingMessage.setFailed(true);
             pendingMessage.save();
             getFetLifeApplication().getEventBus().post(new MessageSendFailedEvent(conversationId));
+            return false;
+        }
+    }
+
+    //Go through all the pending messages and send them one by one
+    private int sendPendingGroupMessages(Member user, int sentMessageCount) throws IOException {
+        List<GroupComment> pendingMessages = new Select().from(GroupComment.class).where(GroupComment_Table.pending.is(true)).orderBy(GroupComment_Table.date,true).queryList();
+        //Go through all pending messages (if there is any) and try to send them
+        for (GroupComment pendingMessage : pendingMessages) {
+            String groupId = pendingMessage.getGroupId();
+            String groupPostId = pendingMessage.getGroupPostId();
+            //If the conversation id is local (not created by the backend) it's a new conversation, so start a new conversation call
+            if (sendPendingGroupMessage(pendingMessage)) {
+                sentMessageCount++;
+            } else {
+                continue;
+            }
+        }
+        //Return success result if at least one pending message could have been sent so there was a change in the current state
+        return sentMessageCount;
+    }
+
+    private static long lastSentGroupMessageTime;
+
+    private boolean sendPendingGroupMessage(GroupComment pendingMessage) throws IOException {
+        //Server can handle only one message in every second without adding the same date to it
+
+        //Workaround for server issue as it does not handle millis
+        while (System.currentTimeMillis()/1000 == lastSentGroupMessageTime/1000) {}
+
+        Call<GroupComment> postMessagesCall = getFetLifeApi().postGroupMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getGroupId(), pendingMessage.getGroupPostId(), pendingMessage.getBody());
+
+        Response<GroupComment> postMessageResponse;
+        try {
+            postMessageResponse = postMessagesCall.execute();
+        } catch (IOException ioe) {
+            throw ioe;
+        }
+
+        String groupId = pendingMessage.getGroupId();
+        String groupPostId = pendingMessage.getGroupPostId();
+        if (postMessageResponse.isSuccess()) {
+            lastSentGroupMessageTime = System.currentTimeMillis();
+            //Update the message state of the returned message object
+            final GroupComment message = postMessageResponse.body();
+            //Messages are identify
+            // ed in the db by client id so original pending message will be overridden here with the correct state
+            message.setClientId(pendingMessage.getClientId());
+            message.setPending(false);
+            message.setGroupId(groupId);
+            message.setGroupPostId(groupPostId);
+            message.update();
+            getFetLifeApplication().getEventBus().post(new GroupMessageSendSucceededEvent(groupId,groupPostId));
+            return true;
+        } else {
+            //If the call failed make the pending message to a failed message
+            //Note if the post is failed due to connection issue an exception will be thrown, so here we make the assumption the failure is permanent.
+            //TODO check the result code and based on that send the message permanently failed or keep it still pending
+            //TODO add functionality for the user to be able to retry sending failed messages
+            pendingMessage.setPending(false);
+            pendingMessage.setFailed(true);
+            pendingMessage.save();
+            getFetLifeApplication().getEventBus().post(new GroupMessageSendFailedEvent(groupId,groupPostId));
             return false;
         }
     }
@@ -1241,6 +1337,63 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int retrieveGroupMessages(Member user, String... params) throws IOException {
+
+        final String groupId = params[0];
+        final String groupDiscussionId = params[1];
+
+        final int limit = getIntFromParams(params, 2, 25);
+        final int page = getIntFromParams(params, 3, 1);
+
+        Call<GroupPost> getGroupDiscussionCall = getFetLifeApi().getGroupDiscussion(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, groupDiscussionId);
+        Response<GroupPost> groupDiscussionResponse = getGroupDiscussionCall.execute();
+        GroupPost retrievedGroupDiscussion;
+
+        if (groupDiscussionResponse.isSuccess()) {
+            retrievedGroupDiscussion = groupDiscussionResponse.body();
+
+            retrievedGroupDiscussion.getMember().mergeSave();
+
+            GroupPost localGroupDiscussion = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupDiscussionId)).querySingle();
+            if (localGroupDiscussion !=null) {
+                retrievedGroupDiscussion.setDraftMessage(localGroupDiscussion.getDraftMessage());
+            }
+            retrievedGroupDiscussion.save();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+
+        Call<List<GroupComment>> getGroupMessagesCall = null;
+        getGroupMessagesCall = getFetLifeApi().getGroupMessages(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, groupDiscussionId, limit, page);
+
+        //TODO solve edge case when there is the gap between last message in db and the retrieved messages (e.g. when because of the limit not all recent messages could be retrieved)
+
+        Response<List<GroupComment>> messagesResponse = getGroupMessagesCall.execute();
+        if (messagesResponse.isSuccess()) {
+            final List<GroupComment> messages = messagesResponse.body();
+            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
+                @Override
+                public void execute(DatabaseWrapper databaseWrapper) {
+                    for (GroupComment message : messages) {
+                        GroupComment storedMessage = new Select().from(GroupComment.class).where(GroupComment_Table.id.is(message.getId())).querySingle();
+                        if (storedMessage != null) {
+                            message.setClientId(storedMessage.getClientId());
+                        } else {
+                            message.setClientId(UUID.randomUUID().toString());
+                        }
+                        message.setGroupId(groupId);
+                        message.setGroupPostId(groupDiscussionId);
+                        message.setPending(false);
+                        message.save();
+                    }
+                }
+            });
+            return messages.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int retrieveFeed(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
@@ -1605,9 +1758,10 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
-    private int retrieveGroupMembers(String groupId, String[] params) throws IOException {
-        final int limit = getIntFromParams(params, 0, 10);
-        final int page = getIntFromParams(params, 1, 1);
+    private int retrieveGroupMembers(String[] params) throws IOException {
+        String groupId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
 
         final Call<List<Member>> getGroupMembersCall = getFetLifeApi().getGroupMembers(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);;
         final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
@@ -1616,7 +1770,7 @@ public class FetLifeApiIntentService extends IntentService {
         if (groupMembersResponse.isSuccess()) {
 
             final List<Member> groupMembers = groupMembersResponse.body();
-            List<GroupMemberReference> currentGroupMembers = null;//new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            List<GroupMemberReference> currentGroupMembers = new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
             final Collator coll = Collator.getInstance(Locale.US);
             coll.setStrength(Collator.IDENTICAL);
             Collections.sort(currentGroupMembers, new Comparator<GroupMemberReference>() {
@@ -1667,6 +1821,65 @@ public class FetLifeApiIntentService extends IntentService {
             saveLastSyncedPosition(syncedPositionType,groupId,lastConfirmedPosition+newItemCount);
 
             return groupMembers.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveGroupDiscussions(String[] params) throws IOException {
+        String groupId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<GroupPost>> getGroupDiscussionsCall = getFetLifeApi().getGroupDiscussions(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);
+        final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
+
+        Response<List<GroupPost>> groupDiscussionsResponse = getGroupDiscussionsCall.execute();
+        if (groupDiscussionsResponse.isSuccess()) {
+
+            final List<GroupPost> groupDisucssions = groupDiscussionsResponse.body();
+            List<GroupDiscussionReference> currentGroupDiscussions = new Select().from(GroupDiscussionReference.class).where(GroupDiscussionReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupDiscussionReference_Table.createdAt).ascending().collate(Collate.NOCASE)).queryList();
+            final Collator coll = Collator.getInstance(Locale.US);
+            coll.setStrength(Collator.IDENTICAL);
+
+            int lastConfirmedPosition;
+            if (page == 1) {
+                lastConfirmedPosition = -1;
+            } else {
+                lastConfirmedPosition = loadLastSyncedPosition(syncedPositionType,groupId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (GroupPost groupDiscussion : groupDisucssions) {
+
+                groupDiscussion.save();
+
+                int foundPos;
+                for (foundPos = lastConfirmedPosition+1; foundPos < currentGroupDiscussions.size(); foundPos++) {
+                    GroupDiscussionReference checkGroupDiscussion = currentGroupDiscussions.get(foundPos);
+                    if (checkGroupDiscussion.getId().equals(checkGroupDiscussion.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentGroupDiscussions.size()) {
+                    newItemCount++;
+                    GroupDiscussionReference groupDiscussionReference = new GroupDiscussionReference();
+                    groupDiscussionReference.setId(groupDiscussion.getId());
+                    groupDiscussionReference.setCreatedAt(groupDiscussion.getCreatedAt());
+                    groupDiscussionReference.setGroupId(groupId);
+                    groupDiscussionReference.save();
+                } else {
+                    for (int i = lastConfirmedPosition+1; i < foundPos; i++) {
+                        currentGroupDiscussions.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedPosition = foundPos;
+                }
+            }
+
+            saveLastSyncedPosition(syncedPositionType,groupId,lastConfirmedPosition+newItemCount);
+
+            return groupDisucssions.size() - deletedItemCount;
         } else {
             return Integer.MIN_VALUE;
         }
@@ -2220,7 +2433,7 @@ public class FetLifeApiIntentService extends IntentService {
     //Helper utility methods
     //****
 
-    private int getIntFromParams(String[] params, int pageParamPosition, int defaultValue) {
+    public static int getIntFromParams(String[] params, int pageParamPosition, int defaultValue) {
         int param = defaultValue;
         if (params != null && params.length > pageParamPosition) {
             try {
@@ -2231,7 +2444,7 @@ public class FetLifeApiIntentService extends IntentService {
         return param;
     }
 
-    private boolean getBoolFromParams(String[] params, int pageParamPosition, boolean defaultValue) {
+    public static boolean getBoolFromParams(String[] params, int pageParamPosition, boolean defaultValue) {
         boolean param = defaultValue;
         if (params != null && params.length > pageParamPosition) {
             try {
@@ -2248,7 +2461,7 @@ public class FetLifeApiIntentService extends IntentService {
         EVENT,
         EVENT_RSVP,
         FRIEND,
-        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP, GROUP_MEMBERS;
+        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP, GROUP_MEMBERS, GROUP_DISCUSSIONS;
 
         @Override
         public String toString() {

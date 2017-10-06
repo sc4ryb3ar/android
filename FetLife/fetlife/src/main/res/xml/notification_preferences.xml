@@ -56,6 +56,12 @@
             android:summary="@string/settings_summary_notification_messages_enabled"/>
 
         <CheckBoxPreference
+            android:key="@string/settings_key_notification_group_messages_enabled"
+            android:defaultValue="@string/settings_default_notification_group_messages_enabled"
+            android:title="@string/settings_title_notification_group_messages_enabled"
+            android:summary="@string/settings_summary_notification_group_messages_enabled"/>
+
+        <CheckBoxPreference
             android:key="@string/settings_key_notification_friendrequests_enabled"
             android:defaultValue="@string/settings_default_notification_friendrequests_enabled"
             android:title="@string/settings_title_notification_friendrequests_enabled"

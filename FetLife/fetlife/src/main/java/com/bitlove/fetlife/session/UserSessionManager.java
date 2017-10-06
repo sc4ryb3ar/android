@@ -299,7 +299,7 @@ public class UserSessionManager {
         userDbName = getUserDatabaseName(userId);
     }
 
-    private void deleteCurrentUserDb() {
+    public void deleteCurrentUserDb() {
         fetLifeApplication.deleteDatabase(getUserDatabaseName(currentUser.getId()));
         FlowManager.reset();
         FlowManager.destroy();

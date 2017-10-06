@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.adapter;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
@@ -29,7 +30,7 @@ public class GroupMembersRecyclerAdapter extends MembersRecyclerAdapter {
     protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            List<GroupMemberReference> relationReferences = null;//new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.userId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
+            List<GroupMemberReference> relationReferences = new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
             List<String> relationIds = new ArrayList<>();
             for (GroupMemberReference relationReference : relationReferences) {
                 relationIds.add(relationReference.getId());

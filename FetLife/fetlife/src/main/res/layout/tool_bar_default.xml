@@ -14,7 +14,9 @@
             android:id="@+id/toolbar_title"
             style="@style/ToolbarTitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:maxWidth="250dp"/>
 
         <TextView
             android:id="@+id/text_preview"

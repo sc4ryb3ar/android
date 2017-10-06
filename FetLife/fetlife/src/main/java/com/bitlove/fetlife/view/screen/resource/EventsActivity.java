@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
@@ -23,6 +24,8 @@ import com.bitlove.fetlife.view.screen.resource.profile.EventsFragment;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.ref.WeakReference;
+
 public class EventsActivity extends ResourceActivity {
 
     static final String ARG_EVENT_ID = "ARG_EVENT_ID";
@@ -30,6 +33,7 @@ public class EventsActivity extends ResourceActivity {
     static final String ARG_EVENT_LATITUDE = "ARG_EVENT_LATITUDE";
 
     private ViewPager viewPager;
+    private WeakReference<Fragment> currentFragmentReference;
 
     public static void startActivity(Context context) {
         context.startActivity(createIntent(context));
@@ -73,6 +77,13 @@ public class EventsActivity extends ResourceActivity {
                     return;
                 }
                 viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+
+                    @Override
+                    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+                        currentFragmentReference = object != null ? new WeakReference<Fragment>((Fragment) object) : null;
+                        super.setPrimaryItem(container, position, object);
+                    }
+
                     @Override
                     public Fragment getItem(int position) {
                         switch (position) {
@@ -162,4 +173,30 @@ public class EventsActivity extends ResourceActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void showProgress() {
+        super.showProgress();
+        Fragment page = getCurrentFragment();
+        if (page != null && page instanceof LoadFragment) {
+            ((LoadFragment)page).showProgress();
+        }
+    }
+
+    @Override
+    public void dismissProgress() {
+        super.dismissProgress();
+        Fragment page = getCurrentFragment();
+        if (page != null && page instanceof LoadFragment) {
+            ((LoadFragment)page).dismissProgress();
+        }
+    }
+
+    private Fragment getCurrentFragment() {
+        if (currentFragmentReference == null) {
+            return null;
+        }
+        return currentFragmentReference.get();
+    }
+
 }

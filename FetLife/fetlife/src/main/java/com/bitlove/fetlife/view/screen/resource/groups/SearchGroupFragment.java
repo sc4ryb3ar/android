@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
@@ -124,10 +125,11 @@ public class SearchGroupFragment extends LoadFragment implements ResourceListRec
 
     @Override
     public void onItemClick(Group group) {
-        GroupActivity.startActivity((BaseActivity) getActivity(),group.getId());
+        GroupActivity.startActivity((BaseActivity) getActivity(),group.getId(),group.getName(),false);
     }
 
     @Override
     public void onAvatarClick(Group group) {
     }
+
 }

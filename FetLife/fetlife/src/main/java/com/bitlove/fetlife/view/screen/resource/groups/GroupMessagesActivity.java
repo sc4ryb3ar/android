@@ -1,4 +1,4 @@
-package com.bitlove.fetlife.view.screen.resource;
+package com.bitlove.fetlife.view.screen.resource.groups;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,22 +12,31 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.event.GroupMessageSendFailedEvent;
+import com.bitlove.fetlife.event.GroupMessageSendSucceededEvent;
 import com.bitlove.fetlife.event.MessageSendFailedEvent;
 import com.bitlove.fetlife.event.MessageSendSucceededEvent;
-import com.bitlove.fetlife.event.NewConversationEvent;
+//import com.bitlove.fetlife.event.NewGroupPostEvent;
+import com.bitlove.fetlife.event.NewGroupMessageEvent;
 import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
+import com.bitlove.fetlife.view.adapter.GroupMembersRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.GroupMessagesRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.GroupsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
@@ -40,41 +49,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class MessagesActivity extends ResourceActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class GroupMessagesActivity extends ResourceActivity
+        implements NavigationView.OnNavigationItemSelectedListener, GroupMessagesRecyclerAdapter.GroupMessageClickListener {
 
-    private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
-    private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
+    private static final String EXTRA_GROUP_ID = "com.bitlove.fetlife.extra.group_id";
+    private static final String EXTRA_GROUP_DISUCSSION_ID = "com.bitlove.fetlife.extra.groupDiscussion_id";
+    private static final String EXTRA_DISCUSSION_TITLE = "com.bitlove.fetlife.extra.groupDiscussion_title";
     private static final String EXTRA_AVATAR_RESOURCE_URL = "com.bitlove.fetlife.extra.avatar_resource_url";
 
-    private MessagesRecyclerAdapter messagesAdapter;
+    private GroupMessagesRecyclerAdapter messagesAdapter;
 
-    private String conversationId;
+    private String groupDiscussionId;
     private String avatarUrl;
     private String memberId;
-    private boolean oldMessageLoadingInProgress;
 
     protected RecyclerView recyclerView;
     protected LinearLayoutManager recyclerLayoutManager;
     protected View inputLayout;
     protected View inputIcon;
     protected EditText textInput;
-    private Conversation conversation;
+    private String groupId;
+    private GroupPost groupDiscussion;
 
-    public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
-        context.startActivity(createIntent(context, conversationId, title, avatarResourceUrl, newTask));
+    public static void startActivity(Context context, String groupId, String groupDiscussionId, String title, String avatarResourceUrl, boolean newTask) {
+        context.startActivity(createIntent(context, groupId, groupDiscussionId, title, avatarResourceUrl, newTask));
     }
 
-    public static Intent createIntent(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
-        Intent intent = new Intent(context, MessagesActivity.class);
+    public static Intent createIntent(Context context, String groupId, String groupDiscussionId, String title, String avatarResourceUrl, boolean newTask) {
+        Intent intent = new Intent(context, GroupMessagesActivity.class);
         if (newTask) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        intent.putExtra(EXTRA_CONVERSATION_ID, conversationId);
-        intent.putExtra(EXTRA_CONVERSATION_TITLE, title);
+        intent.putExtra(EXTRA_GROUP_ID, groupId);
+        intent.putExtra(EXTRA_GROUP_DISUCSSION_ID, groupDiscussionId);
+        intent.putExtra(EXTRA_DISCUSSION_TITLE, title);
         intent.putExtra(EXTRA_AVATAR_RESOURCE_URL, avatarResourceUrl);
         return intent;
+    }
+
+    public String getGroupDiscussionId() {
+        return groupDiscussionId;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 
     @Override
@@ -116,34 +135,53 @@ public class MessagesActivity extends ResourceActivity
         inputLayout.setVisibility(View.VISIBLE);
         inputIcon.setVisibility(View.VISIBLE);
 
-        setConversation(getIntent());
+        setGroupPost(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        setConversation(intent);
+        setGroupPost(intent);
     }
 
-    private void setConversation(Intent intent) {
+    @Override
+    public void onMemberClick(String memberId) {
+        ProfileActivity.startActivity(this,memberId);
+    }
 
-        conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-        String conversationTitle = intent.getStringExtra(EXTRA_CONVERSATION_TITLE);
+    @Override
+    public void onMessageMetaClicked(String meta) {
+        if (!textInput.getText().toString().endsWith(meta)) {
+            textInput.append(meta);
+        }
+    }
+
+    @Override
+    public void onRequestPageClick(int page) {
+        messagesAdapter.refresh();
+        startResourceCall(getPageCount(),page);
+    }
+
+    private void setGroupPost(Intent intent) {
+
+        groupId = intent.getStringExtra(EXTRA_GROUP_ID);
+        groupDiscussionId = intent.getStringExtra(EXTRA_GROUP_DISUCSSION_ID);
+        String groupDiscussionTitle = intent.getStringExtra(EXTRA_DISCUSSION_TITLE);
         avatarUrl = intent.getStringExtra(EXTRA_AVATAR_RESOURCE_URL);
         memberId = null;
 
-        messagesAdapter = new MessagesRecyclerAdapter(conversationId);
-        conversation = messagesAdapter.getConversation();
-        if (conversation != null) {
-            String draftMessage = conversation.getDraftMessage();
+        messagesAdapter = new GroupMessagesRecyclerAdapter(groupId,groupDiscussionId,this);
+        groupDiscussion = messagesAdapter.getGroupPost();
+        if (groupDiscussion != null) {
+            String draftMessage = groupDiscussion.getDraftMessage();
             if (draftMessage != null) {
                 textInput.append(draftMessage);
             }
             if (avatarUrl == null) {
-                avatarUrl = conversation.getAvatarLink();
+                avatarUrl = groupDiscussion.getAvatarLink();
             }
-            memberId = conversation.getMemberId();
+            memberId = groupDiscussion.getMemberId();
         }
 
         if (avatarUrl != null) {
@@ -157,7 +195,7 @@ public class MessagesActivity extends ResourceActivity
             toolBarItemClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ProfileActivity.startActivity(MessagesActivity.this,memberId);
+                    ProfileActivity.startActivity(GroupMessagesActivity.this,memberId);
                 }
             };
         } else {
@@ -169,13 +207,9 @@ public class MessagesActivity extends ResourceActivity
         }
         toolBarImage.setOnClickListener(toolBarItemClickListener);
         toolBarTitle.setOnClickListener(toolBarItemClickListener);
-        setTitle(conversationTitle);
+        setTitle(groupDiscussionTitle);
 
         recyclerView.setAdapter(messagesAdapter);
-    }
-
-    public String getConversationId() {
-        return conversationId;
     }
 
     @Override
@@ -192,32 +226,33 @@ public class MessagesActivity extends ResourceActivity
 
         messagesAdapter.refresh();
 
-        if (!Conversation.isLocal(conversationId)) {
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+//        {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+//            {
+//                if (dy < 0) {
+//                    LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//                    int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+//
+//                    if (firstVisibleItem == 0 && requestedItems <= linearLayoutManager.getItemCount()) {
+//                        requestedItems += getPageCount();
+//                        startResourceCall(getPageCount(), ++requestedPage);
+//                    }
+//                }
+//            }
+//        });
 
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
-            {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-                {
-                    if(!oldMessageLoadingInProgress && dy < 0) {
-                        int lastVisibleItem = recyclerLayoutManager.findLastVisibleItemPosition();
-                        int totalItemCount = recyclerLayoutManager.getItemCount();
+        showProgress();
+        startResourceCall(getPageCount(), 1);
+    }
 
-                        if (lastVisibleItem == (totalItemCount-1)) {
-                            oldMessageLoadingInProgress = true;
-                            //TODO: not trigger call if the old messages were already triggered and there was no older message
-                            FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_MESSAGES, conversationId, Boolean.toString(false));
-                        }
-                    }
-                }
-            });
+    private int getPageCount() {
+        return GroupMessagesRecyclerAdapter.ITEM_PER_PAGE;
+    }
 
-            showProgress();
-            FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MESSAGES, conversationId);
-        } else if (messagesAdapter.getItemCount() != 0) {
-            showProgress();
-            FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES, conversationId);
-        }
+    private void startResourceCall(int pageCount, int requestedPage) {
+        FetLifeApiIntentService.startApiCall(GroupMessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_GROUP_MESSAGES, groupId, groupDiscussionId, Integer.toString(pageCount), Integer.toString(requestedPage));
     }
 
     @Override
@@ -229,30 +264,21 @@ public class MessagesActivity extends ResourceActivity
             recyclerView.stopScroll();
         }
 
-        Conversation conversation = messagesAdapter.getConversation();
-        if (conversation != null) {
-            conversation.setDraftMessage(textInput.getText().toString());
+        GroupPost groupDiscussion = messagesAdapter.getGroupPost();
+        if (groupDiscussion != null) {
+            groupDiscussion.setDraftMessage(textInput.getText().toString());
             try {
-                conversation.save();
+                groupDiscussion.save();
             } catch (InvalidDBConfiguration idbce) {
                 Crashlytics.logException(idbce);
             }
         } else {
-            Crashlytics.logException(new Exception("Draft Message could not be saved : Conversation is bull"));
+            Crashlytics.logException(new Exception("Draft Message could not be saved : GroupPost is bull"));
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (Conversation.isLocal(conversationId) && messagesAdapter.getItemCount() == 0) {
-            //TODO: consider using it in a db thread executor
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    new Delete().from(Conversation.class).where(Conversation_Table.id.is(conversationId)).query();
-                }
-            }).start();
-        }
         super.onBackPressed();
     }
 
@@ -266,89 +292,74 @@ public class MessagesActivity extends ResourceActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void setMessagesRead() {
-        final List<String> params = new ArrayList<>();
-        params.add(conversationId);
-
-        for (int i = 0; i < messagesAdapter.getItemCount(); i++) {
-            Message message = messagesAdapter.getItem(i);
-            if (!message.getPending() && message.isNewMessage()) {
-                params.add(message.getId());
-            }
-        }
-
-        if (params.size() == 1) {
-            return;
-        }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                FetLifeApiIntentService.startApiCall(MessagesActivity.this.getApplicationContext(), FetLifeApiIntentService.ACTION_APICALL_SET_MESSAGES_READ, params.toArray(new String[params.size()]));
-            }
-        }).run();
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessagesCallFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
-        if (serviceCallFinishedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
-            //TODO: solve setting this value false only if appropriate message call is finished (otherwise same call can be triggered twice)
-            oldMessageLoadingInProgress = false;
-            messagesAdapter.refresh();
-            setMessagesRead();
-            dismissProgress();
+        if (serviceCallFinishedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_GROUP_MESSAGES) {
+            String[] params = serviceCallFinishedEvent.getParams();
+            final String groupId = params[0];
+            final String groupDiscussionId = params[1];
+            if (this.groupId.equals(groupId) && this.groupDiscussionId.equals(groupDiscussionId)) {
+                messagesAdapter.refresh();
+                dismissProgress();
+            }
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessagesCallFailed(ServiceCallFailedEvent serviceCallFailedEvent) {
-        if (serviceCallFailedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
-            //TODO: solve setting this value false only if appropriate message call is failed (otherwise same call can be triggered twice)
-            oldMessageLoadingInProgress = false;
-            messagesAdapter.refresh();
-            dismissProgress();
+        if (serviceCallFailedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_GROUP_MESSAGES) {
+            String[] params = serviceCallFailedEvent.getParams();
+            final String groupId = params[0];
+            final String groupDiscussionId = params[1];
+            if (this.groupId.equals(groupId) && this.groupDiscussionId.equals(groupDiscussionId)) {
+                //TODO: solve setting this value false only if appropriate message call is failed (otherwise same call can be triggered twice)
+                messagesAdapter.refresh();
+                dismissProgress();
+            }
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageCallStarted(ServiceCallStartedEvent serviceCallStartedEvent) {
-        if (serviceCallStartedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_MESSAGES) {
+        if (serviceCallStartedEvent.getServiceCallAction() == FetLifeApiIntentService.ACTION_APICALL_GROUP_MESSAGES) {
             showProgress();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNewMessageArrived(NewMessageEvent newMessageEvent) {
-        if (!conversationId.equals(newMessageEvent.getConversationId())) {
-            //TODO: display (snackbar?) notification
-        } else {
+    public void onNewMessageArrived(NewGroupMessageEvent newMessageEvent) {
+        //TODO remove temporary call solution
+        startResourceCall(getPageCount(),1);
+//        if (!groupDiscussionId.equals(newMessageEvent.getGroupDiscussionId()) || !groupId.equals(newMessageEvent.getGroupId())) {
+//            //TODO: display (snackbar?) notification
+//        } else {
+//            messagesAdapter.refresh();
+//        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNewMessageSent(GroupMessageSendSucceededEvent messageSendSucceededEvent) {
+        if (groupId.equals(messageSendSucceededEvent.getGroupId()) && groupDiscussionId.equals(messageSendSucceededEvent.getGroupPostId())) {
             messagesAdapter.refresh();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNewMessageSent(MessageSendSucceededEvent messageSendSucceededEvent) {
-        if (conversationId.equals(messageSendSucceededEvent.getConversationId())) {
+    public void onNewMessageSendFailed(GroupMessageSendFailedEvent messageSendFailedEvent) {
+        if (groupId.equals(messageSendFailedEvent.getGroupId()) && groupDiscussionId.equals(messageSendFailedEvent.getGroupPostId())) {
             messagesAdapter.refresh();
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNewMessageSendFailed(MessageSendFailedEvent messageSendFailedEvent) {
-        if (conversationId.equals(messageSendFailedEvent.getConversationId())) {
-            messagesAdapter.refresh();
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNewConversation(NewConversationEvent newConversationEvent) {
-        if (newConversationEvent.getLocalConversationId().equals(conversationId)) {
-            Intent intent = getIntent();
-            intent.putExtra(EXTRA_CONVERSATION_ID, newConversationEvent.getConversationId());
-            onNewIntent(intent);
-        } else {
-        }
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onNewGroupPost(NewGroupPostEvent newGroupPostEvent) {
+//        if (newGroupPostEvent.getLocalGroupPostId().equals(groupDiscussionId)) {
+//            Intent intent = getIntent();
+//            intent.putExtra(EXTRA_CONVERSATION_ID, newGroupPostEvent.getGroupPostId());
+//            onNewIntent(intent);
+//        } else {
+//        }
+//    }
 
     private long lastSendButtonClickTime = 0l;
     private static final long SEND_BUTTON_CLICK_THRESHOLD = 700l;
@@ -373,22 +384,23 @@ public class MessagesActivity extends ResourceActivity
 
         textInput.setText("");
 
-        Message message = new Message();
+        GroupComment message = new GroupComment();
         message.setPending(true);
         message.setDate(System.currentTimeMillis());
         message.setClientId(UUID.randomUUID().toString());
-        message.setConversationId(conversationId);
+        message.setGroupId(groupId);
+        message.setGroupPostId(groupDiscussionId);
         message.setBody(text.trim());
         message.setSenderId(currentUser.getId());
         message.setSenderNickname(currentUser.getNickname());
         message.save();
 
-        FetLifeApiIntentService.startApiCall(MessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_MESSAGES);
+        FetLifeApiIntentService.startApiCall(GroupMessagesActivity.this, FetLifeApiIntentService.ACTION_APICALL_SEND_GROUP_MESSAGES);
 
-        Conversation conversation = messagesAdapter.getConversation();
-        if (conversation != null) {
-            conversation.setDraftMessage("");
-            conversation.save();
+        GroupPost groupDiscussion = messagesAdapter.getGroupPost();
+        if (groupDiscussion != null) {
+            groupDiscussion.setDraftMessage("");
+            groupDiscussion.save();
 
         }
 

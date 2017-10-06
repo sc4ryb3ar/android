@@ -2,6 +2,7 @@ package com.bitlove.fetlife.model.api;
 
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
@@ -10,8 +11,10 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Comment;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
@@ -66,6 +69,19 @@ public interface FetLifeApi {
 
     @GET("/api/v2/groups/{groupId}/members")
     Call<List<Member>> getGroupMembers(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/groups/{groupId}/posts")
+    Call<List<GroupPost>> getGroupDiscussions(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/groups/{groupId}/posts/{groupPostId}")
+    Call<GroupPost> getGroupDiscussion(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId);
+
+    @GET("/api/v2/groups/{groupId}/posts/{groupPostId}/comments")
+    Call<List<GroupComment>> getGroupMessages(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId, @Query("limit") int limit, @Query("page") int page);
+
+    @FormUrlEncoded
+    @POST("/api/v2/groups/{groupId}/posts/{groupPostId}/comments")
+    Call<GroupComment> postGroupMessage(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId, @Field("body") String body);
 
     @GET("/api/v2/members/{memberId}")
     Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);

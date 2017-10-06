@@ -9,19 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
-import com.bitlove.fetlife.view.adapter.GroupMembersRecyclerAdapter;
-import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
+import com.bitlove.fetlife.view.adapter.GroupDiscussionsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
-public class GroupMembersFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class GroupDiscussionsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<GroupPost> {
 
-    public static GroupMembersFragment newInstance(String groupId) {
-        GroupMembersFragment groupMembersFragment = new GroupMembersFragment();
+    public static GroupDiscussionsFragment newInstance(String groupId) {
+        GroupDiscussionsFragment groupMembersFragment = new GroupDiscussionsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_REFERENCE_ID, groupId);
         groupMembersFragment.setArguments(args);
@@ -35,7 +35,7 @@ public class GroupMembersFragment extends LoadFragment implements ResourceListRe
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        GroupMembersRecyclerAdapter adapter = new GroupMembersRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID), getFetLifeApplication());
+        GroupDiscussionsRecyclerAdapter adapter = new GroupDiscussionsRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID), getFetLifeApplication());
         adapter.setOnItemClickListener(this);
         adapter.setUseSwipe(false);
         recyclerView.setAdapter(adapter);
@@ -44,27 +44,25 @@ public class GroupMembersFragment extends LoadFragment implements ResourceListRe
 
     @Override
     public String getApiCallAction() {
-        return FetLifeApiIntentService.ACTION_APICALL_GROUP_MEMBERS;
+        return FetLifeApiIntentService.ACTION_APICALL_GROUP_DISCUSSIONS;
     }
 
     public void refreshUi() {
         if (recyclerView != null) {
-            GroupMembersRecyclerAdapter recyclerViewAdapter = (GroupMembersRecyclerAdapter) recyclerView.getAdapter();
+            GroupDiscussionsRecyclerAdapter recyclerViewAdapter = (GroupDiscussionsRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();
         }
     }
 
     @Override
-    public void onItemClick(Member member) {
-        openProfileScreen(member);
+    public void onItemClick(GroupPost groupPost) {
+        String groupId = getArguments().getString(ARG_REFERENCE_ID);
+        GroupMessagesActivity.startActivity(getContext(),groupId,groupPost.getId(),groupPost.getTitle(),null,false);
     }
 
     @Override
-    public void onAvatarClick(Member member) {
-        openProfileScreen(member);
+    public void onAvatarClick(GroupPost groupPost) {
+        ProfileActivity.startActivity((BaseActivity) getActivity(),groupPost.getMemberId());
     }
 
-    private void openProfileScreen(Member member) {
-        ProfileActivity.startActivity((BaseActivity) getActivity(),member.getId());
-    }
 }
