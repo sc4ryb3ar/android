@@ -103,18 +103,22 @@ public class TurbolinksSession implements TurbolinksScrollUpCallback {
             @Override
             public void onPageFinished(WebView view, final String location) {
                 String jsCall = "window.webView == null";
-                webView.evaluateJavascript(jsCall, new ValueCallback<String>() {
-                    @Override
-                    public void onReceiveValue(String s) {
-                        if (Boolean.parseBoolean(s) && !bridgeInjectionInProgress) {
-                            bridgeInjectionInProgress = true;
-                            TurbolinksHelper.injectTurbolinksBridge(TurbolinksSession.this, applicationContext, webView);
-                            TurbolinksLog.d("Bridge injected");
+                try {
+                    webView.evaluateJavascript(jsCall, new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String s) {
+                            if (Boolean.parseBoolean(s) && !bridgeInjectionInProgress) {
+                                bridgeInjectionInProgress = true;
+                                TurbolinksHelper.injectTurbolinksBridge(TurbolinksSession.this, applicationContext, webView);
+                                TurbolinksLog.d("Bridge injected");
 
-                            turbolinksAdapter.onPageFinished();
+                                turbolinksAdapter.onPageFinished();
+                            }
                         }
-                    }
-                });
+                    });
+                } catch (NoSuchMethodError nsme) {
+                    //Happens only on older Android OS
+                }
             }
 
             /**

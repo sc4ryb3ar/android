@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.FetLifeApplication;
@@ -156,10 +157,13 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
             messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, messageViewHolder.vPadding, messageViewHolder.hPadding, messageViewHolder.vPadding);
             messageViewHolder.memberAvatar.setVisibility(View.GONE);
+            messageViewHolder.selfAvatar.setVisibility(View.GONE);
+            messageViewHolder.selfAvatar.setImageURI(groupMessage.getAvatarLink());
         } else {
             messageViewHolder.subText.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.hPadding, messageViewHolder.vPadding, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
+            messageViewHolder.selfAvatar.setVisibility(View.GONE);
             messageViewHolder.memberAvatar.setVisibility(View.VISIBLE);
             messageViewHolder.memberAvatar.setImageURI(groupMessage.getAvatarLink());
         }
@@ -189,12 +193,13 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
 class GroupMessageViewHolder extends RecyclerView.ViewHolder {
 
-    private static final int EXTEND_PADDING_MULTIPLIER = 10;
+    private static final int EXTEND_PADDING_MULTIPLIER = 3;
 
-    LinearLayout messageContainer, messageTextContainer;
+    LinearLayout messageContainer;
+    LinearLayout messageTextContainer;
     TextView messageText, subText;
     String subMessageSeparator;
-    SimpleDraweeView memberAvatar;
+    SimpleDraweeView memberAvatar, selfAvatar;
     int extendedHPadding, extendedVPadding, hPadding, vPadding;
     public String selfMessageId;
     public int primaryTextColor, errorTextColor;
@@ -219,7 +224,8 @@ class GroupMessageViewHolder extends RecyclerView.ViewHolder {
         messageText = (TextView) itemView.findViewById(R.id.message_text);
         messageText.setMovementMethod(LinkMovementMethod.getInstance());
         subText = (TextView) itemView.findViewById(R.id.message_sub);
-        memberAvatar = (SimpleDraweeView) itemView.findViewById(R.id.member_image);
+        memberAvatar = (SimpleDraweeView) itemView.findViewById(R.id.left_member_image);
+        selfAvatar = (SimpleDraweeView) itemView.findViewById(R.id.right_member_image);
     }
 
     public String getSelfMessageId() {

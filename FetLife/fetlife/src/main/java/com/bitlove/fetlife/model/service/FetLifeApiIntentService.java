@@ -191,6 +191,9 @@ public class FetLifeApiIntentService extends IntentService {
     private static final String PARAM_VALUE_FRIEND_REQUEST_SENT = "sent";
     private static final String PARAM_VALUE_FRIEND_REQUEST_RECEIVED = "received";
 
+    private static final String PARAM_VALUE_EVENT_RSVP_YES = "yes";
+    private static final String PARAM_VALUE_EVENT_RSVP_MAYBE = "maybe";
+
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
 
@@ -341,6 +344,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         //Check for network state
         if (NetworkUtil.getConnectivityStatus(this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+            Crashlytics.logException(new Exception("Connection failed due to no network connection"));
             sendConnectionFailedNotification(action, params);
             return;
         }
@@ -501,6 +505,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             if (result == Integer.MIN_VALUE) {
                 //If the call failed notify all subscribers about
+                Crashlytics.logException(new Exception("Load failed with response code: " + lastResponseCode));
                 sendLoadFailedNotification(action, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refreshUi the token as it is most probably expired
@@ -519,6 +524,7 @@ public class FetLifeApiIntentService extends IntentService {
             }
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
+            Crashlytics.logException(new Exception("Connection failed with exception",ioe));
             sendConnectionFailedNotification(action, params);
         } catch (SQLiteDiskIOException | InvalidDBConfiguration | SQLiteReadOnlyDatabaseException | IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
@@ -1371,6 +1377,19 @@ public class FetLifeApiIntentService extends IntentService {
         Response<List<GroupComment>> messagesResponse = getGroupMessagesCall.execute();
         if (messagesResponse.isSuccess()) {
             final List<GroupComment> messages = messagesResponse.body();
+            if (page == 1 && !messages.isEmpty()) {
+                long messageDate = messages.get(0).getDate();
+                Group group = Group.loadGroup(groupId);
+                if (group != null && group.getDate() < messageDate) {
+                    group.setDate(messageDate);
+                    group.save();
+                }
+                GroupPost groupDiscussion = GroupPost.loadGroupPost(groupDiscussionId);
+                if (groupDiscussionId != null && groupDiscussion.getDate() < messageDate) {
+                    groupDiscussion.setDate(messageDate);
+                    groupDiscussion.save();
+                }
+            }
             FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
                 @Override
                 public void execute(DatabaseWrapper databaseWrapper) {
@@ -1562,6 +1581,10 @@ public class FetLifeApiIntentService extends IntentService {
         Response<Group> getGroupResponse = getGroupCall.execute();
         if (getGroupResponse.isSuccess()) {
             Group group = getGroupResponse.body();
+            Group currentGroup = Group.loadGroup(groupId);
+            if (currentGroup!= null && currentGroup.getDate() > group.getDate()) {
+                group.setDate(currentGroup.getDate());
+            }
             group.save();
             return 1;
         } else {
@@ -1852,6 +1875,10 @@ public class FetLifeApiIntentService extends IntentService {
 
             for (GroupPost groupDiscussion : groupDisucssions) {
 
+                GroupPost currentGroupDiscussion = GroupPost.loadGroupPost(groupDiscussion.getId());
+                if (currentGroupDiscussion != null && currentGroupDiscussion.getDate() > groupDiscussion.getDate()) {
+                    groupDiscussion.setDate(currentGroupDiscussion.getDate());
+                }
                 groupDiscussion.save();
 
                 int foundPos;
@@ -2105,9 +2132,10 @@ public class FetLifeApiIntentService extends IntentService {
         String eventId = params[0];
         final int limit = getIntFromParams(params, 2, 10);
         final int page = getIntFromParams(params, 3, 1);
+        final int rsvpType = getIntFromParams(params, 1, EventRsvpReference.VALUE_RSVPTYPE_GOING);
 
         final Call<List<Rsvp>> getRsvpsCall;
-        getRsvpsCall = getFetLifeApi().getEventRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId, /*"start_date_time",*/ limit, page);
+        getRsvpsCall = getFetLifeApi().getEventRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId, EventRsvpReference.VALUE_RSVPTYPE_GOING == rsvpType ? PARAM_VALUE_EVENT_RSVP_YES : PARAM_VALUE_EVENT_RSVP_MAYBE,/*"start_date_time",*/ limit, page);
 
         Response<List<Rsvp>> rsvpsResponse = getRsvpsCall.execute();
         if (rsvpsResponse.isSuccess()) {
@@ -2203,6 +2231,10 @@ public class FetLifeApiIntentService extends IntentService {
                         deletedItemCount++;
                     }
                     lastConfirmedGroupPosition = foundPos;
+                }
+                Group currentGroup = Group.loadGroup(retrievedGroup.getId());
+                if (currentGroup!= null && currentGroup.getDate() > retrievedGroup.getDate()) {
+                    retrievedGroup.setDate(currentGroup.getDate());
                 }
                 retrievedGroup.save();
             }

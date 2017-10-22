@@ -11,8 +11,8 @@ if (propFile.canRead()) {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
         applicationId "com.bitlove.fetlife"
@@ -20,8 +20,8 @@ android {
         targetSdkVersion 25
         multiDexEnabled true
 
-        versionCode 21100
-        versionName "2.11.0"
+        versionCode 21111
+        versionName "2.11.11"
 
         vectorDrawables.useSupportLibrary = true
 

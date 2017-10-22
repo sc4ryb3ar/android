@@ -25,6 +25,7 @@ import com.bitlove.fetlife.event.NewMessageEvent;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost_Table;
@@ -65,8 +66,7 @@ public class GroupMessagesActivity extends ResourceActivity
 
     protected RecyclerView recyclerView;
     protected LinearLayoutManager recyclerLayoutManager;
-    protected View inputLayout;
-    protected View inputIcon;
+    protected View inputLayout, inputIcon, floatingArrow;
     protected EditText textInput;
     private String groupId;
     private GroupPost groupDiscussion;
@@ -137,6 +137,15 @@ public class GroupMessagesActivity extends ResourceActivity
         inputLayout.setVisibility(View.VISIBLE);
         inputIcon.setVisibility(View.VISIBLE);
 
+        floatingArrow = findViewById(R.id.floating_arrow);
+        floatingArrow.setVisibility(View.VISIBLE);
+        floatingArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+            }
+        });
+
         setGroupPost(getIntent());
     }
 
@@ -184,6 +193,9 @@ public class GroupMessagesActivity extends ResourceActivity
                 avatarUrl = groupDiscussion.getAvatarLink();
             }
             memberId = groupDiscussion.getMemberId();
+            setTitle(groupDiscussion.getTitle());
+        } else {
+            setTitle(groupDiscussionTitle);
         }
 
         if (avatarUrl != null) {
@@ -209,7 +221,6 @@ public class GroupMessagesActivity extends ResourceActivity
         }
         toolBarImage.setOnClickListener(toolBarItemClickListener);
         toolBarTitle.setOnClickListener(toolBarItemClickListener);
-        setTitle(groupDiscussionTitle);
 
         recyclerView.setAdapter(messagesAdapter);
     }
@@ -228,22 +239,20 @@ public class GroupMessagesActivity extends ResourceActivity
 
         messagesAdapter.refresh();
 
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
-//        {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-//            {
-//                if (dy < 0) {
-//                    LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-//                    int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-//
-//                    if (firstVisibleItem == 0 && requestedItems <= linearLayoutManager.getItemCount()) {
-//                        requestedItems += getPageCount();
-//                        startResourceCall(getPageCount(), ++requestedPage);
-//                    }
-//                }
-//            }
-//        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                if (lastVisibleItem == messagesAdapter.getItemCount()-1) {
+                    floatingArrow.setVisibility(View.GONE);
+                } else {
+                    floatingArrow.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         showProgress();
         startResourceCall(getPageCount(), 1);
@@ -301,9 +310,17 @@ public class GroupMessagesActivity extends ResourceActivity
             final String groupId = params[0];
             final String groupDiscussionId = params[1];
             if (this.groupId.equals(groupId) && this.groupDiscussionId.equals(groupDiscussionId)) {
+                verifyTitle(groupDiscussionId);
                 messagesAdapter.refresh();
                 dismissProgress();
             }
+        }
+    }
+
+    private void verifyTitle(String groupDiscussionId) {
+        GroupPost groupPost = GroupPost.loadGroupPost(groupDiscussionId);
+        if (groupPost != null) {
+            setTitle(groupPost.getTitle());
         }
     }
 

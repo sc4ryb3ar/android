@@ -110,6 +110,8 @@ public class NotificationParser {
     public static final String JSON_FIELD_STRING_GROUPPOSTID = "group_post_id";
     public static final String JSON_VALUE_TYPE_GROUP_COMMENT = "comment_group";
     public static final String JSON_FIELD_STRING_GROUP_POST_TITLE = "group_post_title";
+    public static final String JSON_FIELD_OBJECT_API = "api";
+    public static final java.lang.String JSON_FIELD_STRING_GROUP_NAME = "group_name";
 
     public OneSignalNotification parseNotification(FetLifeApplication fetLifeApplication, OSNotificationOpenResult osNotificationOpenResult) {
 

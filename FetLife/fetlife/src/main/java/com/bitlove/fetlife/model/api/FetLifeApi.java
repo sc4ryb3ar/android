@@ -123,7 +123,7 @@ public interface FetLifeApi {
     Call<List<Rsvp>> getMemberRsvps(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
 
     @GET("/api/v2/events/{eventId}/rsvps")
-    Call<List<Rsvp>> getEventRsvps(@Header("Authorization") String authHeader, @Path("eventId") String eventid, @Query("limit") int limit, @Query("page") int page);
+    Call<List<Rsvp>> getEventRsvps(@Header("Authorization") String authHeader, @Path("eventId") String eventId, @Query("status") String status, @Query("limit") int limit, @Query("page") int page);
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")

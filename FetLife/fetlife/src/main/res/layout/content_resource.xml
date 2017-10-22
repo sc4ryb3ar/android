@@ -68,4 +68,15 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
+    <ImageView
+        android:id="@+id/floating_arrow"
+        app:srcCompat="@drawable/ic_arrow_upward_black_70_24dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:visibility="gone"
+        android:tint="@color/text_color_primary_dark"
+        android:layout_margin="10dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"/>
+
 </RelativeLayout>

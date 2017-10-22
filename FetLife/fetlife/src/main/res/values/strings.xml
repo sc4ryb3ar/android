@@ -29,6 +29,29 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.11.11<br/>
+                    <ul>
+                        <li>Group discussions ordered by last comment</li>
+                        <li>Group comment notification click leads to the proper discussion</li>
+                        <li>Other groups related fixes</li>
+                    </ul>
+
+            <p/>v2.11.8<br/>
+                    <ul>
+                        <li>Fix crash after pressing view button at groups</li>
+                        <li>Slightly improved ordering for groups and discussions (ordered based on last retrieved message date, if there is any)</li>
+                        <li>Crash fix for webview based screens</li>
+                    </ul>
+
+            <p/>v2.11.5<br/>
+                    <ul>
+                        <li>Fix for invisible group info at feed</li>
+                        <li>Fix for incorrect profile opened in case of new relation feed item</li>
+                        <li>Small improvements for Group Discussion screen</li>
+                        <li>Group screen page order change</li>
+                        <li>Opening group(discussion) screen from appropriate feed item</li>
+                    </ul>
+
             <p/>v2.11.0<br/>
                     <ul>
                         <li>Groups</li>

@@ -13,7 +13,9 @@ import android.text.TextUtils;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NewGroupMessageEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.util.StringUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
@@ -38,9 +40,18 @@ public class GroupMessageNotification extends OneSignalNotification {
 
     public GroupMessageNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
         super(title, message,launchUrl,additionalData,id, group);
-        groupId = additionalData.optString(NotificationParser.JSON_FIELD_STRING_GROUPID);
-        groupDiscussionId = additionalData.optString(NotificationParser.JSON_FIELD_STRING_GROUPPOSTID);
-        groupDiscussionTitle = additionalData.optString(NotificationParser.JSON_FIELD_STRING_GROUP_POST_TITLE);
+        JSONObject apiContainer = additionalData.optJSONObject(NotificationParser.JSON_FIELD_OBJECT_API);
+        groupId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPID);
+        groupDiscussionId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPPOSTID);
+        GroupPost groupPost = GroupPost.loadGroupPost(groupDiscussionId);
+        if (groupPost != null) {
+            groupDiscussionTitle = groupPost.getTitle();
+        } else {
+            groupDiscussionTitle = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUP_POST_TITLE);
+            if (TextUtils.isEmpty(groupDiscussionTitle)) {
+                groupDiscussionTitle = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUP_NAME);
+            }
+        }
         notificationType = NotificationParser.JSON_VALUE_TYPE_GROUP_COMMENT;
     }
 

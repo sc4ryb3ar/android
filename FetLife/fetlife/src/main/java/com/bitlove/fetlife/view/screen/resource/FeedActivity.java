@@ -9,6 +9,7 @@ import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
@@ -17,8 +18,10 @@ import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
+import com.bitlove.fetlife.view.screen.resource.groups.GroupMessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 
 public class FeedActivity extends ResourceListActivity<Story> implements MenuActivityComponent.MenuActivityCallBack, FeedRecyclerAdapter.OnFeedItemClickListener {
@@ -75,7 +78,7 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     @Override
     public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, FeedItemResourceHelper feedItemResourceHelper) {
         if (feedStoryType == Story.FeedStoryType.FOLLOW_CREATED || feedStoryType == Story.FeedStoryType.FRIEND_CREATED) {
-            Member targetMember = feedItemResourceHelper.getMember(feedEvent);
+            Member targetMember = feedItemResourceHelper.getTargetMember(feedEvent);
             if (targetMember != null) {
                 //TODO(feed): Remove this mergeSave after Feed is stored in local db
                 targetMember.mergeSave();
@@ -89,9 +92,22 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
                 EventActivity.startActivity(this,targetEvent.getId());
                 return;
             }
-        } else if (feedStoryType == Story.FeedStoryType.GROUP_COMMENT_CREATED || feedStoryType == Story.FeedStoryType.GROUP_MEMBERSHIP_CREATED || feedStoryType == Story.FeedStoryType.GROUP_POST_CREATED) {
+        } else if (feedStoryType == Story.FeedStoryType.GROUP_MEMBERSHIP_CREATED) {
             Group targetGroup = feedItemResourceHelper.getGroup(feedEvent);
             if (targetGroup != null) {
+                targetGroup.save();
+                GroupActivity.startActivity(this,targetGroup.getId(),targetGroup.getName(),false);
+                return;
+            }
+        } else if (feedStoryType == Story.FeedStoryType.GROUP_COMMENT_CREATED || feedStoryType == Story.FeedStoryType.GROUP_MEMBERSHIP_CREATED || feedStoryType == Story.FeedStoryType.GROUP_POST_CREATED) {
+            Group targetGroup = feedItemResourceHelper.getGroup(feedEvent);
+            GroupPost targetGroupPost = feedItemResourceHelper.getGroupPost(feedEvent);
+            if (targetGroup != null && targetGroupPost != null) {
+                targetGroup.save();
+                targetGroupPost.save();
+                GroupMessagesActivity.startActivity(this,targetGroup.getId(),targetGroupPost.getId(),targetGroupPost.getTitle(),null,false);
+                return;
+            } else if (targetGroup != null) {
                 targetGroup.save();
                 GroupActivity.startActivity(this,targetGroup.getId(),targetGroup.getName(),false);
                 return;

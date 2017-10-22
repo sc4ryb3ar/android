@@ -119,6 +119,7 @@ public class TurboLinksViewActivity extends ResourceActivity implements Turbolin
                         .restoreWithCachedSnapshot(false)
                         .setPullToRefreshEnabled(false)
                         .visitWithAuthHeader(location, FetLifeService.AUTH_HEADER_PREFIX + accessToken);
+
             }
         },33);
     }

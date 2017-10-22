@@ -4,6 +4,9 @@
           android:installLocation="auto"
           package="com.bitlove.fetlife">
 
+    <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+               android:value="true" />
+
     <uses-permission android:name="com.sonyericsson.home.permission.BROADCAST_BADGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.NFC"/>

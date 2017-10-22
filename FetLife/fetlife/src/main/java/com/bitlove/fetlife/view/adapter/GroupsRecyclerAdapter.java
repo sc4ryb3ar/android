@@ -54,7 +54,7 @@ public class GroupsRecyclerAdapter extends ResourceListRecyclerAdapter<Group, Gr
             for (GroupReference groupReference : groupReferences) {
                 groupIds.add(groupReference.getId());
             }
-            itemList = new Select().from(Group.class).where(Group_Table.id.in(groupIds)).orderBy(OrderBy.fromProperty(Group_Table.date).ascending()).queryList();
+            itemList = new Select().from(Group.class).where(Group_Table.id.in(groupIds)).orderBy(OrderBy.fromProperty(Group_Table.name).ascending()).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }

@@ -10,12 +10,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 //TODO: updated at attribute?
 
 @Table(database = FetLifeDatabase.class)
 public class GroupPost extends BaseModel {
+
+    public static GroupPost loadGroupPost(String groupPostId) {
+        GroupPost groupPost = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupPostId)).querySingle();
+        return groupPost;
+    }
 
     @Column
     @PrimaryKey(autoincrement = false)
@@ -33,7 +39,7 @@ public class GroupPost extends BaseModel {
     @JsonProperty("content_type")
     private String contentType;
 
-    @JsonProperty("updated_at")
+    @JsonProperty("last_comment_at")
     @Column
     private String updatedAt;
 

@@ -1,6 +1,7 @@
 
 package com.bitlove.fetlife.model.pojos.fetlife.json;
 
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
@@ -30,6 +31,19 @@ public class SecondaryTarget {
 
     @JsonProperty("writing")
     private Writing writing;
+
+    @JsonProperty("group")
+    private Group group;
+
+    @JsonProperty("group")
+    public Group getGroup() {
+        return group;
+    }
+
+    @JsonProperty("group")
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 
     @JsonProperty("group_post")
     public GroupPost getGroupPost() {

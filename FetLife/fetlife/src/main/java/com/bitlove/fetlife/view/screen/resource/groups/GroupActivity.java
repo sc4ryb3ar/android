@@ -71,17 +71,23 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
             String groupTitle = getIntent().getStringExtra(EXTRA_GROUP_TITLE);
             setGroupDetails(groupTitle,-1);
         }
+        findViewById(R.id.group_menu_icon_view_container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onViewGroup(v);
+            }
+        });
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
-                    case 0:
-                        return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.DESCRIPTION);
                     case 1:
-                        return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.RULES);
+                        return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.DESCRIPTION);
                     case 2:
+                        return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.RULES);
+                    case 0:
                         return GroupDiscussionsFragment.newInstance(group.getId());
                     case 3:
                         return GroupMembersFragment.newInstance(group.getId());
@@ -98,11 +104,11 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
             @Override
             public CharSequence getPageTitle(int position) {
                 switch (position) {
-                    case 0:
-                        return getString(R.string.title_fragment_group_description);
                     case 1:
-                        return getString(R.string.title_fragment_group_rules);
+                        return getString(R.string.title_fragment_group_description);
                     case 2:
+                        return getString(R.string.title_fragment_group_rules);
+                    case 0:
                         return getString(R.string.title_fragment_group_discussions);
                     case 3:
                         return getString(R.string.title_fragment_group_members);
