@@ -29,6 +29,13 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.11.13<br/>
+                    <ul>
+                        <li>Several crahs fixex</li>
+                        <li>Temporary fix for crash after notification click</li>
+                        <li>Making group notifications visible on Notifications screen</li>
+                    </ul>
+
             <p/>v2.11.11<br/>
                     <ul>
                         <li>Group discussions ordered by last comment</li>
@@ -782,5 +789,6 @@
     <string name="title_activity_glossary">Kinktionary</string>
     <string name="title_fragment_group_discussions">Discussions</string>
     <string name="title_fragment_group_members">Members</string>
+    <string name="action_share">Share</string>
 
 </resources>

@@ -386,7 +386,11 @@ public class EventMapFragment extends BaseFragment implements OnMapReadyCallback
     }
 
     private float getMarkerColorForEvent(Event event) {
-        String selectedEventId = getActivity().getIntent().getStringExtra(EventsActivity.ARG_EVENT_ID);
+        Activity activity = getActivity();
+        if (activity == null) {
+            return MARKER_COLOR_NO_DUE;
+        }
+        String selectedEventId = activity.getIntent().getStringExtra(EventsActivity.ARG_EVENT_ID);
         if (selectedEventId != null && selectedEventId.equals(event.getId())) {
             return MARKER_COLOR_SELECTED;
         }

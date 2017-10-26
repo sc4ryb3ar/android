@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -28,6 +30,7 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.ViewUtil;
 import com.bitlove.fetlife.view.dialog.ProfileConfirmationDialog;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
@@ -45,6 +48,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private static final String EXTRA_MEMBERID = "EXTRA_MEMBERID";
 
     private static final int PAGE_NUMBER_PICTURES = 4;
+    private static final String MENMTION_PREFEIX = "@";
 
     private ViewPager viewPager;
     private TextView nickNameView,metaView;
@@ -256,6 +260,13 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             return false;
         }
         return relationWithMe.equals(Member.VALUE_FRIEND) || relationWithMe.equals(Member.VALUE_FOLLOWING) ||  relationWithMe.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT) ||  relationWithMe.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING) ;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_share, menu);
+        return true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -480,6 +491,10 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_share:
+                Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+                ConversationsActivity.startActivity(this,MENMTION_PREFEIX + member.getNickname(), false);
+                return true;
             case android.R.id.home:
                 finish();
                 return true;

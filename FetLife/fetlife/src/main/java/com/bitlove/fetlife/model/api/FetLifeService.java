@@ -71,9 +71,9 @@ public class FetLifeService {
                 return response;
             }
         });
-        client.setConnectTimeout(15, TimeUnit.SECONDS);
-        client.setReadTimeout(15, TimeUnit.SECONDS);
-        client.setWriteTimeout(15, TimeUnit.SECONDS);
+        client.setConnectTimeout(20, TimeUnit.SECONDS);
+        client.setReadTimeout(20, TimeUnit.SECONDS);
+        client.setWriteTimeout(20, TimeUnit.SECONDS);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);

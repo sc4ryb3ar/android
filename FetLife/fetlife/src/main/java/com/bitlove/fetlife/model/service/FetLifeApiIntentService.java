@@ -505,7 +505,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             if (result == Integer.MIN_VALUE) {
                 //If the call failed notify all subscribers about
-                Crashlytics.logException(new Exception("Load failed with response code: " + lastResponseCode));
+                Crashlytics.logException(new Exception("Load failed with response code: " + action + ";" + lastResponseCode));
                 sendLoadFailedNotification(action, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refreshUi the token as it is most probably expired

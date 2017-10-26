@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.NewGroupMessageEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
+import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.StringUtil;
@@ -21,6 +23,9 @@ import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupMessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupsActivity;
+import com.crashlytics.android.Crashlytics;
+import com.onesignal.OneSignal;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.json.JSONObject;
 
@@ -41,28 +46,60 @@ public class GroupMessageNotification extends OneSignalNotification {
     public GroupMessageNotification(String title, String message, String launchUrl, JSONObject additionalData, String id, String group) {
         super(title, message,launchUrl,additionalData,id, group);
         JSONObject apiContainer = additionalData.optJSONObject(NotificationParser.JSON_FIELD_OBJECT_API);
-        groupId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPID);
-        groupDiscussionId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPPOSTID);
-        GroupPost groupPost = GroupPost.loadGroupPost(groupDiscussionId);
-        if (groupPost != null) {
-            groupDiscussionTitle = groupPost.getTitle();
+        if (apiContainer == null) {
+            Crashlytics.log("Missing Group Notification API key");
+            Crashlytics.log("title: " + title);
+            Crashlytics.log("message: " + message);
+            Crashlytics.log("additional data: " + additionalData != null ? additionalData.toString() : "null");
+            Crashlytics.logException(new Exception());
         } else {
-            groupDiscussionTitle = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUP_POST_TITLE);
-            if (TextUtils.isEmpty(groupDiscussionTitle)) {
-                groupDiscussionTitle = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUP_NAME);
+            groupId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPID);
+            groupDiscussionId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPPOSTID);
+            GroupPost groupPost;
+            try {
+                groupPost = GroupPost.loadGroupPost(groupDiscussionId);
+            } catch (Throwable t) {
+                groupPost = null;
+            }
+            if (groupPost != null) {
+                groupDiscussionTitle = groupPost.getTitle();
+            } else {
+                groupDiscussionTitle = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUP_POST_TITLE);
+                if (TextUtils.isEmpty(groupDiscussionTitle)) {
+                    groupDiscussionTitle = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUP_NAME);
+                }
             }
         }
-        notificationType = NotificationParser.JSON_VALUE_TYPE_GROUP_COMMENT;
+
+        NotificationHistoryItem notificationHistoryItem = createNotificationItem(NOTIFICATION_ID_GROUP, groupDiscussionId);
+        if (groupDiscussionId != null) {
+            notificationHistoryItem.setLaunchUrl(getInnerLaunchUrl());
+            NotificationHistoryItem toBeCollapsedNotification = new Select().from(NotificationHistoryItem.class).where(NotificationHistoryItem_Table.collapseId.eq(notificationHistoryItem.getCollapseId())).querySingle();
+            if (toBeCollapsedNotification != null) {
+                OneSignal.cancelNotification(toBeCollapsedNotification.getDisplayId());
+                toBeCollapsedNotification.delete();
+            }
+        }
+        notificationHistoryItem.save();
+    }
+
+    private String getInnerLaunchUrl() {
+        return LAUNCH_URL_PREFIX + getClass().getName()+LAUNCH_URL_PARAM_SEPARATOR+groupId+LAUNCH_URL_PARAM_SEPARATOR+groupDiscussionId+LAUNCH_URL_PARAM_SEPARATOR+groupDiscussionTitle;
+    }
+
+    public static void handleInnerLaunchUrl(Context context,String launchUrl) {
+        String[] params = launchUrl.substring(LAUNCH_URL_PREFIX.length()).split(LAUNCH_URL_PARAM_SEPARATOR);
+        GroupMessagesActivity.startActivity(context, params[1], params[2], params[3], null, true);
     }
 
     @Override
     public boolean handle(FetLifeApplication fetLifeApplication) {
-        if (!TextUtils.isEmpty(groupId) && !TextUtils.isEmpty(groupDiscussionId)) {
-            FetLifeApiIntentService.startApiCall(fetLifeApplication, FetLifeApiIntentService.ACTION_APICALL_GROUP, groupId);
-            FetLifeApiIntentService.startApiCall(fetLifeApplication, FetLifeApiIntentService.ACTION_APICALL_GROUP_MESSAGES, groupId, groupDiscussionId);
-        } else {
-//            throw new IllegalArgumentException("Missing field");
+        if (TextUtils.isEmpty(groupId) || TextUtils.isEmpty(groupDiscussionId)) {
+            return false;
         }
+
+        FetLifeApiIntentService.startApiCall(fetLifeApplication, FetLifeApiIntentService.ACTION_APICALL_GROUP, groupId);
+        FetLifeApiIntentService.startApiCall(fetLifeApplication, FetLifeApiIntentService.ACTION_APICALL_GROUP_MESSAGES, groupId, groupDiscussionId);
 
         boolean groupDiscussionInForeground = false;
         boolean appInForeground = fetLifeApplication.isAppInForeground();
@@ -109,7 +146,9 @@ public class GroupMessageNotification extends OneSignalNotification {
             notificationBuilder.setStyle(inboxStyle);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(fetLifeApplication);
-            notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_MESSAGE, notificationBuilder.build());
+            notificationManager.notify(OneSignalNotification.NOTIFICATION_ID_GROUP, notificationBuilder.build());
+
+            onNotificationDisplayed(fetLifeApplication,NOTIFICATION_ID_DO_NOT_COLLAPSE);
         }
     }
 
@@ -121,19 +160,10 @@ public class GroupMessageNotification extends OneSignalNotification {
                 Intent contentIntent = GroupMessagesActivity.createIntent(context, groupId, groupDiscussionId, groupDiscussionTitle, null, true);
                 contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
                 return TaskStackBuilder.create(context).addNextIntent(GroupActivity.createIntent(context, groupId, null, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+            } else {
+                return getLaunchPendingIntent(context,launchUrl,getNotificationType());
             }
         }
-
-        Intent contentIntent = GroupsActivity.createIntent(context, true);
-        PendingIntent contentPendingIntent =
-                PendingIntent.getActivity(
-                        context,
-                        0,
-                        contentIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-
-        return contentPendingIntent;
     }
 
     @Override

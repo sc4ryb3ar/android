@@ -46,6 +46,7 @@ public class MessagesActivity extends ResourceActivity
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
     private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
     private static final String EXTRA_AVATAR_RESOURCE_URL = "com.bitlove.fetlife.extra.avatar_resource_url";
+    private static final String EXTRA_SHARE_URL = "com.bitlove.fetlife.extra.share_url";
 
     private MessagesRecyclerAdapter messagesAdapter;
 
@@ -62,10 +63,18 @@ public class MessagesActivity extends ResourceActivity
     private Conversation conversation;
 
     public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
-        context.startActivity(createIntent(context, conversationId, title, avatarResourceUrl, newTask));
+        startActivity(context, conversationId, title, avatarResourceUrl, null, newTask);
+    }
+
+    public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, String shareUrl, boolean newTask) {
+        context.startActivity(createIntent(context, conversationId, title, avatarResourceUrl, shareUrl, newTask));
     }
 
     public static Intent createIntent(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
+        return createIntent(context, conversationId, title, avatarResourceUrl, null, newTask);
+    }
+
+    public static Intent createIntent(Context context, String conversationId, String title, String avatarResourceUrl, String shareUrl, boolean newTask) {
         Intent intent = new Intent(context, MessagesActivity.class);
         if (newTask) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -74,6 +83,7 @@ public class MessagesActivity extends ResourceActivity
         intent.putExtra(EXTRA_CONVERSATION_ID, conversationId);
         intent.putExtra(EXTRA_CONVERSATION_TITLE, title);
         intent.putExtra(EXTRA_AVATAR_RESOURCE_URL, avatarResourceUrl);
+        intent.putExtra(EXTRA_SHARE_URL, shareUrl);
         return intent;
     }
 
@@ -101,6 +111,10 @@ public class MessagesActivity extends ResourceActivity
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
+        String shareUrl = getIntent().getStringExtra(EXTRA_SHARE_URL);
+        if (shareUrl != null) {
+            textInput.append(shareUrl+"\n");
+        }
 //        textInput.setFilters(new InputFilter[]{new InputFilter() {
 //            @Override
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {

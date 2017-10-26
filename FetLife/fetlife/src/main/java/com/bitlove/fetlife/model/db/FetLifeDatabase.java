@@ -21,6 +21,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.raizlabs.android.dbflow.annotation.Database;
 import com.raizlabs.android.dbflow.annotation.Migration;
 import com.raizlabs.android.dbflow.sql.SQLiteType;
@@ -34,7 +35,7 @@ public class FetLifeDatabase {
     public static final String NAME = "fetlife";
 
     //Simple increase the version number in case of new tables
-    public static final int VERSION = 41;
+    public static final int VERSION = 42;
 
     //Add new Migration classes in case of table structure change
     @Migration(version = 26, database = FetLifeDatabase.class)
@@ -125,6 +126,20 @@ public class FetLifeDatabase {
         @Override
         public void onPreMigrate() {
             addColumn(SQLiteType.INTEGER, "roughtStartDate");
+        }
+    }
+
+    //Add new Migration classes in case of table structure change
+    @Migration(version = 42, database = FetLifeDatabase.class)
+    public static class Migration42 extends AlterTableMigration<Message> {
+
+        public Migration42(Class<Message> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.TEXT, "entitiesJson");
         }
     }
 }
