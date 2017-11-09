@@ -22,7 +22,90 @@
             If you find a bug please start by reading through the current list of open issues and if you can\'t find anything about your bug please submit a new bug at our GitHub page:
             <br/>https://github.com/fetlife/android/issues
 
+            <p><b><br/>Need help or want to know more?</b></p>
+
+            Visit our GitHub page to access Trouble Shooting Guide, get more information about current and upcoming releases and many more:
+            <br/>https://github.com/fetlife/android/
+
             <p><b><br/>Version History</b></p>
+
+            <p/>v2.11.13<br/>
+                    <ul>
+                        <li>Several crahs fixex</li>
+                        <li>Temporary fix for crash after notification click</li>
+                        <li>Making group notifications visible on Notifications screen</li>
+                    </ul>
+
+            <p/>v2.11.11<br/>
+                    <ul>
+                        <li>Group discussions ordered by last comment</li>
+                        <li>Group comment notification click leads to the proper discussion</li>
+                        <li>Other groups related fixes</li>
+                    </ul>
+
+            <p/>v2.11.8<br/>
+                    <ul>
+                        <li>Fix crash after pressing view button at groups</li>
+                        <li>Slightly improved ordering for groups and discussions (ordered based on last retrieved message date, if there is any)</li>
+                        <li>Crash fix for webview based screens</li>
+                    </ul>
+
+            <p/>v2.11.5<br/>
+                    <ul>
+                        <li>Fix for invisible group info at feed</li>
+                        <li>Fix for incorrect profile opened in case of new relation feed item</li>
+                        <li>Small improvements for Group Discussion screen</li>
+                        <li>Group screen page order change</li>
+                        <li>Opening group(discussion) screen from appropriate feed item</li>
+                    </ul>
+
+            <p/>v2.11.0<br/>
+                    <ul>
+                        <li>Groups</li>
+                        <p>Note: Group discussion notifications are by default turned off. Check your settings to enable them.
+                    </ul>
+
+            <p/>v2.10.3<br/>
+                    <ul>
+                        <li>Support</li>
+                        <li>Ads</li>
+                        <li>Kinktionary</li>
+                    </ul>
+
+            <p/>v2.10.0<br/>
+                    <ul>
+                        <li>Important security update</li>
+                    </ul>
+
+            <p/>v2.9.12<br/>
+                    <ul>
+                        <li>Crash fix</li>
+                        <li>Support for install on SD card</li>
+                        <li>Fix for stuck message about connection issues</li>
+                        <li>Directly opening conversation from notification</li>
+                        <li>Check for update fix</li>
+                    </ul>
+
+            <p/>v2.9.11<br/>
+                    <ul>
+                        <li>Hot fix for resending rejected friend requests</li>
+                        <li>Small Profile Screen improvement</li>
+                        <li>Fix for Profile Screen refresh after relationship change</li>
+                        <li>Several crash fixes</li>
+                    </ul>
+
+            <p/>v2.9.7<br/>
+                    <ul>
+                        <li>List of My Events</li>
+                        <li>Search Events by Tag</li>
+                    </ul>
+
+            <p/>v2.9.5<br/>
+                    <ul>
+                        <li>Frequent Login issue fix</li>
+                        <li>List Members set RSVP to an event</li>
+                        <li>Set RSVP for an Event from Event Detail Screen</li>
+                    </ul>
 
             <p/>v2.9.2<br/>
                     <ul>
@@ -230,6 +313,8 @@
     <string name="settings_category_notification_enablement">Enable Notifications</string>
     <string name="settings_title_notification_messages_enabled">Message Notifications</string>
     <string name="settings_summary_notification_messages_enabled">Enable Notifications for incoming Messages</string>
+    <string name="settings_title_notification_group_messages_enabled">Group Discussion Notifications</string>
+    <string name="settings_summary_notification_group_messages_enabled">Enable Notifications for Group Discussion Comments and Mentions</string>
     <string name="settings_title_notification_friendrequests_enabled">Friend Request Notifications</string>
     <string name="settings_summary_notification_friendrequests_enabled">Enable Notifications for incoming Friend Requests</string>
     <string name="settings_title_notification_prerelease_enabled">Pre-Release Notifications</string>
@@ -458,7 +543,7 @@
     <string name="menu_profile_follow">Follow</string>
     <string name="menu_profile_message">Message</string>
     <string name="menu_profile_view">View</string>
-    <string name="menu_eventmap">Event Map</string>
+    <string name="menu_events">Events</string>
 
     <string name="text_profile_location">%2$s, %1$s</string>
     <string name="text_profile_header_location">Location:</string>
@@ -473,6 +558,8 @@
     <string name="title_fragment_profile_friends">Friends</string>
     <string name="title_fragment_profile_following">Following</string>
     <string name="title_fragment_profile_followers">Followers</string>
+    <string name="title_fragment_profile_events">Events</string>
+
     <string name="text_profile_lookingfor_ltr">A lifetime relationship</string>
     <string name="text_profile_lookingfor_relationship">A relationship</string>
     <string name="text_profile_lookingfor_teacher">A mentor/teacher</string>
@@ -647,8 +734,12 @@
     <string name="title_fragment_member_serach">Search</string>
     <string name="noification_title_new_message">New private message</string>
     <string name="noification_title_new_messages">%1$d new private messages</string>
+    <string name="noification_title_new_group_message">New group comment</string>
+    <string name="noification_title_new_group_messages">%1$d new group comments</string>
     <string name="noification_text_new_message">New message from %1$s</string>
     <string name="noification_text_new_messages">%1$d messages from %2$s</string>
+    <string name="noification_text_new_group_message">New comment from %1$s</string>
+    <string name="noification_text_new_group_messages">%1$d comments from %2$s</string>
     <string name="noification_title_new_friendrequest">New Friend Request</string>
     <string name="noification_title_new_friendrequests">%1$d new Friend Requests</string>
     <string name="noification_text_new_love">%1$s loved your stuff</string>
@@ -657,7 +748,7 @@
     <string name="noification_title_new_loves">You received new loves</string>
     <string name="noification_title_new_comments">You received new comments</string>
     <string name="noification_title_new_mentions">You were mentioned</string>
-    <string name="title_activity_event_map">FetLife Event Map</string>
+    <string name="title_activity_events">Events</string>
     <string name="title_activity_event">EventActivity</string>
 
     <string name="text_event_header_location">Location:</string>
@@ -672,6 +763,32 @@
     <string name="menu_event_not">Not Going</string>
     <string name="menu_event_view">View</string>
     <string name="menu_event_calendar">Add to Calendar</string>
-
+    <string name="menu_event_show_on_map">Show on Map</string>
+    <string name="title_fragment_event_rsvp_going">Going</string>
+    <string name="title_fragment_event_rsvp_maybe">Maybe Going</string>
+    <string name="title_fragment_event_map">Event Map</string>
+    <string name="title_fragment_event_myevents">My Events</string>
+    <string name="title_fragment_event_search">Search</string>
+    <string name="text_group_member_count">%1$d member</string>
+    <string name="text_group_members_count">%1$d members</string>
+    <string name="menu_group_view">View</string>
+    <string name="menu_group_member_join">Join</string>
+    <string name="title_fragment_group_description">Description</string>
+    <string name="title_fragment_group_rules">Rules</string>
+    <string name="title_activity_group">Group</string>
+    <string name="title_fragment_groups">Groups</string>
+    <string name="title_fragment_group_serach">Search</string>
+    <string name="menu_groups">Groups</string>
+    <string name="title_activity_groups">Groups</string>
+    <string name="menu_support">Support FetLife</string>
+    <string name="menu_glossary">Kinktionary</string>
+    <string name="menu_ads">Advertise on FetLife</string>
+    <string name="title_activity_webview">FetLife</string>
+    <string name="title_activity_support">Support FetLife</string>
+    <string name="title_activity_ads">Advertise on FetLife</string>
+    <string name="title_activity_glossary">Kinktionary</string>
+    <string name="title_fragment_group_discussions">Discussions</string>
+    <string name="title_fragment_group_members">Members</string>
+    <string name="action_share">Share</string>
 
 </resources>

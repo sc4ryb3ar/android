@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.DateUtil;
 
 import java.text.DateFormat;
@@ -21,6 +22,8 @@ public class EventInfoFragment extends LoadFragment {
 
     private static final String ARG_EVENT_ID = "ARG_EVENT_ID";
     private static final String DATE_INTERVAL_SEPARATOR = " - ";
+    private Event event;
+
     private TextView locationTextView;
     private TextView addressTextView;
     private TextView dateTextView;
@@ -37,7 +40,7 @@ public class EventInfoFragment extends LoadFragment {
     }
 
     private void loadAndSetDetails() {
-        Event event = Event.loadEvent(getArguments().getString(ARG_EVENT_ID));
+        event = Event.loadEvent(getArguments().getString(ARG_EVENT_ID));
         if (event == null) {
             return;
         }
@@ -50,7 +53,7 @@ public class EventInfoFragment extends LoadFragment {
         if (startTimeLong > -1) {
             startDateTime = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT,SimpleDateFormat.SHORT).format(startTimeLong);
             if (endTimeLong > -1) {
-                endDateTime = ((endTimeLong - startTimeLong) > 24*60*60*1000) ? SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT,SimpleDateFormat.SHORT).format(endDateTime) : SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(endTimeLong);
+                endDateTime = ((endTimeLong - startTimeLong) > 24*60*60*1000) ? SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT,SimpleDateFormat.SHORT).format(endTimeLong) : SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(endTimeLong);
             } else {
                 endDateTime = "";
             }
@@ -86,8 +89,17 @@ public class EventInfoFragment extends LoadFragment {
 
     @Override
     public String getApiCallAction() {
-//        return FetLifeApiIntentService.ACTION_APICALL_EVENT;
-        return null;
+        return FetLifeApiIntentService.ACTION_APICALL_EVENT;
+    }
+
+    @Override
+    public void startResourceCall(int pageCount, int requestedPage) {
+        event = Event.loadEvent(getArguments().getString(ARG_EVENT_ID));
+        if (event == null) {
+            return;
+        } else {
+            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(),event.getId(),Integer.toString(pageCount),Integer.toString(requestedPage));
+        }
     }
 
     @Override

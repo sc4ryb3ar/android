@@ -23,6 +23,8 @@ import com.bitlove.fetlife.event.EventsByLocationRetrieveFailedEvent;
 import com.bitlove.fetlife.event.EventsByLocationRetrievedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendFailedEvent;
 import com.bitlove.fetlife.event.FriendRequestResponseSendSucceededEvent;
+import com.bitlove.fetlife.event.GroupMessageSendFailedEvent;
+import com.bitlove.fetlife.event.GroupMessageSendSucceededEvent;
 import com.bitlove.fetlife.event.LatestReleaseEvent;
 import com.bitlove.fetlife.event.LoginFailedEvent;
 import com.bitlove.fetlife.event.LoginFinishedEvent;
@@ -45,7 +47,17 @@ import com.bitlove.fetlife.model.api.FetLifeApi;
 import com.bitlove.fetlife.model.api.FetLifeMultipartUploadApi;
 import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupDiscussionReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupDiscussionReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
@@ -60,17 +72,24 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
@@ -80,11 +99,13 @@ import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
+import com.bitlove.fetlife.util.VersionUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
@@ -130,6 +151,8 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEARCH_MEMBER = "com.bitlove.fetlife.action.apicall.search_member";
     public static final String ACTION_APICALL_MEMBER_RELATIONS = "com.bitlove.fetlife.action.apicall.member_relations";
     public static final String ACTION_APICALL_MEMBER_STATUSES = "com.bitlove.fetlife.action.apicall.member_statuses";
+    public static final String ACTION_APICALL_MEMBER_EVENTS = "com.bitlove.fetlife.action.apicall.member_events";
+    public static final String ACTION_APICALL_MEMBER_GROUPS = "com.bitlove.fetlife.action.apicall.member_groups";
     public static final String ACTION_APICALL_MEMBER_PICTURES = "com.bitlove.fetlife.action.apicall.member_pictures";
     public static final String ACTION_APICALL_MEMBER_VIDEOS = "com.bitlove.fetlife.action.apicall.member_videos";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.conversations";
@@ -137,7 +160,9 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MEMBER_FEED = "com.bitlove.fetlife.action.apicall.member_feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
+    public static final String ACTION_APICALL_GROUP_MESSAGES = "com.bitlove.fetlife.action.apicall.group_messages";
     public static final String ACTION_APICALL_SEND_MESSAGES = "com.bitlove.fetlife.action.apicall.send_messages";
+    public static final String ACTION_APICALL_SEND_GROUP_MESSAGES = "com.bitlove.fetlife.action.apicall.send_group_messages";
     public static final String ACTION_APICALL_SET_MESSAGES_READ = "com.bitlove.fetlife.action.apicall.set_messages_read";
     public static final String ACTION_APICALL_ADD_LOVE = "com.bitlove.fetlife.action.apicall.add_love";
     public static final String ACTION_APICALL_REMOVE_LOVE = "com.bitlove.fetlife.action.apicall.remove_love";
@@ -150,6 +175,14 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_UPLOAD_VIDEO = "com.bitlove.fetlife.action.apicall.upload_video";
     public static final String ACTION_APICALL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.apicall.upload_video_chunk";
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_LOCATION = "com.bitlove.fetlife.action.apicall.search_events_by_location";
+    public static final String ACTION_APICALL_SEARCH_EVENT_BY_TAG = "com.bitlove.fetlife.action.apicall.search_events_by_tag";
+    public static final String ACTION_APICALL_EVENT = "com.bitlove.fetlife.action.apicall.event";
+    public static final String ACTION_APICALL_SEARCH_GROUP = "com.bitlove.fetlife.action.apicall.search_group";
+    public static final String ACTION_APICALL_GROUP = "com.bitlove.fetlife.action.apicall.group";
+    public static final String ACTION_APICALL_EVENT_RSVPS = "com.bitlove.fetlife.action.apicall.event.ravps";
+    public static final String ACTION_APICALL_SET_RSVP_STATUS = "com.bitlove.fetlife.action.apicall.event.set_ravp";
+    public static final String ACTION_APICALL_GROUP_MEMBERS = "com.bitlove.fetlife.action.apicall.group_members";
+    public static final String ACTION_APICALL_GROUP_DISCUSSIONS = "com.bitlove.fetlife.action.apicall.group_discussions";
 
     public static final String ACTION_CANCEL_UPLOAD_VIDEO_CHUNK = "com.bitlove.fetlife.action.cancel.upload_video_chunk";
 
@@ -157,6 +190,9 @@ public class FetLifeApiIntentService extends IntentService {
 
     private static final String PARAM_VALUE_FRIEND_REQUEST_SENT = "sent";
     private static final String PARAM_VALUE_FRIEND_REQUEST_RECEIVED = "received";
+
+    private static final String PARAM_VALUE_EVENT_RSVP_YES = "yes";
+    private static final String PARAM_VALUE_EVENT_RSVP_MAYBE = "maybe";
 
     //Incoming intent extra parameter name
     private static final String EXTRA_PARAMS = "com.bitlove.fetlife.extra.params";
@@ -227,6 +263,9 @@ public class FetLifeApiIntentService extends IntentService {
     public static synchronized void startPendingCalls(Context context) {
         if (!isActionInProgress(ACTION_APICALL_SEND_MESSAGES)) {
             startApiCall(context, ACTION_APICALL_SEND_MESSAGES);
+        }
+        if (!isActionInProgress(ACTION_APICALL_SEND_GROUP_MESSAGES)) {
+            startApiCall(context, ACTION_APICALL_SEND_GROUP_MESSAGES);
         }
         if (!isActionInProgress(ACTION_APICALL_PENDING_RELATIONS)) {
             startApiCall(context, ACTION_APICALL_PENDING_RELATIONS);
@@ -305,6 +344,7 @@ public class FetLifeApiIntentService extends IntentService {
 
         //Check for network state
         if (NetworkUtil.getConnectivityStatus(this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+            Crashlytics.logException(new Exception("Connection failed due to no network connection"));
             sendConnectionFailedNotification(action, params);
             return;
         }
@@ -358,6 +398,21 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MEMBER_STATUSES:
                     result = retrieveMemberStatuses(params);
                     break;
+                case ACTION_APICALL_MEMBER_EVENTS:
+                    result = retrieveMemberEvents(params);
+                    break;
+                case ACTION_APICALL_MEMBER_GROUPS:
+                    result = retrieveMemberGroups(params);
+                    break;
+                case ACTION_APICALL_GROUP_MEMBERS:
+                    result = retrieveGroupMembers(params);
+                    break;
+                case ACTION_APICALL_GROUP_DISCUSSIONS:
+                    result = retrieveGroupDiscussions(params);
+                    break;
+                case ACTION_APICALL_EVENT_RSVPS:
+                    result = retrieveEventRsvps(params);
+                    break;
                 case ACTION_APICALL_MEMBER_FEED:
                     result = retrieveMemberFeed(params);
                     break;
@@ -373,9 +428,20 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MESSAGES:
                     result = retrieveMessages(currentUser, params);
                     break;
+                case ACTION_APICALL_GROUP_MESSAGES:
+                    result = retrieveGroupMessages(currentUser, params);
+                    break;
                 case ACTION_APICALL_SEND_MESSAGES:
                     for (int i = PENDING_MESSAGE_RETRY_COUNT; i > 0; i--) {
                         result = sendPendingMessages(currentUser, 0);
+                        if (result != Integer.MIN_VALUE) {
+                            break;
+                        }
+                    }
+                    break;
+                case ACTION_APICALL_SEND_GROUP_MESSAGES:
+                    for (int i = PENDING_MESSAGE_RETRY_COUNT; i > 0; i--) {
+                        result = sendPendingGroupMessages(currentUser, 0);
                         if (result != Integer.MIN_VALUE) {
                             break;
                         }
@@ -387,16 +453,14 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_ADD_LOVE:
                     result = addLove(params);
                     break;
+                case ACTION_APICALL_SET_RSVP_STATUS:
+                    result = setRsvp(params);
+                    break;
                 case ACTION_APICALL_REMOVE_LOVE:
                     result = removeLove(params);
                     break;
                 case ACTION_APICALL_PENDING_RELATIONS:
-                    for (int i = PENDING_FRIENDREQUEST_RETRY_COUNT; i > 0; i--) {
-                        result = sendPendingFriendRequests();
-                        if (result != Integer.MIN_VALUE) {
-                            break;
-                        }
-                    }
+                    result = sendPendingFriendRequests();
                     break;
                 case ACTION_APICALL_UPLOAD_PICTURE:
                     result = uploadPicture(params);
@@ -414,6 +478,12 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_SEARCH_MEMBER:
                     result = searchMember(params);
                     break;
+                case ACTION_APICALL_SEARCH_GROUP:
+                    result = searchGroup(params);
+                    break;
+                case ACTION_APICALL_SEARCH_EVENT_BY_TAG:
+                    result = searchEventByTag(params);
+                    break;
                 case ACTION_APICALL_SEARCH_EVENT_BY_LOCATION:
                     result = searchEventByLocation(params);
                     break;
@@ -423,12 +493,19 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_EXTERNAL_CALL_CHECK_4_UPDATES:
                     result = checkForUpdates(params);
                     break;
+                case ACTION_APICALL_EVENT:
+                    result = getEvent(params);
+                    break;
+                case ACTION_APICALL_GROUP:
+                    result = getGroup(params);
+                    break;
             }
 
             int lastResponseCode = getFetLifeApplication().getFetLifeService().getLastResponseCode();
 
             if (result == Integer.MIN_VALUE) {
                 //If the call failed notify all subscribers about
+                Crashlytics.logException(new Exception("Load failed with response code: " + action + ";" + lastResponseCode));
                 sendLoadFailedNotification(action, params);
             } else if (action != ACTION_APICALL_LOGON_USER && (lastResponseCode == 401)) {
                 //If the result is failed due to Authentication or Authorization issue, let's try to refreshUi the token as it is most probably expired
@@ -447,6 +524,7 @@ public class FetLifeApiIntentService extends IntentService {
             }
         } catch (IOException ioe) {
             //If the call failed notify all subscribers about
+            Crashlytics.logException(new Exception("Connection failed with exception",ioe));
             sendConnectionFailedNotification(action, params);
         } catch (SQLiteDiskIOException | InvalidDBConfiguration | SQLiteReadOnlyDatabaseException | IllegalStateException idb) {
             //db might have been closed due probably to user logout, check it and let
@@ -469,7 +547,14 @@ public class FetLifeApiIntentService extends IntentService {
         if (releasesCallResponse.isSuccess()) {
             Release latestRelease = null;
             Release latestPreRelease = null;
-            for (Release release : releasesCallResponse.body()) {
+            final List<Release> releases = releasesCallResponse.body();
+            Collections.sort(releases, new Comparator<Release>() {
+                @Override
+                public int compare(Release o1, Release o2) {
+                    return VersionUtil.getVersionInt(o1.getTag())-VersionUtil.getVersionInt(o2.getTag());
+                }
+            });
+            for (Release release : releases) {
                 if (release.isPrerelease()) {
                     latestPreRelease = release;
                 } else {
@@ -494,12 +579,18 @@ public class FetLifeApiIntentService extends IntentService {
     private boolean refreshToken(Member currentUser) throws IOException {
 
         if (currentUser == null) {
+            if (BuildConfig.DEBUG) {
+//                Debug.waitForDebugger();
+            }
             return false;
         }
 
         String refreshToken = currentUser.getRefreshToken();
 
         if (refreshToken == null) {
+            if (BuildConfig.DEBUG) {
+//                Debug.waitForDebugger();
+            }
             return false;
         }
 
@@ -682,6 +773,69 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    //Go through all the pending messages and send them one by one
+    private int sendPendingGroupMessages(Member user, int sentMessageCount) throws IOException {
+        List<GroupComment> pendingMessages = new Select().from(GroupComment.class).where(GroupComment_Table.pending.is(true)).orderBy(GroupComment_Table.date,true).queryList();
+        //Go through all pending messages (if there is any) and try to send them
+        for (GroupComment pendingMessage : pendingMessages) {
+            String groupId = pendingMessage.getGroupId();
+            String groupPostId = pendingMessage.getGroupPostId();
+            //If the conversation id is local (not created by the backend) it's a new conversation, so start a new conversation call
+            if (sendPendingGroupMessage(pendingMessage)) {
+                sentMessageCount++;
+            } else {
+                continue;
+            }
+        }
+        //Return success result if at least one pending message could have been sent so there was a change in the current state
+        return sentMessageCount;
+    }
+
+    private static long lastSentGroupMessageTime;
+
+    private boolean sendPendingGroupMessage(GroupComment pendingMessage) throws IOException {
+        //Server can handle only one message in every second without adding the same date to it
+
+        //Workaround for server issue as it does not handle millis
+        while (System.currentTimeMillis()/1000 == lastSentGroupMessageTime/1000) {}
+
+        Call<GroupComment> postMessagesCall = getFetLifeApi().postGroupMessage(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingMessage.getGroupId(), pendingMessage.getGroupPostId(), pendingMessage.getBody());
+
+        Response<GroupComment> postMessageResponse;
+        try {
+            postMessageResponse = postMessagesCall.execute();
+        } catch (IOException ioe) {
+            throw ioe;
+        }
+
+        String groupId = pendingMessage.getGroupId();
+        String groupPostId = pendingMessage.getGroupPostId();
+        if (postMessageResponse.isSuccess()) {
+            lastSentGroupMessageTime = System.currentTimeMillis();
+            //Update the message state of the returned message object
+            final GroupComment message = postMessageResponse.body();
+            //Messages are identify
+            // ed in the db by client id so original pending message will be overridden here with the correct state
+            message.setClientId(pendingMessage.getClientId());
+            message.setPending(false);
+            message.setGroupId(groupId);
+            message.setGroupPostId(groupPostId);
+            message.update();
+            getFetLifeApplication().getEventBus().post(new GroupMessageSendSucceededEvent(groupId,groupPostId));
+            return true;
+        } else {
+            //If the call failed make the pending message to a failed message
+            //Note if the post is failed due to connection issue an exception will be thrown, so here we make the assumption the failure is permanent.
+            //TODO check the result code and based on that send the message permanently failed or keep it still pending
+            //TODO add functionality for the user to be able to retry sending failed messages
+            pendingMessage.setPending(false);
+            pendingMessage.setFailed(true);
+            pendingMessage.save();
+            getFetLifeApplication().getEventBus().post(new GroupMessageSendFailedEvent(groupId,groupPostId));
+            return false;
+        }
+    }
+
     private int sendPendingFriendRequests() throws IOException {
 
         int sentCount = 0;
@@ -689,7 +843,11 @@ public class FetLifeApiIntentService extends IntentService {
         for (FriendRequest pendingFriendRequest : pendingFriendRequests) {
             if (pendingFriendRequest.getPendingState() == FriendRequest.PendingState.OUTGOING) {
                 if (!sendPendingFriendRequest(pendingFriendRequest)) {
-                    pendingFriendRequest.delete();
+                    if (pendingFriendRequest.getClientId() == null) {
+                        new Delete().from(FriendRequest.class).where(FriendRequest_Table.targetMemberId.is(pendingFriendRequest.getTargetMemberId())).query();
+                    } else {
+                        pendingFriendRequest.delete();
+                    }
                 } else {
                     sentCount++;
                 }
@@ -794,6 +952,14 @@ public class FetLifeApiIntentService extends IntentService {
         String[] messageIds = Arrays.copyOfRange(params, 1, params.length);
         Call<ResponseBody> setMessagesReadCall = getFetLifeApi().setMessagesRead(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), conversationId, messageIds);
         Response<ResponseBody> response = setMessagesReadCall.execute();
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
+    }
+
+    private int setRsvp(String[] params) throws IOException {
+        String eventId = params[0];
+        String rsvp = params[1];
+        Call<ResponseBody> setRsvpStatus = getFetLifeApi().putRsvp(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId, rsvp);
+        Response<ResponseBody> response = setRsvpStatus.execute();
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
 
@@ -1177,6 +1343,76 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int retrieveGroupMessages(Member user, String... params) throws IOException {
+
+        final String groupId = params[0];
+        final String groupDiscussionId = params[1];
+
+        final int limit = getIntFromParams(params, 2, 25);
+        final int page = getIntFromParams(params, 3, 1);
+
+        Call<GroupPost> getGroupDiscussionCall = getFetLifeApi().getGroupDiscussion(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, groupDiscussionId);
+        Response<GroupPost> groupDiscussionResponse = getGroupDiscussionCall.execute();
+        GroupPost retrievedGroupDiscussion;
+
+        if (groupDiscussionResponse.isSuccess()) {
+            retrievedGroupDiscussion = groupDiscussionResponse.body();
+
+            retrievedGroupDiscussion.getMember().mergeSave();
+
+            GroupPost localGroupDiscussion = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupDiscussionId)).querySingle();
+            if (localGroupDiscussion !=null) {
+                retrievedGroupDiscussion.setDraftMessage(localGroupDiscussion.getDraftMessage());
+            }
+            retrievedGroupDiscussion.save();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+
+        Call<List<GroupComment>> getGroupMessagesCall = null;
+        getGroupMessagesCall = getFetLifeApi().getGroupMessages(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, groupDiscussionId, limit, page);
+
+        //TODO solve edge case when there is the gap between last message in db and the retrieved messages (e.g. when because of the limit not all recent messages could be retrieved)
+
+        Response<List<GroupComment>> messagesResponse = getGroupMessagesCall.execute();
+        if (messagesResponse.isSuccess()) {
+            final List<GroupComment> messages = messagesResponse.body();
+            if (page == 1 && !messages.isEmpty()) {
+                long messageDate = messages.get(0).getDate();
+                Group group = Group.loadGroup(groupId);
+                if (group != null && group.getDate() < messageDate) {
+                    group.setDate(messageDate);
+                    group.save();
+                }
+                GroupPost groupDiscussion = GroupPost.loadGroupPost(groupDiscussionId);
+                if (groupDiscussionId != null && groupDiscussion.getDate() < messageDate) {
+                    groupDiscussion.setDate(messageDate);
+                    groupDiscussion.save();
+                }
+            }
+            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
+                @Override
+                public void execute(DatabaseWrapper databaseWrapper) {
+                    for (GroupComment message : messages) {
+                        GroupComment storedMessage = new Select().from(GroupComment.class).where(GroupComment_Table.id.is(message.getId())).querySingle();
+                        if (storedMessage != null) {
+                            message.setClientId(storedMessage.getClientId());
+                        } else {
+                            message.setClientId(UUID.randomUUID().toString());
+                        }
+                        message.setGroupId(groupId);
+                        message.setGroupPostId(groupDiscussionId);
+                        message.setPending(false);
+                        message.save();
+                    }
+                }
+            });
+            return messages.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int retrieveFeed(String[] params) throws IOException {
         final int limit = getIntFromParams(params, 0, 25);
         final int page = getIntFromParams(params, 1, 1);
@@ -1295,6 +1531,7 @@ public class FetLifeApiIntentService extends IntentService {
             Call<List<Relationship>> getMemberRelationshipCall = getFetLifeApi().getMemberRelationship(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId);
             Response<List<Relationship>> getMemberRelationshipResponse = getMemberRelationshipCall.execute();
             if (getMemberRelationshipResponse.isSuccess()) {
+                new Delete().from(Relationship.class).where(Relationship_Table.memberId.is(memberId)).query();
                 List<Relationship> relationships = getMemberRelationshipResponse.body();
                 for (Relationship relationship : relationships) {
                     Member targetMember = relationship.getTargetMember();
@@ -1305,7 +1542,50 @@ public class FetLifeApiIntentService extends IntentService {
                     relationship.save();
                 }
             }
-            member.save();
+            member.mergeSave();
+            return 1;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int getEvent(String... params) throws IOException {
+        String eventId = params[0];
+        Call<Event> getEventCall = getFetLifeApi().getEvent(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId);
+        Response<Event> getEventResponse = getEventCall.execute();
+        if (getEventResponse.isSuccess()) {
+            Event event = getEventResponse.body();
+            event.setRsvpStatus(Rsvp.RsvpStatus.NO);
+            event.save();
+            Response<List<Rsvp>> rsvpsResponse = getFetLifeApi().getRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),eventId).execute();
+            if (rsvpsResponse.isSuccess()) {
+                List<Rsvp> rsvps = rsvpsResponse.body();
+                if (rsvps.size() > 0) {
+                    Rsvp rsvp = rsvps.get(0);
+                    event.setRsvpStatus(rsvp.getRsvpStatus());
+                    event.save();
+                }
+                return 1;
+            } else {
+                return Integer.MIN_VALUE;
+            }
+        } else {
+            return Integer.MIN_VALUE;
+        }
+
+    }
+
+    private int getGroup(String... params) throws IOException {
+        String groupId = params[0];
+        Call<Group> getGroupCall = getFetLifeApi().getGroup(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId);
+        Response<Group> getGroupResponse = getGroupCall.execute();
+        if (getGroupResponse.isSuccess()) {
+            Group group = getGroupResponse.body();
+            Group currentGroup = Group.loadGroup(groupId);
+            if (currentGroup!= null && currentGroup.getDate() > group.getDate()) {
+                group.setDate(currentGroup.getDate());
+            }
+            group.save();
             return 1;
         } else {
             return Integer.MIN_VALUE;
@@ -1313,7 +1593,6 @@ public class FetLifeApiIntentService extends IntentService {
     }
 
     private int searchMember(String... params) throws IOException {
-
         final String queryString = params[0];
         final int limit = getIntFromParams(params, 1, 10);
         final int page = getIntFromParams(params, 2, 1);
@@ -1325,6 +1604,40 @@ public class FetLifeApiIntentService extends IntentService {
                 friendMember.mergeSave();
             }
             return foundMembers.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int searchGroup(String... params) throws IOException {
+        final String queryString = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Response<List<Group>> searchResponse = getFetLifeApi().searchGroups(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),queryString,limit,page).execute();
+        if (searchResponse.isSuccess()) {
+            final List<Group> foundGroups = searchResponse.body();
+            for (Group foundGroup : foundGroups) {
+                foundGroup.save();
+            }
+            return foundGroups.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int searchEventByTag(String... params) throws IOException {
+        final String queryString = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Response<List<Event>> relationsResponse = getFetLifeApi().searchEvents(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(),queryString,limit,page).execute();
+        if (relationsResponse.isSuccess()) {
+            final List<Event> foundEvents = relationsResponse.body();
+            for (Event event : foundEvents) {
+                event.save();
+            }
+            return foundEvents.size();
         } else {
             return Integer.MIN_VALUE;
         }
@@ -1463,6 +1776,137 @@ public class FetLifeApiIntentService extends IntentService {
             saveLastSyncedPosition(syncedPositionType,userId,lastConfirmedFriendPosition+newItemCount);
 
             return friendMembers.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveGroupMembers(String[] params) throws IOException {
+        String groupId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Member>> getGroupMembersCall = getFetLifeApi().getGroupMembers(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);;
+        final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
+
+        Response<List<Member>> groupMembersResponse = getGroupMembersCall.execute();
+        if (groupMembersResponse.isSuccess()) {
+
+            final List<Member> groupMembers = groupMembersResponse.body();
+            List<GroupMemberReference> currentGroupMembers = new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
+            final Collator coll = Collator.getInstance(Locale.US);
+            coll.setStrength(Collator.IDENTICAL);
+            Collections.sort(currentGroupMembers, new Comparator<GroupMemberReference>() {
+                @Override
+                public int compare(GroupMemberReference relationReference, GroupMemberReference relationReference2) {
+                    //Workaround to match with DB sorting
+                    String nickname1 = relationReference.getNickname().replaceAll("_","z");
+                    String nickname2 = relationReference2.getNickname().replaceAll("_","z");
+                    return coll.compare(nickname1,nickname2);
+                }
+            });
+
+            int lastConfirmedPosition;
+            if (page == 1) {
+                lastConfirmedPosition = -1;
+            } else {
+                lastConfirmedPosition = loadLastSyncedPosition(syncedPositionType,groupId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Member groupMember : groupMembers) {
+
+                groupMember.mergeSave();
+
+                int foundPos;
+                for (foundPos = lastConfirmedPosition+1; foundPos < currentGroupMembers.size(); foundPos++) {
+                    GroupMemberReference checkGroupMember = currentGroupMembers.get(foundPos);
+                    if (groupMember.getId().equals(checkGroupMember.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentGroupMembers.size()) {
+                    newItemCount++;
+                    GroupMemberReference groupMemberReference = new GroupMemberReference();
+                    groupMemberReference.setId(groupMember.getId());
+                    groupMemberReference.setNickname(groupMember.getNickname());
+                    groupMemberReference.setGroupId(groupId);
+                    groupMemberReference.save();
+                } else {
+                    for (int i = lastConfirmedPosition+1; i < foundPos; i++) {
+                        currentGroupMembers.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedPosition = foundPos;
+                }
+            }
+
+            saveLastSyncedPosition(syncedPositionType,groupId,lastConfirmedPosition+newItemCount);
+
+            return groupMembers.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveGroupDiscussions(String[] params) throws IOException {
+        String groupId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<GroupPost>> getGroupDiscussionsCall = getFetLifeApi().getGroupDiscussions(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);
+        final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
+
+        Response<List<GroupPost>> groupDiscussionsResponse = getGroupDiscussionsCall.execute();
+        if (groupDiscussionsResponse.isSuccess()) {
+
+            final List<GroupPost> groupDisucssions = groupDiscussionsResponse.body();
+            List<GroupDiscussionReference> currentGroupDiscussions = new Select().from(GroupDiscussionReference.class).where(GroupDiscussionReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupDiscussionReference_Table.createdAt).ascending().collate(Collate.NOCASE)).queryList();
+            final Collator coll = Collator.getInstance(Locale.US);
+            coll.setStrength(Collator.IDENTICAL);
+
+            int lastConfirmedPosition;
+            if (page == 1) {
+                lastConfirmedPosition = -1;
+            } else {
+                lastConfirmedPosition = loadLastSyncedPosition(syncedPositionType,groupId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (GroupPost groupDiscussion : groupDisucssions) {
+
+                GroupPost currentGroupDiscussion = GroupPost.loadGroupPost(groupDiscussion.getId());
+                if (currentGroupDiscussion != null && currentGroupDiscussion.getDate() > groupDiscussion.getDate()) {
+                    groupDiscussion.setDate(currentGroupDiscussion.getDate());
+                }
+                groupDiscussion.save();
+
+                int foundPos;
+                for (foundPos = lastConfirmedPosition+1; foundPos < currentGroupDiscussions.size(); foundPos++) {
+                    GroupDiscussionReference checkGroupDiscussion = currentGroupDiscussions.get(foundPos);
+                    if (checkGroupDiscussion.getId().equals(checkGroupDiscussion.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentGroupDiscussions.size()) {
+                    newItemCount++;
+                    GroupDiscussionReference groupDiscussionReference = new GroupDiscussionReference();
+                    groupDiscussionReference.setId(groupDiscussion.getId());
+                    groupDiscussionReference.setCreatedAt(groupDiscussion.getCreatedAt());
+                    groupDiscussionReference.setGroupId(groupId);
+                    groupDiscussionReference.save();
+                } else {
+                    for (int i = lastConfirmedPosition+1; i < foundPos; i++) {
+                        currentGroupDiscussions.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedPosition = foundPos;
+                }
+            }
+
+            saveLastSyncedPosition(syncedPositionType,groupId,lastConfirmedPosition+newItemCount);
+
+            return groupDisucssions.size() - deletedItemCount;
         } else {
             return Integer.MIN_VALUE;
         }
@@ -1684,6 +2128,185 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int retrieveEventRsvps(String[] params) throws IOException {
+        String eventId = params[0];
+        final int limit = getIntFromParams(params, 2, 10);
+        final int page = getIntFromParams(params, 3, 1);
+        final int rsvpType = getIntFromParams(params, 1, EventRsvpReference.VALUE_RSVPTYPE_GOING);
+
+        final Call<List<Rsvp>> getRsvpsCall;
+        getRsvpsCall = getFetLifeApi().getEventRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId, EventRsvpReference.VALUE_RSVPTYPE_GOING == rsvpType ? PARAM_VALUE_EVENT_RSVP_YES : PARAM_VALUE_EVENT_RSVP_MAYBE,/*"start_date_time",*/ limit, page);
+
+        Response<List<Rsvp>> rsvpsResponse = getRsvpsCall.execute();
+        if (rsvpsResponse.isSuccess()) {
+
+            final List<Rsvp> retrievedRsvps = rsvpsResponse.body();
+            List<EventRsvpReference> currentEventRsvps = new Select().from(EventRsvpReference.class).where(EventRsvpReference_Table.eventId.is(eventId)).orderBy(OrderBy.fromProperty(EventRsvpReference_Table.nickname).ascending()).queryList();
+
+            int lastConfirmedEventPosition;
+            if (page == 1) {
+                lastConfirmedEventPosition = -1;
+            } else {
+                lastConfirmedEventPosition = loadLastSyncedPosition(SyncedPositionType.EVENT_RSVP,eventId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Rsvp retrievedRsvp : retrievedRsvps) {
+
+                int foundPos;
+                for (foundPos = lastConfirmedEventPosition+1; foundPos < currentEventRsvps.size(); foundPos++) {
+                    EventRsvpReference checkEventRsvp = currentEventRsvps.get(foundPos);
+                    if (retrievedRsvp.getId().equals(checkEventRsvp.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentEventRsvps.size()) {
+                    newItemCount++;
+                    EventRsvpReference eventRsvpReference = new EventRsvpReference();
+                    eventRsvpReference.setId(retrievedRsvp.getMember().getId());
+                    eventRsvpReference.setNickname(retrievedRsvp.getMember().getNickname());
+                    eventRsvpReference.setRsvpType(retrievedRsvp.getRsvpStatus() == Rsvp.RsvpStatus.YES ? EventRsvpReference.VALUE_RSVPTYPE_GOING : EventRsvpReference.VALUE_RSVPTYPE_MAYBE);
+                    eventRsvpReference.setEventId(eventId);
+                    eventRsvpReference.save();
+                } else {
+                    for (int i = lastConfirmedEventPosition+1; i < foundPos; i++) {
+                        currentEventRsvps.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedEventPosition = foundPos;
+                }
+                retrievedRsvp.getMember().mergeSave();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.EVENT_RSVP,eventId,lastConfirmedEventPosition+newItemCount);
+
+            return retrievedRsvps.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+
+    private int retrieveMemberGroups(String[] params) throws IOException {
+        String userId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Group>> getGroupsCall;
+        getGroupsCall = getFetLifeApi().getMemberGroups(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
+
+        Response<List<Group>> groupsResponse = getGroupsCall.execute();
+        if (groupsResponse.isSuccess()) {
+
+            final List<Group> retrievedGroups = groupsResponse.body();
+            List<GroupReference> currentGroups = new Select().from(GroupReference.class).where(GroupReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(GroupReference_Table.date).descending()).queryList();
+
+            int lastConfirmedGroupPosition;
+            if (page == 1) {
+                lastConfirmedGroupPosition = -1;
+            } else {
+                lastConfirmedGroupPosition = loadLastSyncedPosition(SyncedPositionType.GROUP,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Group retrievedGroup : retrievedGroups) {
+
+                int foundPos;
+                for (foundPos = lastConfirmedGroupPosition+1; foundPos < currentGroups.size(); foundPos++) {
+                    GroupReference checkGroup = currentGroups.get(foundPos);
+                    if (retrievedGroup.getId().equals(checkGroup.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentGroups.size()) {
+                    newItemCount++;
+                    GroupReference groupReference = new GroupReference();
+                    groupReference.setId(retrievedGroup.getId());
+                    groupReference.setUpdatedAt(retrievedGroup.getUpdatedAt());
+                    groupReference.setUserId(userId);
+                    groupReference.save();
+                } else {
+                    for (int i = lastConfirmedGroupPosition+1; i < foundPos; i++) {
+                        currentGroups.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedGroupPosition = foundPos;
+                }
+                Group currentGroup = Group.loadGroup(retrievedGroup.getId());
+                if (currentGroup!= null && currentGroup.getDate() > retrievedGroup.getDate()) {
+                    retrievedGroup.setDate(currentGroup.getDate());
+                }
+                retrievedGroup.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.GROUP,userId,lastConfirmedGroupPosition+newItemCount);
+
+            return retrievedGroups.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveMemberEvents(String[] params) throws IOException {
+        String userId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Rsvp>> getRsvpsCall;
+        getRsvpsCall = getFetLifeApi().getMemberRsvps(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, /*"start_date_time",*/ limit, page);
+
+        Response<List<Rsvp>> rsvpsResponse = getRsvpsCall.execute();
+        if (rsvpsResponse.isSuccess()) {
+
+            final List<Rsvp> retrievedRsvps = rsvpsResponse.body();
+            List<EventReference> currentEvents = new Select().from(EventReference.class).where(EventReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
+
+            int lastConfirmedEventPosition;
+            if (page == 1) {
+                lastConfirmedEventPosition = -1;
+            } else {
+                lastConfirmedEventPosition = loadLastSyncedPosition(SyncedPositionType.EVENT,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Rsvp retrievedRsvp : retrievedRsvps) {
+                Event retrievedEvent = retrievedRsvp.getEvent();
+
+                int foundPos;
+                for (foundPos = lastConfirmedEventPosition+1; foundPos < currentEvents.size(); foundPos++) {
+                    EventReference checkEvent = currentEvents.get(foundPos);
+                    if (retrievedEvent.getId().equals(checkEvent.getId())) {
+                        checkEvent.setRsvpStatus(retrievedRsvp.getRsvpStatus());
+                        checkEvent.save();
+                        break;
+                    }
+                }
+                if (foundPos >= currentEvents.size()) {
+                    newItemCount++;
+                    EventReference eventReference = new EventReference();
+                    eventReference.setId(retrievedEvent.getId());
+                    eventReference.setCreatedAt(retrievedEvent.getCreatedAt());
+                    eventReference.setRsvpStatus(retrievedRsvp.getRsvpStatus());
+                    eventReference.setUserId(userId);
+                    eventReference.save();
+                } else {
+                    for (int i = lastConfirmedEventPosition+1; i < foundPos; i++) {
+                        currentEvents.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedEventPosition = foundPos;
+                }
+                retrievedEvent.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.EVENT,userId,lastConfirmedEventPosition+newItemCount);
+
+            return retrievedRsvps.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     private int cancelFriendRequest(String[] params) throws IOException {
         String memberId = params[0];
 
@@ -1842,7 +2465,7 @@ public class FetLifeApiIntentService extends IntentService {
     //Helper utility methods
     //****
 
-    private int getIntFromParams(String[] params, int pageParamPosition, int defaultValue) {
+    public static int getIntFromParams(String[] params, int pageParamPosition, int defaultValue) {
         int param = defaultValue;
         if (params != null && params.length > pageParamPosition) {
             try {
@@ -1853,7 +2476,7 @@ public class FetLifeApiIntentService extends IntentService {
         return param;
     }
 
-    private boolean getBoolFromParams(String[] params, int pageParamPosition, boolean defaultValue) {
+    public static boolean getBoolFromParams(String[] params, int pageParamPosition, boolean defaultValue) {
         boolean param = defaultValue;
         if (params != null && params.length > pageParamPosition) {
             try {
@@ -1867,8 +2490,10 @@ public class FetLifeApiIntentService extends IntentService {
     private enum SyncedPositionType {
         PICTURE,
         STATUS,
+        EVENT,
+        EVENT_RSVP,
         FRIEND,
-        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO;
+        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP, GROUP_MEMBERS, GROUP_DISCUSSIONS;
 
         @Override
         public String toString() {

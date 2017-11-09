@@ -107,7 +107,13 @@ public class Rsvp {
 
     public enum RsvpStatus {
         YES,
-        MAYBE
+        MAYBE,
+        NO;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 
 }

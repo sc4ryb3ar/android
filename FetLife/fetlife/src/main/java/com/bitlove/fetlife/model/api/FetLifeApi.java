@@ -2,6 +2,7 @@ package com.bitlove.fetlife.model.api;
 
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
@@ -10,7 +11,11 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Comment;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.squareup.okhttp.ResponseBody;
@@ -41,6 +46,9 @@ public interface FetLifeApi {
     @GET("/api/v2/me")
     Call<Member> getMe(@Header("Authorization") String authHeader);
 
+    @GET("/api/v2/members/{memberId}/groups")
+    Call<List<Group>> getMemberGroups(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
     @GET("/api/v2/me/conversations")
     Call<List<Conversation>> getConversations(@Header("Authorization") String authHeader, @Query("order_by") String orderBy, @Query("limit") int limit, @Query("page") int page);
 
@@ -56,8 +64,36 @@ public interface FetLifeApi {
     @GET("/api/v2/search/members")
     Call<List<Member>> searchMembers(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
 
+    @GET("/api/v2/search/groups")
+    Call<List<Group>> searchGroups(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/groups/{groupId}/members")
+    Call<List<Member>> getGroupMembers(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/groups/{groupId}/posts")
+    Call<List<GroupPost>> getGroupDiscussions(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/groups/{groupId}/posts/{groupPostId}")
+    Call<GroupPost> getGroupDiscussion(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId);
+
+    @GET("/api/v2/groups/{groupId}/posts/{groupPostId}/comments")
+    Call<List<GroupComment>> getGroupMessages(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId, @Query("limit") int limit, @Query("page") int page);
+
+    @FormUrlEncoded
+    @POST("/api/v2/groups/{groupId}/posts/{groupPostId}/comments")
+    Call<GroupComment> postGroupMessage(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId, @Field("body") String body);
+
     @GET("/api/v2/members/{memberId}")
     Call<Member> getMember(@Header("Authorization") String authHeader, @Path("memberId") String memberId);
+
+    @GET("/api/v2/events/{eventId}")
+    Call<Event> getEvent(@Header("Authorization") String authHeader, @Path("eventId") String memberId);
+
+    @GET("/api/v2/groups/{groupId}")
+    Call<Group> getGroup(@Header("Authorization") String authHeader, @Path("groupId") String memberId);
+
+    @GET("/api/v2/me/rsvps")
+    Call<List<Rsvp>> getRsvps(@Header("Authorization") String authHeader, @Query("event_id") String eventId);
 
     @GET("/api/v2/members/{memberId}/latest_activity")
     Call<Feed> getMemberFeed(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
@@ -82,6 +118,12 @@ public interface FetLifeApi {
 
     @GET("/api/v2/members/{memberId}/statuses")
     Call<List<Status>> getMemberStatuses(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/members/{memberId}/rsvps")
+    Call<List<Rsvp>> getMemberRsvps(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/events/{eventId}/rsvps")
+    Call<List<Rsvp>> getEventRsvps(@Header("Authorization") String authHeader, @Path("eventId") String eventId, @Query("status") String status, @Query("limit") int limit, @Query("page") int page);
 
     @FormUrlEncoded
     @POST("/api/v2/me/conversations/{conversationId}/messages")
@@ -123,6 +165,9 @@ public interface FetLifeApi {
     @PUT("/api/v2/me/loves/{content_type}/{content_id}")
     Call<ResponseBody> putLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);
 
+    @PUT("/api/v2/me/rsvps")
+    Call<ResponseBody> putRsvp(@Header("Authorization") String authHeader, @Query("event_id") String contentId, @Query("status") String rsvpsType);
+
     @DELETE("/api/v2/me/loves/{content_type}/{content_id}")
     Call<ResponseBody> deleteLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);
 
@@ -135,5 +180,8 @@ public interface FetLifeApi {
 
     @GET("/api/v2/search/events/by_location")
     Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("latitude") double latitude, @Query("longitude") double longitude, @Query("range") double range, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/search/events")
+    Call<List<Event>> searchEvents(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
 
 }

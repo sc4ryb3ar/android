@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.StatusesRecyclerAdapter;
@@ -19,7 +18,7 @@ public class StatusesFragment extends LoadFragment {
     public static StatusesFragment newInstance(String memberId) {
         StatusesFragment statusesFragment = new StatusesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         statusesFragment.setArguments(args);
         return statusesFragment;
     }
@@ -27,11 +26,11 @@ public class StatusesFragment extends LoadFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        StatusesRecyclerAdapter adapter = new StatusesRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID));
+        StatusesRecyclerAdapter adapter = new StatusesRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID));
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -46,9 +45,5 @@ public class StatusesFragment extends LoadFragment {
             StatusesRecyclerAdapter recyclerViewAdapter = (StatusesRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();
         }
-    }
-
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
     }
 }

@@ -4,7 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
@@ -20,13 +24,15 @@ public abstract class LoadFragment extends BaseFragment {
 
     public static final int PAGE_COUNT = 25;
 
-    protected static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
-    protected static final String ARG_RELATION_TYPE = "ARG_RELATION_TYPE";
+    protected static final String ARG_REFERENCE_ID = "ARG_REFERENCE_ID";
+    protected static final String ARG_REFERENCE_TYPE = "ARG_REFERENCE_TYPE";
 
     protected RecyclerView recyclerView;
 
     protected int requestedItems = 0;
     protected int requestedPage = 1;
+
+    protected ProgressBar progressView;
 
     //TODO: replace this with a more sophisticated solution od checking queue of FetLife Intent service
     private boolean onCreateCallInProgress;
@@ -115,29 +121,52 @@ public abstract class LoadFragment extends BaseFragment {
         return PAGE_COUNT;
     }
 
-    protected int getRelationTypeReference() {
-        return getArguments().getInt(ARG_RELATION_TYPE,Integer.MIN_VALUE);
+    protected int getReferenceArg() {
+        return getArguments().getInt(ARG_REFERENCE_TYPE,Integer.MIN_VALUE);
     }
 
     public abstract String getApiCallAction();
 
-    public String getMemberId() {
-        return getArguments().getString(ARG_MEMBER_ID);
+    public String getReferenceId() {
+        return getArguments().getString(ARG_REFERENCE_ID);
     }
 
     public void startResourceCall(int pageCount, int requestedPage) {
         if (getApiCallAction() == null) {
             return;
         }
-        int relationTypeReference = getRelationTypeReference();
-        if (relationTypeReference != Integer.MIN_VALUE) {
-            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(),getMemberId(),Integer.toString(relationTypeReference),Integer.toString(pageCount),Integer.toString(requestedPage));
+        int referenceArg = getReferenceArg();
+        if (referenceArg != Integer.MIN_VALUE) {
+            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(), getReferenceId(),Integer.toString(referenceArg),Integer.toString(pageCount),Integer.toString(requestedPage));
         } else {
-            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(),getMemberId(),Integer.toString(pageCount),Integer.toString(requestedPage));
+            FetLifeApiIntentService.startApiCall(getActivity(),getApiCallAction(), getReferenceId(),Integer.toString(pageCount),Integer.toString(requestedPage));
         }
     }
 
     public abstract void refreshUi();
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        final MenuItem progressItem = menu.findItem(R.id.action_progress);
+        if (progressItem != null) {
+            progressView = (ProgressBar) progressItem.getActionView().findViewById(R.id.menu_progress_indicator);
+            progressView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void showProgress() {
+        if (progressView != null) {
+            progressView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void dismissProgress() {
+        if (progressView != null) {
+            progressView.setVisibility(View.INVISIBLE);
+        }
+    }
 
 }

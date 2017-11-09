@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="16dp"
+             android:layout_marginRight="16dp"
+             android:layout_marginTop="12dp">
+
+    <RelativeLayout
+        style="@style/FeedInnerListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/listitem_background_rounded"
+        android:gravity="bottom"
+        android:paddingBottom="@dimen/listitem_vertical_margin"
+        android:paddingEnd="@dimen/listitem_horizontal_margin"
+        android:paddingLeft="@dimen/listitem_horizontal_margin"
+        android:paddingRight="@dimen/listitem_horizontal_margin"
+        android:paddingStart="@dimen/listitem_horizontal_margin"
+        android:paddingTop="@dimen/listitem_vertical_margin">
+
+        <TextView
+            android:id="@+id/group_name"
+            style="@style/FeedInnerListHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:ellipsize="marquee"
+            android:gravity="bottom"
+            android:singleLine="true"/>
+
+        <TextView
+            android:id="@+id/group_description"
+            style="@style/FeedInnerListUpperText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/group_name"
+            android:ellipsize="marquee"
+            android:gravity="bottom"
+            android:maxLines="2"/>
+
+        <TextView
+            android:id="@+id/group_member_count"
+            style="@style/FeedInnerListUpperText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/group_description"
+            android:layout_marginBottom="2dp"
+            android:gravity="right"
+            android:ellipsize="marquee"
+            android:singleLine="true"/>
+
+    </RelativeLayout>
+</FrameLayout>

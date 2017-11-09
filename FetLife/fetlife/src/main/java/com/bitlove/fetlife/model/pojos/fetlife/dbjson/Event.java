@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -22,6 +23,8 @@ import java.text.SimpleDateFormat;
 @Table(database = FetLifeDatabase.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
+
+    public static final double NOT_SET = 0.0d;
 
     public static Event loadEvent(String eventId) {
         Event event = new Select().from(Event.class).where(Event_Table.id.is(eventId)).querySingle();
@@ -67,11 +70,11 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
     @Column
     @JsonProperty("latitude")
-    private double latitude;
+    private double latitude = NOT_SET;
 
     @Column
     @JsonProperty("longitude")
-    private double longitude;
+    private double longitude = NOT_SET;
 
     @Column
     @JsonProperty("cost")
@@ -85,7 +88,15 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
     @Column
     @JsonIgnore
+    private Rsvp.RsvpStatus rsvpStatus;
+
+    @Column
+    @JsonIgnore
     private String memberId;
+
+    @Column
+    @JsonIgnore
+    private long date;
 
     //Json only
     @JsonProperty("content_type")
@@ -102,8 +113,14 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
     //local
     @JsonIgnore
-    private long roughtDate;
+    @Column
+    private long roughtStartDate;
 
+    @JsonIgnore
+    private long roughtEndDate;
+
+    @JsonIgnore
+    private long endDate;
 
     @JsonProperty("address")
     public String getAddress() {
@@ -173,6 +190,10 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
     @JsonProperty("end_date_time")
     public void setEndDateTime(String endDateTime) {
         this.endDateTime = endDateTime;
+        if (endDateTime != null) {
+            endDate = DateUtil.parseDate(endDateTime,true);
+            roughtEndDate = DateUtil.addRoughTimeOffset(endDate, longitude);
+        }
     }
 
     @JsonProperty("id")
@@ -220,11 +241,20 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
         return startDateTime;
     }
 
+    public Rsvp.RsvpStatus getRsvpStatus() {
+        return rsvpStatus;
+    }
+
+    public void setRsvpStatus(Rsvp.RsvpStatus rsvpStatus) {
+        this.rsvpStatus = rsvpStatus;
+    }
+
     @JsonProperty("start_date_time")
     public void setStartDateTime(String startDateTime) {
         this.startDateTime = startDateTime;
         if (startDateTime != null) {
-            roughtDate = DateUtil.addRoughTimeOffset(DateUtil.parseDate(startDateTime,true), longitude);
+            date = DateUtil.parseDate(startDateTime,true);
+            roughtStartDate = DateUtil.addRoughTimeOffset(date, longitude);
         }
     }
 
@@ -294,13 +324,21 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
         return snippet;
     }
 
-    public long getRoughtDate() {
-        return roughtDate;
+    public long getRoughtStartDate() {
+        return roughtStartDate;
+    }
+
+    public void setRoughtStartDate(long roughtStartDate) {
+        this.roughtStartDate = roughtStartDate;
+    }
+
+    public long getRoughtEndDate() {
+        return roughtEndDate;
     }
 
     @Override
     public int hashCode() {
-        return (int) roughtDate;
+        return (int) roughtStartDate;
     }
 
     @Override
@@ -318,8 +356,8 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
 
     @Override
     public int compareTo(@NonNull Event o) {
-        long diff = roughtDate - o.roughtDate;
-        Log.d("COMPARE", roughtDate + " ? " + o.roughtDate + " = " + diff);
+        long diff = roughtStartDate - o.roughtStartDate;
+        Log.d("COMPARE", roughtStartDate + " ? " + o.roughtStartDate + " = " + diff);
         if (diff == 0) return 0;
         if (diff < 0) return -1;
         return 1;
@@ -332,4 +370,32 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
     public void setMemberId(String memberId) {
         this.memberId = memberId;
     }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    private boolean mergeSave() {
+        if (rsvpStatus == null) {
+            Event savedEvent = loadEvent(id);
+            if (savedEvent != null) {
+                setRsvpStatus(savedEvent.getRsvpStatus());
+            }
+        }
+        return internalSave();
+    }
+
+    @Override
+    public boolean save() {
+        return mergeSave();
+    }
+
+    private boolean internalSave() {
+        return super.save();
+    }
+
 }

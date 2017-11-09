@@ -25,10 +25,12 @@ import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
 import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.screen.resource.EventMapActivity;
+import com.bitlove.fetlife.view.screen.resource.EventsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.groups.GroupsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.screen.resource.TurboLinksViewActivity;
 import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
@@ -172,6 +174,7 @@ public class MenuActivityComponent extends ActivityComponent {
 
 
         if (id == R.id.nav_logout) {
+            menuActivity.getFetLifeApplication().getUserSessionManager().deleteCurrentUserDb();
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             menuActivity.finish();
             LoginActivity.startLogin(menuActivity.getFetLifeApplication());
@@ -204,12 +207,20 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
-        } else if (id == R.id.nav_eventmap) {
+        } else if (id == R.id.nav_support) {
+            TurboLinksViewActivity.startActivity(menuActivity,"support",menuActivity.getString(R.string.title_activity_support));
+        } else if (id == R.id.nav_ads) {
+            TurboLinksViewActivity.startActivity(menuActivity,"ads",menuActivity.getString(R.string.title_activity_ads));
+        } else if (id == R.id.nav_glossary) {
+            TurboLinksViewActivity.startActivity(menuActivity,"glossary",menuActivity.getString(R.string.title_activity_glossary));
+        } else if (id == R.id.nav_events) {
             if (isLocationPermissionGranted()) {
-                EventMapActivity.startActivity(menuActivity);
+                EventsActivity.startActivity(menuActivity);
             } else {
                 requestLocationPermission(BaseActivity.PERMISSION_REQUEST_LOCATION);
             }
+        } else if (id == R.id.nav_groups) {
+            GroupsActivity.startActivity(menuActivity,false);
         } else if (id == R.id.nav_updates) {
             menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
             FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));
@@ -262,7 +273,7 @@ public class MenuActivityComponent extends ActivityComponent {
                     VideoUploadSelectionDialog.show(menuActivity);
                     break;
                 case BaseActivity.PERMISSION_REQUEST_LOCATION:
-                    EventMapActivity.startActivity(menuActivity);
+                    EventsActivity.startActivity(menuActivity);
                     break;
                 default:
                     break;
@@ -270,7 +281,7 @@ public class MenuActivityComponent extends ActivityComponent {
         } else {
             switch (requestCode) {
                 case BaseActivity.PERMISSION_REQUEST_LOCATION:
-                    EventMapActivity.startActivity(menuActivity);
+                    EventsActivity.startActivity(menuActivity);
                     break;
                 default:
                     return;

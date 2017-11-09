@@ -72,26 +72,7 @@ public class InfoNotification extends OneSignalNotification {
 
     @Override
     PendingIntent getPendingIntent(Context context) {
-        Intent contentIntent;
-
-        if (launchUrl != null) {
-            contentIntent = new Intent(Intent.ACTION_VIEW);
-            contentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            contentIntent.setData(Uri.parse(launchUrl));
-        } else {
-            contentIntent = NotificationHistoryActivity.createIntent(context,true);
-            contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
-        }
-
-        PendingIntent contentPendingIntent =
-                PendingIntent.getActivity(
-                        context,
-                        0,
-                        contentIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-
-        return contentPendingIntent;
+        return getLaunchPendingIntent(context, launchUrl, getNotificationType());
     }
 
     @Override

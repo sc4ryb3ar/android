@@ -43,7 +43,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Event Title"
                         android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"/>
 
                     <TextView
@@ -52,7 +51,6 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:layout_marginBottom="12dp"
-                        android:text="Event Subitle"
                         android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"/>
 
                     <LinearLayout
@@ -71,11 +69,11 @@
                             android:layout_marginRight="1dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="gone"
                             android:layout_weight="1"
                             android:gravity="center">
 
                             <ImageView
+                                android:id="@+id/event_menu_icon_going"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:tint="@color/text_color_secondary"
@@ -100,11 +98,11 @@
                             android:layout_marginLeft="1dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="gone"
                             android:layout_weight="1"
                             android:gravity="center">
 
                             <ImageView
+                                android:id="@+id/event_menu_icon_maybe"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:tint="@color/text_color_secondary"
@@ -123,14 +121,13 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:id="@+id/event_menu_icon_notgoing_container"
+                            android:id="@+id/event_menu_icon_show_on_map"
                             android:background="@color/area_background_dark"
                             android:layout_marginRight="1dp"
                             android:layout_marginLeft="1dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_weight="1"
-                            android:visibility="gone"
                             android:gravity="center">
 
                             <ImageView
@@ -138,11 +135,11 @@
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_horizontal"
                                 android:tint="@color/text_color_secondary"
-                                app:srcCompat="@drawable/ic_event_not_going_24dp_black"
+                                app:srcCompat="@drawable/ic_menu_map"
                                 android:scaleType="fitXY"/>
 
                             <TextView
-                                android:text="@string/menu_event_not"
+                                android:text="@string/menu_event_show_on_map"
                                 android:layout_marginTop="2dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -155,7 +152,6 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:id="@+id/event_menu_icon_calendar"
-                            android:onClick="onAddEventToCalendar"
                             android:background="@color/area_background_dark"
                             android:layout_marginLeft="1dp"
                             android:layout_weight="1"
@@ -182,7 +178,6 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:onClick="onViewEvent"
                             android:id="@+id/event_menu_icon_view"
                             android:background="@color/area_background_dark"
                             android:layout_marginLeft="1dp"
@@ -210,7 +205,6 @@
 
                 </LinearLayout>
 
-
             </FrameLayout>
 
             <android.support.v7.widget.Toolbar
@@ -223,31 +217,32 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" >
 
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    style="@style/ToolbarTitle"
-                    android:gravity="left"
-                    android:visibility="invisible"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-                <com.facebook.drawee.view.SimpleDraweeView
-                    android:id="@+id/toolbar_image"
-                    android:padding="@dimen/toolbar_item_padding"
-                    android:scaleType="fitCenter"
-                    android:visibility="invisible"
-                    android:layout_gravity="right"
-                    android:layout_width="?attr/actionBarSize"
-                    android:layout_height="?attr/actionBarSize"/>
+                    <ProgressBar
+                        android:id="@+id/toolbar_progress_indicator"
+                        style="?android:attr/progressBarStyle"
+                        android:visibility="visible"
+                        android:padding="@dimen/toolbar_item_padding"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
 
-                <ProgressBar
-                    android:id="@+id/toolbar_progress_indicator"
-                    style="?android:attr/progressBarStyle"
-                    android:visibility="gone"
-                    android:padding="@dimen/toolbar_item_padding"
-                    android:layout_gravity="right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        android:id="@+id/toolbar_title"
+                        style="@style/ToolbarTitle"
+                        android:gravity="left|center_vertical"
+                        android:visibility="invisible"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentLeft="true"
+                        android:layout_toLeftOf="@id/toolbar_progress_indicator"
+                        android:maxLines="2"
+                        android:ellipsize="marquee"/>
+
+                </RelativeLayout>
 
             </android.support.v7.widget.Toolbar>
 

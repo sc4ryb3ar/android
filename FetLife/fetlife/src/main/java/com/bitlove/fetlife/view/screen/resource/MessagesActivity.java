@@ -3,12 +3,13 @@ package com.bitlove.fetlife.view.screen.resource;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
@@ -27,7 +28,6 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
-import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
@@ -41,11 +41,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class MessagesActivity extends ResourceActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MenuActivityComponent.MenuActivityCallBack{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String EXTRA_CONVERSATION_ID = "com.bitlove.fetlife.extra.conversation_id";
     private static final String EXTRA_CONVERSATION_TITLE = "com.bitlove.fetlife.extra.conversation_title";
     private static final String EXTRA_AVATAR_RESOURCE_URL = "com.bitlove.fetlife.extra.avatar_resource_url";
+    private static final String EXTRA_SHARE_URL = "com.bitlove.fetlife.extra.share_url";
 
     private MessagesRecyclerAdapter messagesAdapter;
 
@@ -62,10 +63,18 @@ public class MessagesActivity extends ResourceActivity
     private Conversation conversation;
 
     public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
-        context.startActivity(createIntent(context, conversationId, title, avatarResourceUrl, newTask));
+        startActivity(context, conversationId, title, avatarResourceUrl, null, newTask);
+    }
+
+    public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, String shareUrl, boolean newTask) {
+        context.startActivity(createIntent(context, conversationId, title, avatarResourceUrl, shareUrl, newTask));
     }
 
     public static Intent createIntent(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
+        return createIntent(context, conversationId, title, avatarResourceUrl, null, newTask);
+    }
+
+    public static Intent createIntent(Context context, String conversationId, String title, String avatarResourceUrl, String shareUrl, boolean newTask) {
         Intent intent = new Intent(context, MessagesActivity.class);
         if (newTask) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -74,21 +83,27 @@ public class MessagesActivity extends ResourceActivity
         intent.putExtra(EXTRA_CONVERSATION_ID, conversationId);
         intent.putExtra(EXTRA_CONVERSATION_TITLE, title);
         intent.putExtra(EXTRA_AVATAR_RESOURCE_URL, avatarResourceUrl);
+        intent.putExtra(EXTRA_SHARE_URL, shareUrl);
         return intent;
     }
 
     @Override
     protected void onCreateActivityComponents() {
-        addActivityComponent(new MenuActivityComponent());
     }
 
     @Override
     protected void onSetContentView() {
-        setContentView(R.layout.activity_resource_recycler_menu);
+        setContentView(R.layout.coordinator_resource_default);
     }
 
     @Override
     protected void onResourceCreate(Bundle savedInstanceState) {
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setEnabled(false);
@@ -96,6 +111,10 @@ public class MessagesActivity extends ResourceActivity
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
         textInput = (EditText) findViewById(R.id.text_input);
+        String shareUrl = getIntent().getStringExtra(EXTRA_SHARE_URL);
+        if (shareUrl != null) {
+            textInput.append(shareUrl+"\n");
+        }
 //        textInput.setFilters(new InputFilter[]{new InputFilter() {
 //            @Override
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -251,6 +270,16 @@ public class MessagesActivity extends ResourceActivity
         super.onBackPressed();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setMessagesRead() {
         final List<String> params = new ArrayList<>();
         params.add(conversationId);
@@ -378,10 +407,5 @@ public class MessagesActivity extends ResourceActivity
         }
 
         messagesAdapter.refresh();
-    }
-
-    @Override
-    public boolean finishAtMenuNavigation() {
-        return true;
     }
 }

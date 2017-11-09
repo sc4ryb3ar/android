@@ -82,6 +82,11 @@ public class FetLifeApplication extends MultiDexApplication {
 
     private static FetLifeApplication instance;
 
+    private String lastToastMessage;
+    private long lastToastTime;
+
+    private static final long MIN_TOAST_TRASHOLD = 5*1000l;
+
     public static FetLifeApplication getInstance() {
         return instance;
     }
@@ -289,6 +294,11 @@ public class FetLifeApplication extends MultiDexApplication {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
+                if (text.equals(lastToastMessage) && System.currentTimeMillis() - lastToastTime < MIN_TOAST_TRASHOLD) {
+                    return;
+                }
+                lastToastMessage = text;
+                lastToastTime = System.currentTimeMillis();
                 Toast.makeText(FetLifeApplication.this, text, length).show();
             }
         });

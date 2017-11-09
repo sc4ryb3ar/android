@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
+          android:installLocation="auto"
           package="com.bitlove.fetlife">
+
+    <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+               android:value="true" />
 
     <uses-permission android:name="com.sonyericsson.home.permission.BROADCAST_BADGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -20,7 +24,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-    <uses-sdk tools:overrideLibrary="br.tiagohm.markdownview" />
+    <uses-sdk tools:overrideLibrary="br.tiagohm.markdownview, com.basecamp.turbolinks" />
 
     <!--
  Large Heap added as a workaround to issue with Fresco library in case of large image lists.
@@ -93,8 +97,11 @@
         <activity
             android:name=".view.screen.resource.ConversationsActivity"
             android:label="@string/title_activity_conversations"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".view.screen.resource.TurboLinksViewActivity"
+            android:label="@string/title_activity_webview"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.screen.resource.NotificationHistoryActivity"
             android:label="@string/title_activity_notificationhistory"
@@ -105,13 +112,18 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"/>
         <activity
+            android:name=".view.screen.resource.groups.GroupMessagesActivity"
+            android:label="@string/title_activity_messages"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
             android:name=".view.screen.resource.FeedActivity"
             android:label="@string/title_activity_feed"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"/>
         <activity
-            android:name=".view.screen.resource.EventMapActivity"
-            android:label="@string/title_activity_event_map"
+            android:name=".view.screen.resource.EventsActivity"
+            android:label="@string/title_activity_events"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
@@ -122,6 +134,11 @@
         <activity
             android:name=".view.screen.resource.members.MembersActivity"
             android:label="@string/title_activity_members"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".view.screen.resource.groups.GroupsActivity"
+            android:label="@string/title_activity_groups"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"/>
         <activity
@@ -206,6 +223,11 @@
         <activity
             android:name=".view.screen.resource.EventActivity"
             android:label="@string/title_activity_event"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".view.screen.resource.groups.GroupActivity"
+            android:label="@string/title_activity_group"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

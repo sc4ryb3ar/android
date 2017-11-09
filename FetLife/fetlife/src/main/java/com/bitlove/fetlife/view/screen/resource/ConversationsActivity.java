@@ -22,16 +22,29 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class ConversationsActivity extends ResourceListActivity<Conversation> implements MenuActivityComponent.MenuActivityCallBack {
 
+    private static final String EXTRA_SHARE_URL = "EXTRA_SHARE_URL";
+
     public static void startActivity(Context context, boolean newTask) {
-        context.startActivity(createIntent(context, newTask));
+        startActivity(context, null, newTask);
+    }
+
+    public static void startActivity(Context context, String shareUrl, boolean newTask) {
+        context.startActivity(createIntent(context, shareUrl, newTask));
     }
 
     public static Intent createIntent(Context context, boolean newTask) {
+        return createIntent(context, null, newTask);
+    }
+
+    public static Intent createIntent(Context context, String shareUrl, boolean newTask) {
         Intent intent = new Intent(context, ConversationsActivity.class);
         if (!newTask && FetLifeApplication.getInstance().getUserSessionManager().getActiveUserPreferences().getBoolean(context.getString(R.string.settings_key_general_feed_as_start),false)) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        }
+        if (shareUrl != null) {
+            intent.putExtra(EXTRA_SHARE_URL, shareUrl);
         }
         return intent;
     }
@@ -74,7 +87,7 @@ public class ConversationsActivity extends ResourceListActivity<Conversation> im
 
     @Override
     public void onItemClick(Conversation conversation) {
-        MessagesActivity.startActivity(ConversationsActivity.this, conversation.getId(), conversation.getNickname(), conversation.getAvatarLink(), false);
+        MessagesActivity.startActivity(ConversationsActivity.this, conversation.getId(), conversation.getNickname(), conversation.getAvatarLink(), getIntent().getStringExtra(EXTRA_SHARE_URL), false);
     }
 
     @Override

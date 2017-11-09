@@ -4,6 +4,9 @@ import android.text.Html;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
@@ -200,6 +203,62 @@ public class FeedItemResourceHelper {
         }
     }
 
+    public Event getEvent(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case RSVP_CREATED:
+                    return feedEvent.getTarget().getRsvp().getEvent();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Group getGroup(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case GROUP_MEMBERSHIP_CREATED:
+                    Group group = feedEvent.getSecondaryTarget().getGroup();
+                    if (group == null) {
+                        group = feedEvent.getTarget().getGroupMembership().getGroup();
+                    }
+                    return group;
+                case GROUP_POST_CREATED:
+                    group = feedEvent.getSecondaryTarget().getGroup();
+                    if (group == null) {
+                        group = feedEvent.getSecondaryTarget().getGroupPost().getGroup();
+                    }
+                    return group;
+                case GROUP_COMMENT_CREATED:
+                    group = feedEvent.getSecondaryTarget().getGroupPost().getGroup();
+                    return group;
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public GroupPost getGroupPost(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case GROUP_POST_CREATED:
+                    GroupPost groupPost = feedEvent.getSecondaryTarget().getGroupPost();
+                    return groupPost;
+                case GROUP_COMMENT_CREATED:
+                    groupPost = feedEvent.getSecondaryTarget().getGroupPost();
+                    return groupPost;
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
     public Picture getPicture(FeedEvent feedEvent) {
         try {
             switch (feedStoryType) {
@@ -298,7 +357,7 @@ public class FeedItemResourceHelper {
                 case STATUS_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getStatus().getUrl();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return feedEvent.getTarget().getGroupMembership().getGroup().getUrl();
+                    return getGroup(feedEvent).getUrl();
                 case STATUS_CREATED:
                     return feedEvent.getTarget().getStatus().getUrl();
                 case GROUP_POST_CREATED:
@@ -352,7 +411,7 @@ public class FeedItemResourceHelper {
                 case POST_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getWriting().getTitle();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return feedEvent.getTarget().getGroupMembership().getGroup().getName();
+                    return getGroup(feedEvent).getName();
                 case GROUP_POST_CREATED:
                     return feedEvent.getTarget().getGroupPost().getTitle();
                 case POST_CREATED:
@@ -420,7 +479,7 @@ public class FeedItemResourceHelper {
                 case POST_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getWriting().getBody();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return feedEvent.getTarget().getGroupMembership().getGroup().getDescription();
+                    return getGroup(feedEvent).getDescription();
                 case GROUP_POST_CREATED:
                     return feedEvent.getTarget().getGroupPost().getBody();
                 case WALL_POST_CREATED:
@@ -453,7 +512,7 @@ public class FeedItemResourceHelper {
                 case GROUP_POST_CREATED:
                     return feedEvent.getTarget().getGroupPost().getGroup().getName();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return fetLifeApplication.getString(R.string.feed_caption_member_count,feedEvent.getTarget().getGroupMembership().getGroup().getMemberCount());
+                    return fetLifeApplication.getString(R.string.feed_caption_member_count,getGroup(feedEvent).getMemberCount());
                 case RSVP_CREATED:
                     return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(feedEvent.getTarget().getRsvp().getEvent().getStartDateTime()));
                 default:
