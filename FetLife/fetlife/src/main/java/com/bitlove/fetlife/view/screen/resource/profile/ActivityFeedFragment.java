@@ -15,6 +15,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
@@ -22,7 +23,9 @@ import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.EventActivity;
+import com.bitlove.fetlife.view.screen.resource.PictureShareActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupMessagesActivity;
@@ -135,6 +138,19 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
     @Override
     public void onVisitItem(Object object, String url) {
         UrlUtil.openUrl(getActivity(),url);
+    }
+
+    @Override
+    public void onShareItem(Object object, String url) {
+        if (!(object instanceof  Picture)) {
+            return;
+        }
+        Picture picture = (Picture) object;
+        if (picture.isOnShareList()) {
+            Picture.unsharePicture(picture);
+        } else {
+            Picture.sharePicture(picture);
+        }
     }
 
     public void refreshUi() {

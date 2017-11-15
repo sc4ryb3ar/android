@@ -33,7 +33,7 @@ import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.screen.resource.TurboLinksViewActivity;
 import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
-import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
+import com.bitlove.fetlife.view.screen.standalone.ReleaseNotesActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
@@ -188,7 +188,9 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_introduce) {
             AddNfcFriendActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_about) {
-            AboutActivity.startActivity(menuActivity);
+            TurboLinksViewActivity.startActivity(menuActivity,"android",menuActivity.getString(R.string.title_activity_about));
+        } else if (id == R.id.nav_relnotes) {
+            ReleaseNotesActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_upload_pic) {

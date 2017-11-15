@@ -1,7 +1,9 @@
 package com.bitlove.fetlife.view.screen.resource.profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -57,14 +59,14 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private TextView friendIconTextView,followIconTextView,messageIconTextView;
     private String memberId;
 
-    public static void startActivity(BaseActivity baseActivity, String memberId) {
-        if (baseActivity == null) {
+    public static void startActivity(Context context, String memberId) {
+        if (context == null) {
             return;
         }
-        Intent intent = new Intent(baseActivity, ProfileActivity.class);
+        Intent intent = new Intent(context, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(EXTRA_MEMBERID,memberId);
-        baseActivity.startActivity(intent);
+        context.startActivity(intent);
     }
 
     @Override
@@ -165,10 +167,18 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         appBarLayout.addOnOffsetChangedListener(this);
     }
 
-    private void setMemberDetails(Member member) {
+    private void setMemberDetails(final Member member) {
         if (member == null) {
             Crashlytics.logException(new Exception("Member is null"));
         }
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                member.setLastViewedAt(System.currentTimeMillis());
+                member.save();
+            }
+        });
 
         Member currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
         boolean sameUser = member != null && currentUser != null && member.getId().equals(currentUser.getId());
@@ -260,13 +270,6 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             return false;
         }
         return relationWithMe.equals(Member.VALUE_FRIEND) || relationWithMe.equals(Member.VALUE_FOLLOWING) ||  relationWithMe.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT) ||  relationWithMe.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING) ;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_share, menu);
-        return true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -491,10 +494,6 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_share:
-                Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
-                ConversationsActivity.startActivity(this,MENMTION_PREFEIX + member.getNickname(), false);
-                return true;
             case android.R.id.home:
                 finish();
                 return true;

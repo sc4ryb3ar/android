@@ -117,7 +117,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/feeditem_separator"
         android:layout_alignParentLeft="true"
-        android:columnWidth="?android:listPreferredItemHeight"
+        android:columnWidth="85dp"
         android:numColumns="auto_fit"
         android:visibility="gone"
         android:orientation="vertical" />

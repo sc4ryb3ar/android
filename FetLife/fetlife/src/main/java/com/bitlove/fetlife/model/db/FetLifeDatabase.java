@@ -21,7 +21,9 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.raizlabs.android.dbflow.annotation.Database;
 import com.raizlabs.android.dbflow.annotation.Migration;
 import com.raizlabs.android.dbflow.sql.SQLiteType;
@@ -35,7 +37,7 @@ public class FetLifeDatabase {
     public static final String NAME = "fetlife";
 
     //Simple increase the version number in case of new tables
-    public static final int VERSION = 42;
+    public static final int VERSION = 45;
 
     //Add new Migration classes in case of table structure change
     @Migration(version = 26, database = FetLifeDatabase.class)
@@ -142,4 +144,45 @@ public class FetLifeDatabase {
             addColumn(SQLiteType.TEXT, "entitiesJson");
         }
     }
+
+    @Migration(version = 43, database = FetLifeDatabase.class)
+    public static class Migration43 extends AlterTableMigration<Picture> {
+
+        public Migration43(Class<Picture> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER, "lastViewedAt");
+        }
+    }
+
+    @Migration(version = 44, database = FetLifeDatabase.class)
+    public static class Migration44 extends AlterTableMigration<Member> {
+
+        public Migration44(Class<Member> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER, "lastViewedAt");
+        }
+    }
+
+    @Migration(version = 45, database = FetLifeDatabase.class)
+    public static class Migration45 extends AlterTableMigration<Picture> {
+
+        public Migration45(Class<Picture> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER,"onShareList");
+        }
+    }
+
+
 }

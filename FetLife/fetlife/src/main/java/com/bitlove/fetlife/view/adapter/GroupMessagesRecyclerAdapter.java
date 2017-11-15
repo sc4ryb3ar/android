@@ -154,14 +154,16 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
         if (myMessage) {
             messageViewHolder.subText.setGravity(Gravity.RIGHT);
-            messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
+            //messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
+            messageViewHolder.messageText.setGravity(Gravity.RIGHT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, messageViewHolder.vPadding, messageViewHolder.hPadding, messageViewHolder.vPadding);
             messageViewHolder.memberAvatar.setVisibility(View.GONE);
-            messageViewHolder.selfAvatar.setVisibility(View.GONE);
+            messageViewHolder.selfAvatar.setVisibility(View.VISIBLE);
             messageViewHolder.selfAvatar.setImageURI(groupMessage.getAvatarLink());
         } else {
             messageViewHolder.subText.setGravity(Gravity.LEFT);
-            messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
+//            messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
+            messageViewHolder.messageText.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.hPadding, messageViewHolder.vPadding, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
             messageViewHolder.selfAvatar.setVisibility(View.GONE);
             messageViewHolder.memberAvatar.setVisibility(View.VISIBLE);
@@ -193,10 +195,9 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
 class GroupMessageViewHolder extends RecyclerView.ViewHolder {
 
-    private static final int EXTEND_PADDING_MULTIPLIER = 3;
+    private static final int EXTEND_PADDING_MULTIPLIER = 1;
 
-    LinearLayout messageContainer;
-    LinearLayout messageTextContainer;
+    ViewGroup messageContainer, messageTextContainer;
     TextView messageText, subText;
     String subMessageSeparator;
     SimpleDraweeView memberAvatar, selfAvatar;
@@ -219,8 +220,8 @@ class GroupMessageViewHolder extends RecyclerView.ViewHolder {
         primaryTextColor = ColorUtil.retrieverColor(context, R.color.text_color_primary);
         errorTextColor = ColorUtil.retrieverColor(context, R.color.text_color_error);
 
-        messageTextContainer = (LinearLayout) itemView.findViewById(R.id.message_text_container);
-        messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
+        messageTextContainer = itemView.findViewById(R.id.message_text_container);
+        messageContainer = itemView.findViewById(R.id.message_container);
         messageText = (TextView) itemView.findViewById(R.id.message_text);
         messageText.setMovementMethod(LinkMovementMethod.getInstance());
         subText = (TextView) itemView.findViewById(R.id.message_sub);

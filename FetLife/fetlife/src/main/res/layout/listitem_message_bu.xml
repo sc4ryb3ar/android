@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/message_container"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/message_text_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,6 +15,8 @@
         android:paddingRight="@dimen/listitem_horizontal_margin"
         android:paddingBottom="@dimen/listitem_vertical_margin"
         android:paddingTop="@dimen/listitem_vertical_margin"
+        android:gravity="bottom"
+        android:orientation="horizontal"
         style="@style/MessageItem">
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -23,16 +26,24 @@
             android:layout_marginTop="8dp"
             android:layout_marginLeft="2dp"
             android:scaleType="fitCenter"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
             android:layout_width="36dp"
             android:layout_height="36dp"/>
+
+        <com.bitlove.fetlife.view.widget.WorkaroundTextView
+            android:id="@+id/message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:autoLink="web"
+            android:singleLine="false"
+            android:textIsSelectable="true"
+            android:textColorLink="@color/text_color_link"
+            android:textAppearance="@style/MessageText"/>
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/right_member_image"
             android:visibility="gone"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="2dp"
@@ -40,29 +51,7 @@
             android:layout_gravity="right"
             android:layout_width="36dp"
             android:layout_height="36dp"/>
-
-        <LinearLayout
-            android:id="@+id/message_aligner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <com.bitlove.fetlife.view.widget.WorkaroundTextView
-                android:id="@+id/message_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/right_member_image"
-                android:layout_toRightOf="@id/left_member_image"
-                android:layout_centerInParent="true"
-                android:autoLink="web"
-                android:singleLine="false"
-                android:textIsSelectable="true"
-                android:textColorLink="@color/text_color_link"
-                android:textAppearance="@style/MessageText"/>
-
-        </LinearLayout>
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <com.bitlove.fetlife.view.widget.AutoAlignGridView
         android:id="@+id/message_grid_entities"
@@ -75,7 +64,7 @@
         android:paddingBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/message_text_container"
+        android:layout_below="@+id/feeditem_separator"
         android:layout_alignParentLeft="true"
         android:columnWidth="300dp"
         android:numColumns="1"
@@ -85,7 +74,6 @@
     <TextView
         style="@style/MessageSubText"
         android:id="@+id/message_sub"
-        android:layout_below="@+id/message_grid_entities"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/listitem_horizontal_margin"
@@ -94,4 +82,4 @@
         android:layout_marginStart="@dimen/listitem_horizontal_margin"
         android:layout_marginBottom="@dimen/listitem_vertical_margin"/>
 
-</RelativeLayout>
+</LinearLayout>
