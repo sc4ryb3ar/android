@@ -75,6 +75,9 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         groupDiscussion = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupDiscussionId)).querySingle();
+        if (groupDiscussion == null) {
+            return;
+        }
         itemList = new Select().from(GroupComment.class).where(GroupComment_Table.groupPostId.is(groupDiscussionId)).orderBy(GroupComment_Table.pending,false).orderBy(GroupComment_Table.date,false).orderBy(GroupComment_Table.id,false).limit(requestedPageCount * ITEM_PER_PAGE).queryList();
         if (itemList.size() == requestedPageCount *ITEM_PER_PAGE) {
             GroupComment requestMorePlaceHolder = new GroupComment();

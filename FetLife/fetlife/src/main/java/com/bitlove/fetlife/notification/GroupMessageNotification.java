@@ -55,12 +55,7 @@ public class GroupMessageNotification extends OneSignalNotification {
         } else {
             groupId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPID);
             groupDiscussionId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPPOSTID);
-            GroupPost groupPost;
-            try {
-                groupPost = GroupPost.loadGroupPost(groupDiscussionId);
-            } catch (Throwable t) {
-                groupPost = null;
-            }
+            GroupPost groupPost = GroupPost.loadGroupPost(groupDiscussionId);
             if (groupPost != null) {
                 groupDiscussionTitle = groupPost.getTitle();
             } else {

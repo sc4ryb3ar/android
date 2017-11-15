@@ -5,6 +5,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.StringUtil;
+import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
@@ -19,8 +20,13 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 public class GroupPost extends BaseModel {
 
     public static GroupPost loadGroupPost(String groupPostId) {
-        GroupPost groupPost = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupPostId)).querySingle();
-        return groupPost;
+        try {
+            GroupPost groupPost = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupPostId)).querySingle();
+            return groupPost;
+        } catch (Throwable t) {
+            Crashlytics.logException(t);
+            return null;
+        }
     }
 
     @Column
