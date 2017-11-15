@@ -3,6 +3,7 @@ package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.StringUtil;
+import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
@@ -14,8 +15,13 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 public class Group extends BaseModel {
 
     public static Group loadGroup(String groupId) {
-        Group group = new Select().from(Group.class).where(Group_Table.id.is(groupId)).querySingle();
-        return group;
+        try {
+            Group group = new Select().from(Group.class).where(Group_Table.id.is(groupId)).querySingle();
+            return group;
+        } catch (Throwable t) {
+            Crashlytics.logException(t);
+            return null;
+        }
     }
 
     //Primary key

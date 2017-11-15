@@ -63,7 +63,7 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        String groupId = getIntent().getStringExtra(EXTRA_GROUPID);
+        final String groupId = getIntent().getStringExtra(EXTRA_GROUPID);
         group = Group.loadGroup(groupId);
         if (group != null) {
             setGroupDetails(group);
@@ -84,13 +84,13 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
             public Fragment getItem(int position) {
                 switch (position) {
                     case 1:
-                        return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.DESCRIPTION);
+                        return GroupInfoFragment.newInstance(groupId, GroupInfoFragment.GroupInfoEnum.DESCRIPTION);
                     case 2:
-                        return GroupInfoFragment.newInstance(group.getId(), GroupInfoFragment.GroupInfoEnum.RULES);
+                        return GroupInfoFragment.newInstance(groupId, GroupInfoFragment.GroupInfoEnum.RULES);
                     case 0:
-                        return GroupDiscussionsFragment.newInstance(group.getId());
+                        return GroupDiscussionsFragment.newInstance(groupId);
                     case 3:
-                        return GroupMembersFragment.newInstance(group.getId());
+                        return GroupMembersFragment.newInstance(groupId);
                     default:
                         return null;
                 }
