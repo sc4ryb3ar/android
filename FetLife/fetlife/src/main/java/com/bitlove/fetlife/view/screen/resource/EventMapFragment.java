@@ -164,8 +164,12 @@ public class EventMapFragment extends BaseFragment implements OnMapReadyCallback
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 //            Criteria criteria = new Criteria();
 //            String provider = locationManager.getBestProvider(criteria, true);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Long.MAX_VALUE, 0f, this);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Long.MAX_VALUE, 0f, this);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Long.MAX_VALUE, 0f, this);
+            }
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Long.MAX_VALUE, 0f, this);
+            }
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location == null) {
                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
