@@ -14,6 +14,10 @@ import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
 //TODO: updated at attribute?
 
 @Table(database = FetLifeDatabase.class)
@@ -66,6 +70,13 @@ public class GroupPost extends BaseModel {
     @JsonProperty("url")
     @Column
     private String url;
+
+    @JsonProperty("body_entities")
+    private Object bodyEntities;
+
+    @Column
+    @JsonIgnore
+    private String entitiesJson;
 
     @Column
     @JsonIgnore
@@ -270,5 +281,24 @@ public class GroupPost extends BaseModel {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public Object getBodyEntities() {
+        return bodyEntities;
+    }
+
+    public void setBodyEntities(Object bodyEntities) {
+        this.bodyEntities = bodyEntities;
+        if (bodyEntities != null) {
+            entitiesJson = new JSONObject((Map)bodyEntities).toString();
+        }
+    }
+
+    public String getEntitiesJson() {
+        return entitiesJson;
+    }
+
+    public void setEntitiesJson(String entitiesJson) {
+        this.entitiesJson = entitiesJson;
     }
 }

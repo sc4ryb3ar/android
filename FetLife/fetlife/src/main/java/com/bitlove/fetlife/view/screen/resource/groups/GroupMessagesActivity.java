@@ -9,9 +9,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 
 import com.bitlove.fetlife.R;
@@ -30,17 +34,22 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
+import com.bitlove.fetlife.util.SpaceTokenizer;
 import com.bitlove.fetlife.view.adapter.GroupMembersRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.GroupMessagesRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.GroupsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
+import com.bitlove.fetlife.view.screen.resource.PictureShareActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -57,6 +66,8 @@ public class GroupMessagesActivity extends ResourceActivity
     private static final String EXTRA_GROUP_DISUCSSION_ID = "com.bitlove.fetlife.extra.groupDiscussion_id";
     private static final String EXTRA_DISCUSSION_TITLE = "com.bitlove.fetlife.extra.groupDiscussion_title";
     private static final String EXTRA_AVATAR_RESOURCE_URL = "com.bitlove.fetlife.extra.avatar_resource_url";
+    private static final int MAX_MEMBER_SUGGESTION = 5;
+    private static final int REQUEST_CODE_SHARE_PICTURES = 213;
 
     private GroupMessagesRecyclerAdapter messagesAdapter;
 
@@ -66,8 +77,8 @@ public class GroupMessagesActivity extends ResourceActivity
 
     protected RecyclerView recyclerView;
     protected LinearLayoutManager recyclerLayoutManager;
-    protected View inputLayout, inputIcon, floatingArrow;
-    protected EditText textInput;
+    protected View inputLayout, inputIcon, floatingArrow, shareIcon;
+    protected MultiAutoCompleteTextView textInput;
     private String groupId;
     private GroupPost groupDiscussion;
 
@@ -121,8 +132,37 @@ public class GroupMessagesActivity extends ResourceActivity
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
-        textInput = (EditText) findViewById(R.id.text_input);
-//        textInput.setFilters(new InputFilter[]{new InputFilter() {
+        shareIcon = findViewById(R.id.picture_share_icon);
+        textInput = (MultiAutoCompleteTextView) findViewById(R.id.text_input);
+        textInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String[] parts = s.toString().split(" ");
+                List<String> suggesstions = new ArrayList<>();
+                for (String part : parts) {
+                    if (part.length() < 3 || part.charAt(0) != '@') {
+                        continue;
+                    }
+                    List<Member> possibleMembers = new Select().from(Member.class).where(Member_Table.nickname.like(part.substring(1) + "%")).orderBy(Member_Table.lastViewedAt,false).limit(MAX_MEMBER_SUGGESTION).queryList();
+                    for (Member member : possibleMembers) {
+                        suggesstions.add("@"+member.getNickname());
+                    }
+                }
+                textInput.setAdapter(new ArrayAdapter<String >(GroupMessagesActivity.this,android.R.layout.simple_dropdown_item_1line,suggesstions.toArray(new String[suggesstions.size()])));
+                textInput.setTokenizer(new SpaceTokenizer());
+            }
+        });
+        //        textInput.setFilters(new InputFilter[]{new InputFilter() {
 //            @Override
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
 //                  //Custom Emoji Support will go here
@@ -136,6 +176,7 @@ public class GroupMessagesActivity extends ResourceActivity
 
         inputLayout.setVisibility(View.VISIBLE);
         inputIcon.setVisibility(View.VISIBLE);
+        shareIcon.setVisibility(View.VISIBLE);
 
         floatingArrow = findViewById(R.id.floating_arrow);
         floatingArrow.setVisibility(View.VISIBLE);
@@ -154,6 +195,19 @@ public class GroupMessagesActivity extends ResourceActivity
         super.onNewIntent(intent);
         setIntent(intent);
         setGroupPost(intent);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_SHARE_PICTURES && resultCode == RESULT_OK) {
+            String[] selectedUrls = data.getStringArrayExtra(PictureShareActivity.RESULT_STRINGS_URLS);
+            if (textInput.getText() != null && textInput.getText().length() > 0) {
+                textInput.append("\n");
+            }
+            for (String selectedUrl : selectedUrls) {
+                textInput.getText().append(selectedUrl + "\n");
+            }
+        }
     }
 
     @Override
@@ -230,7 +284,35 @@ public class GroupMessagesActivity extends ResourceActivity
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
-        textInput = (EditText) findViewById(R.id.text_input);
+        textInput = (MultiAutoCompleteTextView) findViewById(R.id.text_input);
+        textInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String[] parts = s.toString().split(" ");
+                List<String> suggesstions = new ArrayList<>();
+                for (String part : parts) {
+                    if (part.length() < 2 || part.charAt(0) != '@') {
+                        continue;
+                    }
+                    List<Member> possibleMembers = new Select().from(Member.class).where(Member_Table.nickname.like(part.substring(1) + "%")).orderBy(Member_Table.lastViewedAt,false).limit(MAX_MEMBER_SUGGESTION).queryList();
+                    for (Member member : possibleMembers) {
+                        suggesstions.add("@"+member.getNickname());
+                    }
+                }
+                textInput.setAdapter(new ArrayAdapter<String >(GroupMessagesActivity.this,android.R.layout.simple_dropdown_item_1line,suggesstions.toArray(new String[suggesstions.size()])));
+                textInput.setTokenizer(new SpaceTokenizer());
+            }
+        });
 //        textInput.setFilters(new InputFilter[]{new InputFilter() {
 //            @Override
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -425,4 +507,9 @@ public class GroupMessagesActivity extends ResourceActivity
 
         messagesAdapter.refresh();
     }
+
+    public void onShare(View v) {
+        PictureShareActivity.startActivityForResult(this,REQUEST_CODE_SHARE_PICTURES);
+    }
+
 }

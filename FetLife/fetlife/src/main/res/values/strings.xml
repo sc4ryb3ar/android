@@ -29,6 +29,14 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.12.0<br/>
+                    <ul>
+                        <li>Mention links in messages lead to user profiles</li>
+                        <li>Auto extend helper for mentions after using @ character</li>
+                        <li>Add pictures to your share list with the share icon on picture overlay</li>
+                        <li>Share pictures from your share list or recently viewed pictures in conversations or group discussions</li>
+                    </ul>
+
             <p/>v2.11.15<br/>
                     <ul>
                         <li>Crash fixes</li>
@@ -240,7 +248,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="menu_members">Members</string>
-    <string name="menu_about">About</string>
+    <string name="menu_about">About &amp; Install</string>
     <string name="menu_friendrequests">Friend Requests</string>
     <string name="menu_introduce">Share My Profile</string>
     <string name="menu_notifications">Notifications</string>
@@ -496,7 +504,7 @@
     <string name="action_undo">UNDO</string>
     <string name="undo_no_longer_possible">Undo is no longer possible</string>
 
-    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'About\' screen</string>
+    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'Release Notes\' screen</string>
 
     <string name="input_message_description">Your Message</string>
     <string name="button_new_conversation_discription">New Conversation</string>
@@ -765,5 +773,11 @@
     <string name="title_fragment_group_discussions">Discussions</string>
     <string name="title_fragment_group_members">Members</string>
     <string name="action_share">Share</string>
+    <string name="menu_relnotes">Release Notes</string>
+    <string name="title_activity_relnotes">Release Notes</string>
+    <string name="list_header_picture_suggest">Recently Viewed</string>
+    <string name="list_header_picture_sharelist">Share List</string>
+    <string name="title_activity_pictureshare">Select Pictures</string>
+    <string name="message_picture_shared">Picture added to your share list</string>
 
 </resources>

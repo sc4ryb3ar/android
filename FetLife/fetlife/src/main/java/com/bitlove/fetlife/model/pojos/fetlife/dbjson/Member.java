@@ -105,6 +105,10 @@ public class Member extends BaseModel {
     @Column
     private String lookingForRawString;
 
+    @Column
+    @JsonIgnore
+    private long lastViewedAt;
+
     //Json Only
     @JsonProperty("avatar")
     private Avatar avatar;
@@ -147,6 +151,14 @@ public class Member extends BaseModel {
 
     public void setAdministrativeArea(String administrativeArea) {
         this.administrativeArea = administrativeArea;
+    }
+
+    public long getLastViewedAt() {
+        return lastViewedAt;
+    }
+
+    public void setLastViewedAt(long lastViewedAt) {
+        this.lastViewedAt = lastViewedAt;
     }
 
     public Avatar getAvatar() {
@@ -329,6 +341,9 @@ public class Member extends BaseModel {
             }
             if (TextUtils.isEmpty(lookingForRawString)) {
                 setLookingForRawString(savedMember.lookingForRawString);
+            }
+            if (savedMember.getLastViewedAt() > lastViewedAt) {
+                lastViewedAt = savedMember.getLastViewedAt();
             }
         }
         return internalSave();

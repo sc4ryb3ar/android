@@ -59,6 +59,14 @@ public class PicturesFragment extends LoadFragment implements PicturesRecyclerAd
         }
     }
 
+    @Override
+    public void onShareItem(Picture picture, String url) {
+        if (picture.isOnShareList()) {
+            Picture.unsharePicture(picture);
+        } else {
+            Picture.sharePicture(picture);
+        }
+    }
 
     @Override
     public void onVisitItem(Picture picture, String url) {

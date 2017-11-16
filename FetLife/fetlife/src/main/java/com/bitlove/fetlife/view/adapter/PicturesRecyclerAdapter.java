@@ -1,8 +1,10 @@
 package com.bitlove.fetlife.view.adapter;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,6 +113,15 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
     }
 
     private void setOverlayContent(View overlay, final Picture picture, final OnPictureClickListener onItemClickListener) {
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                picture.setLastViewedAt(System.currentTimeMillis());
+                picture.save();
+            }
+        });
+
         TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
         TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
@@ -141,6 +152,18 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
             }
         });
 
+        ImageView imageShare = overlay.findViewById(R.id.feedImageShare);
+        imageShare.setColorFilter(picture.isOnShareList() ? overlay.getContext().getResources().getColor(R.color.text_color_primary) : overlay.getContext().getResources().getColor(R.color.text_color_secondary));
+        ViewUtil.increaseTouchArea(imageShare,OVERLAY_HITREC_PADDING);
+        imageShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onShareItem(picture, picture.getUrl());
+                ((ImageView)v).setColorFilter(picture.isOnShareList() ? v.getContext().getResources().getColor(R.color.text_color_primary) : v.getContext().getResources().getColor(R.color.text_color_secondary));
+            }
+        });
+
+
         imageName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,6 +182,7 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
     }
 
     public interface OnPictureClickListener {
+        void onShareItem(Picture picture, String url);
         void onVisitItem(Picture picture, String url);
         void onMemberClick(Member member);
     }
