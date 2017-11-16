@@ -29,6 +29,14 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.12.0<br/>
+                    <ul>
+                        <li>Mention links in messages lead to user profiles</li>
+                        <li>Auto extend helper for mentions after using @ character</li>
+                        <li>Add pictures to your share list with the share icon on picture overlay</li>
+                        <li>Share pictures from your share list or recently viewed pictures in conversations or group discussions</li>
+                    </ul>
+
             <p/>v2.11.15<br/>
                     <ul>
                         <li>Crash fixes</li>

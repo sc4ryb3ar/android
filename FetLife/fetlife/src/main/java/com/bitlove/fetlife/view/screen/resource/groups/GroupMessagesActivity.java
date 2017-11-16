@@ -301,7 +301,7 @@ public class GroupMessagesActivity extends ResourceActivity
                 String[] parts = s.toString().split(" ");
                 List<String> suggesstions = new ArrayList<>();
                 for (String part : parts) {
-                    if (part.length() < 3 || part.charAt(0) != '@') {
+                    if (part.length() < 2 || part.charAt(0) != '@') {
                         continue;
                     }
                     List<Member> possibleMembers = new Select().from(Member.class).where(Member_Table.nickname.like(part.substring(1) + "%")).orderBy(Member_Table.lastViewedAt,false).limit(MAX_MEMBER_SUGGESTION).queryList();

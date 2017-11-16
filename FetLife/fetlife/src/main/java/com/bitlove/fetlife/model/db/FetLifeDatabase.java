@@ -21,6 +21,8 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventReference;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
@@ -37,7 +39,7 @@ public class FetLifeDatabase {
     public static final String NAME = "fetlife";
 
     //Simple increase the version number in case of new tables
-    public static final int VERSION = 45;
+    public static final int VERSION = 47;
 
     //Add new Migration classes in case of table structure change
     @Migration(version = 26, database = FetLifeDatabase.class)
@@ -184,5 +186,30 @@ public class FetLifeDatabase {
         }
     }
 
+    @Migration(version = 46, database = FetLifeDatabase.class)
+    public static class Migration46 extends AlterTableMigration<GroupPost> {
+
+        public Migration46(Class<GroupPost> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.TEXT, "entitiesJson");
+        }
+    }
+
+    @Migration(version = 47, database = FetLifeDatabase.class)
+    public static class Migration47 extends AlterTableMigration<GroupComment> {
+
+        public Migration47(Class<GroupComment> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.TEXT, "entitiesJson");
+        }
+    }
 
 }
