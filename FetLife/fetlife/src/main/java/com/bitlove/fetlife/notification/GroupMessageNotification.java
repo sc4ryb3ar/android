@@ -26,6 +26,7 @@ import com.bitlove.fetlife.view.screen.resource.groups.GroupsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 
 import org.json.JSONObject;
 
@@ -69,7 +70,12 @@ public class GroupMessageNotification extends OneSignalNotification {
         NotificationHistoryItem notificationHistoryItem = createNotificationItem(NOTIFICATION_ID_GROUP, groupDiscussionId);
         if (groupDiscussionId != null) {
             notificationHistoryItem.setLaunchUrl(getInnerLaunchUrl());
-            NotificationHistoryItem toBeCollapsedNotification = new Select().from(NotificationHistoryItem.class).where(NotificationHistoryItem_Table.collapseId.eq(notificationHistoryItem.getCollapseId())).querySingle();
+            NotificationHistoryItem toBeCollapsedNotification;
+            try {
+                toBeCollapsedNotification = new Select().from(NotificationHistoryItem.class).where(NotificationHistoryItem_Table.collapseId.eq(notificationHistoryItem.getCollapseId())).querySingle();
+            } catch (InvalidDBConfiguration | IllegalStateException idbe) {
+                toBeCollapsedNotification = null;
+            }
             if (toBeCollapsedNotification != null) {
                 OneSignal.cancelNotification(toBeCollapsedNotification.getDisplayId());
                 toBeCollapsedNotification.delete();

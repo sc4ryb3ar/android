@@ -101,7 +101,7 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return itemList != null ? itemList.size() : 0;
     }
 
     public GroupComment getItem(int position) {
