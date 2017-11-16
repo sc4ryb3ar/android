@@ -176,7 +176,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             @Override
             public void run() {
                 member.setLastViewedAt(System.currentTimeMillis());
-                member.save();
+                member.mergeSave();
             }
         });
 
@@ -224,8 +224,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFriend();
             }
         });
-        friendIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
-        friendIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        friendIconView.setVisibility(sameUser || !member.isDetailRetrieved() ? View.INVISIBLE : View.VISIBLE);
+        friendIconTextView.setVisibility(sameUser || !member.isDetailRetrieved()? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(friendIconView,PROFILE_MENU_HITREC_PADDING);
         followIconView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
         followIconView.setOnClickListener(new View.OnClickListener() {
@@ -234,8 +234,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFollow();
             }
         });
-        followIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
-        followIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        followIconView.setVisibility(sameUser || !member.isDetailRetrieved() || !member.isFollowable() ? View.INVISIBLE : View.VISIBLE);
+        followIconTextView.setVisibility(sameUser || !member.isDetailRetrieved() || !member.isFollowable() ? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(followIconView,PROFILE_MENU_HITREC_PADDING);
         messageIconView.setOnClickListener(new View.OnClickListener() {
             @Override

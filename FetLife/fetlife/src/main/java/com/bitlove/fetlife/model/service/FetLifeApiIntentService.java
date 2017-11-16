@@ -1549,7 +1549,7 @@ public class FetLifeApiIntentService extends IntentService {
                     relationship.save();
                 }
             }
-            member.mergeSave();
+            member.internalSave();
             return 1;
         } else {
             return Integer.MIN_VALUE;

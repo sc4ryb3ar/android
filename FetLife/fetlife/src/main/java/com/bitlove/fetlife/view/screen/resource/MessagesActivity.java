@@ -191,7 +191,7 @@ public class MessagesActivity extends ResourceActivity
                 public void run() {
                     Member member = Member.loadMember(memberId);
                     member.setLastViewedAt(System.currentTimeMillis());
-                    member.save();
+                    member.mergeSave();
                 }
             });
         } else {

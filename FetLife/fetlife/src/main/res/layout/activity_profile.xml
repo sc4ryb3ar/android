@@ -57,6 +57,7 @@
 
                             <ImageView
                                 android:id="@+id/profile_menu_icon_friend"
+                                android:visibility="invisible"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_horizontal"
@@ -81,6 +82,7 @@
 
                             <ImageView
                                 android:id="@+id/profile_menu_icon_follow"
+                                android:visibility="invisible"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/ic_follow"

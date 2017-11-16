@@ -105,7 +105,7 @@ public class SharePictureGridAdapter extends BaseAdapter {
                 final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener = new FeedRecyclerAdapter.OnFeedItemClickListener() {
                     @Override
                     public void onMemberClick(Member member) {
-                        member.save();
+                        member.mergeSave();
                         ProfileActivity.startActivity(v.getContext(),member.getId());
                     }
 
