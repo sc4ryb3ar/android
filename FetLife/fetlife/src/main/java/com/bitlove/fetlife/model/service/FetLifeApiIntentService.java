@@ -696,8 +696,15 @@ public class FetLifeApiIntentService extends IntentService {
         String body = startMessage.getBody();
         String subject = body == null || body.length() <= MAX_SUBJECT_LENGTH ? body : body.substring(0,MAX_SUBJECT_LENGTH).concat(SUBJECT_SHORTENED_SUFFIX);
         Call<Conversation> postConversationCall = getFetLifeApi().postConversation(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), pendingConversation.getMemberId(), subject, body);
-        Response<Conversation> postConversationResponse = postConversationCall.execute();
-        if (postConversationResponse.isSuccess()) {
+        Response<Conversation> postConversationResponse;
+        try {
+            postConversationResponse = postConversationCall.execute();
+        } catch (IllegalArgumentException iae ) {
+            //okio bug
+            Crashlytics.logException(iae);
+            postConversationResponse = null;
+        }
+        if (postConversationResponse != null && postConversationResponse.isSuccess()) {
             //Delete the local conversation and create a new one, as the id of the conversation is changed (from local to backend based)
             pendingConversation.delete();
 
