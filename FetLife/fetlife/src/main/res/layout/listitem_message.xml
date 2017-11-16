@@ -4,9 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <TextView
+        style="@style/MessageSubText"
+        android:id="@+id/message_top"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="@dimen/listitem_horizontal_margin"
+        android:layout_marginEnd="@dimen/listitem_horizontal_margin"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="@dimen/listitem_vertical_margin"
+        android:layout_marginBottom="2dp"/>
+
     <RelativeLayout
         android:id="@+id/message_text_container"
-        android:layout_width="match_parent"
+        android:layout_below="@id/message_top"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/listitem_horizontal_margin"
         android:paddingLeft="@dimen/listitem_horizontal_margin"
@@ -43,6 +58,9 @@
 
         <LinearLayout
             android:id="@+id/message_aligner"
+            android:layout_toLeftOf="@id/right_member_image"
+            android:layout_toRightOf="@id/left_member_image"
+            android:layout_centerInParent="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -51,9 +69,6 @@
                 android:id="@+id/message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/right_member_image"
-                android:layout_toRightOf="@id/left_member_image"
-                android:layout_centerInParent="true"
                 android:autoLink="web"
                 android:singleLine="false"
                 android:textIsSelectable="true"
@@ -84,14 +99,16 @@
 
     <TextView
         style="@style/MessageSubText"
+        android:gravity="right"
         android:id="@+id/message_sub"
         android:layout_below="@+id/message_grid_entities"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/listitem_horizontal_margin"
-        android:layout_marginRight="@dimen/listitem_horizontal_margin"
-        android:layout_marginEnd="@dimen/listitem_horizontal_margin"
+        android:layout_marginRight="6dp"
+        android:layout_marginEnd="6dp"
         android:layout_marginStart="@dimen/listitem_horizontal_margin"
-        android:layout_marginBottom="@dimen/listitem_vertical_margin"/>
+        android:layout_marginBottom="@dimen/listitem_vertical_margin"
+        android:layout_marginTop="2dp"/>
 
 </RelativeLayout>

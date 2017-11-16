@@ -135,18 +135,23 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
                     }
                 }
             });
+            messageViewHolder.topText.setVisibility(View.GONE);
             messageViewHolder.messageTextContainer.setVisibility(View.GONE);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, 0, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
             return;
         }
 
+        messageViewHolder.topText.setVisibility(View.VISIBLE);
         messageViewHolder.messageTextContainer.setVisibility(View.VISIBLE);
 
         String messageBody = groupMessage.getBody().trim();
         messageViewHolder.messageText.setText(StringUtil.parseHtml(messageBody));
-        messageViewHolder.subText.setText(groupMessage.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(groupMessage.getDate())));
+//        messageViewHolder.subText.setText(groupMessage.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(groupMessage.getDate())));
+        messageViewHolder.topText.setText(groupMessage.getSenderNickname());
+        messageViewHolder.subText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(groupMessage.getDate())));
+
         messageViewHolder.subText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12);
-        messageViewHolder.subText.setOnClickListener(new View.OnClickListener() {
+        messageViewHolder.topText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 groupMessageClickListener.onMessageMetaClicked(GroupComment.MENTION_PREFIX + groupMessage.getSenderNickname() + " ");
@@ -156,17 +161,19 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
         boolean myMessage = groupMessage.getSenderId().equals(messageViewHolder.getSelfMessageId());
 
         if (myMessage) {
-            messageViewHolder.subText.setGravity(Gravity.RIGHT);
-            //messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
-            messageViewHolder.messageText.setGravity(Gravity.RIGHT);
+//            messageViewHolder.subText.setGravity(Gravity.RIGHT);
+//            messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
+//            messageViewHolder.messageText.setGravity(Gravity.RIGHT);
+            messageViewHolder.messsageAligner.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, messageViewHolder.vPadding, messageViewHolder.hPadding, messageViewHolder.vPadding);
             messageViewHolder.memberAvatar.setVisibility(View.GONE);
             messageViewHolder.selfAvatar.setVisibility(View.VISIBLE);
             messageViewHolder.selfAvatar.setImageURI(groupMessage.getAvatarLink());
         } else {
-            messageViewHolder.subText.setGravity(Gravity.LEFT);
+//            messageViewHolder.subText.setGravity(Gravity.LEFT);
 //            messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
-            messageViewHolder.messageText.setGravity(Gravity.LEFT);
+//            messageViewHolder.messageText.setGravity(Gravity.LEFT);
+            messageViewHolder.messsageAligner.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.hPadding, messageViewHolder.vPadding, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
             messageViewHolder.selfAvatar.setVisibility(View.GONE);
             messageViewHolder.memberAvatar.setVisibility(View.VISIBLE);
@@ -198,10 +205,11 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
 class GroupMessageViewHolder extends RecyclerView.ViewHolder {
 
-    private static final int EXTEND_PADDING_MULTIPLIER = 1;
+    private static final int EXTEND_PADDING_MULTIPLIER = 5;
 
+    LinearLayout messsageAligner;
     ViewGroup messageContainer, messageTextContainer;
-    TextView messageText, subText;
+    TextView messageText, subText, topText;
     String subMessageSeparator;
     SimpleDraweeView memberAvatar, selfAvatar;
     int extendedHPadding, extendedVPadding, hPadding, vPadding;
@@ -223,10 +231,12 @@ class GroupMessageViewHolder extends RecyclerView.ViewHolder {
         primaryTextColor = ColorUtil.retrieverColor(context, R.color.text_color_primary);
         errorTextColor = ColorUtil.retrieverColor(context, R.color.text_color_error);
 
+        messsageAligner = itemView.findViewById(R.id.message_aligner);
         messageTextContainer = itemView.findViewById(R.id.message_text_container);
         messageContainer = itemView.findViewById(R.id.message_container);
         messageText = (TextView) itemView.findViewById(R.id.message_text);
         messageText.setMovementMethod(LinkMovementMethod.getInstance());
+        topText = (TextView) itemView.findViewById(R.id.message_top);
         subText = (TextView) itemView.findViewById(R.id.message_sub);
         memberAvatar = (SimpleDraweeView) itemView.findViewById(R.id.left_member_image);
         selfAvatar = (SimpleDraweeView) itemView.findViewById(R.id.right_member_image);

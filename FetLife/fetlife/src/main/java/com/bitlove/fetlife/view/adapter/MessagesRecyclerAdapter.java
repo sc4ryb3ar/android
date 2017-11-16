@@ -188,18 +188,20 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
 //        textView.setHighlightColor(Color.TRANSPARENT);
 
         messageViewHolder.messageText.setText(spannedBody);
-        messageViewHolder.subText.setText(message.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(message.getDate())));
+//        messageViewHolder.subText.setText(message.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(message.getDate())));
+        messageViewHolder.topText.setText(message.getSenderNickname());
+        messageViewHolder.subText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(message.getDate())));
 
         boolean myMessage = message.getSenderId().equals(messageViewHolder.getSelfMessageId());
 
         if (myMessage) {
-            messageViewHolder.subText.setGravity(Gravity.RIGHT);
-            messageViewHolder.messageText.setGravity(Gravity.RIGHT);
+//            messageViewHolder.subText.setGravity(Gravity.RIGHT);
+            messageViewHolder.messsageAligner.setGravity(Gravity.LEFT);
 //            messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, messageViewHolder.vPadding, messageViewHolder.hPadding, messageViewHolder.vPadding);
         } else {
-            messageViewHolder.subText.setGravity(Gravity.LEFT);
-            messageViewHolder.messageText.setGravity(Gravity.LEFT);
+//            messageViewHolder.subText.setGravity(Gravity.LEFT);
+            messageViewHolder.messsageAligner.setGravity(Gravity.LEFT);
 //            messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.hPadding, messageViewHolder.vPadding, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
         }
@@ -222,8 +224,9 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
 
     private static final int EXTEND_PADDING_MULTIPLIER = 10;
 
+    LinearLayout messsageAligner;
     ViewGroup messageContainer;
-    TextView messageText, subText;
+    TextView messageText, subText, topText;
     String subMessageSeparator;
     int extendedHPadding, hPadding, vPadding;
     AutoAlignGridView messageEntitiesGrid;
@@ -246,10 +249,12 @@ class MessageViewHolder extends RecyclerView.ViewHolder {
         primaryTextColor = ColorUtil.retrieverColor(context, R.color.text_color_primary);
         errorTextColor = ColorUtil.retrieverColor(context, R.color.text_color_error);
 
+        messsageAligner = itemView.findViewById(R.id.message_aligner);
         messageContainer = itemView.findViewById(R.id.message_container);
         messageText = (TextView) itemView.findViewById(R.id.message_text);
         messageText.setMovementMethod(LinkMovementMethod.getInstance());
         subText = (TextView) itemView.findViewById(R.id.message_sub);
+        topText = (TextView) itemView.findViewById(R.id.message_top);
 
         messageEntitiesGrid = itemView.findViewById(R.id.message_grid_entities);
     }
