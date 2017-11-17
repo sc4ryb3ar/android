@@ -23,7 +23,7 @@ public class PictureShareActivity extends ResourceActivity {
 
     public static String RESULT_STRINGS_URLS = "RESULT_STRINGS_URLS";
 
-    private static final int MAX_SUGGEST_COUNT = 300;
+    private static final int MAX_SUGGEST_COUNT = 150;
     private SharePictureGridAdapter shareAdapter;
     private SharePictureGridAdapter suggestsAdapter;
 

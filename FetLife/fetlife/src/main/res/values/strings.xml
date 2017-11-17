@@ -29,6 +29,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.12.9<br/>
+                    <ul>
+                        <li>Crash fixes</li>
+                    </ul>
+
             <p/>v2.12.0<br/>
                     <ul>
                         <li>Mention links in messages lead to user profiles</li>
