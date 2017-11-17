@@ -29,6 +29,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.11.16<br/>
+                    <ul>
+                        <li>Removed preview flag</li>
+                    </ul>
+
             <p/>v2.11.15<br/>
                     <ul>
                         <li>Crash fixes</li>
