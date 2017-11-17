@@ -37,6 +37,7 @@ import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
 import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.widget.AutoAlignGridView;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -179,12 +180,18 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
                 @Override
                 public void onClick(View textView) {
                     if (System.currentTimeMillis() - lastClick > CLICK_OFFSET) {
-                        ProfileActivity.startActivity(FetLifeApplication.getInstance(),mention.getMember().getId());
+                        ProfileActivity.startActivity(textView.getContext(),mention.getMember().getId());
                     }
                     lastClick = System.currentTimeMillis();
                 }
             };
-            spannedBody.setSpan(clickableSpan, mention.getOffset(), mention.getOffset() + mention.getLength(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            int endPosition = mention.getOffset() + mention.getLength();
+            if (spannedBody.length() >= endPosition) {
+                spannedBody.setSpan(clickableSpan, mention.getOffset(), endPosition, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                Crashlytics.log("Mention body:" + spannedBody + " mention: " + mention.getOffset() + "," + mention.getLength());
+                Crashlytics.logException(new Exception("Invalid mention position"));
+            }
         }
 
         List<Picture> pictures = messageEntities.getPictures();

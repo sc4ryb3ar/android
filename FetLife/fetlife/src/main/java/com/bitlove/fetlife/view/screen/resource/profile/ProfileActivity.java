@@ -175,8 +175,10 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                member.setLastViewedAt(System.currentTimeMillis());
-                member.mergeSave();
+                if (member != null) {
+                    member.setLastViewedAt(System.currentTimeMillis());
+                    member.mergeSave();
+                }
             }
         });
 

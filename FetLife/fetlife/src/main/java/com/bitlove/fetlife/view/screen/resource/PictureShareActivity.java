@@ -59,8 +59,8 @@ public class PictureShareActivity extends ResourceActivity {
         } else {
             sharesGrid.setVisibility(View.VISIBLE);
             sharesHeader.setVisibility(View.VISIBLE);
-            shareAdapter = setGridAdapter(sharesGrid,pictureShares,true);
         }
+        shareAdapter = setGridAdapter(sharesGrid,pictureShares,true);
 
         List<Picture> pictureSuggests = new Select().from(Picture.class).where(Picture_Table.onShareList.notEq(true)).or(Picture_Table.onShareList.isNull()).orderBy(Picture_Table.lastViewedAt,false).orderBy(Picture_Table.createdAt,false).limit(MAX_SUGGEST_COUNT).queryList();
         AutoAlignGridView suggestionGrid = (AutoAlignGridView) findViewById(R.id.pictrue_grid_suggests);
@@ -71,8 +71,8 @@ public class PictureShareActivity extends ResourceActivity {
         } else {
             suggestionGrid.setVisibility(View.VISIBLE);
             suggestionHeader.setVisibility(View.VISIBLE);
-            suggestsAdapter = setGridAdapter(suggestionGrid,pictureSuggests,false);
         }
+        suggestsAdapter = setGridAdapter(suggestionGrid,pictureSuggests,false);
     }
 
     @Override
@@ -102,8 +102,12 @@ public class PictureShareActivity extends ResourceActivity {
             case R.id.action_done:
                 Intent result = new Intent();
                 List<String> urls = new ArrayList<>();
-                urls.addAll(shareAdapter.getSelectedUrls());
-                urls.addAll(suggestsAdapter.getSelectedUrls());
+                if (shareAdapter != null) {
+                    urls.addAll(shareAdapter.getSelectedUrls());
+                }
+                if (suggestsAdapter != null) {
+                    urls.addAll(suggestsAdapter.getSelectedUrls());
+                }
                 result.putExtra(RESULT_STRINGS_URLS,urls.toArray(new String[urls.size()]));
                 setResult(RESULT_OK,result);
                 finish();

@@ -123,7 +123,7 @@ public class SharePictureGridAdapter extends BaseAdapter {
 
                     @Override
                     public void onVisitItem(Object object, String url) {
-                        UrlUtil.openUrl(FetLifeApplication.getInstance(),url);
+                        UrlUtil.openUrl(v.getContext(),url);
                     }
 
                     @Override
