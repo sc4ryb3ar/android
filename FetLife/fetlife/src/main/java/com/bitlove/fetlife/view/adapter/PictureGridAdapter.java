@@ -125,7 +125,8 @@ public class PictureGridAdapter extends BaseAdapter {
         gridLinks.clear();
         displayLinks.clear();
         for (Picture picture : pictures) {
-            this.pictures.add(picture);
+            Picture currentPicture = Picture.loadPicture(picture.getId());
+            this.pictures.add(currentPicture != null ? currentPicture : picture);
             gridLinks.add(picture != null ? picture.getThumbUrl() : null);
             displayLinks.add(picture != null ? picture.getDisplayUrl() : null);
         }

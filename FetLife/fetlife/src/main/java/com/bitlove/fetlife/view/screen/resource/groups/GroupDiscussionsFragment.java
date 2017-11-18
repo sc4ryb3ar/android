@@ -62,6 +62,10 @@ public class GroupDiscussionsFragment extends LoadFragment implements ResourceLi
 
     @Override
     public void onAvatarClick(GroupPost groupPost) {
+        Member member = groupPost.getMember();
+        if (member != null) {
+            member.mergeSave();
+        }
         ProfileActivity.startActivity((BaseActivity) getActivity(),groupPost.getMemberId());
     }
 

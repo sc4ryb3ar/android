@@ -258,23 +258,32 @@ public class GroupMessagesActivity extends ResourceActivity
         } else {
             toolBarImage.setVisibility(View.GONE);
         }
-        View.OnClickListener toolBarItemClickListener;
+        View.OnClickListener toolBarImageClickListener;
         if (memberId != null) {
-            toolBarItemClickListener = new View.OnClickListener() {
+            toolBarImageClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ProfileActivity.startActivity(GroupMessagesActivity.this,memberId);
                 }
             };
         } else {
-            toolBarItemClickListener = new View.OnClickListener() {
+            toolBarImageClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                 }
             };
         }
-        toolBarImage.setOnClickListener(toolBarItemClickListener);
-        toolBarTitle.setOnClickListener(toolBarItemClickListener);
+        toolBarImage.setOnClickListener(toolBarImageClickListener);
+
+        View.OnClickListener toolBarTitleClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Group group = Group.loadGroup(groupId);
+                GroupActivity.startActivity(GroupMessagesActivity.this, groupId, group != null ? group.getName() : "", false);
+            }
+        };
+
+        toolBarTitle.setOnClickListener(toolBarTitleClickListener);
 
         recyclerView.setAdapter(messagesAdapter);
     }

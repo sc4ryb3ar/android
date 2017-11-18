@@ -322,8 +322,11 @@ public class Picture extends BaseModel {
     @Override
     public boolean save() {
         Picture currentPicture = Picture.loadPicture(id);
-        if (currentPicture != null && currentPicture.getLastViewedAt() > lastViewedAt) {
-            lastViewedAt = currentPicture.getLastViewedAt();
+        if (currentPicture != null) {
+            if (currentPicture.getLastViewedAt() > lastViewedAt) {
+                lastViewedAt = currentPicture.getLastViewedAt();
+                onShareList = currentPicture.isOnShareList();
+            }
         }
         return super.save();
     }

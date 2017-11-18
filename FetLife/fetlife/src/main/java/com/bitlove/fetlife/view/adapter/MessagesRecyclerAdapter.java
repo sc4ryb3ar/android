@@ -125,6 +125,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessageViewHol
                 @Override
                 public void onClick(View textView) {
                     if (System.currentTimeMillis() - lastClick > CLICK_OFFSET) {
+                        mention.getMember().mergeSave();
                         ProfileActivity.startActivity(FetLifeApplication.getInstance(),mention.getMember().getId());
                     }
                     lastClick = System.currentTimeMillis();

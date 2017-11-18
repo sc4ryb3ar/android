@@ -201,6 +201,9 @@ public class GroupPost extends BaseModel {
 
     @JsonProperty("member")
     public Member getMember() {
+        if (member == null) {
+            member = Member.loadMember(memberId);
+        }
         return member;
     }
 

@@ -65,6 +65,7 @@ public class GroupMembersFragment extends LoadFragment implements ResourceListRe
     }
 
     private void openProfileScreen(Member member) {
+        member.mergeSave();
         ProfileActivity.startActivity((BaseActivity) getActivity(),member.getId());
     }
 }
