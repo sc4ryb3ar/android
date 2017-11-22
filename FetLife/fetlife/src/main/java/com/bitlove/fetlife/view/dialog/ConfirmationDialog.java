@@ -15,9 +15,9 @@ import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
 
-public class ProfileConfirmationDialog extends DialogFragment {
+public class ConfirmationDialog extends DialogFragment {
 
-    private static final String FRAGMENT_TAG = ProfileConfirmationDialog.class.getSimpleName();
+    private static final String FRAGMENT_TAG = ConfirmationDialog.class.getSimpleName();
     private static final String ARG_TITLE = "ARG_TITLE";
     private static final String ARG_MESSAGE = "ARG_MESSAGE";
 
@@ -26,8 +26,8 @@ public class ProfileConfirmationDialog extends DialogFragment {
     private OnClickListener leftButtonListener = null;
     private OnClickListener rightButtonListener = null;
 
-    public static ProfileConfirmationDialog newInstance(String title, String message) {
-        ProfileConfirmationDialog profileConfirmationDialog = new ProfileConfirmationDialog();
+    public static ConfirmationDialog newInstance(String title, String message) {
+        ConfirmationDialog profileConfirmationDialog = new ConfirmationDialog();
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         args.putString(ARG_MESSAGE, message);
@@ -69,7 +69,7 @@ public class ProfileConfirmationDialog extends DialogFragment {
             rightButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    rightButtonListener.onClick(ProfileConfirmationDialog.this);
+                    rightButtonListener.onClick(ConfirmationDialog.this);
                 }
             });
         } else {
@@ -90,7 +90,7 @@ public class ProfileConfirmationDialog extends DialogFragment {
             leftButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    leftButtonListener.onClick(ProfileConfirmationDialog.this);
+                    leftButtonListener.onClick(ConfirmationDialog.this);
                 }
             });
         }
@@ -115,7 +115,7 @@ public class ProfileConfirmationDialog extends DialogFragment {
     }
 
     public interface OnClickListener {
-        void onClick(ProfileConfirmationDialog profileConfirmationDialog);
+        void onClick(ConfirmationDialog profileConfirmationDialog);
     }
 
     public void show(FragmentManager fragmentManager) {

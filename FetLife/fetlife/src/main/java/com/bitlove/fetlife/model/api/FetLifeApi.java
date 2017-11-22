@@ -92,6 +92,12 @@ public interface FetLifeApi {
     @GET("/api/v2/groups/{groupId}")
     Call<Group> getGroup(@Header("Authorization") String authHeader, @Path("groupId") String memberId);
 
+    @PUT("/api/v2/groups/{groupId}/join")
+    Call<ResponseBody> joinGroup(@Header("Authorization") String authHeader, @Path("groupId") String memberId);
+
+    @DELETE("/api/v2/groups/{groupId}/join")
+    Call<ResponseBody> leaveGroup(@Header("Authorization") String authHeader, @Path("groupId") String memberId);
+
     @GET("/api/v2/me/rsvps")
     Call<List<Rsvp>> getRsvps(@Header("Authorization") String authHeader, @Query("event_id") String eventId);
 

@@ -52,6 +52,10 @@ public class Group extends BaseModel {
     private Integer memberCount;
 
     @Column
+    @JsonProperty("current_member_is_member")
+    private boolean memberOfGroup;
+
+    @Column
     @JsonProperty("name")
     private String name;
 
@@ -68,6 +72,8 @@ public class Group extends BaseModel {
     @Column
     private long date;
 
+    @Column
+    private boolean detailLoaded;
 
     @JsonProperty("content_type")
     public String getContentType() {
@@ -173,4 +179,33 @@ public class Group extends BaseModel {
         this.url = url;
     }
 
+    public boolean isMemberOfGroup() {
+        return memberOfGroup;
+    }
+
+    public void setMemberOfGroup(boolean memberOfGroup) {
+        this.memberOfGroup = memberOfGroup;
+    }
+
+    @Override
+    public boolean save() {
+        Group currentGroup = Group.loadGroup(id);
+        if (currentGroup!= null) {
+            if (currentGroup.getDate() > getDate()) {
+                setDate(currentGroup.getDate());
+            }
+            if (currentGroup.isDetailLoaded()) {
+                setDetailLoaded(true);
+            }
+        }
+        return super.save();
+    }
+
+    public boolean isDetailLoaded() {
+        return detailLoaded;
+    }
+
+    public void setDetailLoaded(boolean detailLoaded) {
+        this.detailLoaded = detailLoaded;
+    }
 }

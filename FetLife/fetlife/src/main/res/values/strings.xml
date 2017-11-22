@@ -771,6 +771,7 @@
     <string name="text_group_members_count">%1$d members</string>
     <string name="menu_group_view">View</string>
     <string name="menu_group_member_join">Join</string>
+    <string name="menu_group_member_leave">Leave</string>
     <string name="title_fragment_group_description">Description</string>
     <string name="title_fragment_group_rules">Rules</string>
     <string name="title_activity_group">Group</string>
@@ -794,5 +795,9 @@
     <string name="list_header_picture_sharelist">Share List</string>
     <string name="title_activity_pictureshare">Select Pictures</string>
     <string name="message_picture_shared">Picture added to your share list</string>
+    <string name="title_dialog_join_group">Join Group</string>
+    <string name="message_dialog_join_group">Did you read the descritpion and do you agree with the rules of this group?</string>
+    <string name="title_dialog_leave_group">Leave Group</string>
+    <string name="message_dialog_leave_group">Please confirm you want to leave this group</string>
 
 </resources>

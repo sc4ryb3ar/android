@@ -79,6 +79,8 @@ public class UserSessionManager {
             setupUserSession(lastLoggedInUserId);
         } else if (keepUserSignedIn()) {
             logInUser(lastLoggedInUserId, null);
+        } else {
+            startDb();
         }
     }
 

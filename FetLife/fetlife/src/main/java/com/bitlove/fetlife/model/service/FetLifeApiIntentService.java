@@ -179,6 +179,8 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_EVENT = "com.bitlove.fetlife.action.apicall.event";
     public static final String ACTION_APICALL_SEARCH_GROUP = "com.bitlove.fetlife.action.apicall.search_group";
     public static final String ACTION_APICALL_GROUP = "com.bitlove.fetlife.action.apicall.group";
+    public static final String ACTION_APICALL_GROUP_JOIN = "com.bitlove.fetlife.action.apicall.group_join";
+    public static final String ACTION_APICALL_GROUP_LEAVE = "com.bitlove.fetlife.action.apicall.group_leave";
     public static final String ACTION_APICALL_EVENT_RSVPS = "com.bitlove.fetlife.action.apicall.event.ravps";
     public static final String ACTION_APICALL_SET_RSVP_STATUS = "com.bitlove.fetlife.action.apicall.event.set_ravp";
     public static final String ACTION_APICALL_GROUP_MEMBERS = "com.bitlove.fetlife.action.apicall.group_members";
@@ -455,6 +457,12 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_SET_RSVP_STATUS:
                     result = setRsvp(params);
+                    break;
+                case ACTION_APICALL_GROUP_JOIN:
+                    result = joinGroup(params);
+                    break;
+                case ACTION_APICALL_GROUP_LEAVE:
+                    result = leaveGroup(params);
                     break;
                 case ACTION_APICALL_REMOVE_LOVE:
                     result = removeLove(params);
@@ -969,6 +977,21 @@ public class FetLifeApiIntentService extends IntentService {
         Response<ResponseBody> response = setRsvpStatus.execute();
         return response.isSuccess() ? 1 : Integer.MIN_VALUE;
     }
+
+    private int joinGroup(String[] params) throws IOException {
+        String groupId = params[0];
+        Call<ResponseBody> joinGroup = getFetLifeApi().joinGroup(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId);
+        Response<ResponseBody> response = joinGroup.execute();
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
+    }
+
+    private int leaveGroup(String[] params) throws IOException {
+        String groupId = params[0];
+        Call<ResponseBody> joinGroup = getFetLifeApi().leaveGroup(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId);
+        Response<ResponseBody> response = joinGroup.execute();
+        return response.isSuccess() ? 1 : Integer.MIN_VALUE;
+    }
+
 
     private int addLove(String[] params) throws IOException {
         String contentId = params[0];
@@ -1588,10 +1611,7 @@ public class FetLifeApiIntentService extends IntentService {
         Response<Group> getGroupResponse = getGroupCall.execute();
         if (getGroupResponse.isSuccess()) {
             Group group = getGroupResponse.body();
-            Group currentGroup = Group.loadGroup(groupId);
-            if (currentGroup!= null && currentGroup.getDate() > group.getDate()) {
-                group.setDate(currentGroup.getDate());
-            }
+            group.setDetailLoaded(true);
             group.save();
             return 1;
         } else {
@@ -2206,7 +2226,13 @@ public class FetLifeApiIntentService extends IntentService {
         if (groupsResponse.isSuccess()) {
 
             final List<Group> retrievedGroups = groupsResponse.body();
-            List<GroupReference> currentGroups = new Select().from(GroupReference.class).where(GroupReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(GroupReference_Table.date).descending()).queryList();
+            Collections.sort(retrievedGroups, new Comparator<Group>() {
+                @Override
+                public int compare(Group o1, Group o2) {
+                    return o1.getId().compareTo(o2.getId());
+                }
+            });
+            List<GroupReference> currentGroups = new Select().from(GroupReference.class).where(GroupReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(GroupReference_Table.id).ascending()).queryList();
 
             int lastConfirmedGroupPosition;
             if (page == 1) {
@@ -2238,10 +2264,6 @@ public class FetLifeApiIntentService extends IntentService {
                         deletedItemCount++;
                     }
                     lastConfirmedGroupPosition = foundPos;
-                }
-                Group currentGroup = Group.loadGroup(retrievedGroup.getId());
-                if (currentGroup!= null && currentGroup.getDate() > retrievedGroup.getDate()) {
-                    retrievedGroup.setDate(currentGroup.getDate());
                 }
                 retrievedGroup.save();
             }

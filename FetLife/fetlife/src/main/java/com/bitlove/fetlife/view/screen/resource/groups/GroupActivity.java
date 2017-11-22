@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
@@ -19,10 +20,13 @@ import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
+import com.bitlove.fetlife.view.dialog.ConfirmationDialog;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.bitlove.fetlife.view.widget.FlingBehavior;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -35,6 +39,8 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
 
     private TextView groupSubTitle;
     private TextView groupTitle;
+    private ImageView membershipIcon;
+    private TextView membershipIconText;
 
     private ViewPager viewPager;
     private Group group;
@@ -63,6 +69,9 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        membershipIcon = (ImageView) findViewById(R.id.group_menu_icon_member);
+        membershipIconText = (TextView) findViewById(R.id.group_menu_icon_text_member);
+
         final String groupId = getIntent().getStringExtra(EXTRA_GROUPID);
         group = Group.loadGroup(groupId);
         if (group != null) {
@@ -75,6 +84,13 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
             @Override
             public void onClick(View v) {
                 onViewGroup(v);
+            }
+        });
+
+        findViewById(R.id.group_menu_icon_member_container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onMembershipIcon(v);
             }
         });
 
@@ -135,7 +151,22 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
     }
 
     private void setGroupDetails(Group group) {
+        this.group = group;
         setGroupDetails(group.getName(),group.getMemberCount());
+        if (group.isDetailLoaded()) {
+            membershipIcon.setVisibility(View.VISIBLE);
+            membershipIconText.setVisibility(View.VISIBLE);
+            if (group.isMemberOfGroup()) {
+                membershipIcon.setImageResource(R.drawable.ic_group_member_of_24dp);
+                membershipIconText.setText(R.string.menu_group_member_leave);
+                membershipIcon.setColorFilter(getResources().getColor(R.color.text_color_primary));
+            } else {
+                membershipIcon.setColorFilter(getResources().getColor(R.color.text_color_secondary));
+                membershipIconText.setText(R.string.menu_group_member_join);
+                membershipIcon.setImageResource(R.drawable.ic_group_request_sent_24dp);
+                membershipIcon.setImageResource(R.drawable.ic_group_join_black_24dp);
+            }
+        }
     }
 
     private void setGroupDetails(String groupTitle, int memberCount) {
@@ -148,6 +179,8 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
         } else {
             groupSubTitle.setText("");
         }
+        membershipIcon.setVisibility(View.INVISIBLE);
+        membershipIconText.setVisibility(View.INVISIBLE);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -181,6 +214,12 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
         if (params != null && params.length > 0 && groupId != null && !groupId.equals(params[0])) {
             return false;
         }
+        if (FetLifeApiIntentService.ACTION_APICALL_GROUP_JOIN.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_GROUP_LEAVE.equals(serviceCallAction)) {
+            return true;
+        }
         if (FetLifeApiIntentService.ACTION_APICALL_GROUP.equals(serviceCallAction)) {
             return true;
         }
@@ -190,11 +229,50 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
         return false;
     }
 
-    public void onSetJoinStateOfGroup(View v) {
-    }
-
     public void onViewGroup(View v) {
         UrlUtil.openUrl(this,group.getUrl());
+    }
+
+    public void onMembershipIcon(View v) {
+        if (!group.isMemberOfGroup()) {
+            ConfirmationDialog groupConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_join_group),getString(R.string.message_dialog_join_group));
+            groupConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
+                @Override
+                public void onClick(ConfirmationDialog groupConfirmationDialog) {
+                    group.setMemberOfGroup(true);
+                    group.save();
+                    FetLifeApiIntentService.startApiCall(GroupActivity.this,FetLifeApiIntentService.ACTION_APICALL_GROUP_JOIN,group.getId());
+                    groupConfirmationDialog.dismissAllowingStateLoss();
+                    setGroupDetails(group);
+                }
+            });
+            groupConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
+                @Override
+                public void onClick(ConfirmationDialog groupConfirmationDialog) {
+                    groupConfirmationDialog.dismissAllowingStateLoss();
+                }
+            });
+            groupConfirmationDialog.show(getFragmentManager());
+        } else {
+            ConfirmationDialog groupConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_leave_group),getString(R.string.message_dialog_leave_group));
+            groupConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
+                @Override
+                public void onClick(ConfirmationDialog groupConfirmationDialog) {
+                    group.setMemberOfGroup(false);
+                    group.save();
+                    FetLifeApiIntentService.startApiCall(GroupActivity.this,FetLifeApiIntentService.ACTION_APICALL_GROUP_LEAVE,group.getId());
+                    groupConfirmationDialog.dismissAllowingStateLoss();
+                    setGroupDetails(group);
+                }
+            });
+            groupConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
+                @Override
+                public void onClick(ConfirmationDialog groupConfirmationDialog) {
+                    groupConfirmationDialog.dismissAllowingStateLoss();
+                }
+            });
+            groupConfirmationDialog.show(getFragmentManager());
+        }
     }
 
     @Override

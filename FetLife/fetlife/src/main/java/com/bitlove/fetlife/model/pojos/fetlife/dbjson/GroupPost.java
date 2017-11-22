@@ -1,8 +1,6 @@
 package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.StringUtil;
 import com.crashlytics.android.Crashlytics;
@@ -106,6 +104,10 @@ public class GroupPost extends BaseModel {
     @JsonIgnore
     private String nickname;
 
+    @Column
+    @JsonProperty("current_member_is_following")
+    private boolean followed;
+
     @JsonProperty("body")
     public String getBody() {
         return body;
@@ -198,6 +200,8 @@ public class GroupPost extends BaseModel {
     public void setId(String id) {
         this.id = id;
     }
+
+    //current_member_is_following
 
     @JsonProperty("member")
     public Member getMember() {
@@ -304,4 +308,13 @@ public class GroupPost extends BaseModel {
     public void setEntitiesJson(String entitiesJson) {
         this.entitiesJson = entitiesJson;
     }
+
+    public boolean isFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(boolean followed) {
+        this.followed = followed;
+    }
+
 }
