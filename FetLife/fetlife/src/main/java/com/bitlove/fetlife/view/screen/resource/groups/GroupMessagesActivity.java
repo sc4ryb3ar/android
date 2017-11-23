@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -521,4 +522,9 @@ public class GroupMessagesActivity extends ResourceActivity
         PictureShareActivity.startActivityForResult(this,REQUEST_CODE_SHARE_PICTURES);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        return super.onPrepareOptionsMenu(menu);
+    }
 }

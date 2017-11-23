@@ -789,5 +789,7 @@
     <string name="list_header_picture_sharelist">Share List</string>
     <string name="title_activity_pictureshare">Select Pictures</string>
     <string name="message_picture_shared">Picture added to your share list</string>
+    <string name="menu_discussion_follow">Follow</string>
+    <string name="menu_discussion_unfollow">Unfollow</string>
 
 </resources>
