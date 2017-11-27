@@ -11,8 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -30,9 +28,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.ViewUtil;
-import com.bitlove.fetlife.view.dialog.ProfileConfirmationDialog;
-import com.bitlove.fetlife.view.screen.BaseActivity;
-import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
+import com.bitlove.fetlife.view.dialog.ConfirmationDialog;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
@@ -353,10 +349,10 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         switch (currentRelation) {
             case Member.VALUE_FRIEND:
             case Member.VALUE_FRIEND_WITHOUT_FOLLOWING:
-                ProfileConfirmationDialog profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendship),getString(R.string.message_dialog_cancel_friendship));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                ConfirmationDialog profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendship),getString(R.string.message_dialog_cancel_friendship));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_CANCEL_FRIENDSHIP,member.getId());
                         member.setRelationWithMe(null);
                         member.mergeSave();
@@ -364,9 +360,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -374,10 +370,10 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
             case Member.VALUE_FRIEND_REQUEST_SENT:
-                 profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendrequest),getString(R.string.message_dialog_cancel_friendrequest));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                 profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendrequest),getString(R.string.message_dialog_cancel_friendrequest));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_CANCEL_FRIENDREQUEST,member.getId());
                         member.setRelationWithMe(currentRelation.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT) ? Member.VALUE_FOLLOWING : null);
                         member.mergeSave();
@@ -385,9 +381,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -395,27 +391,27 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
             case Member.VALUE_FRIEND_REQUEST_PENDING:
-                profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_approve_friendrequest),getString(R.string.message_dialog_approve_friendrequest));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_approve_friendrequest),getString(R.string.message_dialog_approve_friendrequest));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FriendRequestsActivity.startActivity(ProfileActivity.this,false);
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
                 profileConfirmationDialog.show(getFragmentManager());
                 break;
             default:
-                profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_send_friendrequest),getString(R.string.message_dialog_send_friendrequest));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_send_friendrequest),getString(R.string.message_dialog_send_friendrequest));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FriendRequest friendRequest = new FriendRequest();
                         friendRequest.setClientId(member.getId());
                         friendRequest.setTargetMemberId(member.getId());
@@ -430,9 +426,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });

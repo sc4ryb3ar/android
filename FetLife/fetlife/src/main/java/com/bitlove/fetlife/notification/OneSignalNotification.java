@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
+import com.bitlove.fetlife.util.AppUtil;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
 import com.crashlytics.android.Crashlytics;
@@ -116,7 +117,7 @@ public abstract class OneSignalNotification {
                 .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(), R.mipmap.app_icon_kinky))
                 .setSmallIcon(R.drawable.ic_stat_onesignal_default)
                 .setAutoCancel(true)
-                .setVisibility(Notification.VISIBILITY_SECRET)
+                .setVisibility(AppUtil.useAnonymNotifications(FetLifeApplication.getInstance()) ? Notification.VISIBILITY_SECRET : Notification.VISIBILITY_PRIVATE)
                 .setContentIntent(getPendingIntent(fetLifeApplication))
                 .setLights(fetLifeApplication.getUserSessionManager().getNotificationColor(),1000,1000)
                 .setSound(fetLifeApplication.getUserSessionManager().getNotificationRingtone());

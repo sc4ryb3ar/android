@@ -37,6 +37,8 @@ import com.bitlove.fetlife.view.screen.standalone.ReleaseNotesActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 public class MenuActivityComponent extends ActivityComponent {
@@ -174,6 +176,7 @@ public class MenuActivityComponent extends ActivityComponent {
 
 
         if (id == R.id.nav_logout) {
+            logEvent("nav_logout");
             menuActivity.getFetLifeApplication().getUserSessionManager().deleteCurrentUserDb();
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             menuActivity.finish();
@@ -182,10 +185,11 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_conversations) {
             ConversationsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_members) {
-            MembersActivity.startActivity(menuActivity);
+            MembersActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_friendrequests) {
             FriendRequestsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_introduce) {
+            logEvent("nav_introduce");
             AddNfcFriendActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_about) {
             TurboLinksViewActivity.startActivity(menuActivity,"android",menuActivity.getString(R.string.title_activity_about));
@@ -194,12 +198,14 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_upload_pic) {
+            logEvent("nav_upload_pic");
             if (isStoragePermissionGranted()) {
                 PictureUploadSelectionDialog.show(menuActivity);
             } else {
                 requestStoragePermission(BaseActivity.PERMISSION_REQUEST_PICTURE_UPLOAD);
             }
         } else if (id == R.id.nav_upload_video) {
+            logEvent("nav_upload_video");
             if (isStoragePermissionGranted()) {
                 VideoUploadSelectionDialog.show(menuActivity);
             } else {
@@ -224,6 +230,7 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_groups) {
             GroupsActivity.startActivity(menuActivity,false);
         } else if (id == R.id.nav_updates) {
+            logEvent("nav_updates");
             menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
             FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));
         }
@@ -236,6 +243,11 @@ public class MenuActivityComponent extends ActivityComponent {
         }
 
         return false;
+    }
+
+    private void logEvent(String item) {
+        Answers.getInstance().logCustom(
+                new CustomEvent("Menu Item: " + item + " selected"));
     }
 
     private void requestStoragePermission(int requestAction) {

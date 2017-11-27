@@ -287,6 +287,8 @@ public class GroupMessagesActivity extends ResourceActivity
         toolBarTitle.setOnClickListener(toolBarTitleClickListener);
 
         recyclerView.setAdapter(messagesAdapter);
+
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -390,6 +392,20 @@ public class GroupMessagesActivity extends ResourceActivity
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.action_follow:
+                groupDiscussion.setFollowed(true);
+                groupDiscussion.save();
+                FetLifeApiIntentService.startApiCall(GroupMessagesActivity.this,FetLifeApiIntentService.ACTION_APICALL_FOLLOW_DISCUSSION,groupId,groupDiscussionId);
+                showToast(getString(R.string.message_discussion_followed));
+                invalidateOptionsMenu();
+                return true;
+            case R.id.action_unfollow:
+                groupDiscussion.setFollowed(false);
+                groupDiscussion.save();
+                FetLifeApiIntentService.startApiCall(GroupMessagesActivity.this,FetLifeApiIntentService.ACTION_APICALL_UNFOLLOW_DISCUSSION,groupId,groupDiscussionId);
+                showToast(getString(R.string.message_discussion_unfollowed));
+                invalidateOptionsMenu();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -525,6 +541,12 @@ public class GroupMessagesActivity extends ResourceActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        return super.onPrepareOptionsMenu(menu);
+        if (groupDiscussion != null && groupDiscussion.isFollowed()) {
+            getMenuInflater().inflate(R.menu.menu_funollow,menu);
+        } else if (groupDiscussion != null) {
+            getMenuInflater().inflate(R.menu.menu_follow,menu);
+        }
+        return true;
     }
+
 }

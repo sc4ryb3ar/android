@@ -92,6 +92,18 @@ public interface FetLifeApi {
     @GET("/api/v2/groups/{groupId}")
     Call<Group> getGroup(@Header("Authorization") String authHeader, @Path("groupId") String memberId);
 
+    @PUT("/api/v2/groups/{groupId}/join")
+    Call<ResponseBody> joinGroup(@Header("Authorization") String authHeader, @Path("groupId") String groupId);
+
+    @DELETE("/api/v2/groups/{groupId}/join")
+    Call<ResponseBody> leaveGroup(@Header("Authorization") String authHeader, @Path("groupId") String groupId);
+
+    @PUT("/api/v2/groups/{groupId}/posts/{groupPostId}/follow")
+    Call<ResponseBody> followDiscussion(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId);
+
+    @DELETE("/api/v2/groups/{groupId}/posts/{groupPostId}/follow")
+    Call<ResponseBody> unfollowDiscussion(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Path("groupPostId") String groupPostId);
+
     @GET("/api/v2/me/rsvps")
     Call<List<Rsvp>> getRsvps(@Header("Authorization") String authHeader, @Query("event_id") String eventId);
 

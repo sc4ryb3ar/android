@@ -160,7 +160,7 @@ public class GroupMessageNotification extends OneSignalNotification {
                 //TODO: Change group title
                 Intent contentIntent = GroupMessagesActivity.createIntent(context, groupId, groupDiscussionId, groupDiscussionTitle, null, true);
                 contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
-                return TaskStackBuilder.create(context).addNextIntent(GroupActivity.createIntent(context, groupId, null, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+                return TaskStackBuilder.create(context).addNextIntent(GroupsActivity.createIntent(context,true)).addNextIntent(GroupActivity.createIntent(context, groupId, null, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
             } else {
                 return getLaunchPendingIntent(context,launchUrl,getNotificationType());
             }

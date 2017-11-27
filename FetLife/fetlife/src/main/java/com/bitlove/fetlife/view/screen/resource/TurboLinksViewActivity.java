@@ -19,6 +19,8 @@ import com.bitlove.fetlife.model.api.FetLifeService;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,6 +58,13 @@ public class TurboLinksViewActivity extends ResourceActivity implements Turbolin
         super.showProgress();
         turbolinksView.setVisibility(View.INVISIBLE);
     }
+
+    protected void logEvent() {
+        String pageUrl = getIntent().getStringExtra(EXTRA_PAGE_URL);
+        Answers.getInstance().logCustom(
+                new CustomEvent(getClass().getSimpleName() + ":" + pageUrl));
+    }
+
 
     @Override
     public void hideProgress() {
