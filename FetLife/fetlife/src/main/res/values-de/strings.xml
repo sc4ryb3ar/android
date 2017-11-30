@@ -533,14 +533,29 @@
     <string name="menu_groups">Gruppen</string>
     <string name="title_activity_groups">Gruppen</string>
     <string name="menu_support">Unterstütze FetLife</string>
-    <string name="menu_glossary">Kinkykon</string>
+    <!--string name="menu_glossary">Kinkykon</string-->
     <string name="menu_ads">Werbe auf FetLife</string>
     <string name="title_activity_webview">FetLife</string>
     <string name="title_activity_support">Unterstütze FetLife</string>
     <string name="title_activity_ads">Werbe auf FetLife</string>
-    <string name="title_activity_glossary">Kinktykon</string>
+    <!--string name="title_activity_glossary">Kinktykon</string TODO: figure out a better word-->
     <string name="title_fragment_group_discussions">Diskussionen</string>
     <string name="title_fragment_group_members">Mitglieder</string>
     <string name="action_share">Teilen</string>
-	
+    <string name="menu_relnotes">Versionsdetails</string>
+    <string name="title_activity_relnotes">Versionsdetails</string>
+    <string name="list_header_picture_suggest">Kürzlich angesehen</string>
+    <!--string name="list_header_picture_sharelist">Share List</string>
+    <string name="title_activity_pictureshare">Select Pictures</string>
+    <string name="message_picture_shared">Picture added to your share list</string-->
+    <!-- TODO: translate the three line above after figuring out what a share list is -->
+    <string name="menu_discussion_follow">Folgen</string>
+    <string name="menu_discussion_unfollow">Entfolgen</string>
+    <string name="title_dialog_join_group">Gruppe beitreten</string>
+    <string name="message_dialog_join_group">Hast du die Beschreibung gelesen und bist mit den Regeln der Gruppe einverstanden?</string>
+    <string name="title_dialog_leave_group">Verlasse Gruppe</string>
+    <string name="message_dialog_leave_group">Bitte bestätige, dass du die Gruppe verlassen möchtest</string>
+    <string name="message_discussion_followed">Du folgst der Diskussion</string>
+    <string name="message_discussion_unfollowed">Du folgst nicht länger der Diskussion</string>
+
 </resources>
