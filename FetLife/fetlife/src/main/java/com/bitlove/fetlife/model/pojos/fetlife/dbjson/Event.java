@@ -27,8 +27,13 @@ public class Event extends BaseModel implements Comparable<Event>, ClusterItem {
     public static final double NOT_SET = 0.0d;
 
     public static Event loadEvent(String eventId) {
-        Event event = new Select().from(Event.class).where(Event_Table.id.is(eventId)).querySingle();
-        return event;
+        try {
+            Event event = new Select().from(Event.class).where(Event_Table.id.is(eventId)).querySingle();
+            return event;
+        } catch (Throwable t) {
+            //db not available
+            return null;
+        }
     }
 
     @Column

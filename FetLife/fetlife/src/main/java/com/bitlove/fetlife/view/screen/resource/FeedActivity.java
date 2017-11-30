@@ -11,6 +11,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
@@ -148,6 +149,19 @@ public class FeedActivity extends ResourceListActivity<Story> implements MenuAct
     @Override
     public void onVisitItem(Object object, String url) {
         UrlUtil.openUrl(this,url);
+    }
+
+    @Override
+    public void onShareItem(Object object, String url) {
+        if (!(object instanceof  Picture)) {
+            return;
+        }
+        Picture picture = (Picture) object;
+        if (picture.isOnShareList()) {
+            Picture.unsharePicture(picture);
+        } else {
+            Picture.sharePicture(picture);
+        }
     }
 
     @Override

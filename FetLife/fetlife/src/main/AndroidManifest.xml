@@ -63,6 +63,12 @@
             android:theme="@style/AppTheme.Transparent">
         </activity>
 
+        <activity
+            android:name=".view.screen.resource.PictureShareActivity"
+            android:label="@string/title_activity_pictureshare"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
         <activity-alias
             android:name=".StartActivity_Kinky"
             android:enabled="true"
@@ -161,8 +167,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.screen.standalone.AboutActivity"
-            android:label="@string/title_activity_about"
+            android:name=".view.screen.standalone.ReleaseNotesActivity"
+            android:label="@string/title_activity_relnotes"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".view.screen.standalone.SettingsActivity"

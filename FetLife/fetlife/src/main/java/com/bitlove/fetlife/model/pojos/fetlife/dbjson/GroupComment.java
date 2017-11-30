@@ -9,6 +9,10 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
 @Table(database = FetLifeDatabase.class)
 public class GroupComment extends BaseModel {
 
@@ -68,6 +72,12 @@ public class GroupComment extends BaseModel {
     @JsonProperty("member")
     private Member sender;
 
+    @JsonProperty("body_entities")
+    private Object bodyEntities;
+
+    @Column
+    @JsonIgnore
+    private String entitiesJson;
 
     public String getBody() {
         return body;
@@ -203,4 +213,24 @@ public class GroupComment extends BaseModel {
     public void setPending(boolean pending) {
         this.pending = pending;
     }
+
+    public Object getBodyEntities() {
+        return bodyEntities;
+    }
+
+    public void setBodyEntities(Object bodyEntities) {
+        this.bodyEntities = bodyEntities;
+        if (bodyEntities != null) {
+            entitiesJson = new JSONObject((Map)bodyEntities).toString();
+        }
+    }
+
+    public String getEntitiesJson() {
+        return entitiesJson;
+    }
+
+    public void setEntitiesJson(String entitiesJson) {
+        this.entitiesJson = entitiesJson;
+    }
+
 }

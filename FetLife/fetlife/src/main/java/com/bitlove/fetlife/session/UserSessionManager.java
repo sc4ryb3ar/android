@@ -79,6 +79,8 @@ public class UserSessionManager {
             setupUserSession(lastLoggedInUserId);
         } else if (keepUserSignedIn()) {
             logInUser(lastLoggedInUserId, null);
+        } else {
+            startDb();
         }
     }
 
@@ -292,6 +294,7 @@ public class UserSessionManager {
         }
         userDbName = null;
         FlowManager.reset();
+        FlowManager.init(fetLifeApplication);
     }
 
     private void loadUserDb(String userId) {
@@ -302,6 +305,7 @@ public class UserSessionManager {
         fetLifeApplication.deleteDatabase(getUserDatabaseName(currentUser.getId()));
         FlowManager.reset();
         FlowManager.destroy();
+        FlowManager.init(fetLifeApplication);
     }
 
     private Member loadUserRecord(String userId) {

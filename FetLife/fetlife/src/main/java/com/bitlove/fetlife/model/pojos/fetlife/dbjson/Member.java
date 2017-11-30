@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,6 +21,7 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,6 +107,10 @@ public class Member extends BaseModel {
     @Column
     private String lookingForRawString;
 
+    @Column
+    @JsonIgnore
+    private long lastViewedAt;
+
     //Json Only
     @JsonProperty("avatar")
     private Avatar avatar;
@@ -147,6 +153,14 @@ public class Member extends BaseModel {
 
     public void setAdministrativeArea(String administrativeArea) {
         this.administrativeArea = administrativeArea;
+    }
+
+    public long getLastViewedAt() {
+        return lastViewedAt;
+    }
+
+    public void setLastViewedAt(long lastViewedAt) {
+        this.lastViewedAt = lastViewedAt;
     }
 
     public Avatar getAvatar() {
@@ -306,12 +320,6 @@ public class Member extends BaseModel {
     public boolean mergeSave() {
         Member savedMember = Member.loadMember(id);
         if (savedMember != null) {
-            if (TextUtils.isEmpty(accessToken)) {
-                setAccessToken(savedMember.accessToken);
-            }
-            if (TextUtils.isEmpty(refreshToken)) {
-                setRefreshToken(savedMember.refreshToken);
-            }
             if (TextUtils.isEmpty(about)) {
                 setAbout(savedMember.about);
             }
@@ -330,8 +338,18 @@ public class Member extends BaseModel {
             if (TextUtils.isEmpty(lookingForRawString)) {
                 setLookingForRawString(savedMember.lookingForRawString);
             }
+            if (savedMember.getLastViewedAt() > lastViewedAt) {
+                lastViewedAt = savedMember.getLastViewedAt();
+            }
+            if (!isFollowable()) {
+                setFollowable(savedMember.isFollowable());
+            }
         }
         return internalSave();
+    }
+
+    public boolean isDetailRetrieved() {
+        return getCountry() != null;
     }
 
     @Override
@@ -340,6 +358,15 @@ public class Member extends BaseModel {
     }
 
     public boolean internalSave() {
+        Member savedMember = Member.loadMember(id);
+        if (savedMember != null) {
+            if (TextUtils.isEmpty(accessToken)) {
+                setAccessToken(savedMember.accessToken);
+            }
+            if (TextUtils.isEmpty(refreshToken)) {
+                setRefreshToken(savedMember.refreshToken);
+            }
+        }
         return super.save();
     }
 

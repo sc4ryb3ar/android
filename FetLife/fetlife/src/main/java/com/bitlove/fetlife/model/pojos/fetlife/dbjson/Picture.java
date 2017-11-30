@@ -1,9 +1,12 @@
 
 package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.text.Html;
 
 import com.bitlove.fetlife.FetLifeApplication;
+import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.ServiceCallFailedEvent;
 import com.bitlove.fetlife.event.ServiceCallFinishedEvent;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
@@ -15,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -73,13 +77,20 @@ public class Picture extends BaseModel {
     @JsonIgnore
     private String thumbUrl;
 
+    @Column
+    @JsonIgnore
+    public boolean onShareList;
+
+    @Column
+    @JsonIgnore
+    private long lastViewedAt;
+
     //Json only
     @JsonProperty("member")
     private Member member;
 
     @JsonProperty("variants")
     private PictureVariants variants;
-
 
     //Helper methods
     public static String getFormattedBody(String body) {
@@ -142,6 +153,22 @@ public class Picture extends BaseModel {
             } catch (Exception e) {
             }
         }
+    }
+
+    public long getLastViewedAt() {
+        return lastViewedAt;
+    }
+
+    public void setLastViewedAt(long lastViewedAt) {
+        this.lastViewedAt = lastViewedAt;
+    }
+
+    public boolean isOnShareList() {
+        return onShareList;
+    }
+
+    public void setOnShareList(boolean onShareList) {
+        this.onShareList = onShareList;
     }
 
     @JsonIgnore
@@ -255,7 +282,6 @@ public class Picture extends BaseModel {
         isLovedByMe = lovedByMe;
     }
 
-
     private static class LoveImageCallObserver {
 
         private final FetLifeApplication fetLifeApplication;
@@ -295,6 +321,33 @@ public class Picture extends BaseModel {
 
     @Override
     public boolean save() {
+        Picture currentPicture = Picture.loadPicture(id);
+        if (currentPicture != null) {
+            if (currentPicture.getLastViewedAt() > lastViewedAt) {
+                lastViewedAt = currentPicture.getLastViewedAt();
+                onShareList = currentPicture.isOnShareList();
+            }
+        }
         return super.save();
+    }
+
+    public static Picture loadPicture(String pictureId) {
+        Picture picture = new Select().from(Picture.class).where(Picture_Table.id.is(pictureId)).querySingle();
+        if (picture == null) {
+            return null;
+        }
+        return picture;
+    }
+
+    public static void sharePicture(Picture picture) {
+        picture.setOnShareList(true);
+        picture.save();
+        FetLifeApplication.getInstance().showToast(R.string.message_picture_shared);
+
+    }
+
+    public static void unsharePicture(Picture picture) {
+        picture.setOnShareList(false);
+        picture.save();
     }
 }

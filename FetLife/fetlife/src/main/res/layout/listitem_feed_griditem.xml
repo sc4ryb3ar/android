@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.facebook.drawee.view.SimpleDraweeView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="60dp"
-    android:layout_height="60dp"
+<com.bitlove.fetlife.view.widget.SquareDraweeView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="80dp"
+    android:minHeight="80dp"
+    android:adjustViewBounds="true"
     android:layout_margin="@dimen/default_image_margin">
-</com.facebook.drawee.view.SimpleDraweeView>
+</com.bitlove.fetlife.view.widget.SquareDraweeView>

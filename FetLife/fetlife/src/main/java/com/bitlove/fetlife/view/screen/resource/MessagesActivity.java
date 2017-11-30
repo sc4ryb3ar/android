@@ -2,6 +2,7 @@ package com.bitlove.fetlife.view.screen.resource;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,9 +10,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.MultiAutoCompleteTextView;
 
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.event.MessageSendFailedEvent;
@@ -24,13 +28,16 @@ import com.bitlove.fetlife.event.ServiceCallStartedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
+import com.bitlove.fetlife.util.SpaceTokenizer;
 import com.bitlove.fetlife.view.adapter.MessagesRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.sql.language.Delete;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -48,6 +55,9 @@ public class MessagesActivity extends ResourceActivity
     private static final String EXTRA_AVATAR_RESOURCE_URL = "com.bitlove.fetlife.extra.avatar_resource_url";
     private static final String EXTRA_SHARE_URL = "com.bitlove.fetlife.extra.share_url";
 
+    private static final int MAX_MEMBER_SUGGESTION = 5;
+    private static final int REQUEST_CODE_SHARE_PICTURES = 213;
+
     private MessagesRecyclerAdapter messagesAdapter;
 
     private String conversationId;
@@ -58,8 +68,8 @@ public class MessagesActivity extends ResourceActivity
     protected RecyclerView recyclerView;
     protected LinearLayoutManager recyclerLayoutManager;
     protected View inputLayout;
-    protected View inputIcon;
-    protected EditText textInput;
+    protected View inputIcon, shareIcon;
+    protected MultiAutoCompleteTextView textInput;
     private Conversation conversation;
 
     public static void startActivity(Context context, String conversationId, String title, String avatarResourceUrl, boolean newTask) {
@@ -110,7 +120,8 @@ public class MessagesActivity extends ResourceActivity
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
-        textInput = (EditText) findViewById(R.id.text_input);
+        shareIcon = findViewById(R.id.picture_share_icon);
+        textInput = (MultiAutoCompleteTextView) findViewById(R.id.text_input);
         String shareUrl = getIntent().getStringExtra(EXTRA_SHARE_URL);
         if (shareUrl != null) {
             textInput.append(shareUrl+"\n");
@@ -129,6 +140,7 @@ public class MessagesActivity extends ResourceActivity
 
         inputLayout.setVisibility(View.VISIBLE);
         inputIcon.setVisibility(View.VISIBLE);
+        shareIcon.setVisibility(View.VISIBLE);
 
         setConversation(getIntent());
     }
@@ -174,6 +186,14 @@ public class MessagesActivity extends ResourceActivity
                     ProfileActivity.startActivity(MessagesActivity.this,memberId);
                 }
             };
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Member member = Member.loadMember(memberId);
+                    member.setLastViewedAt(System.currentTimeMillis());
+                    member.mergeSave();
+                }
+            });
         } else {
             toolBarItemClickListener = new View.OnClickListener() {
                 @Override
@@ -197,7 +217,93 @@ public class MessagesActivity extends ResourceActivity
 
         inputLayout = findViewById(R.id.text_input_layout);
         inputIcon = findViewById(R.id.text_send_icon);
-        textInput = (EditText) findViewById(R.id.text_input);
+        textInput = (MultiAutoCompleteTextView) findViewById(R.id.text_input);
+        textInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String[] parts = s.toString().split(" ");
+                List<String> suggesstions = new ArrayList<>();
+                for (String part : parts) {
+                    if (part.length() < 2 || part.charAt(0) != '@') {
+                        continue;
+                    }
+                    List<Member> possibleMembers = new Select().from(Member.class).where(Member_Table.nickname.like(part.substring(1) + "%")).orderBy(Member_Table.lastViewedAt,false).limit(MAX_MEMBER_SUGGESTION).queryList();
+                    for (Member member : possibleMembers) {
+                        suggesstions.add("@"+member.getNickname());
+                    }
+                }
+                textInput.setAdapter(new ArrayAdapter<String >(MessagesActivity.this,android.R.layout.simple_dropdown_item_1line,suggesstions.toArray(new String[suggesstions.size()])));
+                textInput.setTokenizer(new SpaceTokenizer());
+            }
+        });
+
+//        textInput.setMovementMethod(LinkMovementMethod.getInstance());
+//        textInput.addTextChangedListener(new TextWatcher() {
+//            boolean skipNext = false;
+//            int beforeLength;
+//            abstract class NicknameSpan extends ClickableSpan {
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                beforeLength = s.length();
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (s.length() < beforeLength) {
+//                    skipNext = true;
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (skipNext) {
+//                    skipNext = false;
+//                    return;
+//                }
+//                NicknameSpan[] currentNicknames = s.getSpans(0, s.length(), NicknameSpan.class);
+//                for (NicknameSpan nicknameSpan : currentNicknames) {
+//                    s.removeSpan(nicknameSpan);
+//                }
+//                if (TextUtils.isEmpty(s)) {
+//                    return;
+//                }
+//                int cursorPosition = textInput.getSelectionStart();
+//                if (cursorPosition < 0) {
+//                    return;
+//                }
+//                String[] parts = s.subSequence(0,cursorPosition).toString().split(" ");
+//                String lastPart = parts[parts.length-1];
+//                if (lastPart.length() < 3 || lastPart.charAt(0) != '@') {
+//                    return;
+//                }
+//                List<Member> possibleMembers = new Select().from(Member.class).where(Member_Table.nickname.like(lastPart.substring(1) + "%")).queryList();
+//                if (possibleMembers.size() != 1) {
+//                    return;
+//                }
+//                skipNext = true;
+//                String suggestion = possibleMembers.get(0).getNickname().substring(lastPart.length()-1) + " ";
+//                s.insert(cursorPosition,suggestion);
+//                s.setSpan(new NicknameSpan() {
+//                    @Override
+//                    public void onClick(View widget) {
+//                        textInput.setText(textInput.getText().toString());
+//                    }
+//                },cursorPosition,cursorPosition+suggestion.length(),0);
+//            }
+//        });
+
 //        textInput.setFilters(new InputFilter[]{new InputFilter() {
 //            @Override
 //            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -278,6 +384,19 @@ public class MessagesActivity extends ResourceActivity
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_SHARE_PICTURES && resultCode == RESULT_OK) {
+            String[] selectedUrls = data.getStringArrayExtra(PictureShareActivity.RESULT_STRINGS_URLS);
+            if (textInput.getText() != null && textInput.getText().length() > 0) {
+                textInput.append("\n");
+            }
+            for (String selectedUrl : selectedUrls) {
+                textInput.getText().append(selectedUrl + "\n");
+            }
+        }
     }
 
     private void setMessagesRead() {
@@ -366,6 +485,10 @@ public class MessagesActivity extends ResourceActivity
 
     private long lastSendButtonClickTime = 0l;
     private static final long SEND_BUTTON_CLICK_THRESHOLD = 700l;
+
+    public void onShare(View v) {
+        PictureShareActivity.startActivityForResult(this,REQUEST_CODE_SHARE_PICTURES);
+    }
 
     public void onSend(View v) {
         final String text = textInput.getText().toString();

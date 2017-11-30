@@ -207,6 +207,9 @@ public class EventActivity extends ResourceActivity implements AppBarLayout.OnOf
         if (params != null && params.length > 0 && eventId != null && !eventId.equals(params[0])) {
             return false;
         }
+        if (FetLifeApiIntentService.ACTION_APICALL_EVENT.equals(serviceCallAction)) {
+            return true;
+        }
         if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_EVENTS.equals(serviceCallAction)) {
             return true;
         }

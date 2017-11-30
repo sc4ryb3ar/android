@@ -4,7 +4,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,11 +24,26 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupComment_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Message;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Mention;
+import com.bitlove.fetlife.model.pojos.fetlife.json.MessageEntities;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.util.ColorUtil;
 import com.bitlove.fetlife.util.StringUtil;
+import com.bitlove.fetlife.util.UrlUtil;
+import com.bitlove.fetlife.view.adapter.feed.FeedItemResourceHelper;
+import com.bitlove.fetlife.view.adapter.feed.FeedRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
+import com.bitlove.fetlife.view.widget.AutoAlignGridView;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +93,9 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         groupDiscussion = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupDiscussionId)).querySingle();
+        if (groupDiscussion == null) {
+            return;
+        }
         itemList = new Select().from(GroupComment.class).where(GroupComment_Table.groupPostId.is(groupDiscussionId)).orderBy(GroupComment_Table.pending,false).orderBy(GroupComment_Table.date,false).orderBy(GroupComment_Table.id,false).limit(requestedPageCount * ITEM_PER_PAGE).queryList();
         if (itemList.size() == requestedPageCount *ITEM_PER_PAGE) {
             GroupComment requestMorePlaceHolder = new GroupComment();
@@ -98,7 +119,7 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return itemList != null ? itemList.size() : 0;
     }
 
     public GroupComment getItem(int position) {
@@ -132,18 +153,110 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
                     }
                 }
             });
+            messageViewHolder.topText.setVisibility(View.GONE);
             messageViewHolder.messageTextContainer.setVisibility(View.GONE);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, 0, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
             return;
         }
 
+        MessageEntities messageEntities;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            messageEntities = objectMapper.readValue(groupMessage.getEntitiesJson(), MessageEntities.class);
+        } catch (IOException |NullPointerException e) {
+            messageEntities = new MessageEntities();
+        }
+
+        CharSequence messageBody = StringUtil.parseHtml(groupMessage.getBody().trim());
+        SpannableString spannedBody = new SpannableString(messageBody);
+
+        List<Mention> mentions = messageEntities.getMentions();
+        for (final Mention mention : mentions) {
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                public static final long CLICK_OFFSET = 500;
+                private long lastClick = 0;
+                @Override
+                public void onClick(View textView) {
+                    if (System.currentTimeMillis() - lastClick > CLICK_OFFSET) {
+                        mention.getMember().mergeSave();
+                        ProfileActivity.startActivity(textView.getContext(),mention.getMember().getId());
+                    }
+                    lastClick = System.currentTimeMillis();
+                }
+            };
+            int endPosition = mention.getOffset() + mention.getLength();
+            if (spannedBody.length() >= endPosition) {
+                spannedBody.setSpan(clickableSpan, mention.getOffset(), endPosition, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                Crashlytics.log("Mention body:" + spannedBody + " mention: " + mention.getOffset() + "," + mention.getLength());
+                Crashlytics.logException(new Exception("Invalid mention position"));
+            }
+        }
+
+        List<Picture> pictures = messageEntities.getPictures();
+        if (pictures.isEmpty()) {
+            messageViewHolder.messageEntitiesGrid.setVisibility(View.GONE);
+        } else {
+            messageViewHolder.messageEntitiesGrid.setVisibility(View.VISIBLE);
+            int columnCount = Math.min(4,(pictures.size()+2)/3);
+            messageViewHolder.messageEntitiesGrid.setNumColumns(columnCount);
+            PictureGridAdapter pictureGridAdapter = new PictureGridAdapter(new FeedRecyclerAdapter.OnFeedItemClickListener() {
+                @Override
+                public void onMemberClick(Member member) {
+                    member.mergeSave();
+                    ProfileActivity.startActivity(FetLifeApplication.getInstance(), member.getId());
+                }
+
+                @Override
+                public void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, FeedItemResourceHelper feedItemResourceHelper) {
+
+                }
+
+                @Override
+                public void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember) {
+
+                }
+
+                @Override
+                public void onFeedImageLongClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember) {
+
+                }
+
+                @Override
+                public void onVisitItem(Object object, String url) {
+                    UrlUtil.openUrl(FetLifeApplication.getInstance(),url);
+                }
+
+                @Override
+                public void onShareItem(Object object, String url) {
+                    if (!(object instanceof  Picture)) {
+                        return;
+                    }
+                    Picture picture = (Picture) object;
+                    if (picture.isOnShareList()) {
+                        Picture.unsharePicture(picture);
+                    } else {
+                        Picture.sharePicture(picture);
+                    }
+                }
+
+            });
+            pictureGridAdapter.setPictures(pictures);
+            messageViewHolder.messageEntitiesGrid.setAdapter(pictureGridAdapter);
+        }
+
+        messageViewHolder.topText.setVisibility(View.VISIBLE);
         messageViewHolder.messageTextContainer.setVisibility(View.VISIBLE);
 
-        String messageBody = groupMessage.getBody().trim();
-        messageViewHolder.messageText.setText(StringUtil.parseHtml(messageBody));
-        messageViewHolder.subText.setText(groupMessage.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(groupMessage.getDate())));
+        messageViewHolder.messageText.setText(spannedBody);
+//        messageViewHolder.subText.setText(groupMessage.getSenderNickname() + messageViewHolder.subMessageSeparator + SimpleDateFormat.getDateTimeInstance().format(new Date(groupMessage.getDate())));
+        messageViewHolder.topText.setText(groupMessage.getSenderNickname());
+        messageViewHolder.subText.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(groupMessage.getDate())));
+
         messageViewHolder.subText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12);
-        messageViewHolder.subText.setOnClickListener(new View.OnClickListener() {
+        messageViewHolder.topText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 groupMessageClickListener.onMessageMetaClicked(GroupComment.MENTION_PREFIX + groupMessage.getSenderNickname() + " ");
@@ -153,15 +266,19 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
         boolean myMessage = groupMessage.getSenderId().equals(messageViewHolder.getSelfMessageId());
 
         if (myMessage) {
-            messageViewHolder.subText.setGravity(Gravity.RIGHT);
-            messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
+//            messageViewHolder.subText.setGravity(Gravity.RIGHT);
+//            messageViewHolder.messageContainer.setGravity(Gravity.RIGHT);
+//            messageViewHolder.messageText.setGravity(Gravity.RIGHT);
+            messageViewHolder.messsageAligner.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.extendedHPadding, messageViewHolder.vPadding, messageViewHolder.hPadding, messageViewHolder.vPadding);
             messageViewHolder.memberAvatar.setVisibility(View.GONE);
-            messageViewHolder.selfAvatar.setVisibility(View.GONE);
+            messageViewHolder.selfAvatar.setVisibility(View.VISIBLE);
             messageViewHolder.selfAvatar.setImageURI(groupMessage.getAvatarLink());
         } else {
-            messageViewHolder.subText.setGravity(Gravity.LEFT);
-            messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
+//            messageViewHolder.subText.setGravity(Gravity.LEFT);
+//            messageViewHolder.messageContainer.setGravity(Gravity.LEFT);
+//            messageViewHolder.messageText.setGravity(Gravity.LEFT);
+            messageViewHolder.messsageAligner.setGravity(Gravity.LEFT);
             messageViewHolder.messageContainer.setPadding(messageViewHolder.hPadding, messageViewHolder.vPadding, messageViewHolder.extendedHPadding, messageViewHolder.vPadding);
             messageViewHolder.selfAvatar.setVisibility(View.GONE);
             messageViewHolder.memberAvatar.setVisibility(View.VISIBLE);
@@ -193,11 +310,12 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
 
 class GroupMessageViewHolder extends RecyclerView.ViewHolder {
 
-    private static final int EXTEND_PADDING_MULTIPLIER = 3;
+    private static final int EXTEND_PADDING_MULTIPLIER = 5;
+    AutoAlignGridView messageEntitiesGrid;
 
-    LinearLayout messageContainer;
-    LinearLayout messageTextContainer;
-    TextView messageText, subText;
+    LinearLayout messsageAligner;
+    ViewGroup messageContainer, messageTextContainer;
+    TextView messageText, subText, topText;
     String subMessageSeparator;
     SimpleDraweeView memberAvatar, selfAvatar;
     int extendedHPadding, extendedVPadding, hPadding, vPadding;
@@ -219,13 +337,18 @@ class GroupMessageViewHolder extends RecyclerView.ViewHolder {
         primaryTextColor = ColorUtil.retrieverColor(context, R.color.text_color_primary);
         errorTextColor = ColorUtil.retrieverColor(context, R.color.text_color_error);
 
-        messageTextContainer = (LinearLayout) itemView.findViewById(R.id.message_text_container);
-        messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
+        messsageAligner = itemView.findViewById(R.id.message_aligner);
+        messageTextContainer = itemView.findViewById(R.id.message_text_container);
+        messageContainer = itemView.findViewById(R.id.message_container);
         messageText = (TextView) itemView.findViewById(R.id.message_text);
         messageText.setMovementMethod(LinkMovementMethod.getInstance());
+        topText = (TextView) itemView.findViewById(R.id.message_top);
         subText = (TextView) itemView.findViewById(R.id.message_sub);
         memberAvatar = (SimpleDraweeView) itemView.findViewById(R.id.left_member_image);
         selfAvatar = (SimpleDraweeView) itemView.findViewById(R.id.right_member_image);
+
+        messageEntitiesGrid = itemView.findViewById(R.id.message_grid_entities);
+
     }
 
     public String getSelfMessageId() {

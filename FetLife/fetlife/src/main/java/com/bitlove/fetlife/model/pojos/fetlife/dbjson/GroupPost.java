@@ -1,10 +1,9 @@
 package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
-import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.StringUtil;
+import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
@@ -13,14 +12,23 @@ import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
 //TODO: updated at attribute?
 
 @Table(database = FetLifeDatabase.class)
 public class GroupPost extends BaseModel {
 
     public static GroupPost loadGroupPost(String groupPostId) {
-        GroupPost groupPost = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupPostId)).querySingle();
-        return groupPost;
+        try {
+            GroupPost groupPost = new Select().from(GroupPost.class).where(GroupPost_Table.id.is(groupPostId)).querySingle();
+            return groupPost;
+        } catch (Throwable t) {
+            Crashlytics.logException(t);
+            return null;
+        }
     }
 
     @Column
@@ -61,6 +69,13 @@ public class GroupPost extends BaseModel {
     @Column
     private String url;
 
+    @JsonProperty("body_entities")
+    private Object bodyEntities;
+
+    @Column
+    @JsonIgnore
+    private String entitiesJson;
+
     @Column
     @JsonIgnore
     private String avatarLink;
@@ -88,6 +103,10 @@ public class GroupPost extends BaseModel {
     @Column
     @JsonIgnore
     private String nickname;
+
+    @Column
+    @JsonProperty("current_member_is_following")
+    private boolean followed;
 
     @JsonProperty("body")
     public String getBody() {
@@ -182,8 +201,13 @@ public class GroupPost extends BaseModel {
         this.id = id;
     }
 
+    //current_member_is_following
+
     @JsonProperty("member")
     public Member getMember() {
+        if (member == null) {
+            member = Member.loadMember(memberId);
+        }
         return member;
     }
 
@@ -265,4 +289,32 @@ public class GroupPost extends BaseModel {
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public Object getBodyEntities() {
+        return bodyEntities;
+    }
+
+    public void setBodyEntities(Object bodyEntities) {
+        this.bodyEntities = bodyEntities;
+        if (bodyEntities != null) {
+            entitiesJson = new JSONObject((Map)bodyEntities).toString();
+        }
+    }
+
+    public String getEntitiesJson() {
+        return entitiesJson;
+    }
+
+    public void setEntitiesJson(String entitiesJson) {
+        this.entitiesJson = entitiesJson;
+    }
+
+    public boolean isFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(boolean followed) {
+        this.followed = followed;
+    }
+
 }

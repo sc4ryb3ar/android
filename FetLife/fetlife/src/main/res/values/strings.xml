@@ -29,40 +29,34 @@
 
             <p><b><br/>Version History</b></p>
 
-            <p/>v2.11.13<br/>
+            <p/>v2.12.19<br/>
                     <ul>
-                        <li>Several crahs fixex</li>
-                        <li>Temporary fix for crash after notification click</li>
-                        <li>Making group notifications visible on Notifications screen</li>
+                        <li>Join / leave group</li>
+                        <li>Follow / unfollow group discussion</li>
                     </ul>
 
-            <p/>v2.11.11<br/>
+            <p/>v2.12.0<br/>
                     <ul>
-                        <li>Group discussions ordered by last comment</li>
-                        <li>Group comment notification click leads to the proper discussion</li>
-                        <li>Other groups related fixes</li>
+                        <li>Mention links in messages lead to user profiles</li>
+                        <li>Auto extend helper for mentions after using @ character</li>
+                        <li>Add pictures to your share list with the share icon on picture overlay</li>
+                        <li>Share pictures from your share list or recently viewed pictures in conversations or group discussions</li>
                     </ul>
 
-            <p/>v2.11.8<br/>
+            <p/>v2.11.16<br/>
                     <ul>
-                        <li>Fix crash after pressing view button at groups</li>
-                        <li>Slightly improved ordering for groups and discussions (ordered based on last retrieved message date, if there is any)</li>
-                        <li>Crash fix for webview based screens</li>
+                        <li>Removed preview flag</li>
                     </ul>
 
-            <p/>v2.11.5<br/>
+            <p/>v2.11.15<br/>
                     <ul>
-                        <li>Fix for invisible group info at feed</li>
-                        <li>Fix for incorrect profile opened in case of new relation feed item</li>
-                        <li>Small improvements for Group Discussion screen</li>
-                        <li>Group screen page order change</li>
-                        <li>Opening group(discussion) screen from appropriate feed item</li>
+                        <li>Crash fixes</li>
                     </ul>
 
-            <p/>v2.11.0<br/>
+            <p/>v2.11.14<br/>
                     <ul>
                         <li>Groups</li>
-                        <p>Note: Group discussion notifications are by default turned off. Check your settings to enable them.
+                        <li>App Download Page</li>
                     </ul>
 
             <p/>v2.10.3<br/>
@@ -265,7 +259,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="menu_members">Members</string>
-    <string name="menu_about">About</string>
+    <string name="menu_about">About &amp; Install</string>
     <string name="menu_friendrequests">Friend Requests</string>
     <string name="menu_introduce">Share My Profile</string>
     <string name="menu_notifications">Notifications</string>
@@ -309,7 +303,7 @@
     <string name="settings_summary_notifications">Manage when and how to receive notifications</string>
     <string name="settings_category_notification_text">Notification Text</string>
     <string name="settings_title_notification_anonymtext">Anonymous Notifications</string>
-    <string name="settings_summary_notification_anonymtext">Hide any details in incoming notifications and use a single general notification instead</string>
+    <string name="settings_summary_notification_anonymtext">Hide all details in incoming notifications and keep them away from lock screen</string>
     <string name="settings_category_notification_enablement">Enable Notifications</string>
     <string name="settings_title_notification_messages_enabled">Message Notifications</string>
     <string name="settings_summary_notification_messages_enabled">Enable Notifications for incoming Messages</string>
@@ -521,7 +515,7 @@
     <string name="action_undo">UNDO</string>
     <string name="undo_no_longer_possible">Undo is no longer possible</string>
 
-    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'About\' screen</string>
+    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'Release Notes\' screen</string>
 
     <string name="input_message_description">Your Message</string>
     <string name="button_new_conversation_discription">New Conversation</string>
@@ -773,6 +767,7 @@
     <string name="text_group_members_count">%1$d members</string>
     <string name="menu_group_view">View</string>
     <string name="menu_group_member_join">Join</string>
+    <string name="menu_group_member_leave">Leave</string>
     <string name="title_fragment_group_description">Description</string>
     <string name="title_fragment_group_rules">Rules</string>
     <string name="title_activity_group">Group</string>
@@ -790,5 +785,19 @@
     <string name="title_fragment_group_discussions">Discussions</string>
     <string name="title_fragment_group_members">Members</string>
     <string name="action_share">Share</string>
+    <string name="menu_relnotes">Release Notes</string>
+    <string name="title_activity_relnotes">Release Notes</string>
+    <string name="list_header_picture_suggest">Recently Viewed</string>
+    <string name="list_header_picture_sharelist">Share List</string>
+    <string name="title_activity_pictureshare">Select Pictures</string>
+    <string name="message_picture_shared">Picture added to your share list</string>
+    <string name="menu_discussion_follow">Follow</string>
+    <string name="menu_discussion_unfollow">Unfollow</string>
+    <string name="title_dialog_join_group">Join Group</string>
+    <string name="message_dialog_join_group">Did you read the descritpion and do you agree with the rules of this group?</string>
+    <string name="title_dialog_leave_group">Leave Group</string>
+    <string name="message_dialog_leave_group">Please confirm you want to leave this group</string>
+    <string name="message_discussion_followed">You are following the discussion</string>
+    <string name="message_discussion_unfollowed">You are no longer following the discussion</string>
 
 </resources>

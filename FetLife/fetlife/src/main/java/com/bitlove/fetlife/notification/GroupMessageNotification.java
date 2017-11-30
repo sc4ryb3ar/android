@@ -26,6 +26,7 @@ import com.bitlove.fetlife.view.screen.resource.groups.GroupsActivity;
 import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
 import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.InvalidDBConfiguration;
 
 import org.json.JSONObject;
 
@@ -55,12 +56,7 @@ public class GroupMessageNotification extends OneSignalNotification {
         } else {
             groupId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPID);
             groupDiscussionId = apiContainer.optString(NotificationParser.JSON_FIELD_STRING_GROUPPOSTID);
-            GroupPost groupPost;
-            try {
-                groupPost = GroupPost.loadGroupPost(groupDiscussionId);
-            } catch (Throwable t) {
-                groupPost = null;
-            }
+            GroupPost groupPost = GroupPost.loadGroupPost(groupDiscussionId);
             if (groupPost != null) {
                 groupDiscussionTitle = groupPost.getTitle();
             } else {
@@ -74,7 +70,12 @@ public class GroupMessageNotification extends OneSignalNotification {
         NotificationHistoryItem notificationHistoryItem = createNotificationItem(NOTIFICATION_ID_GROUP, groupDiscussionId);
         if (groupDiscussionId != null) {
             notificationHistoryItem.setLaunchUrl(getInnerLaunchUrl());
-            NotificationHistoryItem toBeCollapsedNotification = new Select().from(NotificationHistoryItem.class).where(NotificationHistoryItem_Table.collapseId.eq(notificationHistoryItem.getCollapseId())).querySingle();
+            NotificationHistoryItem toBeCollapsedNotification;
+            try {
+                toBeCollapsedNotification = new Select().from(NotificationHistoryItem.class).where(NotificationHistoryItem_Table.collapseId.eq(notificationHistoryItem.getCollapseId())).querySingle();
+            } catch (InvalidDBConfiguration | IllegalStateException idbe) {
+                toBeCollapsedNotification = null;
+            }
             if (toBeCollapsedNotification != null) {
                 OneSignal.cancelNotification(toBeCollapsedNotification.getDisplayId());
                 toBeCollapsedNotification.delete();
@@ -159,7 +160,7 @@ public class GroupMessageNotification extends OneSignalNotification {
                 //TODO: Change group title
                 Intent contentIntent = GroupMessagesActivity.createIntent(context, groupId, groupDiscussionId, groupDiscussionTitle, null, true);
                 contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,getNotificationType());
-                return TaskStackBuilder.create(context).addNextIntent(GroupActivity.createIntent(context, groupId, null, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+                return TaskStackBuilder.create(context).addNextIntent(GroupsActivity.createIntent(context,true)).addNextIntent(GroupActivity.createIntent(context, groupId, null, true)).addNextIntent(contentIntent).getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
             } else {
                 return getLaunchPendingIntent(context,launchUrl,getNotificationType());
             }
