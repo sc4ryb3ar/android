@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "443588821165",
+    "firebase_url": "https://fetlife-eadce.firebaseio.com",
+    "project_id": "fetlife-eadce",
+    "storage_bucket": "fetlife-eadce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443588821165:android:3e2925e0fb5c57c8",
+        "android_client_info": {
+          "package_name": "com.bitlove.fetlife"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "443588821165-t63fu9ofb82fgei8opbaklnap0lfbq8v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLWNuSyStLnMpDVxDOQsLVIZFR_xqXRkg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

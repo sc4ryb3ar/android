@@ -54,10 +54,8 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.EventRsvpReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.FollowRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupDiscussionReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupDiscussionReference_Table;
-import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference;
-import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference_Table;
-import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference;
-import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMembershipReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMembershipReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
@@ -89,6 +87,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
+import com.bitlove.fetlife.model.pojos.fetlife.json.GroupMembership;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
@@ -122,6 +121,7 @@ import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1838,25 +1838,14 @@ public class FetLifeApiIntentService extends IntentService {
         final int limit = getIntFromParams(params, 1, 10);
         final int page = getIntFromParams(params, 2, 1);
 
-        final Call<List<Member>> getGroupMembersCall = getFetLifeApi().getGroupMembers(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);;
+        final Call<List<GroupMembership>> getGroupMembersCall = getFetLifeApi().getGroupMembers(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);
         final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
 
-        Response<List<Member>> groupMembersResponse = getGroupMembersCall.execute();
+        Response<List<GroupMembership>> groupMembersResponse = getGroupMembersCall.execute();
         if (groupMembersResponse.isSuccess()) {
 
-            final List<Member> groupMembers = groupMembersResponse.body();
-            List<GroupMemberReference> currentGroupMembers = new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.NOCASE)).queryList();
-            final Collator coll = Collator.getInstance(Locale.US);
-            coll.setStrength(Collator.IDENTICAL);
-            Collections.sort(currentGroupMembers, new Comparator<GroupMemberReference>() {
-                @Override
-                public int compare(GroupMemberReference relationReference, GroupMemberReference relationReference2) {
-                    //Workaround to match with DB sorting
-                    String nickname1 = relationReference.getNickname().replaceAll("_","z");
-                    String nickname2 = relationReference2.getNickname().replaceAll("_","z");
-                    return coll.compare(nickname1,nickname2);
-                }
-            });
+            List<GroupMembership> memberships = groupMembersResponse.body();
+            List<GroupMembershipReference> currentGroupMembers = new Select().from(GroupMembershipReference.class).where(GroupMembershipReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMembershipReference_Table.createdAt).descending().collate(Collate.NOCASE)).queryList();
 
             int lastConfirmedPosition;
             if (page == 1) {
@@ -1866,27 +1855,31 @@ public class FetLifeApiIntentService extends IntentService {
             }
             int newItemCount = 0, deletedItemCount = 0;
 
-            for (Member groupMember : groupMembers) {
+            for (GroupMembership groupMembership : memberships) {
 
+                Member groupMember = groupMembership.getMember();
                 groupMember.mergeSave();
 
                 int foundPos;
                 for (foundPos = lastConfirmedPosition+1; foundPos < currentGroupMembers.size(); foundPos++) {
-                    GroupMemberReference checkGroupMember = currentGroupMembers.get(foundPos);
+                    GroupMembershipReference checkGroupMember = currentGroupMembers.get(foundPos);
                     if (groupMember.getId().equals(checkGroupMember.getId())) {
                         break;
                     }
                 }
                 if (foundPos >= currentGroupMembers.size()) {
                     newItemCount++;
-                    GroupMemberReference groupMemberReference = new GroupMemberReference();
-                    groupMemberReference.setId(groupMember.getId());
-                    groupMemberReference.setNickname(groupMember.getNickname());
-                    groupMemberReference.setGroupId(groupId);
-                    groupMemberReference.save();
+                    GroupMembershipReference groupMembershipReference = new GroupMembershipReference();
+                    groupMembershipReference.setId(groupMembership.getId());
+                    groupMembershipReference.setMemberId(groupMember.getId());
+                    groupMembershipReference.setNickname(groupMember.getNickname());
+                    groupMembershipReference.setGroupId(groupId);
+                    groupMembershipReference.setCreatedAt(groupMembership.getCreatedAt());
+                    groupMembershipReference.setLastVisitedAt(groupMembership.getLastVisitedAt());
+                    groupMembershipReference.save();
                 } else {
                     for (int i = lastConfirmedPosition+1; i < foundPos; i++) {
-                        currentGroupMembers.get(i).delete();
+                        //currentGroupMembers.get(i).delete();
                         deletedItemCount++;
                     }
                     lastConfirmedPosition = foundPos;
@@ -1895,7 +1888,7 @@ public class FetLifeApiIntentService extends IntentService {
 
             saveLastSyncedPosition(syncedPositionType,groupId,lastConfirmedPosition+newItemCount);
 
-            return groupMembers.size() - deletedItemCount;
+            return memberships.size() - deletedItemCount;
         } else {
             return Integer.MIN_VALUE;
         }
@@ -1907,7 +1900,7 @@ public class FetLifeApiIntentService extends IntentService {
         final int page = getIntFromParams(params, 2, 1);
 
         final Call<List<GroupPost>> getGroupDiscussionsCall = getFetLifeApi().getGroupDiscussions(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), groupId, limit, page);
-        final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_MEMBERS;
+        final SyncedPositionType syncedPositionType = SyncedPositionType.GROUP_DISCUSSIONS;
 
         Response<List<GroupPost>> groupDiscussionsResponse = getGroupDiscussionsCall.execute();
         if (groupDiscussionsResponse.isSuccess()) {
@@ -2244,20 +2237,14 @@ public class FetLifeApiIntentService extends IntentService {
         final int limit = getIntFromParams(params, 1, 10);
         final int page = getIntFromParams(params, 2, 1);
 
-        final Call<List<Group>> getGroupsCall;
-        getGroupsCall = getFetLifeApi().getMemberGroups(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
+        final Call<List<GroupMembership>> getGroupMembershipsCall;
+        getGroupMembershipsCall = getFetLifeApi().getMemberGroupMemberships(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, limit, page);
 
-        Response<List<Group>> groupsResponse = getGroupsCall.execute();
-        if (groupsResponse.isSuccess()) {
+        Response<List<GroupMembership>> groupMembershipsResponse = getGroupMembershipsCall.execute();
+        if (groupMembershipsResponse.isSuccess()) {
 
-            final List<Group> retrievedGroups = groupsResponse.body();
-            Collections.sort(retrievedGroups, new Comparator<Group>() {
-                @Override
-                public int compare(Group o1, Group o2) {
-                    return o1.getId().compareTo(o2.getId());
-                }
-            });
-            List<GroupReference> currentGroups = new Select().from(GroupReference.class).where(GroupReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(GroupReference_Table.id).ascending()).queryList();
+            final List<GroupMembership> retrievedGroupMemberships = groupMembershipsResponse.body();
+            List<GroupMembershipReference> currentGroups = new Select().from(GroupMembershipReference.class).where(GroupMembershipReference_Table.id.is(userId)).orderBy(OrderBy.fromProperty(GroupMembershipReference_Table.lastVisitedAt).descending()).queryList();
 
             int lastConfirmedGroupPosition;
             if (page == 1) {
@@ -2267,35 +2254,38 @@ public class FetLifeApiIntentService extends IntentService {
             }
             int newItemCount = 0, deletedItemCount = 0;
 
-            for (Group retrievedGroup : retrievedGroups) {
+            for (GroupMembership retrievedGroupMembership : retrievedGroupMemberships) {
 
                 int foundPos;
                 for (foundPos = lastConfirmedGroupPosition+1; foundPos < currentGroups.size(); foundPos++) {
-                    GroupReference checkGroup = currentGroups.get(foundPos);
-                    if (retrievedGroup.getId().equals(checkGroup.getId())) {
+                    GroupMembershipReference checkGroup = currentGroups.get(foundPos);
+                    if (retrievedGroupMembership.getId().equals(checkGroup.getId())) {
                         break;
                     }
                 }
                 if (foundPos >= currentGroups.size()) {
                     newItemCount++;
-                    GroupReference groupReference = new GroupReference();
-                    groupReference.setId(retrievedGroup.getId());
-                    groupReference.setUpdatedAt(retrievedGroup.getUpdatedAt());
-                    groupReference.setUserId(userId);
-                    groupReference.save();
+                    GroupMembershipReference groupMembershipReference = new GroupMembershipReference();
+                    groupMembershipReference.setId(retrievedGroupMembership.getId());
+                    groupMembershipReference.setCreatedAt(retrievedGroupMembership.getCreatedAt());
+                    groupMembershipReference.setLastVisitedAt(retrievedGroupMembership.getLastVisitedAt());
+                    groupMembershipReference.setMemberId(userId);
+                    groupMembershipReference.setGroupId(retrievedGroupMembership.getGroup().getId());
+                    groupMembershipReference.save();
                 } else {
                     for (int i = lastConfirmedGroupPosition+1; i < foundPos; i++) {
-                        currentGroups.get(i).delete();
+                        //temp workaround
+                        //currentGroups.get(i).delete();
                         deletedItemCount++;
                     }
                     lastConfirmedGroupPosition = foundPos;
                 }
-                retrievedGroup.save();
+                retrievedGroupMembership.getGroup().save();
             }
 
             saveLastSyncedPosition(SyncedPositionType.GROUP,userId,lastConfirmedGroupPosition+newItemCount);
 
-            return retrievedGroups.size() - deletedItemCount;
+            return retrievedGroupMemberships.size() - deletedItemCount;
         } else {
             return Integer.MIN_VALUE;
         }

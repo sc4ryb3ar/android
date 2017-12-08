@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMembershipReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMembershipReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.GroupReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
@@ -19,7 +21,11 @@ import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupsRecyclerAdapter extends ResourceListRecyclerAdapter<Group, GroupsViewHolder> {
 
@@ -49,12 +55,23 @@ public class GroupsRecyclerAdapter extends ResourceListRecyclerAdapter<Group, Gr
     protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            List<GroupReference> groupReferences = new Select().from(GroupReference.class).where(GroupReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(GroupReference_Table.id).ascending().collate(Collate.NOCASE)).queryList();
+            List<GroupMembershipReference> groupMembershipReferences = new Select().from(GroupMembershipReference.class).where(GroupMembershipReference_Table.memberId.is(memberId)).orderBy(OrderBy.fromProperty(GroupMembershipReference_Table.lastVisitedAt).descending()).queryList();
+            final Map<String,Integer> orderReference = new HashMap<>();
+            int i = 0;
+            for (GroupMembershipReference membershipReference : groupMembershipReferences) {
+                orderReference.put(membershipReference.getGroupId(),i++);
+            }
             List<String> groupIds = new ArrayList<>();
-            for (GroupReference groupReference : groupReferences) {
-                groupIds.add(groupReference.getId());
+            for (GroupMembershipReference groupMembershipReference : groupMembershipReferences) {
+                groupIds.add(groupMembershipReference.getGroupId());
             }
             itemList = new Select().from(Group.class).where(Group_Table.id.in(groupIds)).orderBy(OrderBy.fromProperty(Group_Table.name).ascending()).queryList();
+            Collections.sort(itemList, new Comparator<Group>() {
+                @Override
+                public int compare(Group o1, Group o2) {
+                    return orderReference.get(o1.getId()) - orderReference.get(o2.getId());
+                }
+            });
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }

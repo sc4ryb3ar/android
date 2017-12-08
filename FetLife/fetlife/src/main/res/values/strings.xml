@@ -2,7 +2,7 @@
 
     <!-- *** Technical values *** -->
 
-    <string name="google_app_id" translatable="false">latex-fetish-123456</string>
+    <!--<string name="google_app_id" translatable="false">latex-fetish-123456</string>-->
 
     <string name="message_sub_separator" translatable="false">" \@ "</string>
 
@@ -28,6 +28,14 @@
             <br/>https://github.com/fetlife/android/
 
             <p><b><br/>Version History</b></p>
+
+            <p/>v2.12.21<br/>
+                    <ul>
+                        <li>Download support for updates</li>
+                        <li>List of Members Groups</li>
+                        <li>List of Group Members</li>
+                        <li>Groups related fixes</li>
+                    </ul>
 
             <p/>v2.12.19<br/>
                     <ul>
@@ -523,12 +531,12 @@
     <string name="action_settings">Settings</string>
     <string name="settings_title_general">General Settings</string>
     <string name="settings_summary_general">Manage general App settings</string>
-    <string name="notification_title_new_release">New FetLife App release</string>
-    <string name="notification_toast_new_release">New FetLife App version is available</string>
-    <string name="notification_text_new_release">Download FetLife App version %1$s\nfor tha latest features and bug fixes.</string>
-    <string name="notification_title_new_prerelease">New FetLife App pre-release</string>
+    <string name="notification_title_new_release">New FetLife App - Stable Version</string>
+    <string name="notification_toast_new_release">New FetLife App Stable Version is available</string>
+    <string name="notification_text_new_release">Click to Download version %1$s</string>
+    <string name="notification_title_new_prerelease">New FetLife App - Preview Version</string>
     <string name="notification_toast_new_prerelease">New FetLife App Preview version is available</string>
-    <string name="notification_text_new_prerelease">Download FetLife App Preview version %1$s\nto test upcoming features.</string>
+    <string name="notification_text_new_prerelease">Click to download version %1$s\n</string>
     <string name="message_friend_request_sent">Friend Request has been sent to %1$s</string>
     <string name="message_follow_set">You are following %1$s</string>
     <string name="message_unfollow_set">You are no longer following %1$s</string>
@@ -799,5 +807,11 @@
     <string name="message_dialog_leave_group">Please confirm you want to leave this group</string>
     <string name="message_discussion_followed">You are following the discussion</string>
     <string name="message_discussion_unfollowed">You are no longer following the discussion</string>
+    <string name="title_fragment_profile_groups">Groups</string>
+    <string name="notification_description_apk_download">Downloading new FetLife App version</string>
+    <string name="noification_title_ready_to_install_apk">New FetLife App version is ready to install</string>
+    <string name="noification_message_ready_to_install_apk">Click to Install</string>
+    <string name="noification_title_downloading_apk">New FetLife App version is being downloaded</string>
+    <string name="noification_message_downloading_apk">In progress</string>
 
 </resources>

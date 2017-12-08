@@ -1,17 +1,21 @@
 package com.bitlove.fetlife.model.pojos.fetlife.db;
 
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 @Table(database = FetLifeDatabase.class)
-public class GroupMemberReference extends BaseModel {
+public class GroupMembershipReference extends BaseModel {
 
     @Column
     @PrimaryKey(autoincrement = false)
     private String id;
+
+    @Column
+    private String memberId;
 
     @Column
     private String nickname;
@@ -19,6 +23,11 @@ public class GroupMemberReference extends BaseModel {
     @Column
     private String groupId;
 
+    @Column
+    private String createdAt;
+
+    @Column
+    private String lastVisitedAt;
 
     public String getId() {
         return id;
@@ -42,5 +51,29 @@ public class GroupMemberReference extends BaseModel {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getLastVisitedAt() {
+        return lastVisitedAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setLastVisitedAt(String lastVisitedAt) {
+        this.lastVisitedAt = lastVisitedAt;
     }
 }

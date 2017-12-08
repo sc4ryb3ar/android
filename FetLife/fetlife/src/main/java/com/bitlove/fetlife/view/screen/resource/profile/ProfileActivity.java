@@ -113,10 +113,12 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     case 6:
                         return EventsFragment.newInstance(memberId);
                     case 7:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
+                        return GroupsFragment.newInstance(memberId);
                     case 8:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
                     case 9:
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                    case 10:
                         return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWER);
                     default:
                         return null;
@@ -125,7 +127,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
             @Override
             public int getCount() {
-                return 10;
+                return 11;
             }
 
             @Override
@@ -146,10 +148,12 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     case 6:
                         return getString(R.string.title_fragment_profile_events);
                     case 7:
-                        return getString(R.string.title_fragment_profile_friends);
+                        return getString(R.string.title_fragment_profile_groups);
                     case 8:
-                        return getString(R.string.title_fragment_profile_following);
+                        return getString(R.string.title_fragment_profile_friends);
                     case 9:
+                        return getString(R.string.title_fragment_profile_following);
+                    case 10:
                         return getString(R.string.title_fragment_profile_followers);
                     default:
                         return null;
@@ -322,6 +326,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
             return true;
         }
         if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_EVENTS.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_GROUPS.equals(serviceCallAction)) {
             return true;
         }
         return false;

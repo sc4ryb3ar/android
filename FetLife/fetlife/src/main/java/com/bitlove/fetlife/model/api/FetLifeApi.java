@@ -15,6 +15,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.json.Comment;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
+import com.bitlove.fetlife.model.pojos.fetlife.json.GroupMembership;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
@@ -46,8 +47,8 @@ public interface FetLifeApi {
     @GET("/api/v2/me")
     Call<Member> getMe(@Header("Authorization") String authHeader);
 
-    @GET("/api/v2/members/{memberId}/groups")
-    Call<List<Group>> getMemberGroups(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+    @GET("/api/v2/members/{memberId}/memberships")
+    Call<List<GroupMembership>> getMemberGroupMemberships(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
 
     @GET("/api/v2/me/conversations")
     Call<List<Conversation>> getConversations(@Header("Authorization") String authHeader, @Query("order_by") String orderBy, @Query("limit") int limit, @Query("page") int page);
@@ -67,8 +68,8 @@ public interface FetLifeApi {
     @GET("/api/v2/search/groups")
     Call<List<Group>> searchGroups(@Header("Authorization") String authHeader, @Query("query") String query, @Query("limit") int limit, @Query("page") int page);
 
-    @GET("/api/v2/groups/{groupId}/members")
-    Call<List<Member>> getGroupMembers(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
+    @GET("/api/v2/groups/{groupId}/memberships")
+    Call<List<GroupMembership>> getGroupMembers(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);
 
     @GET("/api/v2/groups/{groupId}/posts")
     Call<List<GroupPost>> getGroupDiscussions(@Header("Authorization") String authHeader, @Path("groupId") String groupId, @Query("limit") int limit, @Query("page") int page);

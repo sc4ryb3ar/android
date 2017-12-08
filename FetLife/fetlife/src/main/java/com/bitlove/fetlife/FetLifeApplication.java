@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 import android.util.Base64;
 import android.widget.Toast;
@@ -117,6 +118,10 @@ public class FetLifeApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //See: https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
 //        if (BuildConfig.DEBUG) {
 //            Debug.waitForDebugger();

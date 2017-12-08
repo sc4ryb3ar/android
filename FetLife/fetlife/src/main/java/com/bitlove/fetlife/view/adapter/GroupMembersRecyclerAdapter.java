@@ -1,10 +1,8 @@
 package com.bitlove.fetlife.view.adapter;
 
 import com.bitlove.fetlife.FetLifeApplication;
-import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference;
-import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMemberReference_Table;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference;
-import com.bitlove.fetlife.model.pojos.fetlife.db.RelationReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMembershipReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.GroupMembershipReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member_Table;
 import com.raizlabs.android.dbflow.annotation.Collate;
@@ -15,7 +13,9 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupMembersRecyclerAdapter extends MembersRecyclerAdapter {
 
@@ -30,23 +30,22 @@ public class GroupMembersRecyclerAdapter extends MembersRecyclerAdapter {
     protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
-            List<GroupMemberReference> relationReferences = new Select().from(GroupMemberReference.class).where(GroupMemberReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMemberReference_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
+            List<GroupMembershipReference> relationReferences = new Select().from(GroupMembershipReference.class).where(GroupMembershipReference_Table.groupId.is(groupId)).orderBy(OrderBy.fromProperty(GroupMembershipReference_Table.createdAt).descending().collate(Collate.UNICODE)).queryList();
+            final Map<String,Integer> orderReference = new HashMap<>();
+            int i = 0;
             List<String> relationIds = new ArrayList<>();
-            for (GroupMemberReference relationReference : relationReferences) {
-                relationIds.add(relationReference.getId());
+            for (GroupMembershipReference relationReference : relationReferences) {
+                orderReference.put(relationReference.getMemberId(),i++);
+                relationIds.add(relationReference.getMemberId());
             }
-            itemList = new Select().from(Member.class).where(Member_Table.id.in(relationIds)).orderBy(OrderBy.fromProperty(Member_Table.nickname).ascending().collate(Collate.UNICODE)).queryList();
-            final Collator coll = Collator.getInstance();
-            coll.setStrength(Collator.IDENTICAL);
+            itemList = new Select().from(Member.class).where(Member_Table.id.in(relationIds)).queryList();
             Collections.sort(itemList, new Comparator<Member>() {
                 @Override
-                public int compare(Member member, Member member2) {
-                    //Workaround to match with DB sorting
-                    String nickname1 = member.getNickname().replaceAll("_","z");
-                    String nickname2 = member2.getNickname().replaceAll("_","z");
-                    return coll.compare(nickname1,nickname2);
+                public int compare(Member o1, Member o2) {
+                    return orderReference.get(o1.getId()) - orderReference.get(o2.getId());
                 }
             });
+
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }

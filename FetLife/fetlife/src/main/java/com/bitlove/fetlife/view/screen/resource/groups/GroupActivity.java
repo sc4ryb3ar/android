@@ -114,7 +114,7 @@ public class GroupActivity extends ResourceActivity implements AppBarLayout.OnOf
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
 
             @Override
