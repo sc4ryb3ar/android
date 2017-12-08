@@ -285,12 +285,12 @@
     <string name="action_settings">Einstellungen</string>
     <string name="settings_title_general">Allgemeine Einstellungen</string>
     <string name="settings_summary_general">Überprüfe die allgemeinen Appeinstellungen</string>
-    <string name="notification_title_new_release">Neue FetLife App Version verfügbar</string>
-    <string name="notification_toast_new_release">Neue FetLife App Version verfügbar</string>
-    <string name="notification_text_new_release">Lade die FetLife App Version %1$s herunter\nfür die neuesten Features und Bug Fixes.</string>
+    <string name="notification_title_new_release">Neue stabile FetLife App</string>
+    <string name="notification_toast_new_release">Neue stabile FetLife App Version verfügbar</string>
+    <string name="notification_text_new_release">Klicke hier um Version %1$s herunterzuladen</string>
     <string name="notification_title_new_prerelease">Neue vorveröffentlichte FetLife App</string>
-    <string name="notification_toast_new_prerelease">Neue Vorschau der FetLife App ist verfügbar</string>
-    <string name="notification_text_new_prerelease">Lade die Vorschau der FetLife App Version %1$s,\n um neue Features zu testen.</string>
+    <string name="notification_toast_new_prerelease">Neue vorveröffentlichte Version der FetLife App ist verfügbar</string>
+    <string name="notification_text_new_prerelease">Klicke hier um Version %1$s herunterzuladen</string>
     <string name="message_friend_request_sent">Freundschaftsanfrage wurde an %1$s gesendet</string>
     <string name="message_follow_set">Du folgst jetzt %1$s</string>
     <string name="message_unfollow_set">Du folgst nicht länger %1$s</string>
@@ -525,6 +525,7 @@
     <string name="text_group_members_count">%1$d Mitglieder</string>
     <string name="menu_group_view">Ansehen</string>
     <string name="menu_group_member_join">Beitreten</string>
+    <string name="menu_group_member_leave">Verlassen</string>
     <string name="title_fragment_group_description">Beschreibung</string>
     <string name="title_fragment_group_rules">Regeln</string>
     <string name="title_activity_group">Gruppe</string>
@@ -557,5 +558,11 @@
     <string name="message_dialog_leave_group">Bitte bestätige, dass du die Gruppe verlassen möchtest</string>
     <string name="message_discussion_followed">Du folgst der Diskussion</string>
     <string name="message_discussion_unfollowed">Du folgst nicht länger der Diskussion</string>
+    <string name="title_fragment_profile_groups">Gruppen</string>
+    <string name="notification_description_apk_download">Lade neue FetLife App herunter</string>
+    <string name="noification_title_ready_to_install_apk">Neue FetLife App kann installiert werden</string>
+    <string name="noification_message_ready_to_install_apk">Klicke zum installieren</string>
+    <string name="noification_title_downloading_apk">Neue FetLife App wird heruntergeladen</string>
+    <string name="noification_message_downloading_apk">Im Gange</string>
 
 </resources>
