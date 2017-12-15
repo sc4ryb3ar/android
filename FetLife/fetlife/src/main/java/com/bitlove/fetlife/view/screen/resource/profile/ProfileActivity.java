@@ -111,14 +111,16 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     case 5:
                         return VideosFragment.newInstance(memberId);
                     case 6:
-                        return EventsFragment.newInstance(memberId);
+                        return WritingsFragment.newInstance(memberId);
                     case 7:
-                        return GroupsFragment.newInstance(memberId);
+                        return EventsFragment.newInstance(memberId);
                     case 8:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
+                        return GroupsFragment.newInstance(memberId);
                     case 9:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
                     case 10:
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                    case 11:
                         return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWER);
                     default:
                         return null;
@@ -127,7 +129,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
             @Override
             public int getCount() {
-                return 11;
+                return 12;
             }
 
             @Override
@@ -146,14 +148,16 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     case 5:
                         return getString(R.string.title_fragment_profile_videos);
                     case 6:
-                        return getString(R.string.title_fragment_profile_events);
+                        return getString(R.string.title_fragment_profile_writings);
                     case 7:
-                        return getString(R.string.title_fragment_profile_groups);
+                        return getString(R.string.title_fragment_profile_events);
                     case 8:
-                        return getString(R.string.title_fragment_profile_friends);
+                        return getString(R.string.title_fragment_profile_groups);
                     case 9:
-                        return getString(R.string.title_fragment_profile_following);
+                        return getString(R.string.title_fragment_profile_friends);
                     case 10:
+                        return getString(R.string.title_fragment_profile_following);
+                    case 11:
                         return getString(R.string.title_fragment_profile_followers);
                     default:
                         return null;

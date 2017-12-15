@@ -66,6 +66,8 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.StatusReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.StatusReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.db.VideoReference;
 import com.bitlove.fetlife.model.pojos.fetlife.db.VideoReference_Table;
+import com.bitlove.fetlife.model.pojos.fetlife.db.WritingReference;
+import com.bitlove.fetlife.model.pojos.fetlife.db.WritingReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Conversation_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
@@ -82,6 +84,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Writing;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Feed;
@@ -152,6 +155,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MEMBER_RELATIONS = "com.bitlove.fetlife.action.apicall.member_relations";
     public static final String ACTION_APICALL_MEMBER_STATUSES = "com.bitlove.fetlife.action.apicall.member_statuses";
     public static final String ACTION_APICALL_MEMBER_EVENTS = "com.bitlove.fetlife.action.apicall.member_events";
+    public static final String ACTION_APICALL_MEMBER_WRITINGS = "com.bitlove.fetlife.action.apicall.member_writings";
     public static final String ACTION_APICALL_MEMBER_GROUPS = "com.bitlove.fetlife.action.apicall.member_groups";
     public static final String ACTION_APICALL_MEMBER_PICTURES = "com.bitlove.fetlife.action.apicall.member_pictures";
     public static final String ACTION_APICALL_MEMBER_VIDEOS = "com.bitlove.fetlife.action.apicall.member_videos";
@@ -177,6 +181,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_LOCATION = "com.bitlove.fetlife.action.apicall.search_events_by_location";
     public static final String ACTION_APICALL_SEARCH_EVENT_BY_TAG = "com.bitlove.fetlife.action.apicall.search_events_by_tag";
     public static final String ACTION_APICALL_EVENT = "com.bitlove.fetlife.action.apicall.event";
+    public static final String ACTION_APICALL_WRITING = "com.bitlove.fetlife.action.apicall.writing";
     public static final String ACTION_APICALL_SEARCH_GROUP = "com.bitlove.fetlife.action.apicall.search_group";
     public static final String ACTION_APICALL_GROUP = "com.bitlove.fetlife.action.apicall.group";
     public static final String ACTION_APICALL_GROUP_JOIN = "com.bitlove.fetlife.action.apicall.group_join";
@@ -406,6 +411,9 @@ public class FetLifeApiIntentService extends IntentService {
                 case ACTION_APICALL_MEMBER_EVENTS:
                     result = retrieveMemberEvents(params);
                     break;
+                case ACTION_APICALL_MEMBER_WRITINGS:
+                    result = retrieveMemberWritings(params);
+                    break;
                 case ACTION_APICALL_MEMBER_GROUPS:
                     result = retrieveMemberGroups(params);
                     break;
@@ -414,6 +422,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_GROUP_DISCUSSIONS:
                     result = retrieveGroupDiscussions(params);
+                    break;
+                case ACTION_APICALL_WRITING:
+                    result = getWriting(params);
                     break;
                 case ACTION_APICALL_EVENT_RSVPS:
                     result = retrieveEventRsvps(params);
@@ -1604,6 +1615,21 @@ public class FetLifeApiIntentService extends IntentService {
         }
     }
 
+    private int getWriting(String... params) throws IOException {
+        String writingId = params[0];
+        String memberId = params[1];
+        Call<Writing> getWritingCall = getFetLifeApi().getWriting(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), memberId, writingId);
+        Response<Writing> getWritingResponse = getWritingCall.execute();
+        if (getWritingResponse.isSuccess()) {
+            Writing writing = getWritingResponse.body();
+            writing.detailSave();
+            return 1;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+
+    }
+
     private int getEvent(String... params) throws IOException {
         String eventId = params[0];
         Call<Event> getEventCall = getFetLifeApi().getEvent(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), eventId);
@@ -2303,7 +2329,7 @@ public class FetLifeApiIntentService extends IntentService {
         if (rsvpsResponse.isSuccess()) {
 
             final List<Rsvp> retrievedRsvps = rsvpsResponse.body();
-            List<EventReference> currentEvents = new Select().from(EventReference.class).where(EventReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
+            List<EventReference> currentEvents = new Select().from(EventReference.class).where(EventReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(EventReference_Table.date).descending()).queryList();
 
             int lastConfirmedEventPosition;
             if (page == 1) {
@@ -2346,6 +2372,63 @@ public class FetLifeApiIntentService extends IntentService {
             saveLastSyncedPosition(SyncedPositionType.EVENT,userId,lastConfirmedEventPosition+newItemCount);
 
             return retrievedRsvps.size() - deletedItemCount;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveMemberWritings(String[] params) throws IOException {
+        String userId = params[0];
+        final int limit = getIntFromParams(params, 1, 10);
+        final int page = getIntFromParams(params, 2, 1);
+
+        final Call<List<Writing>> getWritingsCall;
+        getWritingsCall = getFetLifeApi().getMemberWritings(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), userId, /*"start_date_time",*/ limit, page);
+
+        Response<List<Writing>> writingsResponse = getWritingsCall.execute();
+        if (writingsResponse.isSuccess()) {
+
+            final List<Writing> retrievedWritings = writingsResponse.body();
+            List<WritingReference> currentWritings = new Select().from(WritingReference.class).where(WritingReference_Table.userId.is(userId)).orderBy(OrderBy.fromProperty(WritingReference_Table.date).descending()).queryList();
+
+            int lastConfirmedEventPosition;
+            if (page == 1) {
+                lastConfirmedEventPosition = -1;
+            } else {
+                lastConfirmedEventPosition = loadLastSyncedPosition(SyncedPositionType.WRITING,userId);
+            }
+            int newItemCount = 0, deletedItemCount = 0;
+
+            for (Writing retrievedWriting : retrievedWritings) {
+
+                int foundPos;
+                for (foundPos = lastConfirmedEventPosition+1; foundPos < currentWritings.size(); foundPos++) {
+                    WritingReference checkEvent = currentWritings.get(foundPos);
+                    if (retrievedWriting.getId().equals(checkEvent.getId())) {
+                        break;
+                    }
+                }
+                if (foundPos >= currentWritings.size()) {
+                    newItemCount++;
+                    WritingReference writingReference = new WritingReference();
+                    writingReference.setId(retrievedWriting.getId());
+                    writingReference.setCreatedAt(retrievedWriting.getCreatedAt());
+                    writingReference.setDate(retrievedWriting.getDate());
+                    writingReference.setUserId(userId);
+                    writingReference.save();
+                } else {
+                    for (int i = lastConfirmedEventPosition+1; i < foundPos; i++) {
+                        currentWritings.get(i).delete();
+                        deletedItemCount++;
+                    }
+                    lastConfirmedEventPosition = foundPos;
+                }
+                retrievedWriting.save();
+            }
+
+            saveLastSyncedPosition(SyncedPositionType.WRITING,userId,lastConfirmedEventPosition+newItemCount);
+
+            return retrievedWritings.size() - deletedItemCount;
         } else {
             return Integer.MIN_VALUE;
         }
@@ -2537,7 +2620,7 @@ public class FetLifeApiIntentService extends IntentService {
         EVENT,
         EVENT_RSVP,
         FRIEND,
-        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP, GROUP_MEMBERS, GROUP_DISCUSSIONS;
+        CONVERSATION, FOLLOWER, FOLLOWING, VIDEO, GROUP, GROUP_MEMBERS, GROUP_DISCUSSIONS, WRITING;
 
         @Override
         public String toString() {

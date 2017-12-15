@@ -140,6 +140,7 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
                 imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
                 Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
                 picture.setLovedByMe(newIsLoved);
+                picture.save();
             }
         });
 

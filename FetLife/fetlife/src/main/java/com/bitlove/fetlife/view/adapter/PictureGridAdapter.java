@@ -56,6 +56,7 @@ public class PictureGridAdapter extends BaseAdapter {
                 imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
                 Picture.startLoveCallWithObserver(FetLifeApplication.getInstance(), picture, newIsLoved);
                 picture.setLovedByMe(newIsLoved);
+                picture.save();
             }
         });
 

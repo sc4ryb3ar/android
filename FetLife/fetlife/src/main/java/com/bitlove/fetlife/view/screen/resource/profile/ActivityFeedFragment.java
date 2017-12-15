@@ -16,6 +16,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Writing;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
@@ -26,6 +27,7 @@ import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.EventActivity;
 import com.bitlove.fetlife.view.screen.resource.PictureShareActivity;
+import com.bitlove.fetlife.view.screen.resource.WritingActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupActivity;
 import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupMessagesActivity;
@@ -73,6 +75,13 @@ public class ActivityFeedFragment extends LoadFragment implements FeedRecyclerAd
                 //TODO(feed): Remove this mergeSave after Feed is stored in local db
                 targetMember.mergeSave();
                 ProfileActivity.startActivity((BaseActivity) getActivity(), targetMember.getId());
+                return;
+            }
+        } else if (feedStoryType == Story.FeedStoryType.LIKE_CREATED || feedStoryType == Story.FeedStoryType.COMMENT_CREATED) {
+            Writing targetWriting = feedItemResourceHelper.getWriting(feedEvent);
+            if (targetWriting != null) {
+                targetWriting.save();
+                WritingActivity.startActivity((BaseActivity) getActivity(),targetWriting.getId(),targetWriting.getMemberId());
                 return;
             }
         } else if (feedStoryType == Story.FeedStoryType.RSVP_CREATED) {

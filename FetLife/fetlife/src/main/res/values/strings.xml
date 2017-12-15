@@ -29,6 +29,11 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.13.0<br/>
+                    <ul>
+                        <li>Writings</li>
+                    </ul>
+
             <p/>v2.12.21<br/>
                     <ul>
                         <li>Download support for updates</li>
@@ -813,5 +818,10 @@
     <string name="noification_message_ready_to_install_apk">Click to Install</string>
     <string name="noification_title_downloading_apk">New FetLife App version is being downloaded</string>
     <string name="noification_message_downloading_apk">In progress</string>
+    <string name="title_fragment_profile_writings">Writings</string>
+    <string name="menu_writing_love">Love</string>
+    <string name="menu_writing_view">View</string>
+    <string name="title_activity_writing">WritingActivity</string>
+    <string name="menu_writing_author">Author</string>
 
 </resources>

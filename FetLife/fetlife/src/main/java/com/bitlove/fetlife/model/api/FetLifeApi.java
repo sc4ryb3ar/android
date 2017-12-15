@@ -9,6 +9,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Video;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Writing;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AuthBody;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Comment;
@@ -134,6 +135,12 @@ public interface FetLifeApi {
 
     @GET("/api/v2/members/{memberId}/rsvps")
     Call<List<Rsvp>> getMemberRsvps(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/members/{memberId}/writings/{writingId}")
+    Call<Writing> getWriting(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Path("writingId") String writingId);
+
+    @GET("/api/v2/members/{memberId}/writings")
+    Call<List<Writing>> getMemberWritings(@Header("Authorization") String authHeader, @Path("memberId") String memberId, @Query("limit") int limit, @Query("page") int page);
 
     @GET("/api/v2/events/{eventId}/rsvps")
     Call<List<Rsvp>> getEventRsvps(@Header("Authorization") String authHeader, @Path("eventId") String eventId, @Query("status") String status, @Query("limit") int limit, @Query("page") int page);

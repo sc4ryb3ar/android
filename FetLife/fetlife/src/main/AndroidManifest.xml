@@ -231,6 +231,11 @@
             android:value="@string/google_maps_key"/>
 
         <activity
+            android:name=".view.screen.resource.WritingActivity"
+            android:label="@string/title_activity_writing"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
             android:name=".view.screen.resource.EventActivity"
             android:label="@string/title_activity_event"
             android:theme="@style/AppTheme.NoActionBar">
