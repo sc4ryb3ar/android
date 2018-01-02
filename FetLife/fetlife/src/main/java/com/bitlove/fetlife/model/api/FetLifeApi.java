@@ -18,6 +18,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.json.GroupMembership;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Rsvp;
+import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.squareup.okhttp.ResponseBody;
@@ -181,6 +182,15 @@ public interface FetLifeApi {
 
     @GET("/api/v2/me/feed")
     Call<Feed> getFeed(@Header("Authorization") String authHeader, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/explore/stuff-you-love")
+    Call<List<Story>> getStuffYouLove(@Header("Authorization") String authHeader, @Query("marker") String timeStamp, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/explore/fresh-and-pervy")
+    Call<List<Story>> getFreshAndPervy(@Header("Authorization") String authHeader, @Query("marker") String timeStamp, @Query("limit") int limit, @Query("page") int page);
+
+    @GET("/api/v2/explore/kinky-and-popular")
+    Call<List<Story>> getKinkyAndPopular(@Header("Authorization") String authHeader, @Query("marker") String timeStamp, @Query("limit") int limit, @Query("page") int page);
 
     @PUT("/api/v2/me/loves/{content_type}/{content_id}")
     Call<ResponseBody> putLove(@Header("Authorization") String authHeader, @Path("content_id") String contentId, @Path("content_type") String contentType);

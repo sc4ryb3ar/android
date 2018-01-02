@@ -26,7 +26,7 @@ import java.util.List;
 
 public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, FeedViewHolder> {
 
-    private final String memberId;
+    protected final String memberId;
 
     public interface OnFeedItemClickListener {
         void onMemberClick(Member member);
@@ -38,10 +38,10 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
         void onVisitItem(Object object, String url);
     }
 
-    private final FetLifeApplication fetLifeApplication;
-    private final OnFeedItemClickListener onFeedItemClickListener;
+    protected final FetLifeApplication fetLifeApplication;
+    protected final OnFeedItemClickListener onFeedItemClickListener;
 
-    private List<Story> itemList;
+    protected List<Story> itemList;
 
     FeedAdapterBinder feedImageAdapterBinder;
     FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder;
@@ -66,7 +66,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
         });
     }
 
-    private void loadItems() {
+    protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         if (memberId != null) {
             itemList = fetLifeApplication.getInMemoryStorage().getProfileFeed();

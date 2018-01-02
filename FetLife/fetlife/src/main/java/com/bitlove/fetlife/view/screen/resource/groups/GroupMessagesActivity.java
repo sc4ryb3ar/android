@@ -72,7 +72,6 @@ public class GroupMessagesActivity extends ResourceActivity
 
     private GroupMessagesRecyclerAdapter messagesAdapter;
 
-    private String groupDiscussionId;
     private String avatarUrl;
     private String memberId;
 
@@ -80,7 +79,10 @@ public class GroupMessagesActivity extends ResourceActivity
     protected LinearLayoutManager recyclerLayoutManager;
     protected View inputLayout, inputIcon, floatingArrow, shareIcon;
     protected MultiAutoCompleteTextView textInput;
+
     private String groupId;
+    private String groupDiscussionId;
+    private Group group;
     private GroupPost groupDiscussion;
 
     public static void startActivity(Context context, String groupId, String groupDiscussionId, String title, String avatarResourceUrl, boolean newTask) {
@@ -237,6 +239,7 @@ public class GroupMessagesActivity extends ResourceActivity
         avatarUrl = intent.getStringExtra(EXTRA_AVATAR_RESOURCE_URL);
         memberId = null;
 
+        group = Group.loadGroup(groupId);
         messagesAdapter = new GroupMessagesRecyclerAdapter(groupId,groupDiscussionId,this);
         groupDiscussion = messagesAdapter.getGroupPost();
         if (groupDiscussion != null) {
@@ -287,6 +290,13 @@ public class GroupMessagesActivity extends ResourceActivity
         toolBarTitle.setOnClickListener(toolBarTitleClickListener);
 
         recyclerView.setAdapter(messagesAdapter);
+
+
+        int visibility = group != null && group.isMemberOfGroup() ? View.VISIBLE : View.GONE;
+
+        inputLayout.setVisibility(visibility);
+        inputIcon.setVisibility(visibility);
+        shareIcon.setVisibility(visibility);
 
         invalidateOptionsMenu();
     }

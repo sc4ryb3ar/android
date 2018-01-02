@@ -29,6 +29,16 @@
 
             <p><b><br/>Version History</b></p>
 
+            <p/>v2.13.5<br/>
+                    <ul>
+                        <li>Kinky &amp; Popular [Design work in progress]</li>
+                    </ul>
+
+            <p/>v2.13.2<br/>
+                    <ul>
+                        <li>Stuff you Love [Design work in progress]</li>
+                    </ul>
+
             <p/>v2.13.0<br/>
                     <ul>
                         <li>Writings</li>
@@ -528,7 +538,7 @@
     <string name="action_undo">UNDO</string>
     <string name="undo_no_longer_possible">Undo is no longer possible</string>
 
-    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'Release Notes\' screen</string>
+    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'Release Notes\'</string>
 
     <string name="input_message_description">Your Message</string>
     <string name="button_new_conversation_discription">New Conversation</string>
@@ -823,5 +833,11 @@
     <string name="menu_writing_view">View</string>
     <string name="title_activity_writing">WritingActivity</string>
     <string name="menu_writing_author">Author</string>
+    <string name="title_activity_stuff_you_love">Stuff you Love</string>
+    <string name="nav_stuff_you_love">Stuff you Love</string>
+    <string name="nav_fresh_and_pervy"><![CDATA[Fresh & Pervy]]></string>
+    <string name="nav_kinky_and_popular"><![CDATA[Kinky & Popular]]></string>
+    <string name="title_activity_kinky_and_popular"><![CDATA[Kinky & Popular]]></string>
+    <string name="title_activity_fresh_and_pervy"><![CDATA[Fresh & Pervy]]></string>
 
 </resources>

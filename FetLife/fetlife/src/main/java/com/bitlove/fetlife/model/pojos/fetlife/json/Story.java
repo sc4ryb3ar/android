@@ -58,7 +58,6 @@ public class Story {
         return EnumUtil.safeParse(FeedStoryType.class, name);
     }
 
-
     @JsonProperty("events")
     private List<FeedEvent> events = new ArrayList<FeedEvent>();
 

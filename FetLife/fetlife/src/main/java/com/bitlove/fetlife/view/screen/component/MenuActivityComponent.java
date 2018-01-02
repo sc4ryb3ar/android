@@ -28,6 +28,7 @@ import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
 import com.bitlove.fetlife.view.screen.resource.EventsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.ExploreActivity;
 import com.bitlove.fetlife.view.screen.resource.groups.GroupsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
 import com.bitlove.fetlife.view.screen.resource.TurboLinksViewActivity;
@@ -215,6 +216,12 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
+        } else if (id == R.id.nav_stuff_you_love) {
+            ExploreActivity.startActivity(menuActivity, ExploreActivity.Explore.STUFF_YOU_LOVE);
+//        } else if (id == R.id.nav_fresh_and_pervy) {
+//            ExploreActivity.startActivity(menuActivity, ExploreActivity.Explore.FRESH_AND_PERVY);
+        } else if (id == R.id.nav_kinky_and_popular) {
+            ExploreActivity.startActivity(menuActivity, ExploreActivity.Explore.KINKY_AND_POPULAR);
         } else if (id == R.id.nav_support) {
             TurboLinksViewActivity.startActivity(menuActivity,"support",menuActivity.getString(R.string.title_activity_support));
         } else if (id == R.id.nav_ads) {

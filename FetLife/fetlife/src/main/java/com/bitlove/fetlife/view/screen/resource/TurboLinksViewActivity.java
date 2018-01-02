@@ -65,7 +65,6 @@ public class TurboLinksViewActivity extends ResourceActivity implements Turbolin
                 new CustomEvent(getClass().getSimpleName() + ":" + pageUrl));
     }
 
-
     @Override
     public void hideProgress() {
         hideProgress(true);

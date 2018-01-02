@@ -97,11 +97,13 @@ import com.bitlove.fetlife.model.pojos.fetlife.json.Token;
 import com.bitlove.fetlife.model.pojos.fetlife.json.VideoUploadResult;
 import com.bitlove.fetlife.model.pojos.github.Release;
 import com.bitlove.fetlife.util.BytesUtil;
+import com.bitlove.fetlife.util.DateUtil;
 import com.bitlove.fetlife.util.FileUtil;
 import com.bitlove.fetlife.util.MapUtil;
 import com.bitlove.fetlife.util.MessageDuplicationDebugUtil;
 import com.bitlove.fetlife.util.NetworkUtil;
 import com.bitlove.fetlife.util.VersionUtil;
+import com.bitlove.fetlife.view.screen.resource.ExploreActivity;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -124,7 +126,6 @@ import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -161,6 +162,7 @@ public class FetLifeApiIntentService extends IntentService {
     public static final String ACTION_APICALL_MEMBER_VIDEOS = "com.bitlove.fetlife.action.apicall.member_videos";
     public static final String ACTION_APICALL_CONVERSATIONS = "com.bitlove.fetlife.action.apicall.conversations";
     public static final String ACTION_APICALL_FEED = "com.bitlove.fetlife.action.apicall.feed";
+    public static final String ACTION_APICALL_EXPLORE = "com.bitlove.fetlife.action.apicall.explore";
     public static final String ACTION_APICALL_MEMBER_FEED = "com.bitlove.fetlife.action.apicall.member_feed";
     public static final String ACTION_APICALL_FRIENDS = "com.bitlove.fetlife.action.apicall.friends";
     public static final String ACTION_APICALL_MESSAGES = "com.bitlove.fetlife.action.apicall.messages";
@@ -389,6 +391,9 @@ public class FetLifeApiIntentService extends IntentService {
                     break;
                 case ACTION_APICALL_FEED:
                     result = retrieveFeed(params);
+                    break;
+                case ACTION_APICALL_EXPLORE:
+                    result = retrieveExplore(params);
                     break;
                 case ACTION_APICALL_CONVERSATIONS:
                     result = retrieveConversations(params);
@@ -1490,6 +1495,49 @@ public class FetLifeApiIntentService extends IntentService {
             final Feed feed = feedResponse.body();
             final List<Story> stories = feed.getStories();
             getFetLifeApplication().getInMemoryStorage().addFeed(page,stories);
+
+//            Kept for later if/when we move to database persistence
+//            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
+//                @Override
+//                public void execute(DatabaseWrapper databaseWrapper) {
+//                    for (FeedStory story : stories) {
+//                        story.mergeSave();
+//                    }
+//                }
+//            });
+
+            return stories.size();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private int retrieveExplore(String[] params) throws IOException {
+        ExploreActivity.Explore exploreType = ExploreActivity.Explore.valueOf(params[0]);
+        final int limit = getIntFromParams(params, 1, 25);
+        final int page = getIntFromParams(params, 2, 1);
+
+        Call<List<Story>> getFeedCall;
+        List<Story> currentStories = getFetLifeApplication().getInMemoryStorage().getExploreFeed(exploreType);
+        int lastStoryPos = (page-1)*limit-1;
+        Story lastStory = lastStoryPos >= 0 && currentStories.size() > lastStoryPos ? currentStories.get(lastStoryPos) : null;
+        String marker = null;
+        switch (exploreType) {
+            case STUFF_YOU_LOVE:
+                getFeedCall = getFetLifeApi().getStuffYouLove(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), marker, limit, page);
+                break;
+            case KINKY_AND_POPULAR:
+                getFeedCall = getFetLifeApi().getKinkyAndPopular(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), marker, limit, page);
+                break;
+            default:
+            case FRESH_AND_PERVY:
+                getFeedCall = getFetLifeApi().getFreshAndPervy(FetLifeService.AUTH_HEADER_PREFIX + getAccessToken(), marker, limit, page);
+                break;
+        }
+        Response<List<Story>> feedResponse = getFeedCall.execute();
+        if (feedResponse.isSuccess()) {
+            final List<Story> stories = feedResponse.body();
+            getFetLifeApplication().getInMemoryStorage().addExploreFeed(exploreType,page,stories);
 
 //            Kept for later if/when we move to database persistence
 //            FlowManager.getDatabase(FetLifeDatabase.class).executeTransaction(new ITransaction() {
