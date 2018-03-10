@@ -41,7 +41,7 @@
   {
     "id": "12a93b139",
     "subject": "Hi",
-    "has_new_messages": false,
+    "has_new_messages": true,
     "message_count": 1,
     "last_message": {
       "id": "da903529",
@@ -166,7 +166,7 @@
   {
     "id": "f16c9c58",
     "subject": "Android app issue",
-    "has_new_messages": false,
+    "has_new_messages": true,
     "message_count": 10,
     "last_message": {
       "id": "1638d0f9d",
