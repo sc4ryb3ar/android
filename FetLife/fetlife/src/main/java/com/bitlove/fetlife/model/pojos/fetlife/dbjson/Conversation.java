@@ -84,7 +84,7 @@ public class Conversation extends BaseModel {
             return false;
         }
         for (Message message: messages) {
-            if (!currentUser.getId().equals(message.getSenderId())) {
+            if (currentUser == null || !currentUser.getId().equals(message.getSenderId())) {
                 return false;
             }
         }

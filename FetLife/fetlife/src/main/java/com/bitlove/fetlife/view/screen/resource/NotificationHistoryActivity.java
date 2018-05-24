@@ -16,6 +16,7 @@ import com.bitlove.fetlife.notification.CommentNotification;
 import com.bitlove.fetlife.notification.InfoNotification;
 import com.bitlove.fetlife.notification.LoveNotification;
 import com.bitlove.fetlife.notification.MentionNotification;
+import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.bitlove.fetlife.view.adapter.NotificationHistoryRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
@@ -78,10 +79,14 @@ public class NotificationHistoryActivity extends ResourceListActivity<Notificati
     public void onItemClick(NotificationHistoryItem notificationHistoryItem) {
         String launchUrl = notificationHistoryItem.getLaunchUrl();
         if (launchUrl != null && launchUrl.trim().length() != 0) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setData(Uri.parse(launchUrl));
-            startActivity(intent);
+            if (launchUrl.startsWith(OneSignalNotification.LAUNCH_URL_PREFIX)) {
+                OneSignalNotification.handleInnerLaunchUrl(this,launchUrl);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setData(Uri.parse(launchUrl));
+                startActivity(intent);
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.bitlove.fetlife.model.pojos.fetlife.json;
 
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,6 +8,9 @@ public class GroupMembership {
 
     @JsonProperty("created_at")
     private String createdAt;
+
+    @JsonProperty("last_visited_at")
+    private String lastVisitedAt;
 
     @JsonProperty("group")
     private Group group;
@@ -57,4 +61,11 @@ public class GroupMembership {
         this.member = member;
     }
 
+    public String getLastVisitedAt() {
+        return lastVisitedAt;
+    }
+
+    public void setLastVisitedAt(String lastVisitedAt) {
+        this.lastVisitedAt = lastVisitedAt;
+    }
 }

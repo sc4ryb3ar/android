@@ -20,6 +20,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
 import com.bitlove.fetlife.util.ViewUtil;
+import com.bitlove.fetlife.view.adapter.PictureGridAdapter;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
@@ -28,7 +29,6 @@ import java.util.List;
 
 public class FeedAdapterBinder {
 
-    private static final int OVERLAY_HITREC_PADDING = 200;
     private final FeedRecyclerAdapter feedRecyclerAdapter;
     private final FetLifeApplication fetLifeApplication;
 
@@ -119,7 +119,9 @@ public class FeedAdapterBinder {
 
         } else {
 
-            feedViewHolder.gridExpandArea.setAdapter(new PictureGridAdapter(events, feedItemResourceHelper, onItemClickListener));
+            PictureGridAdapter pictureGridAdapter = new PictureGridAdapter(feedItemResourceHelper, onItemClickListener);
+            pictureGridAdapter.setEvents(events);
+            feedViewHolder.gridExpandArea.setAdapter(pictureGridAdapter);
 
             boolean expandByPreference = feedItemResourceHelper.getExpandPreference();
             boolean expanded = expandHistory.get(position,expandByPreference);
@@ -160,10 +162,10 @@ public class FeedAdapterBinder {
                             //TODO: reuse the same imageclick code instead of having it several places in this class
                             LayoutInflater inflater = LayoutInflater.from(v.getContext());
                             final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                            setOverlayContent(overlay, picture, onItemClickListener);
+                            PictureGridAdapter.setOverlayContent(overlay, picture, onItemClickListener);
                             new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                         } else {
-                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
+                            onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedEvent, feedItemResourceHelper);
                         }
                     }
                 });
@@ -202,7 +204,7 @@ public class FeedAdapterBinder {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedItemResourceHelper.getTargetMember(feedEvent));
+                    onItemClickListener.onFeedInnerItemClick(feedItemResourceHelper.getFeedStoryType(), feedItemResourceHelper.getUrl(feedEvent), feedEvent, feedItemResourceHelper);
                 }
             });
 
@@ -226,7 +228,7 @@ public class FeedAdapterBinder {
                     public void onClick(View v) {
                         LayoutInflater inflater = LayoutInflater.from(v.getContext());
                         final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                        setOverlayContent(overlay, picture, onItemClickListener);
+                        PictureGridAdapter.setOverlayContent(overlay, picture, onItemClickListener);
                         new ImageViewer.Builder(v.getContext(), new String[]{picture.getVariants().getHugeUrl()}).setOverlayView(overlay).show();
                     }
                 });
@@ -255,127 +257,6 @@ public class FeedAdapterBinder {
             return true;
         }
         return events.size() == 1;
-    }
-
-    private void setOverlayContent(View overlay, final Picture picture, final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
-        TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
-        TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
-        TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
-
-        final ImageView imageLove = (ImageView) overlay.findViewById(R.id.feedImageLove);
-        ViewUtil.increaseTouchArea(imageLove,OVERLAY_HITREC_PADDING);
-
-        boolean isLoved = picture.isLovedByMe();
-        imageLove.setImageResource(isLoved ? R.drawable.ic_loved : R.drawable.ic_love);
-        imageLove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageView imageLove = (ImageView) v;
-                boolean isLoved = picture.isLovedByMe();
-                boolean newIsLoved = !isLoved;
-                imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
-                Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
-                picture.setLovedByMe(newIsLoved);
-            }
-        });
-
-        View imageVisit = overlay.findViewById(R.id.feedImageVisit);
-        ViewUtil.increaseTouchArea(imageVisit,OVERLAY_HITREC_PADDING);
-        imageVisit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onItemClickListener.onVisitItem(picture, picture.getUrl());
-            }
-        });
-
-        imageName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onItemClickListener.onMemberClick(picture.getMember());
-            }
-        });
-        imageDescription.setText(Picture.getFormattedBody(picture.getBody()));
-        imageMeta.setText(picture.getMember().getMetaInfo());
-        imageName.setText(picture.getMember().getNickname());
-    }
-
-    class PictureGridAdapter extends BaseAdapter {
-        private final FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener;
-        private final FeedItemResourceHelper feedItemResourceHelper;
-        private final List<FeedEvent> events;
-
-        private List<Picture> pictures = new ArrayList<>();
-        private ArrayList<String> gridLinks = new ArrayList<>();
-        private ArrayList<String> displayLinks = new ArrayList<>();
-
-        PictureGridAdapter(List<FeedEvent> events, FeedItemResourceHelper feedItemResourceHelper, FeedRecyclerAdapter.OnFeedItemClickListener onItemClickListener) {
-            this.onItemClickListener = onItemClickListener;
-            this.feedItemResourceHelper = feedItemResourceHelper;
-            this.events = events;
-            for (FeedEvent event : events) {
-                Picture picture = feedItemResourceHelper.getPicture(event);
-                pictures.add(picture);
-                gridLinks.add(picture != null ? picture.getVariants().getMediumUrl() : null);
-                displayLinks.add(picture != null ? picture.getVariants().getHugeUrl() : null);
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return pictures.size();
-        }
-
-        @Override
-        public Picture getItem(int position) {
-            return pictures.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            Uri pictureUri = gridLinks.get(position) != null ? Uri.parse(gridLinks.get(position)) : null;
-
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
-            SimpleDraweeView simpleDraweeView = (SimpleDraweeView) inflater.inflate(R.layout.listitem_feed_griditem, parent, false);
-            simpleDraweeView.setImageURI(pictureUri);
-            if (pictureUri == null) {
-                simpleDraweeView.getHierarchy().setPlaceholderImage(R.drawable.dummy_avatar);
-            } else {
-                simpleDraweeView.getHierarchy().setPlaceholderImage(null);
-            }
-            if (feedItemResourceHelper.browseImageOnClick()) {
-                simpleDraweeView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        LayoutInflater inflater = LayoutInflater.from(v.getContext());
-                        final View overlay = inflater.inflate(R.layout.overlay_feed_imageswipe, null);
-                        setOverlayContent(overlay, getItem(position), onItemClickListener);
-
-                        new ImageViewer.Builder(v.getContext(), displayLinks).setStartPosition(position).setOverlayView(overlay).setImageChangeListener(new ImageViewer.OnImageChangeListener() {
-                            @Override
-                            public void onImageChange(int position) {
-                                setOverlayContent(overlay, getItem(position), onItemClickListener);
-                            }
-                        }).show();
-                    }
-                });
-            } else {
-                simpleDraweeView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onItemClickListener.onFeedImageClick(feedItemResourceHelper.getFeedStoryType(),feedItemResourceHelper.getUrl(events.get(position)), events.get(position), feedItemResourceHelper.getTargetMember(events.get(position)));
-                    }
-                });
-            }
-
-            return simpleDraweeView;
-        }
-
     }
 
 }

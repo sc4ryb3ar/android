@@ -21,6 +21,9 @@ import com.bitlove.fetlife.view.screen.component.MenuActivityComponent;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class ResourceListActivity<Resource> extends ResourceActivity implements MenuActivityComponent.MenuActivityCallBack {
 
     private static final int PAGE_COUNT = 25;
@@ -144,11 +147,16 @@ public abstract class ResourceListActivity<Resource> extends ResourceActivity im
         if (apiCallAction == null) {
             return;
         }
+        List<String> requestedParams = getApiParams();
+        requestedParams.add(Integer.toString(pageCount));
         if (requestedPage != DEFAULT_REQUESTED_PAGE) {
-            FetLifeApiIntentService.startApiCall(ResourceListActivity.this, apiCallAction, Integer.toString(pageCount), Integer.toString(requestedPage));
-        } else {
-            FetLifeApiIntentService.startApiCall(ResourceListActivity.this, apiCallAction, Integer.toString(pageCount));
+            requestedParams.add(Integer.toString(requestedPage));
         }
+        FetLifeApiIntentService.startApiCall(ResourceListActivity.this, apiCallAction, requestedParams.toArray(new String[requestedParams.size()]));
+    }
+
+    protected List<String> getApiParams() {
+        return new ArrayList<>();
     }
 
     protected abstract String getApiCallAction();

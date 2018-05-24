@@ -48,6 +48,7 @@ public class NotificationParser {
     public static final String JSON_VALUE_TYPE_COMMENT_WRITING = "comment_writing";
     public static final String JSON_VALUE_TYPE_COMMENT_STATUS_UPDATE = "comment_status_update";
     public static final String JSON_VALUE_TYPE_COMMENT_SUGGESTION = "comment_suggestion";
+    public static final String JSON_VALUE_TYPE_COMMENT_GROUP = "comment_group";
 
     public static final String JSON_VALUE_TYPE_LOVE_PICTURE = "love_picture";
     public static final String JSON_VALUE_TYPE_LOVE_WRITING = "love_writing";
@@ -105,6 +106,12 @@ public class NotificationParser {
     public static final String JSON_VALUE_TYPE_LEGACY_CONVERSATION_CREATED = "conversation_created";
     public static final String JSON_VALUE_TYPE_LEGACY_MESSAGE_CREATED = "message_created";
     public static final String JSON_VALUE_TYPE_LEGACY_FRIEND_REQUEST_CREATED = "friendship_request_created";
+    public static final String JSON_FIELD_STRING_GROUPID = "group_id";
+    public static final String JSON_FIELD_STRING_GROUPPOSTID = "group_post_id";
+    public static final String JSON_VALUE_TYPE_GROUP_COMMENT = "comment_group";
+    public static final String JSON_FIELD_STRING_GROUP_POST_TITLE = "group_post_title";
+    public static final String JSON_FIELD_OBJECT_API = "api";
+    public static final java.lang.String JSON_FIELD_STRING_GROUP_NAME = "group_name";
 
     public OneSignalNotification parseNotification(FetLifeApplication fetLifeApplication, OSNotificationOpenResult osNotificationOpenResult) {
 
@@ -181,6 +188,10 @@ public class NotificationParser {
             case JSON_VALUE_TYPE_CONVERSATION_NEW:
             case JSON_VALUE_TYPE_CONVERSATION_RESPONSE:
                 return new MessageNotification(title, message, launchUrl, additionalData, id, group);
+            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION:
+            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION_COMMENT:
+            case JSON_VALUE_TYPE_COMMENT_GROUP:
+                return new GroupMessageNotification(title, message, launchUrl, additionalData, id, group);
             case JSON_VALUE_TYPE_FRIEND_REQUEST:
             case JSON_VALUE_TYPE_LEGACY_FRIEND_REQUEST_CREATED:
                 return new FriendRequestNotification(title, message, launchUrl, additionalData, id, group);
@@ -203,8 +214,6 @@ public class NotificationParser {
             case JSON_VALUE_TYPE_MENTION_VIDEO_COMMENT:
             case JSON_VALUE_TYPE_MENTION_WRITING:
             case JSON_VALUE_TYPE_MENTION_WRITING_COMMENT:
-            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION:
-            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION_COMMENT:
             case JSON_VALUE_TYPE_MENTION_GROUP_DESCRIPTION:
             case JSON_VALUE_TYPE_MENTION_STATUS_UPDATE:
             case JSON_VALUE_TYPE_MENTION_STATUS_UPDATE_COMMENT:
@@ -254,6 +263,11 @@ public class NotificationParser {
             case JSON_VALUE_TYPE_COMMENT_WRITING:
                 CommentNotification.clearNotifications();
                 break;
+            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION:
+            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION_COMMENT:
+            case JSON_VALUE_TYPE_MENTION_GROUP_DESCRIPTION:
+                GroupMessageNotification.clearNotifications();
+                break;
             case JSON_VALUE_TYPE_MENTION:
             case JSON_VALUE_TYPE_MENTION_PICTURE_CAPTION:
             case JSON_VALUE_TYPE_MENTION_PICTURE_COMMENT:
@@ -261,9 +275,6 @@ public class NotificationParser {
             case JSON_VALUE_TYPE_MENTION_VIDEO_COMMENT:
             case JSON_VALUE_TYPE_MENTION_WRITING:
             case JSON_VALUE_TYPE_MENTION_WRITING_COMMENT:
-            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION:
-            case JSON_VALUE_TYPE_MENTION_GROUP_DISCUSSION_COMMENT:
-            case JSON_VALUE_TYPE_MENTION_GROUP_DESCRIPTION:
             case JSON_VALUE_TYPE_MENTION_STATUS_UPDATE:
             case JSON_VALUE_TYPE_MENTION_STATUS_UPDATE_COMMENT:
             case JSON_VALUE_TYPE_MENTION_FETISH:

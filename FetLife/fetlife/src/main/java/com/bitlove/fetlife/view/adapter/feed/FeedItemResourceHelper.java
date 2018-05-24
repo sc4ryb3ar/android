@@ -4,8 +4,12 @@ import android.text.Html;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Group;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.GroupPost;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Writing;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.PeopleInto;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
@@ -27,7 +31,7 @@ public class FeedItemResourceHelper {
     private final Story feedStory;
     private FetLifeApplication fetLifeApplication;
 
-    FeedItemResourceHelper(FetLifeApplication fetLifeApplication, Story feedstory) {
+    public FeedItemResourceHelper(FetLifeApplication fetLifeApplication, Story feedstory) {
         this.fetLifeApplication = fetLifeApplication;
         this.feedStoryType = feedstory.getType();
         this.feedStory = feedstory;
@@ -61,6 +65,8 @@ public class FeedItemResourceHelper {
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_grouppost) : fetLifeApplication.getString(R.string.feed_title_new_groupposts, eventCount);
             case WALL_POST_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_wallpost) : fetLifeApplication.getString(R.string.feed_title_new_wallposts, eventCount);
+            case VIDEO_CREATED:
+                return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_video) : fetLifeApplication.getString(R.string.feed_title_new_pictures, eventCount);
             case PICTURE_CREATED:
                 return eventCount == 1 ? fetLifeApplication.getString(R.string.feed_title_new_picture) : fetLifeApplication.getString(R.string.feed_title_new_pictures, eventCount);
             case LIKE_CREATED:
@@ -100,7 +106,7 @@ public class FeedItemResourceHelper {
         int preferenceResource = -1;
         switch (feedStoryType) {
             case PICTURE_CREATED:
-//            case VIDEO_CREATED:
+            case VIDEO_CREATED:
                 preferenceResource = R.string.settings_key_feed_auto_expand_media;
                 break;
             case POST_COMMENT_CREATED:
@@ -167,6 +173,8 @@ public class FeedItemResourceHelper {
                     return event.getTarget().getGroupPost().getMember();
                 case POST_CREATED:
                     return event.getTarget().getWriting().getMember();
+                case VIDEO_CREATED:
+                    return event.getTarget().getVideo().getMember();
                 case PICTURE_CREATED:
                     return event.getTarget().getPicture().getMember();
                 case LIKE_CREATED:
@@ -200,6 +208,81 @@ public class FeedItemResourceHelper {
         }
     }
 
+    public Event getEvent(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case RSVP_CREATED:
+                    return feedEvent.getTarget().getRsvp().getEvent();
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Writing getWriting(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case COMMENT_CREATED:
+                case LIKE_CREATED:
+                case POST_CREATED:
+                    Writing writing = feedEvent.getTarget() != null ? feedEvent.getTarget().getWriting() : null;
+                    if (writing == null) {
+                        writing = feedEvent.getSecondaryTarget() != null ? feedEvent.getSecondaryTarget().getWriting() : null;
+                    }
+                    return writing;
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public Group getGroup(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case GROUP_MEMBERSHIP_CREATED:
+                    Group group = feedEvent.getSecondaryTarget().getGroup();
+                    if (group == null) {
+                        group = feedEvent.getTarget().getGroupMembership().getGroup();
+                    }
+                    return group;
+                case GROUP_POST_CREATED:
+                    group = feedEvent.getSecondaryTarget().getGroup();
+                    if (group == null) {
+                        group = feedEvent.getSecondaryTarget().getGroupPost().getGroup();
+                    }
+                    return group;
+                case GROUP_COMMENT_CREATED:
+                    group = feedEvent.getSecondaryTarget().getGroupPost().getGroup();
+                    return group;
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public GroupPost getGroupPost(FeedEvent feedEvent) {
+        try {
+            switch (feedStoryType) {
+                case GROUP_POST_CREATED:
+                    GroupPost groupPost = feedEvent.getSecondaryTarget().getGroupPost();
+                    return groupPost;
+                case GROUP_COMMENT_CREATED:
+                    groupPost = feedEvent.getSecondaryTarget().getGroupPost();
+                    return groupPost;
+                default:
+                    return null;
+            }
+        } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
     public Picture getPicture(FeedEvent feedEvent) {
         try {
             switch (feedStoryType) {
@@ -213,6 +296,8 @@ public class FeedItemResourceHelper {
                     } else {
                         return null;
                     }
+                case VIDEO_CREATED:
+                    return feedEvent.getTarget().getVideo().getThumbnail().getAsPicture(feedEvent.getTarget().getVideo().getMember());
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:
                     return feedEvent.getSecondaryTarget().getMember().getAvatarPicture();
@@ -230,56 +315,51 @@ public class FeedItemResourceHelper {
         }
     }
 
-    public String getCreatedAt(FeedEvent feedEvent) {
+    public String getServerTimeStamp(FeedEvent feedEvent) {
         try {
             String createdAt;
             switch (feedStoryType) {
                 case PEOPLE_INTO_CREATED:
-                    createdAt = feedEvent.getTarget().getPeopleInto().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getPeopleInto().getCreatedAt();
                 case VIDEO_COMMENT_CREATED:
                 case GROUP_COMMENT_CREATED:
                 case STATUS_COMMENT_CREATED:
                 case POST_COMMENT_CREATED:
-                    createdAt = feedEvent.getTarget().getComment().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getComment().getCreatedAt();
                 case GROUP_MEMBERSHIP_CREATED:
-                    createdAt = feedEvent.getTarget().getGroupMembership().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getGroupMembership().getCreatedAt();
                 case STATUS_CREATED:
-                    createdAt = feedEvent.getTarget().getStatus().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getStatus().getCreatedAt();
                 case GROUP_POST_CREATED:
-                    createdAt = feedEvent.getTarget().getGroupPost().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getGroupPost().getCreatedAt();
                 case WALL_POST_CREATED:
-                    createdAt = feedEvent.getTarget().getWallPost().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getWallPost().getCreatedAt();
                 case POST_CREATED:
-                    createdAt = feedEvent.getTarget().getWriting().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getWriting().getCreatedAt();
+                case VIDEO_CREATED:
+                    return createdAt = feedEvent.getTarget().getVideo().getCreatedAt();
                 case PICTURE_CREATED:
-                    createdAt = feedEvent.getTarget().getPicture().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getPicture().getCreatedAt();
                 case LIKE_CREATED:
-                    createdAt = feedEvent.getTarget().getLove().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getLove().getCreatedAt();
                 case COMMENT_CREATED:
-                    createdAt = feedEvent.getTarget().getComment().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getComment().getCreatedAt();
                 case FRIEND_CREATED:
                 case FOLLOW_CREATED:
-                    createdAt = feedEvent.getTarget().getRelation().getCreatedAt();
-                    break;
+                    return createdAt = feedEvent.getTarget().getRelation().getCreatedAt();
                 default:
                     return null;
             }
-            if (createdAt !=  null) {
-                return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(createdAt));
-            } else {
-                return null;
-            }
         } catch (NullPointerException npe) {
+            return null;
+        }
+    }
+
+    public String getCreatedAt(FeedEvent feedEvent) {
+        String createdAt = getServerTimeStamp(feedEvent);
+        if (createdAt !=  null) {
+            return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(createdAt));
+        } else {
             return null;
         }
     }
@@ -298,7 +378,7 @@ public class FeedItemResourceHelper {
                 case STATUS_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getStatus().getUrl();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return feedEvent.getTarget().getGroupMembership().getGroup().getUrl();
+                    return getGroup(feedEvent).getUrl();
                 case STATUS_CREATED:
                     return feedEvent.getTarget().getStatus().getUrl();
                 case GROUP_POST_CREATED:
@@ -307,6 +387,8 @@ public class FeedItemResourceHelper {
                     return feedEvent.getTarget().getWallPost().getUrl();
                 case POST_CREATED:
                     return feedEvent.getTarget().getWriting().getUrl();
+                case VIDEO_CREATED:
+                    return feedEvent.getTarget().getVideo().getUrl();
                 case PICTURE_CREATED:
                     return feedEvent.getTarget().getPicture().getUrl();
                 case LIKE_CREATED:
@@ -345,14 +427,12 @@ public class FeedItemResourceHelper {
                     } else {
                         return null;
                     }
-                case VIDEO_COMMENT_CREATED:
-                    return null;
                 case GROUP_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getGroupPost().getTitle();
                 case POST_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getWriting().getTitle();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return feedEvent.getTarget().getGroupMembership().getGroup().getName();
+                    return getGroup(feedEvent).getName();
                 case GROUP_POST_CREATED:
                     return feedEvent.getTarget().getGroupPost().getTitle();
                 case POST_CREATED:
@@ -420,7 +500,7 @@ public class FeedItemResourceHelper {
                 case POST_COMMENT_CREATED:
                     return feedEvent.getSecondaryTarget().getWriting().getBody();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return feedEvent.getTarget().getGroupMembership().getGroup().getDescription();
+                    return getGroup(feedEvent).getDescription();
                 case GROUP_POST_CREATED:
                     return feedEvent.getTarget().getGroupPost().getBody();
                 case WALL_POST_CREATED:
@@ -453,7 +533,7 @@ public class FeedItemResourceHelper {
                 case GROUP_POST_CREATED:
                     return feedEvent.getTarget().getGroupPost().getGroup().getName();
                 case GROUP_MEMBERSHIP_CREATED:
-                    return fetLifeApplication.getString(R.string.feed_caption_member_count,feedEvent.getTarget().getGroupMembership().getGroup().getMemberCount());
+                    return fetLifeApplication.getString(R.string.feed_caption_member_count,getGroup(feedEvent).getMemberCount());
                 case RSVP_CREATED:
                     return SimpleDateFormat.getDateTimeInstance().format(DateUtil.parseDate(feedEvent.getTarget().getRsvp().getEvent().getStartDateTime()));
                 default:
@@ -467,6 +547,7 @@ public class FeedItemResourceHelper {
     public boolean imageOnlyListItems() {
         switch (feedStoryType) {
             case PICTURE_CREATED:
+            case VIDEO_CREATED:
                 return true;
             case LIKE_CREATED:
                 return (feedStory.getEvents().get(0).getSecondaryTarget().getWriting() == null && feedStory.getEvents().get(0).getSecondaryTarget().getStatus() == null);

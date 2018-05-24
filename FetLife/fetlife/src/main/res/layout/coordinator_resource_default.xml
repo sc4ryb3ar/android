@@ -4,7 +4,15 @@
                                                  android:layout_height="match_parent"
                                                  android:fitsSystemWindows="true">
 
-    <include layout="@layout/app_bar_default" />
-    <include layout="@layout/content_resource" />
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <include layout="@layout/tool_bar_default"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_resource"/>
 
 </android.support.design.widget.CoordinatorLayout>

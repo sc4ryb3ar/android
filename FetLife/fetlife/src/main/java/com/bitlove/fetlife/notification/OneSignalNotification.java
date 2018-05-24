@@ -6,13 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.db.NotificationHistoryItem;
+import com.bitlove.fetlife.util.AppUtil;
+import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.crashlytics.android.Crashlytics;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Method;
 
 public abstract class OneSignalNotification {
 
@@ -24,7 +32,45 @@ public abstract class OneSignalNotification {
     public static final int NOTIFICATION_ID_LOVE = 40;
     public static final int NOTIFICATION_ID_COMMENT = 50;
     public static final int NOTIFICATION_ID_MENTION = 60;
+    public static final int NOTIFICATION_ID_GROUP = 70;
     public static int NOTIFICATION_ID_INFO_INTERVAL = 1000;
+
+    public static final String LAUNCH_URL_PARAM_SEPARATOR = ":";
+    public static final String LAUNCH_URL_PREFIX = "FetLifeApp://";
+
+    protected static PendingIntent getLaunchPendingIntent(Context context, String launchUrl, String notificationType) {
+        Intent contentIntent;
+
+        if (launchUrl != null) {
+            contentIntent = new Intent(Intent.ACTION_VIEW);
+            contentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            contentIntent.setData(Uri.parse(launchUrl));
+        } else {
+            contentIntent = NotificationHistoryActivity.createIntent(context,true);
+            contentIntent.putExtra(BaseActivity.EXTRA_NOTIFICATION_SOURCE_TYPE,notificationType);
+        }
+
+        PendingIntent contentPendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        contentIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        return contentPendingIntent;
+    }
+
+    public static void handleInnerLaunchUrl(Context context,String launchUrl) {
+        try {
+            String baseString = launchUrl.substring(LAUNCH_URL_PREFIX.length());
+            String className = baseString.substring(0,baseString.indexOf(LAUNCH_URL_PARAM_SEPARATOR));
+            Method method = Class.forName(className).getMethod("handleInnerLaunchUrl", Context.class, String.class);
+            method.invoke(null,context,launchUrl);
+        } catch (Throwable t) {
+            Crashlytics.logException(t);
+        }
+    }
 
     protected final String id;
     protected final String title;
@@ -72,7 +118,7 @@ public abstract class OneSignalNotification {
                 .setLargeIcon(BitmapFactory.decodeResource(fetLifeApplication.getResources(), R.mipmap.app_icon_kinky))
                 .setSmallIcon(R.drawable.ic_stat_onesignal_default)
                 .setAutoCancel(true)
-                .setVisibility(Notification.VISIBILITY_SECRET)
+                .setVisibility(AppUtil.useAnonymNotifications(FetLifeApplication.getInstance()) ? Notification.VISIBILITY_SECRET : Notification.VISIBILITY_PRIVATE)
                 .setContentIntent(getPendingIntent(fetLifeApplication))
                 .setLights(fetLifeApplication.getUserSessionManager().getNotificationColor(),1000,1000)
                 .setSound(fetLifeApplication.getUserSessionManager().getNotificationRingtone());
@@ -97,6 +143,13 @@ public abstract class OneSignalNotification {
 
     protected NotificationHistoryItem createNotificationItem(int notificationId, String collapseId) {
         NotificationHistoryItem notificationItem = new NotificationHistoryItem();
+        try {
+            double serverTimeDouble = additionalData.getDouble("sent_at");
+            long serverTime = (long)(serverTimeDouble*1000);
+            notificationItem.setTimeStamp(serverTime);
+        } catch (JSONException t) {
+            //skip, server change
+        }
         notificationItem.setDisplayId(notificationId);
         notificationItem.setDisplayHeader(title);
         notificationItem.setDisplayMessage(message);

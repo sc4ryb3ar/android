@@ -24,6 +24,8 @@ import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.view.screen.component.ActivityComponent;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
@@ -52,6 +54,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        logEvent();
+
         if (savedInstanceState == null) {
             String notificationSourceType = getIntent().getStringExtra(EXTRA_NOTIFICATION_SOURCE_TYPE);
             if (notificationSourceType != null) {
@@ -76,6 +80,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         for (ActivityComponent activityComponent : activityComponentList) {
             activityComponent.onActivityCreated(this, savedInstanceState);
         }
+    }
+
+    protected void logEvent() {
+        Answers.getInstance().logCustom(
+                new CustomEvent(BaseActivity.this.getClass().getSimpleName()));
     }
 
     protected abstract void onCreateActivityComponents();
@@ -312,12 +321,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     }
 
     public void showToast(final String text) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
-            }
-        });
+        getFetLifeApplication().showToast(text);
     }
 
     public FetLifeApplication getFetLifeApplication() {

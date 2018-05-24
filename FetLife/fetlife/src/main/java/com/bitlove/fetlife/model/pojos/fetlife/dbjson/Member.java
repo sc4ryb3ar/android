@@ -1,8 +1,15 @@
 package com.bitlove.fetlife.model.pojos.fetlife.dbjson;
 
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Avatar;
 import com.bitlove.fetlife.model.pojos.fetlife.json.AvatarVariants;
+import com.bitlove.fetlife.util.ServerIdUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,10 +23,13 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //TODO: clean up the POJOs and define relations
 @Table(database = FetLifeDatabase.class)
@@ -40,6 +50,10 @@ public class Member extends BaseModel {
     @Column
     @PrimaryKey(autoincrement = false)
     private String id;
+
+    @JsonIgnore
+    @Column
+    private String serverId;
 
     @JsonProperty("about")
     @Column
@@ -101,6 +115,10 @@ public class Member extends BaseModel {
     @Column
     private String lookingForRawString;
 
+    @Column
+    @JsonIgnore
+    private long lastViewedAt;
+
     //Json Only
     @JsonProperty("avatar")
     private Avatar avatar;
@@ -113,20 +131,20 @@ public class Member extends BaseModel {
     private List<Relationship> relationships = new ArrayList<>();
 
 
-    public static Member loadMember(String memberId) {
-        Member member = new Select().from(Member.class).where(Member_Table.id.is(memberId)).querySingle();
-        if (member == null) {
-            return null;
-        }
-        return member;
-    }
-
     public String getAbout() {
         return about;
     }
 
     public void setAbout(String about) {
         this.about = about;
+    }
+
+    public String getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     public String getAccessToken() {
@@ -143,6 +161,14 @@ public class Member extends BaseModel {
 
     public void setAdministrativeArea(String administrativeArea) {
         this.administrativeArea = administrativeArea;
+    }
+
+    public long getLastViewedAt() {
+        return lastViewedAt;
+    }
+
+    public void setLastViewedAt(long lastViewedAt) {
+        this.lastViewedAt = lastViewedAt;
     }
 
     public Avatar getAvatar() {
@@ -299,22 +325,57 @@ public class Member extends BaseModel {
         this.followable = followable;
     }
 
-    public void mergeSave() {
+    public boolean mergeSave() {
         Member savedMember = Member.loadMember(id);
         if (savedMember != null) {
-            savedMember.setAvatar(getAvatar());
-            savedMember.setMetaInfo(getMetaInfo());
-            savedMember.setNickname(getNickname());
-            if (accessToken != null && accessToken.trim().length() != 0) {
-                savedMember.setAccessToken(accessToken);
+            if (TextUtils.isEmpty(about)) {
+                setAbout(savedMember.about);
             }
-            if (refreshToken != null && refreshToken.trim().length() != 0) {
-                savedMember.setRefreshToken(refreshToken);
+            if (TextUtils.isEmpty(country)) {
+                setCountry(savedMember.country);
             }
-            savedMember.save();
-        } else {
-            save();
+            if (TextUtils.isEmpty(administrativeArea)) {
+                setAdministrativeArea(savedMember.administrativeArea);
+            }
+            if (TextUtils.isEmpty(city)) {
+                setCity(savedMember.city);
+            }
+            if (TextUtils.isEmpty(sexualOrientation)) {
+                setSexualOrientation(savedMember.sexualOrientation);
+            }
+            if (TextUtils.isEmpty(lookingForRawString)) {
+                setLookingForRawString(savedMember.lookingForRawString);
+            }
+            if (savedMember.getLastViewedAt() > lastViewedAt) {
+                lastViewedAt = savedMember.getLastViewedAt();
+            }
+            if (!isFollowable()) {
+                setFollowable(savedMember.isFollowable());
+            }
         }
+        return internalSave();
+    }
+
+    public boolean isDetailRetrieved() {
+        return getCountry() != null;
+    }
+
+    @Override
+    public boolean save() {
+        return mergeSave();
+    }
+
+    public boolean internalSave() {
+        Member savedMember = Member.loadMember(id);
+        if (savedMember != null) {
+            if (TextUtils.isEmpty(accessToken)) {
+                setAccessToken(savedMember.accessToken);
+            }
+            if (TextUtils.isEmpty(refreshToken)) {
+                setRefreshToken(savedMember.refreshToken);
+            }
+        }
+        return super.save();
     }
 
     public String toJsonString() throws JsonProcessingException {
@@ -325,4 +386,16 @@ public class Member extends BaseModel {
             }
         }).writeValueAsString(this);
     }
+
+    public static Member loadMember(String memberId) {
+        if (ServerIdUtil.containsServerId(memberId)) {
+            memberId = ServerIdUtil.getLocalId(memberId);
+        }
+        Member member = new Select().from(Member.class).where(Member_Table.id.is(memberId)).querySingle();
+        if (member == null) {
+            return null;
+        }
+        return member;
+    }
+
 }

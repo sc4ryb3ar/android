@@ -1,6 +1,7 @@
 
 package com.bitlove.fetlife.model.pojos.fetlife.json;
 
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Event;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.EnumUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -106,7 +107,13 @@ public class Rsvp {
 
     public enum RsvpStatus {
         YES,
-        MAYBE
+        MAYBE,
+        NO;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 
 }

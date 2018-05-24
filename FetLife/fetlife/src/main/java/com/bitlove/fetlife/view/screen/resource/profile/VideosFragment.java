@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.VideosRecyclerAdapter;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class VideosFragment extends ProfileFragment {
+public class VideosFragment extends LoadFragment {
 
     private static final int VIDEO_GRID_COLUMN_COUNT = 3;
     public static int PAGE_COUNT = 24;
@@ -21,7 +21,7 @@ public class VideosFragment extends ProfileFragment {
     public static VideosFragment newInstance(String memberId) {
         VideosFragment videosFragment = new VideosFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         videosFragment.setArguments(args);
         return videosFragment;
     }
@@ -29,11 +29,11 @@ public class VideosFragment extends ProfileFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getFetLifeApplication(), VIDEO_GRID_COLUMN_COUNT);
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        VideosRecyclerAdapter adapter = new VideosRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID));
+        VideosRecyclerAdapter adapter = new VideosRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID));
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -55,7 +55,4 @@ public class VideosFragment extends ProfileFragment {
         }
     }
 
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
-    }
 }

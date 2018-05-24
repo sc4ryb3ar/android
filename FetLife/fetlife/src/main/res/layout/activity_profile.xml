@@ -57,6 +57,7 @@
 
                             <ImageView
                                 android:id="@+id/profile_menu_icon_friend"
+                                android:visibility="invisible"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_horizontal"
@@ -81,6 +82,7 @@
 
                             <ImageView
                                 android:id="@+id/profile_menu_icon_follow"
+                                android:visibility="invisible"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/ic_follow"
@@ -257,8 +259,8 @@
             android:layout_gravity="top"
             android:background="@color/color_accent"
             android:textColor="#fff"
-            android:paddingTop="2dp"
-            android:paddingBottom="4dp" />
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp" />
 
     </android.support.v4.view.ViewPager>
 

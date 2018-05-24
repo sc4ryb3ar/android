@@ -25,16 +25,21 @@ import com.bitlove.fetlife.view.dialog.PictureUploadSelectionDialog;
 import com.bitlove.fetlife.view.dialog.VideoUploadSelectionDialog;
 import com.bitlove.fetlife.view.screen.BaseActivity;
 import com.bitlove.fetlife.view.screen.resource.ConversationsActivity;
-import com.bitlove.fetlife.view.screen.resource.EventMapActivity;
+import com.bitlove.fetlife.view.screen.resource.EventsActivity;
 import com.bitlove.fetlife.view.screen.resource.FeedActivity;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
+import com.bitlove.fetlife.view.screen.resource.ExploreActivity;
+import com.bitlove.fetlife.view.screen.resource.groups.GroupsActivity;
 import com.bitlove.fetlife.view.screen.resource.NotificationHistoryActivity;
+import com.bitlove.fetlife.view.screen.resource.TurboLinksViewActivity;
 import com.bitlove.fetlife.view.screen.resource.members.MembersActivity;
 import com.bitlove.fetlife.view.screen.resource.profile.ProfileActivity;
-import com.bitlove.fetlife.view.screen.standalone.AboutActivity;
+import com.bitlove.fetlife.view.screen.standalone.ReleaseNotesActivity;
 import com.bitlove.fetlife.view.screen.standalone.AddNfcFriendActivity;
 import com.bitlove.fetlife.view.screen.standalone.LoginActivity;
 import com.bitlove.fetlife.view.screen.standalone.SettingsActivity;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 public class MenuActivityComponent extends ActivityComponent {
@@ -172,6 +177,8 @@ public class MenuActivityComponent extends ActivityComponent {
 
 
         if (id == R.id.nav_logout) {
+            logEvent("nav_logout");
+            menuActivity.getFetLifeApplication().getUserSessionManager().deleteCurrentUserDb();
             menuActivity.getFetLifeApplication().getUserSessionManager().onUserLogOut();
             menuActivity.finish();
             LoginActivity.startLogin(menuActivity.getFetLifeApplication());
@@ -179,22 +186,27 @@ public class MenuActivityComponent extends ActivityComponent {
         } else if (id == R.id.nav_conversations) {
             ConversationsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_members) {
-            MembersActivity.startActivity(menuActivity);
+            MembersActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_friendrequests) {
             FriendRequestsActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_introduce) {
+            logEvent("nav_introduce");
             AddNfcFriendActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_about) {
-            AboutActivity.startActivity(menuActivity);
+            TurboLinksViewActivity.startActivity(menuActivity,"android",menuActivity.getString(R.string.title_activity_about));
+        } else if (id == R.id.nav_relnotes) {
+            ReleaseNotesActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_notifications) {
             NotificationHistoryActivity.startActivity(menuActivity, false);
         } else if (id == R.id.nav_upload_pic) {
+            logEvent("nav_upload_pic");
             if (isStoragePermissionGranted()) {
                 PictureUploadSelectionDialog.show(menuActivity);
             } else {
                 requestStoragePermission(BaseActivity.PERMISSION_REQUEST_PICTURE_UPLOAD);
             }
         } else if (id == R.id.nav_upload_video) {
+            logEvent("nav_upload_video");
             if (isStoragePermissionGranted()) {
                 VideoUploadSelectionDialog.show(menuActivity);
             } else {
@@ -204,13 +216,30 @@ public class MenuActivityComponent extends ActivityComponent {
             SettingsActivity.startActivity(menuActivity);
         } else if (id == R.id.nav_feed) {
             FeedActivity.startActivity(menuActivity);
-        } else if (id == R.id.nav_eventmap) {
+        } else if (id == R.id.nav_stuff_you_love) {
+            ExploreActivity.startActivity(menuActivity, ExploreActivity.Explore.STUFF_YOU_LOVE);
+        } else if (id == R.id.nav_fresh_and_pervy) {
+            ExploreActivity.startActivity(menuActivity, ExploreActivity.Explore.FRESH_AND_PERVY);
+        } else if (id == R.id.nav_kinky_and_popular) {
+            ExploreActivity.startActivity(menuActivity, ExploreActivity.Explore.KINKY_AND_POPULAR);
+        } else if (id == R.id.nav_support) {
+            TurboLinksViewActivity.startActivity(menuActivity,"support",menuActivity.getString(R.string.title_activity_support));
+//        } else if (id == R.id.nav_search) {
+//            TurboLinksViewActivity.startActivity(menuActivity,"search",menuActivity.getString(R.string.title_activity_search));
+        } else if (id == R.id.nav_ads) {
+            TurboLinksViewActivity.startActivity(menuActivity,"ads",menuActivity.getString(R.string.title_activity_ads));
+        } else if (id == R.id.nav_glossary) {
+            TurboLinksViewActivity.startActivity(menuActivity,"glossary",menuActivity.getString(R.string.title_activity_glossary));
+        } else if (id == R.id.nav_events) {
             if (isLocationPermissionGranted()) {
-                EventMapActivity.startActivity(menuActivity);
+                EventsActivity.startActivity(menuActivity);
             } else {
                 requestLocationPermission(BaseActivity.PERMISSION_REQUEST_LOCATION);
             }
+        } else if (id == R.id.nav_groups) {
+            GroupsActivity.startActivity(menuActivity,false);
         } else if (id == R.id.nav_updates) {
+            logEvent("nav_updates");
             menuActivity.showToast(menuActivity.getString(R.string.message_toast_checking_for_updates));
             FetLifeApiIntentService.startApiCall(menuActivity,FetLifeApiIntentService.ACTION_EXTERNAL_CALL_CHECK_4_UPDATES,Boolean.toString(true));
         }
@@ -223,6 +252,11 @@ public class MenuActivityComponent extends ActivityComponent {
         }
 
         return false;
+    }
+
+    private void logEvent(String item) {
+        Answers.getInstance().logCustom(
+                new CustomEvent("Menu Item: " + item + " selected"));
     }
 
     private void requestStoragePermission(int requestAction) {
@@ -262,10 +296,18 @@ public class MenuActivityComponent extends ActivityComponent {
                     VideoUploadSelectionDialog.show(menuActivity);
                     break;
                 case BaseActivity.PERMISSION_REQUEST_LOCATION:
-                    EventMapActivity.startActivity(menuActivity);
+                    EventsActivity.startActivity(menuActivity);
                     break;
                 default:
                     break;
+            }
+        } else {
+            switch (requestCode) {
+                case BaseActivity.PERMISSION_REQUEST_LOCATION:
+                    EventsActivity.startActivity(menuActivity);
+                    break;
+                default:
+                    return;
             }
         }
     }

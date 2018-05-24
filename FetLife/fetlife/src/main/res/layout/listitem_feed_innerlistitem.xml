@@ -79,6 +79,5 @@
             android:singleLine="true"
             android:ellipsize="marquee"/>
 
-
     </RelativeLayout>
 </FrameLayout>

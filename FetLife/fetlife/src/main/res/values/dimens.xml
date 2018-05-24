@@ -25,7 +25,9 @@
     <dimen name="listitem_background_margin">16dp</dimen>
 
     <dimen name="listitem_horizontal_margin">8dp</dimen>
-    <dimen name="listitem_vertical_margin">4dp</dimen>
+    <dimen name="listitem_vertical_margin">6dp</dimen>
+
+    <dimen name="message_extended_horizontal_margin">80dp</dimen>
 
     <dimen name="listitem_height">84dp</dimen>
     <dimen name="listitem_header_height">21dp</dimen>

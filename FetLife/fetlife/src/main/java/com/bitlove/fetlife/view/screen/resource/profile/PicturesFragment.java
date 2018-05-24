@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
@@ -16,8 +15,9 @@ import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.UrlUtil;
 import com.bitlove.fetlife.view.adapter.PicturesRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class PicturesFragment extends ProfileFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
+public class PicturesFragment extends LoadFragment implements PicturesRecyclerAdapter.OnPictureClickListener {
 
     private static final int PICTURE_GRID_COLUMN_COUNT = 3;
     public static int PAGE_COUNT = 24;
@@ -25,7 +25,7 @@ public class PicturesFragment extends ProfileFragment implements PicturesRecycle
     public static PicturesFragment newInstance(String memberId) {
         PicturesFragment picturesFragment = new PicturesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
+        args.putString(ARG_REFERENCE_ID, memberId);
         picturesFragment.setArguments(args);
         return picturesFragment;
     }
@@ -33,11 +33,11 @@ public class PicturesFragment extends ProfileFragment implements PicturesRecycle
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getFetLifeApplication(), PICTURE_GRID_COLUMN_COUNT);
         recyclerView.setLayoutManager(recyclerLayoutManager);
-        PicturesRecyclerAdapter adapter = new PicturesRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID),this,getFetLifeApplication());
+        PicturesRecyclerAdapter adapter = new PicturesRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID),this,getFetLifeApplication());
         recyclerView.setAdapter(adapter);
         return view;
     }
@@ -59,9 +59,13 @@ public class PicturesFragment extends ProfileFragment implements PicturesRecycle
         }
     }
 
-
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
+    @Override
+    public void onShareItem(Picture picture, String url) {
+        if (picture.isOnShareList()) {
+            Picture.unsharePicture(picture);
+        } else {
+            Picture.sharePicture(picture);
+        }
     }
 
     @Override

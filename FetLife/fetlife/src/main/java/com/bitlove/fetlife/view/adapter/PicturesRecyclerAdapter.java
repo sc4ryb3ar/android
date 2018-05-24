@@ -1,8 +1,10 @@
 package com.bitlove.fetlife.view.adapter;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.PictureReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
+import com.bitlove.fetlife.util.ServerIdUtil;
 import com.bitlove.fetlife.util.ViewUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -32,7 +35,7 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
 
     private final FetLifeApplication fetLifeApplication;
 
-    private final String memberId;
+    private String memberId;
     private List<Picture> itemList;
     private ArrayList<String> displayLinks;
     private OnPictureClickListener onPictureClickListener;
@@ -58,6 +61,13 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
+            if (ServerIdUtil.isServerId(memberId)) {
+                if (ServerIdUtil.containsServerId(memberId)) {
+                    memberId = ServerIdUtil.getLocalId(memberId);
+                } else {
+                    return;
+                }
+            }
             List<PictureReference> pictureReferences = new Select().from(PictureReference.class).where(PictureReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(PictureReference_Table.date).descending()).queryList();
             List<String> pictureIds = new ArrayList<>();
             for (PictureReference pictureReference : pictureReferences) {
@@ -111,6 +121,15 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
     }
 
     private void setOverlayContent(View overlay, final Picture picture, final OnPictureClickListener onItemClickListener) {
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                picture.setLastViewedAt(System.currentTimeMillis());
+                picture.save();
+            }
+        });
+
         TextView imageDescription = (TextView) overlay.findViewById(R.id.feedImageOverlayDescription);
         TextView imageMeta = (TextView) overlay.findViewById(R.id.feedImageOverlayMeta);
         TextView imageName = (TextView) overlay.findViewById(R.id.feedImageOverlayName);
@@ -129,6 +148,7 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
                 imageLove.setImageResource(newIsLoved ? R.drawable.ic_loved : R.drawable.ic_love);
                 Picture.startLoveCallWithObserver(fetLifeApplication, picture, newIsLoved);
                 picture.setLovedByMe(newIsLoved);
+                picture.save();
             }
         });
 
@@ -140,6 +160,18 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
                 onItemClickListener.onVisitItem(picture, picture.getUrl());
             }
         });
+
+        ImageView imageShare = overlay.findViewById(R.id.feedImageShare);
+        imageShare.setColorFilter(picture.isOnShareList() ? overlay.getContext().getResources().getColor(R.color.text_color_primary) : overlay.getContext().getResources().getColor(R.color.text_color_secondary));
+        ViewUtil.increaseTouchArea(imageShare,OVERLAY_HITREC_PADDING);
+        imageShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onShareItem(picture, picture.getUrl());
+                ((ImageView)v).setColorFilter(picture.isOnShareList() ? v.getContext().getResources().getColor(R.color.text_color_primary) : v.getContext().getResources().getColor(R.color.text_color_secondary));
+            }
+        });
+
 
         imageName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,6 +191,7 @@ public class PicturesRecyclerAdapter extends RecyclerView.Adapter<PictureViewHol
     }
 
     public interface OnPictureClickListener {
+        void onShareItem(Picture picture, String url);
         void onVisitItem(Picture picture, String url);
         void onMemberClick(Member member);
     }

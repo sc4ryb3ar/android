@@ -1,7 +1,9 @@
 package com.bitlove.fetlife.view.screen.resource.profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -26,8 +28,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.FriendRequest;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.util.ViewUtil;
-import com.bitlove.fetlife.view.dialog.ProfileConfirmationDialog;
-import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.dialog.ConfirmationDialog;
 import com.bitlove.fetlife.view.screen.resource.FriendRequestsActivity;
 import com.bitlove.fetlife.view.screen.resource.MessagesActivity;
 import com.bitlove.fetlife.view.screen.resource.ResourceActivity;
@@ -44,6 +45,9 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
     private static final String EXTRA_MEMBERID = "EXTRA_MEMBERID";
 
+    private static final int PAGE_NUMBER_PICTURES = 4;
+    private static final String MENMTION_PREFEIX = "@";
+
     private ViewPager viewPager;
     private TextView nickNameView,metaView;
     private SimpleDraweeView avatarView,imageHeaderView,toolbarHeaderView;
@@ -51,11 +55,14 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     private TextView friendIconTextView,followIconTextView,messageIconTextView;
     private String memberId;
 
-    public static void startActivity(BaseActivity baseActivity, String memberId) {
-        Intent intent = new Intent(baseActivity, ProfileActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+    public static void startActivity(Context context, String memberId) {
+        if (context == null) {
+            return;
+        }
+        Intent intent = new Intent(context, ProfileActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION|Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(EXTRA_MEMBERID,memberId);
-        baseActivity.startActivity(intent);
+        context.startActivity(intent);
     }
 
     @Override
@@ -68,8 +75,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
-        Member member = Member.loadMember(memberId);
+        Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        memberId = member != null ? member.getId() : getIntent().getStringExtra(EXTRA_MEMBERID);
 
         nickNameView = (TextView) findViewById(R.id.profile_nickname);
         metaView = (TextView) findViewById(R.id.profile_meta);
@@ -99,15 +106,21 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         return StatusesFragment.newInstance(memberId);
                     case 3:
                         return ActivityFeedFragment.newInstance(memberId);
-                    case 4:
+                    case PAGE_NUMBER_PICTURES:
                         return PicturesFragment.newInstance(memberId);
                     case 5:
                         return VideosFragment.newInstance(memberId);
                     case 6:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
+                        return WritingsFragment.newInstance(memberId);
                     case 7:
-                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                        return EventsFragment.newInstance(memberId);
                     case 8:
+                        return GroupsFragment.newInstance(memberId);
+                    case 9:
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FRIEND);
+                    case 10:
+                        return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWING);
+                    case 11:
                         return RelationsFragment.newInstance(memberId,RelationReference.VALUE_RELATIONTYPE_FOLLOWER);
                     default:
                         return null;
@@ -116,7 +129,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 
             @Override
             public int getCount() {
-                return 9;
+                return 12;
             }
 
             @Override
@@ -130,15 +143,21 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                         return getString(R.string.title_fragment_profile_statuses);
                     case 3:
                         return getString(R.string.title_fragment_profile_feed);
-                    case 4:
+                    case PAGE_NUMBER_PICTURES:
                         return getString(R.string.title_fragment_profile_pictures);
                     case 5:
                         return getString(R.string.title_fragment_profile_videos);
                     case 6:
-                        return getString(R.string.title_fragment_profile_friends);
+                        return getString(R.string.title_fragment_profile_writings);
                     case 7:
-                        return getString(R.string.title_fragment_profile_following);
+                        return getString(R.string.title_fragment_profile_events);
                     case 8:
+                        return getString(R.string.title_fragment_profile_groups);
+                    case 9:
+                        return getString(R.string.title_fragment_profile_friends);
+                    case 10:
+                        return getString(R.string.title_fragment_profile_following);
+                    case 11:
                         return getString(R.string.title_fragment_profile_followers);
                     default:
                         return null;
@@ -152,10 +171,20 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         appBarLayout.addOnOffsetChangedListener(this);
     }
 
-    private void setMemberDetails(Member member) {
+    private void setMemberDetails(final Member member) {
         if (member == null) {
             Crashlytics.logException(new Exception("Member is null"));
         }
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (member != null) {
+                    member.setLastViewedAt(System.currentTimeMillis());
+                    member.mergeSave();
+                }
+            }
+        });
 
         Member currentUser = getFetLifeApplication().getUserSessionManager().getCurrentUser();
         boolean sameUser = member != null && currentUser != null && member.getId().equals(currentUser.getId());
@@ -165,6 +194,12 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         metaView.setText(member != null ? member.getMetaInfo() : "");
         avatarView.setImageURI(member != null ? member.getAvatarLink() : "");
         imageHeaderView.setImageURI(member != null ? member.getAvatarLink() : "");
+        imageHeaderView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(PAGE_NUMBER_PICTURES);
+            }
+        });
         toolbarHeaderView.setImageURI(member != null ? member.getAvatarLink() : "");
         toolbarHeaderView.setTag(member != null ? member.getAvatarLink() : "");
 
@@ -195,8 +230,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFriend();
             }
         });
-        friendIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
-        friendIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        friendIconView.setVisibility(sameUser || member == null || !member.isDetailRetrieved() ? View.INVISIBLE : View.VISIBLE);
+        friendIconTextView.setVisibility(sameUser || member == null || !member.isDetailRetrieved()? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(friendIconView,PROFILE_MENU_HITREC_PADDING);
         followIconView.setImageResource(isFollowedByMe(member) ? R.drawable.ic_following : R.drawable.ic_follow);
         followIconView.setOnClickListener(new View.OnClickListener() {
@@ -205,8 +240,8 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 onMenuIconFollow();
             }
         });
-        followIconView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
-        followIconTextView.setVisibility(sameUser ? View.INVISIBLE : View.VISIBLE);
+        followIconView.setVisibility(sameUser || member == null || !member.isDetailRetrieved() || !member.isFollowable() ? View.INVISIBLE : View.VISIBLE);
+        followIconTextView.setVisibility(sameUser || member == null || !member.isDetailRetrieved() || !member.isFollowable() ? View.INVISIBLE : View.VISIBLE);
         ViewUtil.increaseTouchArea(followIconView,PROFILE_MENU_HITREC_PADDING);
         messageIconView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,9 +288,10 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void callFinished(ServiceCallFinishedEvent serviceCallFinishedEvent) {
         if (serviceCallFinishedEvent.getServiceCallAction().equals(FetLifeApiIntentService.ACTION_APICALL_MEMBER)) {
-            final String memberId = getIntent().getStringExtra(EXTRA_MEMBERID);
             Member member = Member.loadMember(memberId);
-            setMemberDetails(member);
+            if (member != null) {
+                setMemberDetails(member);
+            }
         }
         if (isRelatedCall(serviceCallFinishedEvent.getServiceCallAction(),serviceCallFinishedEvent.getParams()) && !isRelatedCall(FetLifeApiIntentService.getActionInProgress(),FetLifeApiIntentService.getInProgressActionParams())) {
             dismissProgress();
@@ -294,18 +330,24 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
         if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS.equals(serviceCallAction)) {
             return true;
         }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_EVENTS.equals(serviceCallAction)) {
+            return true;
+        }
+        if (FetLifeApiIntentService.ACTION_APICALL_MEMBER_GROUPS.equals(serviceCallAction)) {
+            return true;
+        }
         return false;
     }
 
     private void onMenuIconMessage() {
-        Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        Member member = Member.loadMember(memberId);
         if (member != null) {
             MessagesActivity.startActivity(this, Conversation.createLocalConversation(member), member.getNickname(), member.getAvatarLink(), false);
         }
     }
 
     private void onMenuIconView() {
-        Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        Member member = Member.loadMember(memberId);
         if (member != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(member.getLink()));
@@ -314,25 +356,25 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     }
 
     private void onMenuIconFriend() {
-        final Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        final Member member = Member.loadMember(memberId);
         final String currentRelation = member.getRelationWithMe() != null ? member.getRelationWithMe() : "";
         switch (currentRelation) {
             case Member.VALUE_FRIEND:
             case Member.VALUE_FRIEND_WITHOUT_FOLLOWING:
-                ProfileConfirmationDialog profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendship),getString(R.string.message_dialog_cancel_friendship));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                ConfirmationDialog profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendship),getString(R.string.message_dialog_cancel_friendship));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_CANCEL_FRIENDSHIP,member.getId());
                         member.setRelationWithMe(null);
-                        member.save();
+                        member.mergeSave();
                         setMemberDetails(member);
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -340,20 +382,20 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT:
             case Member.VALUE_FRIEND_REQUEST_SENT:
-                 profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendrequest),getString(R.string.message_dialog_cancel_friendrequest));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                 profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_cancel_friendrequest),getString(R.string.message_dialog_cancel_friendrequest));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_CANCEL_FRIENDREQUEST,member.getId());
                         member.setRelationWithMe(currentRelation.equals(Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT) ? Member.VALUE_FOLLOWING : null);
-                        member.save();
+                        member.mergeSave();
                         setMemberDetails(member);
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -361,43 +403,44 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                 break;
             case Member.VALUE_FOLLOWING_FRIEND_REQUEST_PENDING:
             case Member.VALUE_FRIEND_REQUEST_PENDING:
-                profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_approve_friendrequest),getString(R.string.message_dialog_approve_friendrequest));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_approve_friendrequest),getString(R.string.message_dialog_approve_friendrequest));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FriendRequestsActivity.startActivity(ProfileActivity.this,false);
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
                 profileConfirmationDialog.show(getFragmentManager());
                 break;
             default:
-                profileConfirmationDialog = ProfileConfirmationDialog.newInstance(getString(R.string.title_dialog_send_friendrequest),getString(R.string.message_dialog_send_friendrequest));
-                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog = ConfirmationDialog.newInstance(getString(R.string.title_dialog_send_friendrequest),getString(R.string.message_dialog_send_friendrequest));
+                profileConfirmationDialog.setRightButton(getString(R.string.button_dialog_yes), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         FriendRequest friendRequest = new FriendRequest();
+                        friendRequest.setClientId(member.getId());
                         friendRequest.setTargetMemberId(member.getId());
                         friendRequest.setPendingState(FriendRequest.PendingState.OUTGOING);
                         friendRequest.setPending(true);
                         friendRequest.save();
                         FetLifeApiIntentService.startApiCall(ProfileActivity.this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
                         member.setRelationWithMe(isFollowedByMe(member) ? Member.VALUE_FOLLOWING_FRIEND_REQUEST_SENT : Member.VALUE_FRIEND_REQUEST_SENT);
-                        member.save();
+                        member.mergeSave();
                         setMemberDetails(member);
                         showToast(getString(R.string.message_friend_request_sent,member.getNickname()));
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
-                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ProfileConfirmationDialog.OnClickListener(){
+                profileConfirmationDialog.setLeftButton(getString(R.string.button_dialog_no), new ConfirmationDialog.OnClickListener(){
                     @Override
-                    public void onClick(ProfileConfirmationDialog profileConfirmationDialog) {
+                    public void onClick(ConfirmationDialog profileConfirmationDialog) {
                         profileConfirmationDialog.dismissAllowingStateLoss();
                     }
                 });
@@ -407,7 +450,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
     }
 
     private void onMenuIconFollow() {
-        Member member = Member.loadMember(getIntent().getStringExtra(EXTRA_MEMBERID));
+        Member member = Member.loadMember(memberId);
         if (member != null && !isFollowedByMe(member) && member.isFollowable()) {
             FollowRequest followRequest = new FollowRequest();
             followRequest.setMemberId(member.getId());
@@ -427,7 +470,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     member.setRelationWithMe(Member.VALUE_FOLLOWING);
                     break;
             }
-            member.save();
+            member.mergeSave();
             setMemberDetails(member);
             FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
             showToast(getString(R.string.message_follow_set,member.getNickname()));
@@ -451,7 +494,7 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
                     member.setRelationWithMe(Member.VALUE_FRIEND_WITHOUT_FOLLOWING);
                     break;
             }
-            member.save();
+            member.mergeSave();
             setMemberDetails(member);
             FetLifeApiIntentService.startApiCall(this,FetLifeApiIntentService.ACTION_APICALL_PENDING_RELATIONS);
             showToast(getString(R.string.message_unfollow_set,member.getNickname()));
@@ -475,12 +518,12 @@ public class ProfileActivity extends ResourceActivity implements AppBarLayout.On
 //    private void refresh(String memberId) {
 //        showProgress();
 //        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER, memberId);
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(ProfileFragment.PAGE_COUNT), "1");
-//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.PAGE_COUNT), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_STATUSES, memberId, Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_PICTURES, memberId, Integer.toString(PicturesFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FRIEND), Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWER), Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_RELATIONS, memberId, Integer.toString(RelationReference.VALUE_RELATIONTYPE_FOLLOWING), Integer.toString(LoadFragment.ITEM_PER_PAGE), "1");
+//        FetLifeApiIntentService.startApiCall(this, FetLifeApiIntentService.ACTION_APICALL_MEMBER_VIDEOS, memberId, Integer.toString(VideosFragment.ITEM_PER_PAGE), "1");
 //    }
 
     @Override

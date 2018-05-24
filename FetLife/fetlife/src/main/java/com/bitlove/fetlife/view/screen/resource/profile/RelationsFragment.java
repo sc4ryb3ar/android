@@ -8,21 +8,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.adapter.RelationsRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class RelationsFragment extends ProfileFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
+public class RelationsFragment extends LoadFragment implements ResourceListRecyclerAdapter.OnResourceClickListener<Member> {
 
     public static RelationsFragment newInstance(String memberId, int relationType) {
         RelationsFragment friendsFragment = new RelationsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_MEMBER_ID, memberId);
-        args.putInt(ARG_RELATION_TYPE, relationType);
+        args.putString(ARG_REFERENCE_ID, memberId);
+        args.putInt(ARG_REFERENCE_TYPE, relationType);
         friendsFragment.setArguments(args);
         return friendsFragment;
     }
@@ -30,12 +30,12 @@ public class RelationsFragment extends ProfileFragment implements ResourceListRe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile_recycler,container,false);
+        View view = inflater.inflate(R.layout.fragment_recycler,container,false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getFetLifeApplication());
         recyclerView.setLayoutManager(recyclerLayoutManager);
         //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        RelationsRecyclerAdapter adapter = new RelationsRecyclerAdapter(getArguments().getString(ARG_MEMBER_ID), getArguments().getInt(ARG_RELATION_TYPE),getFetLifeApplication());
+        RelationsRecyclerAdapter adapter = new RelationsRecyclerAdapter(getArguments().getString(ARG_REFERENCE_ID), getArguments().getInt(ARG_REFERENCE_TYPE),getFetLifeApplication());
         adapter.setOnItemClickListener(this);
         adapter.setUseSwipe(false);
         recyclerView.setAdapter(adapter);
@@ -52,10 +52,6 @@ public class RelationsFragment extends ProfileFragment implements ResourceListRe
             RelationsRecyclerAdapter recyclerViewAdapter = (RelationsRecyclerAdapter) recyclerView.getAdapter();
             recyclerViewAdapter.refresh();
         }
-    }
-
-    private FetLifeApplication getFetLifeApplication() {
-        return (FetLifeApplication) getActivity().getApplication();
     }
 
     @Override

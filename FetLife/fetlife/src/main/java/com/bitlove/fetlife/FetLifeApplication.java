@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 import android.util.Base64;
 import android.widget.Toast;
@@ -82,6 +83,11 @@ public class FetLifeApplication extends MultiDexApplication {
 
     private static FetLifeApplication instance;
 
+    private String lastToastMessage;
+    private long lastToastTime;
+
+    private static final long MIN_TOAST_TRASHOLD = 5*1000l;
+
     public static FetLifeApplication getInstance() {
         return instance;
     }
@@ -112,6 +118,10 @@ public class FetLifeApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //See: https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
 //        if (BuildConfig.DEBUG) {
 //            Debug.waitForDebugger();
@@ -226,6 +236,7 @@ public class FetLifeApplication extends MultiDexApplication {
         Fresco.initialize(this, imagePipelineConfig);
     }
 
+
     static class FrescoTokenLessCacheKey implements CacheKey {
 
         final String cacheUrl;
@@ -288,6 +299,11 @@ public class FetLifeApplication extends MultiDexApplication {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
+                if (text.equals(lastToastMessage) && System.currentTimeMillis() - lastToastTime < MIN_TOAST_TRASHOLD) {
+                    return;
+                }
+                lastToastMessage = text;
+                lastToastTime = System.currentTimeMillis();
                 Toast.makeText(FetLifeApplication.this, text, length).show();
             }
         });

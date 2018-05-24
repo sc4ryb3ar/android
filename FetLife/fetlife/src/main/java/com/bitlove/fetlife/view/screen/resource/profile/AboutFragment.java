@@ -10,10 +10,11 @@ import android.widget.TextView;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
-public class AboutFragment extends ProfileFragment {
+public class AboutFragment extends LoadFragment {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
+    private static final String ARG_MEMBER_ID = "ARG_REFERENCE_ID";
     private TextView aboutTextView;
 
     public static AboutFragment newInstance(String memberId) {

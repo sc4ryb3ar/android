@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.bitlove.fetlife.view.screen.resource.EventActivityBak">
+    <item
+        android:id="@+id/action_unfollow"
+        android:orderInCategory="100"
+        android:title="@string/menu_discussion_unfollow"
+        app:showAsAction="never"/>
+
+</menu>

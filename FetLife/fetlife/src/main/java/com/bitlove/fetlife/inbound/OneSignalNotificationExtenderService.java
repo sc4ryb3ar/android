@@ -10,6 +10,8 @@ import com.bitlove.fetlife.notification.NotificationParser;
 import com.bitlove.fetlife.notification.OneSignalNotification;
 import com.bitlove.fetlife.util.AppUtil;
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationDisplayedResult;
 import com.onesignal.OSNotificationReceivedResult;
@@ -36,6 +38,28 @@ public class OneSignalNotificationExtenderService extends NotificationExtenderSe
 
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult notification) {
+
+        try {
+            long clientTime = System.currentTimeMillis();
+            double serverTimeDouble = notification.payload.additionalData.getDouble("sent_at");
+            long serverTime = (long)(serverTimeDouble*1000);
+            String type = notification.payload.additionalData.getString("type");
+            long googleTime = new JSONObject(notification.payload.rawPayload).getLong("google.sent_time");
+            long time2Google = googleTime-serverTime;
+            long time2Client = clientTime-googleTime;
+            long totalTime = clientTime-serverTime;
+
+            Answers.getInstance().logCustom(
+                    new CustomEvent("CloudMessageReceived")
+                            .putCustomAttribute("notificationId",notification.payload.notificationID)
+                            .putCustomAttribute("type",type)
+                            .putCustomAttribute("time2Google",time2Google)
+                            .putCustomAttribute("time2Client",time2Client)
+                            .putCustomAttribute("totalTime",totalTime));
+
+        } catch (Throwable t) {
+            Crashlytics.logException(t);
+        }
 
         FetLifeApplication fetLifeApplication = getFetLifeApplication();
 

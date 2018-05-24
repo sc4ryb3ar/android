@@ -18,6 +18,10 @@ public class VersionUtil {
 
     public static boolean toBeNotified(BaseActivity baseActivity, Release release, boolean forcedCheck) {
 
+        if (release == null) {
+            return false;
+        }
+
         String releaseVersion = release.getTag();
 
         int version = getVersionInt(releaseVersion);
@@ -33,12 +37,11 @@ public class VersionUtil {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(baseActivity.getApplication());
 
         if (releaseVersion.equals(sharedPreferences.getString(release.isPrerelease() ? PREF_NOTIFIED_LATEST_PRERELEASE : PREF_NOTIFIED_LATEST_RELEASE, null))) {
-            return false;
+            return forcedCheck;
         }
         sharedPreferences.edit().putString(release.isPrerelease() ? PREF_NOTIFIED_LATEST_PRERELEASE : PREF_NOTIFIED_LATEST_RELEASE, releaseVersion).apply();
 
         return true;
-
     }
 
     private static boolean notifyAboutPrereleases(BaseActivity baseActivity) {

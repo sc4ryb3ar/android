@@ -17,14 +17,17 @@ import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Relationship;
 import com.bitlove.fetlife.model.service.FetLifeApiIntentService;
 import com.bitlove.fetlife.view.screen.BaseActivity;
+import com.bitlove.fetlife.view.screen.resource.LoadFragment;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BasicInfoFragment extends ProfileFragment {
+public class BasicInfoFragment extends LoadFragment {
 
-    private static final String ARG_MEMBER_ID = "ARG_MEMBER_ID";
+    private static final String ARG_MEMBER_ID = "ARG_REFERENCE_ID";
+    private static final String LOCATION_SEPARATOR = ", ";
+
     private View locationRowView, relationshipRowView, orientationRowView, lookingForRowView;
     private TextView locationTextView, relationshipTextView, orientationTextView, lookingForTextView;
 
@@ -48,15 +51,18 @@ public class BasicInfoFragment extends ProfileFragment {
         String city = member.getCity();
         String administrativeArea = member.getAdministrativeArea();
 
-        String location = null;
+        String location = "";
         if (country != null) {
-            if (city != null || administrativeArea != null) {
-                location = getString(R.string.text_profile_location,member.getCountry(),member.getCity() != null ? member.getCity() : member.getAdministrativeArea());
-            } else {
-                location = country;
-            }
-        } else if (city != null || administrativeArea != null) {
-            location = city != null ? city : administrativeArea;
+            location = country;
+        }
+        if (administrativeArea != null) {
+            location = administrativeArea + LOCATION_SEPARATOR + location;
+        }
+        if (city != null) {
+            location = city + LOCATION_SEPARATOR + location;
+        }
+        if ("".equals(location)) {
+            location = null;
         }
 
         locationRowView.setVisibility(location != null ? View.VISIBLE : View.GONE);

@@ -2,7 +2,7 @@
 
     <!-- *** Technical values *** -->
 
-    <string name="google_app_id" translatable="false">latex-fetish-123456</string>
+    <!--<string name="google_app_id" translatable="false">latex-fetish-123456</string>-->
 
     <string name="message_sub_separator" translatable="false">" \@ "</string>
 
@@ -22,7 +22,135 @@
             If you find a bug please start by reading through the current list of open issues and if you can\'t find anything about your bug please submit a new bug at our GitHub page:
             <br/>https://github.com/fetlife/android/issues
 
+            <p><b><br/>Need help or want to know more?</b></p>
+
+            Visit our GitHub page to access Trouble Shooting Guide, get more information about current and upcoming releases and many more:
+            <br/>https://github.com/fetlife/android/
+
             <p><b><br/>Version History</b></p>
+
+            <p/>v2.15.0<br/>
+                    <ul>
+                        <li>Smaller bug fixes</li>
+                    </ul>
+
+            <p/>v2.14.7<br/>
+                    <ul>
+                        <li>Fix for Video upload description issue</li>
+                        <li>Improvement in opening Stacked group comment notifications</li>
+                    </ul>
+
+            <p/>v2.14.5<br/>
+                    <ul>
+                        <li>Added new video events to Explore section feeds</li>
+                        <li>Bugfixes</li>
+                    </ul>
+
+            <p/>v2.14.3<br/>
+                    <ul>
+                        <li>Fresh &amp; Pervy</li>
+                    </ul>
+
+            <p/>v2.13.5<br/>
+                    <ul>
+                        <li>Kinky &amp; Popular</li>
+                    </ul>
+
+            <p/>v2.13.2<br/>
+                    <ul>
+                        <li>Stuff you Love</li>
+                    </ul>
+
+            <p/>v2.13.0<br/>
+                    <ul>
+                        <li>Writings</li>
+                    </ul>
+
+            <p/>v2.12.21<br/>
+                    <ul>
+                        <li>Download support for updates</li>
+                        <li>List of Members Groups</li>
+                        <li>List of Group Members</li>
+                        <li>Groups related fixes</li>
+                    </ul>
+
+            <p/>v2.12.19<br/>
+                    <ul>
+                        <li>Join / leave group</li>
+                        <li>Follow / unfollow group discussion</li>
+                    </ul>
+
+            <p/>v2.12.0<br/>
+                    <ul>
+                        <li>Mention links in messages lead to user profiles</li>
+                        <li>Auto extend helper for mentions after using @ character</li>
+                        <li>Add pictures to your share list with the share icon on picture overlay</li>
+                        <li>Share pictures from your share list or recently viewed pictures in conversations or group discussions</li>
+                    </ul>
+
+            <p/>v2.11.16<br/>
+                    <ul>
+                        <li>Removed preview flag</li>
+                    </ul>
+
+            <p/>v2.11.15<br/>
+                    <ul>
+                        <li>Crash fixes</li>
+                    </ul>
+
+            <p/>v2.11.14<br/>
+                    <ul>
+                        <li>Groups</li>
+                        <li>App Download Page</li>
+                    </ul>
+
+            <p/>v2.10.3<br/>
+                    <ul>
+                        <li>Support</li>
+                        <li>Ads</li>
+                        <li>Kinktionary</li>
+                    </ul>
+
+            <p/>v2.10.0<br/>
+                    <ul>
+                        <li>Important security update</li>
+                    </ul>
+
+            <p/>v2.9.12<br/>
+                    <ul>
+                        <li>Crash fix</li>
+                        <li>Support for install on SD card</li>
+                        <li>Fix for stuck message about connection issues</li>
+                        <li>Directly opening conversation from notification</li>
+                        <li>Check for update fix</li>
+                    </ul>
+
+            <p/>v2.9.11<br/>
+                    <ul>
+                        <li>Hot fix for resending rejected friend requests</li>
+                        <li>Small Profile Screen improvement</li>
+                        <li>Fix for Profile Screen refresh after relationship change</li>
+                        <li>Several crash fixes</li>
+                    </ul>
+
+            <p/>v2.9.7<br/>
+                    <ul>
+                        <li>List of My Events</li>
+                        <li>Search Events by Tag</li>
+                    </ul>
+
+            <p/>v2.9.5<br/>
+                    <ul>
+                        <li>Frequent Login issue fix</li>
+                        <li>List Members set RSVP to an event</li>
+                        <li>Set RSVP for an Event from Event Detail Screen</li>
+                    </ul>
+
+            <p/>v2.9.2<br/>
+                    <ul>
+                        <li>Event Details Screen</li>
+                        <li>Add Events to Calendar from the Event Details Screen</li>
+                    </ul>
 
             <p/>v2.9.0<br/>
                     <ul>
@@ -176,7 +304,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="menu_members">Members</string>
-    <string name="menu_about">About</string>
+    <string name="menu_about">About &amp; Install</string>
     <string name="menu_friendrequests">Friend Requests</string>
     <string name="menu_introduce">Share My Profile</string>
     <string name="menu_notifications">Notifications</string>
@@ -220,10 +348,12 @@
     <string name="settings_summary_notifications">Manage when and how to receive notifications</string>
     <string name="settings_category_notification_text">Notification Text</string>
     <string name="settings_title_notification_anonymtext">Anonymous Notifications</string>
-    <string name="settings_summary_notification_anonymtext">Hide any details in incoming notifications and use a single general notification instead</string>
+    <string name="settings_summary_notification_anonymtext">Hide all details in incoming notifications and keep them away from lock screen</string>
     <string name="settings_category_notification_enablement">Enable Notifications</string>
     <string name="settings_title_notification_messages_enabled">Message Notifications</string>
     <string name="settings_summary_notification_messages_enabled">Enable Notifications for incoming Messages</string>
+    <string name="settings_title_notification_group_messages_enabled">Group Discussion Notifications</string>
+    <string name="settings_summary_notification_group_messages_enabled">Enable Notifications for Group Discussion Comments and Mentions</string>
     <string name="settings_title_notification_friendrequests_enabled">Friend Request Notifications</string>
     <string name="settings_summary_notification_friendrequests_enabled">Enable Notifications for incoming Friend Requests</string>
     <string name="settings_title_notification_prerelease_enabled">Pre-Release Notifications</string>
@@ -288,6 +418,7 @@
     <string name="feed_title_group_joins">joined to %1$d groups</string>
     <string name="feed_title_new_picture">uploaded a new picture</string>
     <string name="feed_title_new_pictures">uploaded %1$d new pictures</string>
+    <string name="feed_title_new_videos">uploaded %1$d new videos</string>
     <string name="feed_title_like_writing">loved a writing</string>
     <string name="feed_title_like_writings">loved %1$d writings</string>
     <string name="feed_title_like_video">loved a video</string>
@@ -367,7 +498,7 @@
 
     <string name="action_log_on">Log me in</string>
     <string name="progress_logging_in">Logging you in...</string>
-    <string name="prompt_username">Username</string>
+    <string name="prompt_username">Nickname or Email</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_new_message">Your message here</string>
     <string name="action_sign_in_short">Log in</string>
@@ -430,7 +561,7 @@
     <string name="action_undo">UNDO</string>
     <string name="undo_no_longer_possible">Undo is no longer possible</string>
 
-    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'About\' screen</string>
+    <string name="snackbar_version_notification">Check out what\'s new in v%1$s at \'Release Notes\'</string>
 
     <string name="input_message_description">Your Message</string>
     <string name="button_new_conversation_discription">New Conversation</string>
@@ -438,12 +569,12 @@
     <string name="action_settings">Settings</string>
     <string name="settings_title_general">General Settings</string>
     <string name="settings_summary_general">Manage general App settings</string>
-    <string name="notification_title_new_release">New FetLife App release</string>
-    <string name="notification_toast_new_release">New FetLife App version is available</string>
-    <string name="notification_text_new_release">Download FetLife App version %1$s\nfor tha latest features and bug fixes.</string>
-    <string name="notification_title_new_prerelease">New FetLife App pre-release</string>
+    <string name="notification_title_new_release">New FetLife App - Stable Version</string>
+    <string name="notification_toast_new_release">New FetLife App Stable Version is available</string>
+    <string name="notification_text_new_release">Click to Download version %1$s</string>
+    <string name="notification_title_new_prerelease">New FetLife App - Preview Version</string>
     <string name="notification_toast_new_prerelease">New FetLife App Preview version is available</string>
-    <string name="notification_text_new_prerelease">Download FetLife App Preview version %1$s\nto test upcoming features.</string>
+    <string name="notification_text_new_prerelease">Click to download version %1$s\n</string>
     <string name="message_friend_request_sent">Friend Request has been sent to %1$s</string>
     <string name="message_follow_set">You are following %1$s</string>
     <string name="message_unfollow_set">You are no longer following %1$s</string>
@@ -452,7 +583,7 @@
     <string name="menu_profile_follow">Follow</string>
     <string name="menu_profile_message">Message</string>
     <string name="menu_profile_view">View</string>
-    <string name="menu_eventmap">Event Map</string>
+    <string name="menu_events">Events</string>
 
     <string name="text_profile_location">%2$s, %1$s</string>
     <string name="text_profile_header_location">Location:</string>
@@ -467,6 +598,8 @@
     <string name="title_fragment_profile_friends">Friends</string>
     <string name="title_fragment_profile_following">Following</string>
     <string name="title_fragment_profile_followers">Followers</string>
+    <string name="title_fragment_profile_events">Events</string>
+
     <string name="text_profile_lookingfor_ltr">A lifetime relationship</string>
     <string name="text_profile_lookingfor_relationship">A relationship</string>
     <string name="text_profile_lookingfor_teacher">A mentor/teacher</string>
@@ -641,8 +774,12 @@
     <string name="title_fragment_member_serach">Search</string>
     <string name="noification_title_new_message">New private message</string>
     <string name="noification_title_new_messages">%1$d new private messages</string>
+    <string name="noification_title_new_group_message">New group comment</string>
+    <string name="noification_title_new_group_messages">%1$d new group comments</string>
     <string name="noification_text_new_message">New message from %1$s</string>
     <string name="noification_text_new_messages">%1$d messages from %2$s</string>
+    <string name="noification_text_new_group_message">New comment in %1$s</string>
+    <string name="noification_text_new_group_messages">%1$d comments in %2$s</string>
     <string name="noification_title_new_friendrequest">New Friend Request</string>
     <string name="noification_title_new_friendrequests">%1$d new Friend Requests</string>
     <string name="noification_text_new_love">%1$s loved your stuff</string>
@@ -651,6 +788,84 @@
     <string name="noification_title_new_loves">You received new loves</string>
     <string name="noification_title_new_comments">You received new comments</string>
     <string name="noification_title_new_mentions">You were mentioned</string>
-    <string name="title_activity_event_map">FetLife Event Map</string>
+    <string name="title_activity_events">Events</string>
+    <string name="title_activity_event">EventActivity</string>
+
+    <string name="text_event_header_location">Location:</string>
+    <string name="text_event_header_address">Address:</string>
+    <string name="text_event_header_date">Date:</string>
+    <string name="text_event_header_dresscodes">Dresscode:</string>
+    <string name="text_event_header_cost">Cost:</string>
+
+    <string name="title_fragment_event_details">Event Details</string>
+    <string name="menu_event_going">Going</string>
+    <string name="menu_event_maybe">Maybe</string>
+    <string name="menu_event_not">Not Going</string>
+    <string name="menu_event_view">View</string>
+    <string name="menu_event_calendar">Add to Calendar</string>
+    <string name="menu_event_show_on_map">Show on Map</string>
+    <string name="title_fragment_event_rsvp_going">Going</string>
+    <string name="title_fragment_event_rsvp_maybe">Maybe Going</string>
+    <string name="title_fragment_event_map">Event Map</string>
+    <string name="title_fragment_event_myevents">My Events</string>
+    <string name="title_fragment_event_search">Search</string>
+    <string name="text_group_member_count">%1$d member</string>
+    <string name="text_group_members_count">%1$d members</string>
+    <string name="menu_group_view">View</string>
+    <string name="menu_group_member_join">Join</string>
+    <string name="menu_group_member_leave">Leave</string>
+    <string name="title_fragment_group_description">Description</string>
+    <string name="title_fragment_group_rules">Rules</string>
+    <string name="title_activity_group">Group</string>
+    <string name="title_fragment_groups">Groups</string>
+    <string name="title_fragment_group_serach">Search</string>
+    <string name="menu_groups">Groups</string>
+    <string name="title_activity_groups">Groups</string>
+    <string name="menu_support">Support FetLife</string>
+    <string name="menu_glossary">Kinktionary</string>
+    <string name="menu_ads">Advertise on FetLife</string>
+    <string name="title_activity_webview">FetLife</string>
+    <string name="title_activity_search">Search</string>
+    <string name="title_activity_support">Support FetLife</string>
+    <string name="title_activity_ads">Advertise on FetLife</string>
+    <string name="title_activity_glossary">Kinktionary</string>
+    <string name="title_fragment_group_discussions">Discussions</string>
+    <string name="title_fragment_group_members">Members</string>
+    <string name="action_share">Share</string>
+    <string name="menu_relnotes">Release Notes</string>
+    <string name="title_activity_relnotes">Release Notes</string>
+    <string name="list_header_picture_suggest">Recently Viewed</string>
+    <string name="list_header_picture_sharelist">Share List</string>
+    <string name="title_activity_pictureshare">Select Pictures</string>
+    <string name="message_picture_shared">Picture added to your share list</string>
+    <string name="menu_discussion_follow">Follow</string>
+    <string name="menu_discussion_unfollow">Unfollow</string>
+    <string name="title_dialog_join_group">Join Group</string>
+    <string name="message_dialog_join_group">Did you read the description and do you agree with the rules of this group?</string>
+    <string name="title_dialog_leave_group">Leave Group</string>
+    <string name="message_dialog_leave_group">Please confirm you want to leave this group</string>
+    <string name="message_discussion_followed">You are following the discussion</string>
+    <string name="message_discussion_unfollowed">You are no longer following the discussion</string>
+    <string name="title_fragment_profile_groups">Groups</string>
+    <string name="notification_description_apk_download">Downloading new FetLife App version</string>
+    <string name="noification_title_ready_to_install_apk">New FetLife App version is ready to install</string>
+    <string name="noification_message_ready_to_install_apk">Click to Install</string>
+    <string name="noification_title_downloading_apk">New FetLife App version is being downloaded</string>
+    <string name="noification_message_downloading_apk">In progress</string>
+    <string name="title_fragment_profile_writings">Writings</string>
+    <string name="menu_writing_love">Love</string>
+    <string name="menu_writing_view">View</string>
+    <string name="title_activity_writing">WritingActivity</string>
+    <string name="menu_writing_author">Author</string>
+    <string name="title_activity_stuff_you_love">Stuff you Love</string>
+    <string name="nav_stuff_you_love">Stuff you Love</string>
+    <string name="nav_fresh_and_pervy"><![CDATA[Fresh & Pervy]]></string>
+    <string name="nav_kinky_and_popular"><![CDATA[Kinky & Popular]]></string>
+    <string name="title_activity_kinky_and_popular"><![CDATA[Kinky & Popular]]></string>
+    <string name="title_activity_fresh_and_pervy"><![CDATA[Fresh & Pervy]]></string>
+    <string name="message_sending_not_members">Only group members can send message to a Group Conversation</string>
+    <string name="feed_title_new_video">Uploaded a new Video</string>
+    <string name="menu_search">Search</string>
+    <string name="message_member_forbidden">Sending messsage to this member is not possible, beceause either the member is inactive/deleted or one of you has blocked the other</string>
 
 </resources>

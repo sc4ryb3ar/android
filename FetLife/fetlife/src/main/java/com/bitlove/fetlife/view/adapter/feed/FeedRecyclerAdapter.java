@@ -13,31 +13,36 @@ import android.widget.TextView;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
+import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture;
 import com.bitlove.fetlife.model.pojos.fetlife.json.FeedEvent;
 import com.bitlove.fetlife.model.pojos.fetlife.json.Story;
+import com.bitlove.fetlife.util.ServerIdUtil;
 import com.bitlove.fetlife.view.adapter.ResourceListRecyclerAdapter;
 import com.bitlove.fetlife.view.adapter.SwipeableViewHolder;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
 public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, FeedViewHolder> {
 
-    private final String memberId;
+    protected String memberId;
 
     public interface OnFeedItemClickListener {
         void onMemberClick(Member member);
-        void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, Member targetMember);
+        void onFeedInnerItemClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, FeedItemResourceHelper feedItemResourceHelper);
         void onFeedImageClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember);
         void onFeedImageLongClick(Story.FeedStoryType feedStoryType, String url, FeedEvent feedEvent, Member targetMember);
+
+        void onShareItem(Object object, String url);
         void onVisitItem(Object object, String url);
     }
 
-    private final FetLifeApplication fetLifeApplication;
-    private final OnFeedItemClickListener onFeedItemClickListener;
+    protected final FetLifeApplication fetLifeApplication;
+    protected final OnFeedItemClickListener onFeedItemClickListener;
 
-    private List<Story> itemList;
+    protected List<Story> itemList;
 
     FeedAdapterBinder feedImageAdapterBinder;
     FeedNotSupportedAdapterBinder feedNotSupportedAdapterBinder;
@@ -62,9 +67,16 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
         });
     }
 
-    private void loadItems() {
+    protected void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         if (memberId != null) {
+            if (ServerIdUtil.isServerId(memberId)) {
+                if (ServerIdUtil.containsServerId(memberId)) {
+                    memberId = ServerIdUtil.getLocalId(memberId);
+                } else {
+                    return;
+                }
+            }
             itemList = fetLifeApplication.getInMemoryStorage().getProfileFeed();
         } else {
             itemList = fetLifeApplication.getInMemoryStorage().getFeed();
@@ -102,6 +114,7 @@ public class FeedRecyclerAdapter extends ResourceListRecyclerAdapter<Story, Feed
                 case RSVP_CREATED:
                 case COMMENT_CREATED:
                 case POST_CREATED:
+                case VIDEO_CREATED:
                 case PICTURE_CREATED:
                 case GROUP_COMMENT_CREATED:
                 case POST_COMMENT_CREATED:

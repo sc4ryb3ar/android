@@ -14,6 +14,7 @@ import com.bitlove.fetlife.model.pojos.fetlife.db.StatusReference_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Picture_Table;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Status_Table;
+import com.bitlove.fetlife.util.ServerIdUtil;
 import com.bitlove.fetlife.util.StringUtil;
 import com.raizlabs.android.dbflow.annotation.Collate;
 import com.raizlabs.android.dbflow.sql.language.OrderBy;
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class StatusesRecyclerAdapter extends RecyclerView.Adapter<StatusViewHolder> {
 
-    private final String memberId;
+    private String memberId;
     private List<Status> itemList;
 
     public StatusesRecyclerAdapter(String memberId) {
@@ -48,12 +49,19 @@ public class StatusesRecyclerAdapter extends RecyclerView.Adapter<StatusViewHold
     private void loadItems() {
         //TODO: think of moving to separate thread with specific DB executor
         try {
+            if (ServerIdUtil.isServerId(memberId)) {
+                if (ServerIdUtil.containsServerId(memberId)) {
+                    memberId = ServerIdUtil.getLocalId(memberId);
+                } else {
+                    return;
+                }
+            }
             List<StatusReference> statusReferences = new Select().from(StatusReference.class).where(StatusReference_Table.userId.is(memberId)).orderBy(OrderBy.fromProperty(StatusReference_Table.id).ascending().collate(Collate.NOCASE)).queryList();
             List<String> statusIds = new ArrayList<>();
             for (StatusReference statusReference : statusReferences) {
                 statusIds.add(statusReference.getId());
             }
-            itemList = new Select().from(Status.class).where(Status_Table.id.in(statusIds)).orderBy(OrderBy.fromProperty(Picture_Table.date).descending()).queryList();
+            itemList = new Select().from(Status.class).where(Status_Table.id.in(statusIds)).orderBy(OrderBy.fromProperty(Status_Table.date).descending()).queryList();
         } catch (Throwable t) {
             itemList = new ArrayList<>();
         }

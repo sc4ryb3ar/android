@@ -15,7 +15,7 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/button_round_padding"
+            android:padding="5dp"
             android:background="@drawable/button_background_circle"
             android:src="@android:drawable/ic_menu_send"
             android:layout_marginLeft="@dimen/listitem_horizontal_margin"
@@ -29,23 +29,42 @@
             android:contentDescription="@string/button_send_description"
             android:onClick="onSend"/>
 
-        <android.support.design.widget.TextInputLayout
+    <ImageView
+        android:id="@+id/picture_share_icon"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:background="@drawable/edit_background_rounded"
+        android:src="@android:drawable/ic_menu_share"
+        android:layout_marginLeft="@dimen/listitem_horizontal_margin"
+        android:layout_marginRight="2dp"
+        android:layout_marginStart="@dimen/listitem_horizontal_margin"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:contentDescription="@string/button_send_description"
+        android:onClick="onShare"/>
+
+    <android.support.design.widget.TextInputLayout
             android:id="@+id/text_input_layout"
             android:visibility="gone"
+            android:layout_toRightOf="@id/picture_share_icon"
             android:layout_toLeftOf="@id/text_send_icon"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:src="@android:drawable/ic_menu_send"
-            android:layout_marginLeft="@dimen/listitem_horizontal_margin"
-            android:layout_marginStart="@dimen/listitem_horizontal_margin"
+            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true">
 
-            <android.support.design.widget.TextInputEditText
+            <MultiAutoCompleteTextView
                 style="@style/ResourceEditText"
                 android:id="@+id/text_input"
+                android:maxLines="5"
                 android:contentDescription="@string/input_message_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,5 +85,16 @@
                 android:scrollbars="vertical"/>
 
         </android.support.v4.widget.SwipeRefreshLayout>
+
+    <ImageView
+        android:id="@+id/floating_arrow"
+        app:srcCompat="@drawable/ic_arrow_upward_black_70_24dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:visibility="gone"
+        android:tint="@color/text_color_primary_dark"
+        android:layout_margin="10dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"/>
 
 </RelativeLayout>

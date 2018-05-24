@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -12,7 +13,6 @@ import com.bitlove.fetlife.BuildConfig;
 import com.bitlove.fetlife.FetLifeApplication;
 import com.bitlove.fetlife.R;
 import com.bitlove.fetlife.model.db.FetLifeDatabase;
-import com.bitlove.fetlife.model.hack.HackFlowManager;
 import com.bitlove.fetlife.model.pojos.fetlife.dbjson.Member;
 import com.bitlove.fetlife.util.PreferenceKeys;
 import com.bitlove.fetlife.util.SecurityUtil;
@@ -59,6 +59,10 @@ public class UserSessionManager {
 
     public void init() {
 
+        if (BuildConfig.DEBUG) {
+//            Debug.waitForDebugger();
+        }
+
         applyVersionUpgrade();
 
         String lastLoggedInUserId = getLastLoggedInUserId();
@@ -75,6 +79,8 @@ public class UserSessionManager {
             setupUserSession(lastLoggedInUserId);
         } else if (keepUserSignedIn()) {
             logInUser(lastLoggedInUserId, null);
+        } else {
+            startDb();
         }
     }
 
@@ -279,7 +285,7 @@ public class UserSessionManager {
         if (BuildConfig.DEBUG) {
             Log.d("UserSession","Starting Db");
         }
-        HackFlowManager.init(fetLifeApplication);
+        FlowManager.init(fetLifeApplication);
     }
 
     private void stopDb() {
@@ -287,17 +293,19 @@ public class UserSessionManager {
             Log.d("UserSession","Stopping Db");
         }
         userDbName = null;
-        HackFlowManager.close();
+        FlowManager.reset();
+        FlowManager.init(fetLifeApplication);
     }
 
     private void loadUserDb(String userId) {
         userDbName = getUserDatabaseName(userId);
     }
 
-    private void deleteCurrentUserDb() {
+    public void deleteCurrentUserDb() {
         fetLifeApplication.deleteDatabase(getUserDatabaseName(currentUser.getId()));
         FlowManager.reset();
         FlowManager.destroy();
+        FlowManager.init(fetLifeApplication);
     }
 
     private Member loadUserRecord(String userId) {
